@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2017, Andy Janata
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification, are permitted
  * provided that the following conditions are met:
- *
+ * <p>
  * * Redistributions of source code must retain the above copyright notice, this list of conditions
- *   and the following disclaimer.
+ * and the following disclaimer.
  * * Redistributions in binary form must reproduce the above copyright notice, this list of
- *   conditions and the following disclaimer in the documentation and/or other materials provided
- *   with the distribution.
- *
+ * conditions and the following disclaimer in the documentation and/or other materials provided
+ * with the distribution.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -23,18 +23,16 @@
 
 package net.socialgamer.cah.metrics;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Singleton;
+import com.maxmind.geoip2.model.CityResponse;
 import net.socialgamer.cah.data.BlackCard;
 import net.socialgamer.cah.data.CardSet;
 import net.socialgamer.cah.data.WhiteCard;
-
 import org.apache.log4j.Logger;
 
-import com.google.inject.Singleton;
-import com.maxmind.geoip2.model.CityResponse;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,43 +43,43 @@ import com.maxmind.geoip2.model.CityResponse;
 @Singleton
 public class NoOpMetrics implements Metrics {
 
-  private static final Logger LOG = Logger.getLogger(NoOpMetrics.class);
+    private static final Logger LOG = Logger.getLogger(NoOpMetrics.class);
 
-  @Override
-  public void shutdown() {
-    // nothing to do
-  }
+    @Override
+    public void shutdown() {
+        // nothing to do
+    }
 
-  @Override
-  public void serverStart(final String startupId) {
-    LOG.trace(String.format("serverStarted(%s)", startupId));
-  }
+    @Override
+    public void serverStart(final String startupId) {
+        LOG.trace(String.format("serverStarted(%s)", startupId));
+    }
 
-  @Override
-  public void userConnect(final String persistentId, final String sessionId, final CityResponse geoIp,
-      final String agentName, final String agentType, final String agentOs,
-      final String agentLanguage) {
-    LOG.trace(String.format("newUser(%s, %s, %s, %s, %s, %s, %s)", persistentId, sessionId, geoIp,
-        agentName, agentType, agentOs, agentLanguage));
-  }
+    @Override
+    public void userConnect(final String persistentId, final String sessionId, final CityResponse geoIp,
+                            final String agentName, final String agentType, final String agentOs,
+                            final String agentLanguage) {
+        LOG.trace(String.format("newUser(%s, %s, %s, %s, %s, %s, %s)", persistentId, sessionId, geoIp,
+                agentName, agentType, agentOs, agentLanguage));
+    }
 
-  @Override
-  public void userDisconnect(final String sessionId) {
-    LOG.trace(String.format("userDisconnect(%s)", sessionId));
-  }
+    @Override
+    public void userDisconnect(final String sessionId) {
+        LOG.trace(String.format("userDisconnect(%s)", sessionId));
+    }
 
-  @Override
-  public void gameStart(final String gameId, final Collection<CardSet> decks, final int blanks,
-      final int maxPlayers, final int scoreGoal, final boolean hasPassword) {
-    LOG.trace(String.format("gameStart(%s, %s, %d, %d, %d, %s)", gameId, decks.toArray(), blanks,
-        maxPlayers, scoreGoal, hasPassword));
-  }
+    @Override
+    public void gameStart(final String gameId, final Collection<CardSet> decks, final int blanks,
+                          final int maxPlayers, final int scoreGoal, final boolean hasPassword) {
+        LOG.trace(String.format("gameStart(%s, %s, %d, %d, %d, %s)", gameId, decks.toArray(), blanks,
+                maxPlayers, scoreGoal, hasPassword));
+    }
 
-  @Override
-  public void roundComplete(final String gameId, final String roundId, final String judgeSessionId,
-      final String winnerSessionId, final BlackCard blackCard,
-      final Map<String, List<WhiteCard>> cards) {
-    LOG.trace(String.format("roundJudged(%s, %s, %s, %s, %s, %s)", gameId, roundId, judgeSessionId,
-        winnerSessionId, blackCard, cards));
-  }
+    @Override
+    public void roundComplete(final String gameId, final String roundId, final String judgeSessionId,
+                              final String winnerSessionId, final BlackCard blackCard,
+                              final Map<String, List<WhiteCard>> cards) {
+        LOG.trace(String.format("roundJudged(%s, %s, %s, %s, %s, %s)", gameId, roundId, judgeSessionId,
+                winnerSessionId, blackCard, cards));
+    }
 }

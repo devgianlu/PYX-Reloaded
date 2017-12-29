@@ -11,8 +11,8 @@
   <name>pyx</name>
 
   <scm>
-    <url>https://github.com/ajanata/PretendYoureXyzzy</url>
-    <connection>scm:git:ssh://git@github.com/ajanata/PretendYoureXyzzy.git</connection>
+    <url>https://github.com/devgianlu/PretendYoureXyzzy</url>
+    <connection>scm:git:ssh://git@github.com/devgianlu/PretendYoureXyzzy.git</connection>
   </scm>
 
   <properties>

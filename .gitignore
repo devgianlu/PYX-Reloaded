@@ -2,3 +2,4 @@ build
 build.properties
 target
 ssl/
+.idea/

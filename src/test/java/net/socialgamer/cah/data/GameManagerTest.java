@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2012-2017, Andy Janata
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification, are permitted
  * provided that the following conditions are met:
- *
+ * <p>
  * * Redistributions of source code must retain the above copyright notice, this list of conditions
- *   and the following disclaimer.
+ * and the following disclaimer.
  * * Redistributions in binary form must reproduce the above copyright notice, this list of
- *   conditions and the following disclaimer in the documentation and/or other materials provided
- *   with the distribution.
- *
+ * conditions and the following disclaimer in the documentation and/or other materials provided
+ * with the distribution.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -23,22 +23,10 @@
 
 package net.socialgamer.cah.data;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
 import net.socialgamer.cah.CahModule.UniqueId;
 import net.socialgamer.cah.HibernateUtil;
 import net.socialgamer.cah.cardcast.CardcastModule.CardcastCardId;
@@ -47,16 +35,19 @@ import net.socialgamer.cah.data.GameManager.MaxGames;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.metrics.Metrics;
 import net.socialgamer.cah.metrics.NoOpMetrics;
-
 import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -66,143 +57,143 @@ import com.google.inject.Provides;
  */
 public class GameManagerTest {
 
-  private Injector injector;
-  private GameManager gameManager;
-  private ConnectedUsers cuMock;
-  private User userMock;
-  private int gameId;
-  private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
-  private Metrics metricsMock;
+    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
+    private Injector injector;
+    private GameManager gameManager;
+    private ConnectedUsers cuMock;
+    private User userMock;
+    private int gameId;
+    private Metrics metricsMock;
 
-  @Before
-  public void setUp() throws Exception {
-    cuMock = createMock(ConnectedUsers.class);
-    userMock = createMock(User.class);
-    metricsMock = createMock(Metrics.class);
+    @Before
+    public void setUp() {
+        cuMock = createMock(ConnectedUsers.class);
+        userMock = createMock(User.class);
+        metricsMock = createMock(Metrics.class);
 
-    injector = Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(ConnectedUsers.class).toInstance(cuMock);
+        injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ConnectedUsers.class).toInstance(cuMock);
 
-        final ScheduledThreadPoolExecutor threadPool =
-            new ScheduledThreadPoolExecutor(1,
-                new ThreadFactory() {
-                  final AtomicInteger threadCount = new AtomicInteger();
+                final ScheduledThreadPoolExecutor threadPool =
+                        new ScheduledThreadPoolExecutor(1,
+                                new ThreadFactory() {
+                                    final AtomicInteger threadCount = new AtomicInteger();
 
-                  @Override
-                  public Thread newThread(final Runnable r) {
-                    final Thread t = new Thread(r);
-                    t.setDaemon(true);
-                    t.setName("timer-task-" + threadCount.incrementAndGet());
-                    return t;
-                  }
-                });
-        bind(ScheduledThreadPoolExecutor.class).toInstance(threadPool);
-        bind(Metrics.class).to(NoOpMetrics.class);
-      }
+                                    @Override
+                                    public Thread newThread(final Runnable r) {
+                                        final Thread t = new Thread(r);
+                                        t.setDaemon(true);
+                                        t.setName("timer-task-" + threadCount.incrementAndGet());
+                                        return t;
+                                    }
+                                });
+                bind(ScheduledThreadPoolExecutor.class).toInstance(threadPool);
+                bind(Metrics.class).to(NoOpMetrics.class);
+            }
 
-      @Provides
-      @MaxGames
-      Integer provideMaxGames() {
-        return 3;
-      }
+            @Provides
+            @MaxGames
+            Integer provideMaxGames() {
+                return 3;
+            }
 
-      @Provides
-      @GameId
-      Integer provideGameId() {
-        return gameId;
-      }
+            @Provides
+            @GameId
+            Integer provideGameId() {
+                return gameId;
+            }
 
-      @Provides
-      Session provideSession() {
-        return HibernateUtil.instance.sessionFactory.openSession();
-      }
+            @Provides
+            Session provideSession() {
+                return HibernateUtil.instance.sessionFactory.openSession();
+            }
 
-      @Provides
-      @CardcastCardId
-      Integer provideCardcastCardId() {
-        return 0;
-      }
+            @Provides
+            @CardcastCardId
+            Integer provideCardcastCardId() {
+                return 0;
+            }
 
-      @Provides
-      @UniqueId
-      String provideUniqueId() {
-        return "1";
-      }
-    });
+            @Provides
+            @UniqueId
+            String provideUniqueId() {
+                return "1";
+            }
+        });
 
-    gameManager = injector.getInstance(GameManager.class);
-  }
+        gameManager = injector.getInstance(GameManager.class);
+    }
 
-  @After
-  public void tearDown() {
-    verify(cuMock);
-    verify(userMock);
-  }
+    @After
+    public void tearDown() {
+        verify(cuMock);
+        verify(userMock);
+    }
 
-  @Test
-  public void testGetAndDestroyGame() {
-    replay(cuMock);
-    replay(userMock);
+    @Test
+    public void testGetAndDestroyGame() {
+        replay(cuMock);
+        replay(userMock);
 
-    // fill it up with 3 games
-    assertEquals(0, gameManager.get().intValue());
-    gameManager.getGames().put(0,
-        new Game(0, cuMock, gameManager, timer, null, null, null, metricsMock));
-    assertEquals(1, gameManager.get().intValue());
-    gameManager.getGames().put(1,
-        new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
-    assertEquals(2, gameManager.get().intValue());
-    gameManager.getGames().put(2,
-        new Game(2, cuMock, gameManager, timer, null, null, null, metricsMock));
-    // make sure it says it can't make any more
-    assertEquals(-1, gameManager.get().intValue());
+        // fill it up with 3 games
+        assertEquals(0, gameManager.get().intValue());
+        gameManager.getGames().put(0,
+                new Game(0, cuMock, gameManager, timer, null, null, null, metricsMock));
+        assertEquals(1, gameManager.get().intValue());
+        gameManager.getGames().put(1,
+                new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
+        assertEquals(2, gameManager.get().intValue());
+        gameManager.getGames().put(2,
+                new Game(2, cuMock, gameManager, timer, null, null, null, metricsMock));
+        // make sure it says it can't make any more
+        assertEquals(-1, gameManager.get().intValue());
 
-    // remove game 1 using its own method -- this should be how it always happens in production
-    gameManager.destroyGame(1);
-    // make sure it re-uses that id
-    assertEquals(1, gameManager.get().intValue());
-    gameManager.getGames().put(1,
-        new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
-    assertEquals(-1, gameManager.get().intValue());
+        // remove game 1 using its own method -- this should be how it always happens in production
+        gameManager.destroyGame(1);
+        // make sure it re-uses that id
+        assertEquals(1, gameManager.get().intValue());
+        gameManager.getGames().put(1,
+                new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
+        assertEquals(-1, gameManager.get().intValue());
 
-    // remove game 1 out from under it, to make sure it'll fix itself
-    gameManager.getGames().remove(1);
-    assertEquals(1, gameManager.get().intValue());
-    gameManager.getGames().put(1,
-        new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
-    assertEquals(-1, gameManager.get().intValue());
+        // remove game 1 out from under it, to make sure it'll fix itself
+        gameManager.getGames().remove(1);
+        assertEquals(1, gameManager.get().intValue());
+        gameManager.getGames().put(1,
+                new Game(1, cuMock, gameManager, timer, null, null, null, metricsMock));
+        assertEquals(-1, gameManager.get().intValue());
 
-    gameManager.destroyGame(2);
-    gameManager.destroyGame(0);
-    assertEquals(2, gameManager.get().intValue());
-  }
+        gameManager.destroyGame(2);
+        gameManager.destroyGame(0);
+        assertEquals(2, gameManager.get().intValue());
+    }
 
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testCreateGame() {
-    cuMock.broadcastToList(anyObject(Collection.class), eq(MessageType.GAME_PLAYER_EVENT),
-        anyObject(HashMap.class));
-    expectLastCall().times(3);
-    replay(cuMock);
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCreateGame() {
+        cuMock.broadcastToList(anyObject(Collection.class), eq(MessageType.GAME_PLAYER_EVENT),
+                anyObject(HashMap.class));
+        expectLastCall().times(3);
+        replay(cuMock);
 
-    userMock.joinGame(anyObject(Game.class));
-    expectLastCall().times(3);
-    userMock.getNickname();
-    expectLastCall().andReturn("test").times(3);
-    replay(userMock);
+        userMock.joinGame(anyObject(Game.class));
+        expectLastCall().times(3);
+        userMock.getNickname();
+        expectLastCall().andReturn("test").times(3);
+        replay(userMock);
 
-    Game game = gameManager.createGameWithPlayer(userMock);
-    assertNotNull(game);
-    gameId = 1;
-    game = gameManager.createGameWithPlayer(userMock);
-    assertNotNull(game);
-    gameId = 2;
-    game = gameManager.createGameWithPlayer(userMock);
-    assertNotNull(game);
-    gameId = -1;
-    game = gameManager.createGameWithPlayer(userMock);
-    assertNull(game);
-  }
+        Game game = gameManager.createGameWithPlayer(userMock);
+        assertNotNull(game);
+        gameId = 1;
+        game = gameManager.createGameWithPlayer(userMock);
+        assertNotNull(game);
+        gameId = 2;
+        game = gameManager.createGameWithPlayer(userMock);
+        assertNotNull(game);
+        gameId = -1;
+        game = gameManager.createGameWithPlayer(userMock);
+        assertNull(game);
+    }
 }

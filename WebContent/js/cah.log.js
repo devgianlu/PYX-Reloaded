@@ -23,9 +23,9 @@
 
 /**
  * Logging functions.
- * 
+ *
  * TODO make this a proper object with a singleton instance.
- * 
+ *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 
@@ -34,32 +34,32 @@ cah.log = {};
 /**
  * "Global Chat" tab's chat log
  */
-cah.log.init = function() {
-  cah.log.log = $('#tab-global .log');
+cah.log.init = function () {
+    cah.log.log = $('#tab-global .log');
 };
 
 /**
  * Log a message to the global chat window for the user the see, always, as a status message. This
  * is also used for chat. The current time is displayed with the log message, using the user's
  * locale settings to determine format.
- * 
+ *
  * @param {string}
  *          text Text to display for this message. Text is added as a TextNode, so HTML is properly
  *          escaped automatically.
  * @param {string}
  *          opt_class Optional CSS class to use for this message.
  */
-cah.log.status = function(text, opt_class) {
-  cah.log.status_with_game(null, text, opt_class);
+cah.log.status = function (text, opt_class) {
+    cah.log.status_with_game(null, text, opt_class);
 };
 
 /**
  * Log a message to a single game's chat window, or the global chat window if game_id is null. This
  * is also used to support chat.
- * 
+ *
  * This displays the current time with the log message, using the user's locale settings to
  * determine format.
- * 
+ *
  * @param {Number|cah.Game}
  *          game_or_id ID of the game for which this message should be displayed, or the game object
  *          itself, or null for the global chat window.
@@ -71,132 +71,132 @@ cah.log.status = function(text, opt_class) {
  * @param {boolean}
  *          opt_allow_html Allow HTML to be used.
  */
-cah.log.status_with_game = function(game_or_id, text, opt_class, opt_allow_html) {
-  var logElement;
-  if (game_or_id === null) {
-    logElement = cah.log.log;
-  } else {
-    var game;
-    if (game_or_id instanceof cah.Game) {
-      game = game_or_id;
+cah.log.status_with_game = function (game_or_id, text, opt_class, opt_allow_html) {
+    var logElement;
+    if (game_or_id === null) {
+        logElement = cah.log.log;
     } else {
-      game = cah.currentGames[game_or_id];
+        var game;
+        if (game_or_id instanceof cah.Game) {
+            game = game_or_id;
+        } else {
+            game = cah.currentGames[game_or_id];
+        }
+        logElement = $(".log", game.getChatElement());
     }
-    logElement = $(".log", game.getChatElement());
-  }
 
-  // TODO this doesn't work right on some mobile browsers
-  var scroll = (logElement.prop("scrollHeight") - logElement.height() - logElement
-      .prop("scrollTop")) <= 5;
+    // TODO this doesn't work right on some mobile browsers
+    var scroll = (logElement.prop("scrollHeight") - logElement.height() - logElement
+        .prop("scrollTop")) <= 5;
 
-  var node = $("<span></span><br/>");
-  var full_msg = "[" + new Date().toLocaleTimeString() + "] " + text + "\n";
-  if (opt_allow_html) {
-    $(node[0]).html(full_msg);
-  } else {
-    $(node[0]).text(full_msg);
-  }
-  if (opt_class) {
-    $(node).addClass(opt_class);
-  }
-  logElement.append(node);
-  // only announce things in our game, or if it has a class (admin or error, likely)
-  if (game_or_id !== null || opt_class) {
-    cah.log.ariaStatus(text);
-  }
+    var node = $("<span></span><br/>");
+    var full_msg = "[" + new Date().toLocaleTimeString() + "] " + text + "\n";
+    if (opt_allow_html) {
+        $(node[0]).html(full_msg);
+    } else {
+        $(node[0]).text(full_msg);
+    }
+    if (opt_class) {
+        $(node).addClass(opt_class);
+    }
+    logElement.append(node);
+    // only announce things in our game, or if it has a class (admin or error, likely)
+    if (game_or_id !== null || opt_class) {
+        cah.log.ariaStatus(text);
+    }
 
-  if (scroll) {
-    logElement.prop("scrollTop", logElement.prop("scrollHeight"));
-  }
+    if (scroll) {
+        logElement.prop("scrollTop", logElement.prop("scrollHeight"));
+    }
 };
 
 /**
  * Log a message for the user to see, always, in every tab, as an error message.
- * 
+ *
  * @param {string}
  *          text Text to display for this message. Text is added as a TextNode, so HTML is properly
  *          escaped automatically.
  */
-cah.log.error = function(text) {
-  cah.log.everyWindow("Error: " + text, "error");
+cah.log.error = function (text) {
+    cah.log.everyWindow("Error: " + text, "error");
 };
 
 /**
  * Log a message for the user to see, always, in every tab.
- * 
+ *
  * @param {string}
  *          text Text to display for this message. Text is added as a TextNode, so HTML is properly
  *          escaped automatically.
  * @param {string}
  *          opt_class Optional CSS class to use for this message.
  */
-cah.log.everyWindow = function(text, opt_class) {
-  cah.log.status(text, opt_class);
+cah.log.everyWindow = function (text, opt_class) {
+    cah.log.status(text, opt_class);
 
-  for (game_id in cah.currentGames) {
-    if (cah.currentGames.hasOwnProperty(game_id)) {
-      cah.log.status_with_game(game_id, text, opt_class);
+    for (game_id in cah.currentGames) {
+        if (cah.currentGames.hasOwnProperty(game_id)) {
+            cah.log.status_with_game(game_id, text, opt_class);
+        }
     }
-  }
 };
 
 /**
  * Set the text of the aria-notification element, which should cause screen readers to read this
  * text.
- * 
+ *
  * @param {string}
  *          text Text to read.
  */
-cah.log.ariaStatus = function(text) {
-  // TODO we should pull this regex from the java code. it's close enough for now
-  var chatMatch = text.match(/<([a-zA-Z0-9_]+)> (.*)/);
-  if (chatMatch) {
-    $('#aria-notifications').text(chatMatch[1] + ' says ' + chatMatch[2]);
-  } else {
-    $('#aria-notifications').text(text);
-  }
+cah.log.ariaStatus = function (text) {
+    // TODO we should pull this regex from the java code. it's close enough for now
+    var chatMatch = text.match(/<([a-zA-Z0-9_]+)> (.*)/);
+    if (chatMatch) {
+        $('#aria-notifications').text(chatMatch[1] + ' says ' + chatMatch[2]);
+    } else {
+        $('#aria-notifications').text(text);
+    }
 };
 
 /**
  * Log a message if debugging is enabled, optionally dumping the contents of an object.
- * 
+ *
  * If SILENT_DEBUG is on, and IE is in use, it can cause the game to break if the debugger isn't
  * open...
- * 
+ *
  * @param {string}
  *          text Text to display
  * @param {object}
  *          opt_obj Optional. Object to dump along with message.
  */
-cah.log.debug = function(text, opt_obj) {
-  if (cah.SILENT_DEBUG && console) {
-    if (console.debug) {
-      console.debug("[" + new Date().toLocaleTimeString() + "]", text, opt_obj);
-    } else if (console.log) {
-      console.log("[" + new Date().toLocaleTimeString() + "] " + text);
-      if (opt_obj) {
-        if (console.dir) {
-          console.dir(opt_obj);
-        } else if (JSON && JSON.stringify) {
-          console.log(JSON.stringify(opt_obj));
-        } else {
-          console.log("TODO: SILENT_DEBUG without console.debug, with console.log, "
-              + "without console.dir, without JSON.stringify");
+cah.log.debug = function (text, opt_obj) {
+    if (cah.SILENT_DEBUG && console) {
+        if (console.debug) {
+            console.debug("[" + new Date().toLocaleTimeString() + "]", text, opt_obj);
+        } else if (console.log) {
+            console.log("[" + new Date().toLocaleTimeString() + "] " + text);
+            if (opt_obj) {
+                if (console.dir) {
+                    console.dir(opt_obj);
+                } else if (JSON && JSON.stringify) {
+                    console.log(JSON.stringify(opt_obj));
+                } else {
+                    console.log("TODO: SILENT_DEBUG without console.debug, with console.log, "
+                        + "without console.dir, without JSON.stringify");
+                }
+            }
+        } else if (console.log) {
+            console.log("[" + new Date().toLocaleTimeString() + "]", text, opt_obj);
         }
-      }
-    } else if (console.log) {
-      console.log("[" + new Date().toLocaleTimeString() + "]", text, opt_obj);
     }
-  }
-  if (cah.DEBUG) {
-    if (opt_obj) {
-      if (JSON && JSON.stringify) {
-        cah.log.debug(text + ": " + JSON.stringify(opt_obj));
-      } else {
-        cah.log.debug(text + ": TODO: debug log without JSON.stringify()");
-      }
-    } else {
-      cah.log.status("DEBUG: " + text, "debug");
+    if (cah.DEBUG) {
+        if (opt_obj) {
+            if (JSON && JSON.stringify) {
+                cah.log.debug(text + ": " + JSON.stringify(opt_obj));
+            } else {
+                cah.log.debug(text + ": TODO: debug log without JSON.stringify()");
+            }
+        } else {
+            cah.log.status("DEBUG: " + text, "debug");
+        }
     }
-  }
 };

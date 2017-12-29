@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2012, Andy Janata
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification, are permitted
  * provided that the following conditions are met:
- *
+ * <p>
  * * Redistributions of source code must retain the above copyright notice, this list of conditions
- *   and the following disclaimer.
+ * and the following disclaimer.
  * * Redistributions in binary form must reproduce the above copyright notice, this list of
- *   conditions and the following disclaimer in the documentation and/or other materials provided
- *   with the distribution.
- *
+ * conditions and the following disclaimer in the documentation and/or other materials provided
+ * with the distribution.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -23,16 +23,11 @@
 
 package net.socialgamer.cah.db;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import net.socialgamer.cah.data.BlackCard;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.*;
 
 
 /**
@@ -46,63 +41,63 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PyxBlackCard extends BlackCard {
 
-  @Id
-  @GeneratedValue
-  private int id;
+    @Id
+    @GeneratedValue
+    private int id;
 
-  private String text;
+    private String text;
 
-  private int draw;
+    private int draw;
 
-  private int pick;
+    private int pick;
 
-  private String watermark;
+    private String watermark;
 
-  @Override
-  public int getId() {
-    return id;
-  }
+    @Override
+    public int getId() {
+        return id;
+    }
 
-  public void setId(final int id) {
-    this.id = id;
-  }
+    public void setId(final int id) {
+        this.id = id;
+    }
 
-  /**
-   * @return Card text. HTML is allowed and entities are required.
-   */
-  @Override
-  public String getText() {
-    return text;
-  }
+    /**
+     * @return Card text. HTML is allowed and entities are required.
+     */
+    @Override
+    public String getText() {
+        return text;
+    }
 
-  public void setText(final String text) {
-    this.text = text;
-  }
+    public void setText(final String text) {
+        this.text = text;
+    }
 
-  @Override
-  public int getDraw() {
-    return draw;
-  }
+    @Override
+    public int getDraw() {
+        return draw;
+    }
 
-  public void setDraw(final int draw) {
-    this.draw = draw;
-  }
+    public void setDraw(final int draw) {
+        this.draw = draw;
+    }
 
-  @Override
-  public int getPick() {
-    return pick;
-  }
+    @Override
+    public int getPick() {
+        return pick;
+    }
 
-  public void setPick(final int pick) {
-    this.pick = pick;
-  }
+    public void setPick(final int pick) {
+        this.pick = pick;
+    }
 
-  @Override
-  public String getWatermark() {
-    return watermark == null ? "" : watermark;
-  }
+    @Override
+    public String getWatermark() {
+        return watermark == null ? "" : watermark;
+    }
 
-  public void setWatermark(final String watermark) {
-    this.watermark = watermark;
-  }
+    public void setWatermark(final String watermark) {
+        this.watermark = watermark;
+    }
 }
