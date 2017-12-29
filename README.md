@@ -11,3 +11,13 @@ If you're doing ```mvn clean package jetty:run```, you now need to add ```-Dmave
 
 
 For GeoIP functions to work, download http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz somewhere, gunzip it, and update the geoip.db value in build.properties to point to it.
+
+
+TODO
+====
+- Make server standlone (no need of Tomcat)
+- Refractor code
+- Fix present bugs
+- Better card loading system
+
+If you have any other please open an issue or a pull request.
