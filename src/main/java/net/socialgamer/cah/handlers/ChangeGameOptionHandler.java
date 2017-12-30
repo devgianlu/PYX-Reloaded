@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -18,7 +17,6 @@ import net.socialgamer.cah.servlets.Parameters;
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CHANGE_GAME_OPTIONS.toString();
 
-    @Inject
     public ChangeGameOptionHandler(final GameManager gameManager) {
         super(gameManager);
     }
@@ -29,7 +27,7 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
         if (game.getState() != GameState.LOBBY) throw new CahResponder.CahException(ErrorCode.ALREADY_STARTED);
 
         try {
-            String value = params.getFirst(AjaxRequest.GAME_OPTIONS);
+            String value = params.get(AjaxRequest.GAME_OPTIONS);
             GameOptions options = GameOptions.deserialize(value);
             String oldPassword = game.getPassword();
             game.updateGameSettings(options);

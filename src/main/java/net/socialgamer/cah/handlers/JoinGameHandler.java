@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -17,14 +16,13 @@ import net.socialgamer.cah.servlets.Parameters;
 public class JoinGameHandler extends GameHandler {
     public static final String OP = AjaxOperation.JOIN_GAME.toString();
 
-    @Inject
     public JoinGameHandler(final GameManager gameManager) {
         super(gameManager);
     }
 
     @Override
     public JsonElement handle(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
-        if (!game.isPasswordCorrect(params.getFirst(AjaxRequest.PASSWORD)))
+        if (!game.isPasswordCorrect(params.get(AjaxRequest.PASSWORD)))
             throw new CahResponder.CahException(ErrorCode.WRONG_PASSWORD);
 
         try {

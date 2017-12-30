@@ -1,32 +1,5 @@
-/**
- * Copyright (c) 2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.metrics;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import net.socialgamer.cah.CahModule.ServerStarted;
 import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
@@ -46,11 +19,8 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-@Singleton
-public class UniqueIds implements Provider<String> {
-
+public class UniqueIds {
     private static final Logger LOG = Logger.getLogger(UniqueIds.class);
-
     private static final String hostname;
 
     static {
@@ -67,14 +37,11 @@ public class UniqueIds implements Provider<String> {
     private final AtomicLong counter = new AtomicLong(0);
     private final Date serverStarted;
 
-    @Inject
-    public UniqueIds(@ServerStarted final Date serverStarted) {
+    public UniqueIds(Date serverStarted) {
         this.serverStarted = serverStarted;
     }
 
-    @Override
     public String get() {
-        // hostname_started_seq
         return String.format("%s_%d_%d", hostname, serverStarted.getTime(), counter.getAndIncrement());
     }
 }

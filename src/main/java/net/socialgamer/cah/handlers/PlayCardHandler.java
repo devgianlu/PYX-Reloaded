@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -17,14 +16,13 @@ import org.apache.commons.lang3.StringEscapeUtils;
 public class PlayCardHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.PLAY_CARD.toString();
 
-    @Inject
     public PlayCardHandler(final GameManager gameManager) {
         super(gameManager);
     }
 
     @Override
     public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
-        String cardIdStr = params.getFirst(AjaxRequest.CARD_ID);
+        String cardIdStr = params.get(AjaxRequest.CARD_ID);
         if (cardIdStr == null || cardIdStr.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_CARD_SPECIFIED);
 
         int cardId;
@@ -34,7 +32,7 @@ public class PlayCardHandler extends GameWithPlayerHandler {
             throw new CahResponder.CahException(ErrorCode.INVALID_CARD, ex);
         }
 
-        String text = params.getFirst(AjaxRequest.MESSAGE);
+        String text = params.get(AjaxRequest.MESSAGE);
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
         final ErrorCode errorCode = game.playCard(user, cardId, text);

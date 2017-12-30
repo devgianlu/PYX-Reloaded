@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -18,7 +17,6 @@ public class StopGameHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.STOP_GAME.toString();
     protected final Logger logger = Logger.getLogger(GameWithPlayerHandler.class);
 
-    @Inject
     public StopGameHandler(final GameManager gameManager) {
         super(gameManager);
     }

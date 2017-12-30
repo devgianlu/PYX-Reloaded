@@ -1,39 +1,12 @@
-/**
- * Copyright (c) 2012-2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import net.socialgamer.cah.CahModule.UniqueId;
 import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
-import net.socialgamer.cah.data.GameManager.GameId;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.metrics.Metrics;
 import net.socialgamer.cah.task.SafeTimerTask;
@@ -42,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
@@ -130,7 +102,7 @@ public class Game {
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
-    private final Provider<Session> sessionProvider;
+    private final Session session;
     private final Object blackCardLock = new Object();
     private final GameOptions options = new GameOptions();
 
@@ -146,8 +118,7 @@ public class Game {
      */
     private final Object roundTimerLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
-    private final Provider<CardcastService> cardcastServiceProvider;
-    private final Provider<String> uniqueIdProvider;
+    private final CardcastService cardcastService;
     private Player host;
     private BlackDeck blackDeck;
     private BlackCard blackCard;
@@ -166,23 +137,15 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    @Inject
-    public Game(@GameId final Integer id, final ConnectedUsers connectedUsers,
-                final GameManager gameManager, final ScheduledThreadPoolExecutor globalTimer,
-                final Provider<Session> sessionProvider,
-                final Provider<CardcastService> cardcastServiceProvider,
-                @UniqueId final Provider<String> uniqueIdProvider,
-                final Metrics metrics) {
+    public Game(Integer id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Session session, CardcastService cardcastService, Metrics metrics) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
-        this.sessionProvider = sessionProvider;
-        this.cardcastServiceProvider = cardcastServiceProvider;
-        this.uniqueIdProvider = uniqueIdProvider;
+        this.session = session;
+        this.cardcastService = cardcastService;
         this.metrics = metrics;
-
-        state = GameState.LOBBY;
+        this.state = GameState.LOBBY;
     }
 
     /**
@@ -229,10 +192,9 @@ public class Game {
             }
         }
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_PLAYER_JOIN.toString());
-        data.put(LongPollResponse.NICKNAME, user.getNickname());
-        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_JOIN);
+        obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
 
         // Don't do this anymore, it was driving up a crazy amount of traffic.
         // gameManager.broadcastGameListRefresh();
@@ -257,7 +219,6 @@ public class Game {
         final Player player = getPlayerForUser(user);
 
         if (null != player) {
-            HashMap<ReturnableData, Object> data;
             // If they played this round, remove card from played card list.
             final List<WhiteCard> cards = playedCards.remove(player);
             if (cards != null && cards.size() > 0) {
@@ -280,10 +241,10 @@ public class Game {
             }
             // If they are judge, return all played cards to hand, and move to next judge.
             if (getJudge() == player && (state == GameState.PLAYING || state == GameState.JUDGING)) {
-                data = getEventMap();
-                data.put(LongPollResponse.EVENT, LongPollEvent.GAME_JUDGE_LEFT.toString());
-                data.put(LongPollResponse.INTERMISSION, ROUND_INTERMISSION);
-                broadcastToPlayers(MessageType.GAME_EVENT, data);
+                JsonObject obj = getEventJson(LongPollEvent.GAME_JUDGE_LEFT);
+                obj.addProperty(LongPollResponse.INTERMISSION.toString(), ROUND_INTERMISSION);
+                broadcastToPlayers(MessageType.GAME_EVENT, obj);
+
                 returnCardsToHand();
                 // startNextRound will advance it again.
                 judgeIndex--;
@@ -301,10 +262,9 @@ public class Game {
             user.leaveGame(this);
 
             // do this down here so the person that left doesn't get the notice too
-            data = getEventMap();
-            data.put(LongPollResponse.EVENT, LongPollEvent.GAME_PLAYER_LEAVE.toString());
-            data.put(LongPollResponse.NICKNAME, user.getNickname());
-            broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, data);
+            JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_LEAVE);
+            obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+            broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
 
             // Don't do this anymore, it was driving up a crazy amount of traffic.
             // gameManager.broadcastGameListRefresh();
@@ -349,7 +309,7 @@ public class Game {
      * @throws TooManySpectatorsException Thrown if this game is at its maximum spectator capacity.
      * @throws IllegalStateException      Thrown if {@code user} is already in a game.
      */
-    public void addSpectator(final User user) throws TooManySpectatorsException, IllegalStateException {
+    public void addSpectator(User user) throws TooManySpectatorsException, IllegalStateException {
         logger.info(String.format("%s joined game %d as a spectator.", user.toString(), id));
         synchronized (spectators) {
             if (spectators.size() >= options.spectatorLimit) {
@@ -360,10 +320,9 @@ public class Game {
             spectators.add(user);
         }
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_SPECTATOR_JOIN.toString());
-        data.put(LongPollResponse.NICKNAME, user.getNickname());
-        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_SPECTATOR_JOIN);
+        obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
 
         gameManager.broadcastGameListRefresh();
     }
@@ -385,10 +344,9 @@ public class Game {
         }
 
         // do this down here so the person that left doesn't get the notice too
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_SPECTATOR_LEAVE.toString());
-        data.put(LongPollResponse.NICKNAME, user.getNickname());
-        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_SPECTATOR_LEAVE);
+        obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
 
         // Don't do this anymore, it was driving up a crazy amount of traffic.
         // gameManager.broadcastGameListRefresh();
@@ -417,8 +375,7 @@ public class Game {
      *                   priority.
      * @param masterData Message data to broadcast.
      */
-    public void broadcastToPlayers(final MessageType type,
-                                   final HashMap<ReturnableData, Object> masterData) {
+    public void broadcastToPlayers(MessageType type, JsonObject masterData) {
         connectedUsers.broadcastToList(playersToUsers(), type, masterData);
     }
 
@@ -427,21 +384,19 @@ public class Game {
      *
      * @param player The player whose information has been changed.
      */
-    public void notifyPlayerInfoChange(final Player player) {
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_PLAYER_INFO_CHANGE.toString());
-        data.put(LongPollResponse.PLAYER_INFO, getPlayerInfo(player));
-        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, data);
+    public void notifyPlayerInfoChange(Player player) {
+        JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_INFO_CHANGE);
+        obj.add(LongPollResponse.PLAYER_INFO.toString(), getPlayerInfoJson(player));
+        broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
     }
 
     /**
      * Sends updated game information to all players in the game.
      */
     private void notifyGameOptionsChanged() {
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_OPTIONS_CHANGED.toString());
-        data.put(LongPollResponse.GAME_INFO, getInfo(true));
-        broadcastToPlayers(MessageType.GAME_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_OPTIONS_CHANGED);
+        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(true));
+        broadcastToPlayers(MessageType.GAME_EVENT, obj);
     }
 
     /**
@@ -537,7 +492,7 @@ public class Game {
      * @return This game's general information: ID, host, state, player list, etc.
      */
     @Nullable
-    public Map<GameInfo, Object> getInfo(final boolean includePassword) {
+    public Map<GameInfo, Object> getInfo(boolean includePassword) {
         final Map<GameInfo, Object> info = new HashMap<>();
         info.put(GameInfo.ID, id);
         // This is probably happening because the game ceases to exist in the middle of getting the
@@ -581,25 +536,6 @@ public class Game {
         final List<Player> copy = new ArrayList<>(players.size());
         copy.addAll(players);
         return copy;
-    }
-
-    /**
-     * Get player information for a single player.
-     *
-     * @param player The player for whom to get status.
-     * @return Information for {@code player}: Name, score, status.
-     */
-    public Map<GamePlayerInfo, Object> getPlayerInfo(final Player player) {
-        final Map<GamePlayerInfo, Object> playerInfo = new HashMap<>();
-        // TODO make sure this can't happen in the first place
-        if (player == null) {
-            return playerInfo;
-        }
-        playerInfo.put(GamePlayerInfo.NAME, player.getUser().getNickname());
-        playerInfo.put(GamePlayerInfo.SCORE, player.getScore());
-        playerInfo.put(GamePlayerInfo.STATUS, getPlayerStatus(player).toString());
-
-        return playerInfo;
     }
 
     @Nullable
@@ -682,9 +618,8 @@ public class Game {
      * clients would prevent that from happening!
      */
     public boolean start() {
-        Session session = null;
+
         try {
-            session = sessionProvider.get();
             if (state != GameState.LOBBY || !hasEnoughCards(session)) {
                 return false;
             }
@@ -698,7 +633,7 @@ public class Game {
                 started = false;
             }
             if (started) {
-                currentUniqueId = uniqueIdProvider.get();
+                currentUniqueId = UniqueIDs.getNewRandomID();
                 logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
                                 + "max players, %d max spectators, %d score limit, players %s, unique %s.",
                         id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
@@ -739,14 +674,13 @@ public class Game {
                 // Not injecting the service itself because we might need to assisted inject it later
                 // with card id stuff.
                 // also TODO maybe make card ids longs instead of ints
-                final CardcastService service = cardcastServiceProvider.get();
 
                 // Avoid ConcurrentModificationException
                 for (final String cardcastId : cardcastDeckIds.toArray(new String[0])) {
                     // Ideally, we can assume that anything in that set is going to load, but it is entirely
                     // possible that the cache has expired and we can't re-load it for some reason, so
                     // let's be safe.
-                    final CardcastDeck cardcastDeck = service.loadSet(cardcastId);
+                    final CardcastDeck cardcastDeck = cardcastService.loadSet(cardcastId);
                     if (null == cardcastDeck) {
                         // TODO better way to indicate this to the user
                         logger.error(String.format("Unable to load %s from Cardcast", cardcastId));
@@ -806,7 +740,7 @@ public class Game {
         final Player[] playersCopy = players.toArray(new Player[players.size()]);
         for (final Player player : playersCopy) {
             final List<WhiteCard> hand = player.getHand();
-            final List<WhiteCard> newCards = new LinkedList<WhiteCard>();
+            final List<WhiteCard> newCards = new LinkedList<>();
             while (hand.size() < 10) {
                 final WhiteCard card = getNextWhiteCard();
                 hand.add(card);
@@ -842,7 +776,7 @@ public class Game {
                     if (getJudge() == player) {
                         continue;
                     }
-                    final List<WhiteCard> cards = new ArrayList<WhiteCard>(newBlackCard.getDraw());
+                    final List<WhiteCard> cards = new ArrayList<>(newBlackCard.getDraw());
                     for (int i = 0; i < newBlackCard.getDraw(); i++) {
                         cards.add(getNextWhiteCard());
                     }
@@ -855,13 +789,11 @@ public class Game {
         // Perhaps figure out a better way to do this...
         final int playTimer = calculateTime(PLAY_TIMEOUT_BASE + (PLAY_TIMEOUT_PER_CARD * blackCard.getPick()));
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_STATE_CHANGE.toString());
-        data.put(LongPollResponse.BLACK_CARD, getBlackCard());
-        data.put(LongPollResponse.GAME_STATE, GameState.PLAYING.toString());
-        data.put(LongPollResponse.PLAY_TIMER, playTimer);
-
-        broadcastToPlayers(MessageType.GAME_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_STATE_CHANGE);
+        obj.add(LongPollResponse.BLACK_CARD.toString(), getBlackCardJson());
+        obj.addProperty(LongPollResponse.GAME_STATE.toString(), GameState.PLAYING.toString());
+        obj.addProperty(LongPollResponse.PLAY_TIMER.toString(), playTimer);
+        broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         synchronized (roundTimerLock) {
             final SafeTimerTask task = new SafeTimerTask() {
@@ -910,11 +842,10 @@ public class Game {
                 for (final Player player : roundPlayers) {
                     final List<WhiteCard> cards = playedCards.getCards(player);
                     if (cards == null || cards.size() < blackCard.getPick()) {
-                        final Map<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
-                        data.put(LongPollResponse.EVENT, LongPollEvent.HURRY_UP.toString());
-                        data.put(LongPollResponse.GAME_ID, this.id);
-                        final QueuedMessage q = new QueuedMessage(MessageType.GAME_EVENT, data);
-                        player.getUser().enqueueMessage(q);
+                        JsonObject obj = new JsonObject();
+                        obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.HURRY_UP.toString());
+                        obj.addProperty(LongPollResponse.GAME_ID.toString(), this.id);
+                        player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
                     }
                 }
             }
@@ -936,11 +867,10 @@ public class Game {
             killRoundTimer();
 
             if (state == GameState.JUDGING) {
-                final Map<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
-                data.put(LongPollResponse.EVENT, LongPollEvent.HURRY_UP.toString());
-                data.put(LongPollResponse.GAME_ID, this.id);
-                final QueuedMessage q = new QueuedMessage(MessageType.GAME_EVENT, data);
-                getJudge().getUser().enqueueMessage(q);
+                JsonObject obj = new JsonObject();
+                obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.HURRY_UP.toString());
+                obj.addProperty(LongPollResponse.GAME_ID.toString(), this.id);
+                getJudge().getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
             }
 
             final SafeTimerTask task = new SafeTimerTask() {
@@ -970,9 +900,8 @@ public class Game {
                 judgeName = judge.getUser().getNickname();
             }
             logger.info(String.format("Skipping idle judge %s in game %d", judgeName, id));
-            final HashMap<ReturnableData, Object> data = getEventMap();
-            data.put(LongPollResponse.EVENT, LongPollEvent.GAME_JUDGE_SKIPPED.toString());
-            broadcastToPlayers(MessageType.GAME_EVENT, data);
+
+            broadcastToPlayers(MessageType.GAME_EVENT, getEventJson(LongPollEvent.GAME_JUDGE_SKIPPED));
             returnCardsToHand();
             startNextRound();
         }
@@ -980,8 +909,8 @@ public class Game {
 
     private void skipIdlePlayers() {
         killRoundTimer();
-        final List<User> playersToRemove = new ArrayList<User>();
-        final List<Player> playersToUpdateStatus = new ArrayList<Player>();
+        final List<User> playersToRemove = new ArrayList<>();
+        final List<Player> playersToUpdateStatus = new ArrayList<>();
         synchronized (roundPlayers) {
 
             for (final Player player : roundPlayers) {
@@ -990,16 +919,17 @@ public class Game {
                     logger.info(String.format("Skipping idle player %s in game %d.", player, id));
                     player.skipped();
 
-                    final HashMap<ReturnableData, Object> data = getEventMap();
-                    data.put(LongPollResponse.NICKNAME, player.getUser().getNickname());
+                    JsonObject obj;
                     if (player.getSkipCount() >= MAX_SKIPS_BEFORE_KICK || playedCards.size() < 2) {
-                        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_PLAYER_KICKED_IDLE.toString());
+                        obj = getEventJson(LongPollEvent.GAME_PLAYER_KICKED_IDLE);
                         playersToRemove.add(player.getUser());
                     } else {
-                        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_PLAYER_SKIPPED.toString());
+                        obj = getEventJson(LongPollEvent.GAME_PLAYER_SKIPPED);
                         playersToUpdateStatus.add(player);
                     }
-                    broadcastToPlayers(MessageType.GAME_EVENT, data);
+
+                    obj.addProperty(LongPollResponse.NICKNAME.toString(), player.getUser().getNickname());
+                    broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
                     // put their cards back
                     final List<WhiteCard> returnCards = playedCards.remove(player);
@@ -1013,10 +943,7 @@ public class Game {
 
         for (final User user : playersToRemove) {
             removePlayer(user);
-            final HashMap<ReturnableData, Object> data = getEventMap();
-            data.put(LongPollResponse.EVENT, LongPollEvent.KICKED_FROM_GAME_IDLE.toString());
-            final QueuedMessage q = new QueuedMessage(MessageType.GAME_PLAYER_EVENT, data);
-            user.enqueueMessage(q);
+            user.enqueueMessage(new QueuedMessage(MessageType.GAME_PLAYER_EVENT, getEventJson(LongPollEvent.KICKED_FROM_GAME_IDLE)));
         }
 
         synchronized (playedCards) {
@@ -1067,12 +994,11 @@ public class Game {
         // Perhaps figure out a better way to do this...
         final int judgeTimer = calculateTime(JUDGE_TIMEOUT_BASE + (JUDGE_TIMEOUT_PER_CARD * playedCards.size() * blackCard.getPick()));
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_STATE_CHANGE.toString());
-        data.put(LongPollResponse.GAME_STATE, GameState.JUDGING.toString());
-        data.put(LongPollResponse.WHITE_CARDS, getWhiteCards());
-        data.put(LongPollResponse.PLAY_TIMER, judgeTimer);
-        broadcastToPlayers(MessageType.GAME_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_STATE_CHANGE);
+        obj.addProperty(LongPollResponse.GAME_STATE.toString(), GameState.JUDGING.toString());
+        obj.add(LongPollResponse.WHITE_CARDS.toString(), getWhiteCardsJson());
+        obj.addProperty(LongPollResponse.PLAY_TIMER.toString(), judgeTimer);
+        broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         notifyPlayerInfoChange(getJudge());
 
@@ -1123,10 +1049,9 @@ public class Game {
         final Player judge = getJudge();
         judgeIndex = 0;
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_STATE_CHANGE.toString());
-        data.put(LongPollResponse.GAME_STATE, GameState.LOBBY.toString());
-        broadcastToPlayers(MessageType.GAME_EVENT, data);
+        JsonObject obj = getEventJson(LongPollEvent.GAME_STATE_CHANGE);
+        obj.addProperty(LongPollResponse.GAME_STATE.toString(), GameState.LOBBY.toString());
+        broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         if (host != null) {
             notifyPlayerInfoChange(host);
@@ -1195,13 +1120,11 @@ public class Game {
         dealState();
     }
 
-    /**
-     * @return A HashMap to use for events dispatched from this game, with the game id already set.
-     */
-    public HashMap<ReturnableData, Object> getEventMap() {
-        final HashMap<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
-        data.put(LongPollResponse.GAME_ID, id);
-        return data;
+    public JsonObject getEventJson(LongPollEvent event) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(LongPollResponse.EVENT.toString(), event.toString());
+        obj.addProperty(LongPollResponse.GAME_ID.toString(), id);
+        return obj;
     }
 
     /**
@@ -1212,9 +1135,8 @@ public class Game {
             return whiteDeck.getNextCard();
         } catch (final OutOfCardsException e) {
             whiteDeck.reshuffle();
-            final HashMap<ReturnableData, Object> data = getEventMap();
-            data.put(LongPollResponse.EVENT, LongPollEvent.GAME_WHITE_RESHUFFLE.toString());
-            broadcastToPlayers(MessageType.GAME_EVENT, data);
+
+            broadcastToPlayers(MessageType.GAME_EVENT, getEventJson(LongPollEvent.GAME_WHITE_RESHUFFLE));
             return getNextWhiteCard();
         }
     }
@@ -1227,9 +1149,8 @@ public class Game {
             return blackDeck.getNextCard();
         } catch (final OutOfCardsException e) {
             blackDeck.reshuffle();
-            final HashMap<ReturnableData, Object> data = getEventMap();
-            data.put(LongPollResponse.EVENT, LongPollEvent.GAME_BLACK_RESHUFFLE.toString());
-            broadcastToPlayers(MessageType.GAME_EVENT, data);
+
+            broadcastToPlayers(MessageType.GAME_EVENT, getEventJson(LongPollEvent.GAME_BLACK_RESHUFFLE));
             return getNextBlackCard();
         }
     }
@@ -1237,12 +1158,12 @@ public class Game {
     /**
      * Get the {@code Player} object for a given {@code User} object.
      *
-     * @param user
+     * @param user the user
      * @return The {@code Player} object representing {@code user} in this game, or {@code null} if
      * {@code user} is not in this game.
      */
     @Nullable
-    public Player getPlayerForUser(final User user) {
+    public Player getPlayerForUser(User user) {
         final Player[] playersCopy = players.toArray(new Player[players.size()]);
         for (final Player player : playersCopy) {
             if (player.getUser() == user) {
@@ -1250,22 +1171,6 @@ public class Game {
             }
         }
         return null;
-    }
-
-    /**
-     * Synchronizes on {@link #blackCardLock}.
-     *
-     * @return Client data for the current {@code BlackCard}, or {@code null} if there is not a
-     * {@code BlackCard}.
-     */
-    public Map<BlackCardData, Object> getBlackCard() {
-        synchronized (blackCardLock) {
-            if (blackCard != null) {
-                return blackCard.getClientData();
-            } else {
-                return null;
-            }
-        }
     }
 
     @Nullable
@@ -1279,26 +1184,6 @@ public class Game {
         }
     }
 
-    /**
-     * @return The "real" white cards played.
-     */
-    private List<List<Map<WhiteCardData, Object>>> getWhiteCards() {
-        if (state != GameState.JUDGING) {
-            return new ArrayList<List<Map<WhiteCardData, Object>>>();
-        } else {
-            final List<List<WhiteCard>> shuffledPlayedCards;
-            shuffledPlayedCards = new ArrayList<List<WhiteCard>>(playedCards.cards());
-            // list of all sets of cards played, which have data. this looks terrible...
-            final List<List<Map<WhiteCardData, Object>>> cardData =
-                    new ArrayList<List<Map<WhiteCardData, Object>>>(shuffledPlayedCards.size());
-            Collections.shuffle(shuffledPlayedCards);
-            for (final List<WhiteCard> cards : shuffledPlayedCards) {
-                cardData.add(getWhiteCardData(cards));
-            }
-            return cardData;
-        }
-    }
-
     private JsonArray getWhiteCardsJson() {
         if (state != GameState.JUDGING) {
             return new JsonArray();
@@ -1309,37 +1194,6 @@ public class Game {
             JsonArray json = new JsonArray(shuffledPlayedCards.size());
             for (final List<WhiteCard> cards : shuffledPlayedCards) json.add(getWhiteCardsDataJson(cards));
             return json;
-        }
-    }
-
-    /**
-     * @param user User to return white cards for.
-     * @return The white cards the specified user can see, i.e., theirs and face-down cards for
-     * everyone else.
-     */
-    public List<List<Map<WhiteCardData, Object>>> getWhiteCards(final User user) {
-        // if we're in judge mode, return all of the cards and ignore which user is asking
-        if (state == GameState.JUDGING) {
-            return getWhiteCards();
-        } else if (state != GameState.PLAYING) {
-            return new ArrayList<>();
-        } else {
-            // getPlayerForUser synchronizes on players. This has caused a deadlock in the past.
-            // Good idea to not nest synchronizes if possible anyway.
-            final Player player = getPlayerForUser(user);
-            synchronized (playedCards) {
-                final List<List<Map<WhiteCardData, Object>>> cardData = new ArrayList<>(playedCards.size());
-                int faceDownCards = playedCards.size();
-                if (playedCards.hasPlayer(player)) {
-                    cardData.add(getWhiteCardData(playedCards.getCards(player)));
-                    faceDownCards--;
-                }
-                // TODO make this figure out how many blank cards in each spot, for multi-play cards
-                while (faceDownCards-- > 0) {
-                    cardData.add(Collections.singletonList(WhiteCard.getFaceDownCardClientData()));
-                }
-                return cardData;
-            }
         }
     }
 
@@ -1377,30 +1231,9 @@ public class Game {
      * @param cards  The cards to send the player.
      */
     private void sendCardsToPlayer(final Player player, final List<WhiteCard> cards) {
-        final Map<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.HAND_DEAL.toString());
-        data.put(LongPollResponse.HAND, getWhiteCardData(cards));
-        final QueuedMessage qm = new QueuedMessage(MessageType.GAME_EVENT, data);
-        player.getUser().enqueueMessage(qm);
-    }
-
-    /**
-     * Get a client data representation of a user's hand.
-     *
-     * @param user User whose hand to convert to client data.
-     * @return Client representation of {@code user}'s hand.
-     */
-    @Nonnull
-    public List<Map<WhiteCardData, Object>> getHand(final User user) {
-        final Player player = getPlayerForUser(user);
-        if (player != null) {
-            final List<WhiteCard> hand = player.getHand();
-            synchronized (hand) {
-                return getWhiteCardData(hand);
-            }
-        } else {
-            return new ArrayList<Map<WhiteCardData, Object>>(0);
-        }
+        JsonObject obj = getEventJson(LongPollEvent.HAND_DEAL);
+        obj.add(LongPollResponse.HAND.toString(), getWhiteCardsDataJson(cards));
+        player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
     }
 
     @NotNull
@@ -1422,7 +1255,7 @@ public class Game {
     private List<User> playersToUsers() {
         final List<User> users;
         final Player[] playersCopy = players.toArray(new Player[players.size()]);
-        users = new ArrayList<User>(playersCopy.length);
+        users = new ArrayList<>(playersCopy.length);
         for (final Player player : playersCopy) {
             users.add(player.getUser());
         }
@@ -1529,14 +1362,14 @@ public class Game {
             cardPlayer.increaseScore();
             state = GameState.ROUND_OVER;
         }
-        final int clientCardId = playedCards.getCards(cardPlayer).get(0).getId();
 
-        final HashMap<ReturnableData, Object> data = getEventMap();
-        data.put(LongPollResponse.EVENT, LongPollEvent.GAME_ROUND_COMPLETE.toString());
-        data.put(LongPollResponse.ROUND_WINNER, cardPlayer.getUser().getNickname());
-        data.put(LongPollResponse.WINNING_CARD, clientCardId);
-        data.put(LongPollResponse.INTERMISSION, ROUND_INTERMISSION);
-        broadcastToPlayers(MessageType.GAME_EVENT, data);
+        int clientCardId = playedCards.getCards(cardPlayer).get(0).getId();
+
+        JsonObject obj = getEventJson(LongPollEvent.GAME_ROUND_COMPLETE);
+        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), cardPlayer.getUser().getNickname());
+        obj.addProperty(LongPollResponse.WINNING_CARD.toString(), clientCardId);
+        obj.addProperty(LongPollResponse.INTERMISSION.toString(), ROUND_INTERMISSION);
+        broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         notifyPlayerInfoChange(getJudge());
         notifyPlayerInfoChange(cardPlayer);
@@ -1563,14 +1396,10 @@ public class Game {
         }
 
         final Map<String, List<WhiteCard>> cardsBySessionId = new HashMap<>();
-        playedCards.cardsByUser().forEach(
-                (key, value) -> cardsBySessionId.put(key.getSessionId(), value));
-        metrics.roundComplete(currentUniqueId, uniqueIdProvider.get(), judge.getSessionId(),
-                cardPlayer.getUser().getSessionId(), blackCard, cardsBySessionId);
-
+        playedCards.cardsByUser().forEach((key, value) -> cardsBySessionId.put(key.getSessionId(), value));
+        metrics.roundComplete(currentUniqueId, UniqueIDs.getNewRandomID(), judge.getSessionId(), cardPlayer.getUser().getSessionId(), blackCard, cardsBySessionId);
         return null;
     }
-
 
     /**
      * Exception to be thrown when there are too many players in a game.

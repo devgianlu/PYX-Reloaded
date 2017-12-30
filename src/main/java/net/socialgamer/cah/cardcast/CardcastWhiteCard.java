@@ -4,7 +4,6 @@ import net.socialgamer.cah.data.WhiteCard;
 
 
 public class CardcastWhiteCard extends WhiteCard {
-
     private final int id;
     private final String text;
     private final String deckId;

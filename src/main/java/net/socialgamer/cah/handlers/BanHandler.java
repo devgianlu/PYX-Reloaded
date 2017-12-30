@@ -2,9 +2,8 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
-import net.socialgamer.cah.CahModule.BanList;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
@@ -13,8 +12,6 @@ import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class BanHandler extends AdminHandler {
@@ -23,8 +20,7 @@ public class BanHandler extends AdminHandler {
     private final ConnectedUsers connectedUsers;
     private final Set<String> banList;
 
-    @Inject
-    public BanHandler(final ConnectedUsers connectedUsers, @BanList final Set<String> banList) {
+    public BanHandler(ConnectedUsers connectedUsers, Set<String> banList) {
         this.connectedUsers = connectedUsers;
         this.banList = banList;
     }
@@ -33,7 +29,7 @@ public class BanHandler extends AdminHandler {
     public JsonElement handleAsAdmin(User user, Parameters params) throws CahResponder.CahException {
         if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
 
-        String nickname = params.getFirst(AjaxRequest.NICKNAME);
+        String nickname = params.get(AjaxRequest.NICKNAME);
         if (nickname == null || nickname.isEmpty())
             throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
 
@@ -42,10 +38,7 @@ public class BanHandler extends AdminHandler {
         if (kickUser != null) {
             banIp = kickUser.getHostname();
 
-            final Map<ReturnableData, Object> kickData = new HashMap<ReturnableData, Object>();
-            kickData.put(LongPollResponse.EVENT, LongPollEvent.BANNED.toString());
-            final QueuedMessage qm = new QueuedMessage(MessageType.KICKED, kickData);
-            kickUser.enqueueMessage(qm);
+            kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, Utils.singletonJsonObject(LongPollResponse.EVENT.toString(), LongPollEvent.BANNED.toString())));
 
             connectedUsers.removeUser(kickUser, DisconnectReason.BANNED);
             logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), banIp, user.getNickname()));

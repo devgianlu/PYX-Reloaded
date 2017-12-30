@@ -1,30 +1,5 @@
-/**
- * Copyright (c) 2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.metrics;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.maxmind.geoip2.model.CityResponse;
 import net.socialgamer.cah.data.BlackCard;
 import net.socialgamer.cah.data.CardSet;
@@ -39,7 +14,6 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONValue;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -54,7 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-@Singleton
 public class KafkaMetrics implements Metrics {
 
     private static final String metricsVersion = "0.1";
@@ -67,7 +40,6 @@ public class KafkaMetrics implements Metrics {
     private final Lock makeProducerLock = new ReentrantLock();
     private volatile Producer<String, String> producer;
 
-    @Inject
     public KafkaMetrics(final Properties properties) {
         build = properties.getProperty("pyx.build");
         topic = properties.getProperty("kafka.topic");
@@ -169,7 +141,7 @@ public class KafkaMetrics implements Metrics {
     }
 
     private void send(final Map<String, Object> map) {
-        send(JSONValue.toJSONString(map));
+        // TODO: send(JSONValue.toJSONString(map));
     }
 
     private void send(final String json) {

@@ -6,18 +6,17 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
 import net.socialgamer.cah.Constants;
 
+import java.io.IOException;
 import java.util.Map;
 
-public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
+import static net.socialgamer.cah.Utils.methodNotAllowed;
 
-    private static NanoHTTPD.Response methodNotAllowed() {
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED, null, null);
-    }
+public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
 
     @Override
     public final NanoHTTPD.Response post(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
         try {
-            JsonElement json = handleRequest(uriResource, new Parameters(session), session); // TODO: Should extract parameters from body
+            JsonElement json = handleRequest(uriResource, Parameters.fromSession(session), session);
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/json", json.toString());
         } catch (StatusException ex) {
             if (ex instanceof CahResponder.CahException) {
@@ -33,6 +32,9 @@ public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
             }
 
             return NanoHTTPD.newFixedLengthResponse(ex.status, null, null);
+        } catch (IOException | NanoHTTPD.ResponseException ex) {
+            ex.printStackTrace(); // TODO
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, null, null);
         }
     }
 

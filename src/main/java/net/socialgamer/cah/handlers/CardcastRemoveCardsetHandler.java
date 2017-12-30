@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.cardcast.CardcastDeck;
@@ -14,15 +13,11 @@ import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
-import java.util.HashMap;
-
 public class CardcastRemoveCardsetHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CARDCAST_REMOVE_CARDSET.toString();
     private final CardcastService cardcastService;
 
-    @Inject
-    public CardcastRemoveCardsetHandler(final GameManager gameManager,
-                                        final CardcastService cardcastService) {
+    public CardcastRemoveCardsetHandler(final GameManager gameManager, final CardcastService cardcastService) {
         super(gameManager);
         this.cardcastService = cardcastService;
     }
@@ -32,7 +27,7 @@ public class CardcastRemoveCardsetHandler extends GameWithPlayerHandler {
         if (game.getHost() != user) throw new CahResponder.CahException(ErrorCode.NOT_GAME_HOST);
         if (game.getState() != GameState.LOBBY) throw new CahResponder.CahException(ErrorCode.ALREADY_STARTED);
 
-        String deckId = params.getFirst(AjaxRequest.CARDCAST_ID);
+        String deckId = params.get(AjaxRequest.CARDCAST_ID);
         if (deckId == null || deckId.isEmpty()) throw new CahResponder.CahException(ErrorCode.BAD_REQUEST);
         if (deckId.length() != 5) throw new CahResponder.CahException(ErrorCode.CARDCAST_INVALID_ID);
         deckId = deckId.toUpperCase();
@@ -42,10 +37,9 @@ public class CardcastRemoveCardsetHandler extends GameWithPlayerHandler {
         final CardcastDeck deck = cardcastService.loadSet(deckId);
         if (deck == null) throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND);
 
-        final HashMap<ReturnableData, Object> map = game.getEventMap();
-        map.put(LongPollResponse.EVENT, LongPollEvent.CARDCAST_REMOVE_CARDSET.toString());
-        map.put(LongPollResponse.CARDCAST_DECK_INFO, deck.getClientMetadata());
-        game.broadcastToPlayers(MessageType.GAME_EVENT, map);
+        JsonObject obj = game.getEventJson(LongPollEvent.CARDCAST_REMOVE_CARDSET);
+        obj.add(LongPollResponse.CARDCAST_DECK_INFO.toString(), deck.getClientMetadataJson());
+        game.broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         return new JsonObject();
     }

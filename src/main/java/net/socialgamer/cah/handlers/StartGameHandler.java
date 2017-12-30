@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -23,7 +22,6 @@ public class StartGameHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.START_GAME.toString();
     private final Session hibernateSession;
 
-    @Inject
     public StartGameHandler(final GameManager gameManager, final Session session) {
         super(gameManager);
         this.hibernateSession = session;

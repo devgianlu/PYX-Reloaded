@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.*;
@@ -13,13 +12,10 @@ import net.socialgamer.cah.servlets.BaseUriResponder;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
-import java.util.HashMap;
-
 public class ChatHandler extends BaseHandler {
     public static final String OP = AjaxOperation.CHAT.toString();
     private final ConnectedUsers users;
 
-    @Inject
     public ChatHandler(final ConnectedUsers users) {
         this.users = users;
     }
@@ -34,25 +30,25 @@ public class ChatHandler extends BaseHandler {
             user.getLastMessageTimes().remove(0);
         }
 
-        String msg = params.getFirst(AjaxRequest.MESSAGE);
+        String msg = params.get(AjaxRequest.MESSAGE);
         if (msg == null || msg.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_MSG_SPECIFIED);
         if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
 
-        boolean wall = params.getFirstBoolean(AjaxRequest.WALL, false);
-        boolean emote = params.getFirstBoolean(AjaxRequest.EMOTE, false);
+        boolean wall = params.getBoolean(AjaxRequest.WALL, false);
+        boolean emote = params.getBoolean(AjaxRequest.EMOTE, false);
 
         if (msg.length() > Constants.CHAT_MAX_LENGTH) {
             throw new CahResponder.CahException(ErrorCode.MESSAGE_TOO_LONG);
         } else {
             user.getLastMessageTimes().add(System.currentTimeMillis());
-            final HashMap<ReturnableData, Object> broadcastData = new HashMap<ReturnableData, Object>();
-            broadcastData.put(LongPollResponse.EVENT, LongPollEvent.CHAT.toString());
-            broadcastData.put(LongPollResponse.FROM, user.getNickname());
-            broadcastData.put(LongPollResponse.MESSAGE, msg);
-            if (user.isAdmin()) broadcastData.put(LongPollResponse.FROM_ADMIN, true);
-            if (wall) broadcastData.put(LongPollResponse.WALL, true);
-            if (emote) broadcastData.put(LongPollResponse.EMOTE, true);
-            users.broadcastToAll(MessageType.CHAT, broadcastData);
+            JsonObject obj = new JsonObject();
+            obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.CHAT.toString());
+            obj.addProperty(LongPollResponse.FROM.toString(), user.getNickname());
+            obj.addProperty(LongPollResponse.MESSAGE.toString(), msg);
+            if (user.isAdmin()) obj.addProperty(LongPollResponse.FROM_ADMIN.toString(), true);
+            if (wall) obj.addProperty(LongPollResponse.WALL.toString(), true);
+            if (emote) obj.addProperty(LongPollResponse.EMOTE.toString(), true);
+            users.broadcastToAll(MessageType.CHAT, obj);
         }
 
         return new JsonObject();

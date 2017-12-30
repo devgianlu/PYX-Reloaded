@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -15,7 +14,6 @@ public class NamesHandler extends BaseHandler {
     public static final String OP = AjaxOperation.NAMES.toString();
     private final ConnectedUsers users;
 
-    @Inject
     public NamesHandler(final ConnectedUsers users) {
         this.users = users;
     }

@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -14,7 +13,6 @@ import net.socialgamer.cah.servlets.Parameters;
 public class GetGameInfoHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.GET_GAME_INFO.toString();
 
-    @Inject
     public GetGameInfoHandler(final GameManager gameManager) {
         super(gameManager);
     }

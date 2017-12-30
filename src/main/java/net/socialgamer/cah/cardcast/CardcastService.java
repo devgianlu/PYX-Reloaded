@@ -1,14 +1,12 @@
 package net.socialgamer.cah.cardcast;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import net.socialgamer.cah.cardcast.CardcastModule.CardcastCardId;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import javax.net.ssl.*;
 import java.io.BufferedReader;
@@ -57,17 +55,10 @@ public class CardcastService {
      * How long to cache valid card sets.
      */
     private static final long VALID_SET_CACHE_LIFETIME = TimeUnit.MINUTES.toMillis(15);
-
     private static final Pattern validIdPattern = Pattern.compile("[A-Z0-9]{5}");
+    private static final Map<String, SoftReference<CardcastCacheEntry>> cache = Collections.synchronizedMap(new HashMap<String, SoftReference<CardcastCacheEntry>>());
 
-    private static final Map<String, SoftReference<CardcastCacheEntry>> cache = Collections
-            .synchronizedMap(new HashMap<String, SoftReference<CardcastCacheEntry>>());
-
-    private final Provider<Integer> cardIdProvider;
-
-    @Inject
-    public CardcastService(@CardcastCardId final Provider<Integer> cardIdProvider) {
-        this.cardIdProvider = cardIdProvider;
+    public CardcastService() {
     }
 
     public static void hackSslVerifier() {
@@ -101,12 +92,7 @@ public class CardcastService {
         }
 
         // Create host name verifier that only trusts cardcast
-        final HostnameVerifier allHostsValid = new HostnameVerifier() {
-            @Override
-            public boolean verify(final String hostname, final SSLSession session) {
-                return HOSTNAME.equals(hostname);
-            }
-        };
+        final HostnameVerifier allHostsValid = (hostname, session) -> HOSTNAME.equals(hostname);
 
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
     }
@@ -134,14 +120,13 @@ public class CardcastService {
         }
 
         try {
-            final String infoContent = getUrlContent(String
-                    .format(CARD_SET_INFO_URL_FORMAT_STRING, setId));
+            final String infoContent = getUrlContent(String.format(CARD_SET_INFO_URL_FORMAT_STRING, setId));
             if (null == infoContent) {
                 // failed to load
                 cacheMissingSet(setId);
                 return null;
             }
-            final JSONObject info = (JSONObject) JSONValue.parse(infoContent);
+            JsonObject info = new Gson().toJsonTree(infoContent).getAsJsonObject();
 
             final String cardContent = getUrlContent(String.format(
                     CARD_SET_CARDS_URL_FORMAT_STRING, setId));
@@ -150,10 +135,11 @@ public class CardcastService {
                 cacheMissingSet(setId);
                 return null;
             }
-            final JSONObject cards = (JSONObject) JSONValue.parse(cardContent);
 
-            final String name = (String) info.get("name");
-            final String description = (String) info.get("description");
+            JsonObject cards = new Gson().toJsonTree(cardContent).getAsJsonObject();
+
+            final String name = info.get("name").getAsString();
+            final String description = info.get("description").getAsString();
             if (null == name || null == description || name.isEmpty()) {
                 // We require a name. Blank description is acceptable, but cannot be null.
                 cacheMissingSet(setId);
@@ -163,33 +149,32 @@ public class CardcastService {
                     StringEscapeUtils.escapeXml11(description));
 
             // load up the cards
-            final JSONArray blacks = (JSONArray) cards.get("calls");
+            JsonArray blacks = cards.getAsJsonArray("calls");
             if (null != blacks) {
-                for (final Object black : blacks) {
-                    final JSONArray texts = (JSONArray) ((JSONObject) black).get("text");
+                for (final JsonElement black : blacks) {
+                    final JsonArray texts = black.getAsJsonObject().getAsJsonArray("text");
                     if (null != texts) {
                         // TODO this is going to need some work to look pretty.
-                        final List<String> strs = new ArrayList<String>(texts.size());
+                        final List<String> strs = new ArrayList<>(texts.size());
                         for (final Object o : texts) {
                             strs.add((String) o);
                         }
                         final String text = StringUtils.join(strs, "____");
                         final int pick = strs.size() - 1;
                         final int draw = (pick >= 3 ? pick - 1 : 0);
-                        final CardcastBlackCard card = new CardcastBlackCard(cardIdProvider.get(),
-                                StringEscapeUtils.escapeXml11(text), draw, pick, setId);
+                        final CardcastBlackCard card = new CardcastBlackCard(CardIdUtils.getNewId(), StringEscapeUtils.escapeXml11(text), draw, pick, setId);
                         deck.getBlackCards().add(card);
                     }
                 }
             }
 
-            final JSONArray whites = (JSONArray) cards.get("responses");
+            JsonArray whites = cards.getAsJsonArray("responses");
             if (null != whites) {
-                for (final Object white : whites) {
-                    final JSONArray texts = (JSONArray) ((JSONObject) white).get("text");
+                for (final JsonElement white : whites) {
+                    final JsonArray texts = white.getAsJsonObject().getAsJsonArray("text");
                     if (null != texts) {
                         // The white cards should only ever have one element in text, but let's be safe.
-                        final List<String> strs = new ArrayList<String>(texts.size());
+                        final List<String> strs = new ArrayList<>(texts.size());
                         for (final Object o : texts) {
                             final String cardCastString = (String) o;
                             if (cardCastString.isEmpty()) {
@@ -213,8 +198,7 @@ public class CardcastService {
                         final String text = StringUtils.join(strs, "");
                         // don't add blank cards, they don't do anything
                         if (!text.isEmpty()) {
-                            final CardcastWhiteCard card = new CardcastWhiteCard(cardIdProvider.get(),
-                                    StringEscapeUtils.escapeXml11(text), setId);
+                            final CardcastWhiteCard card = new CardcastWhiteCard(CardIdUtils.getNewId(), StringEscapeUtils.escapeXml11(text), setId);
                             deck.getWhiteCards().add(card);
                         }
                     }
@@ -233,7 +217,7 @@ public class CardcastService {
 
     private void cachePut(final String setId, final CardcastDeck deck, final long timeout) {
         LOG.info(String.format("Caching %s=%s for %d ms", setId, deck, timeout));
-        cache.put(setId, new SoftReference<CardcastCacheEntry>(new CardcastCacheEntry(timeout, deck)));
+        cache.put(setId, new SoftReference<>(new CardcastCacheEntry(timeout, deck)));
     }
 
     private void cacheSet(final String setId, final CardcastDeck deck) {

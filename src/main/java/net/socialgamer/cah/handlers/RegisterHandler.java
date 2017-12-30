@@ -2,11 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import fi.iki.elonen.NanoHTTPD;
-import net.socialgamer.cah.CahModule.BanList;
-import net.socialgamer.cah.CahModule.UserPersistentId;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -29,28 +25,27 @@ public class RegisterHandler extends BaseHandler {
     private final ConnectedUsers users;
     private final Set<String> banList;
     private final User.Factory userFactory;
-    private final Provider<String> persistentIdProvider;
+    private final String persistentId;
 
-    @Inject
-    public RegisterHandler(final ConnectedUsers users, @BanList final Set<String> banList, final User.Factory userFactory, @UserPersistentId final Provider<String> persistentIdProvider) {
+    public RegisterHandler(ConnectedUsers users, Set<String> banList, User.Factory userFactory, String persistentId) {
         this.users = users;
         this.banList = banList;
         this.userFactory = userFactory;
-        this.persistentIdProvider = persistentIdProvider;
+        this.persistentId = persistentId;
     }
 
     @Override
     public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
         if (banList.contains(session.getRemoteIpAddress())) throw new CahResponder.CahException(ErrorCode.BANNED);
 
-        String nickname = params.getFirst(AjaxRequest.NICKNAME);
+        String nickname = params.get(AjaxRequest.NICKNAME);
         if (nickname == null) throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
         if (!Pattern.matches(VALID_NAME_PATTERN, nickname)) throw new CahResponder.CahException(ErrorCode.INVALID_NICK);
         if (nickname.equalsIgnoreCase("xyzzy"))
             throw new CahResponder.CahException(ErrorCode.RESERVED_NICK);
 
-        String pid = params.getFirst(AjaxRequest.PERSISTENT_ID);
-        if (pid == null || pid.isEmpty()) pid = persistentIdProvider.get();
+        String pid = params.get(AjaxRequest.PERSISTENT_ID);
+        if (pid == null || pid.isEmpty()) pid = persistentId; // TODO: This is stupid, you removed the provider
 
         user = userFactory.create(nickname,
                 session.getRemoteIpAddress(),

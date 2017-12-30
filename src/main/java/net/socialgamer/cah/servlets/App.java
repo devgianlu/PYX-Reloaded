@@ -6,6 +6,8 @@ public class App extends RouterNanoHTTPD {
 
     public App(int port) {
         super(port);
+
+        addMappings();
     }
 
     @Override

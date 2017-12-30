@@ -4,7 +4,6 @@ import net.socialgamer.cah.data.BlackCard;
 
 
 public class CardcastBlackCard extends BlackCard {
-
     private final int id;
     private final String text;
     private final int draw;

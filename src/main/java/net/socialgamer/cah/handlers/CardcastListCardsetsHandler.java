@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -20,7 +19,6 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CARDCAST_LIST_CARDSETS.toString();
     private final CardcastService cardcastService;
 
-    @Inject
     public CardcastListCardsetsHandler(final GameManager gameManager, final CardcastService cardcastService) {
         super(gameManager);
         this.cardcastService = cardcastService;

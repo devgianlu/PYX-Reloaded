@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.DisconnectReason;
@@ -15,7 +14,6 @@ public class LogoutHandler extends BaseHandler {
     public final static String OP = AjaxOperation.LOG_OUT.toString();
     private final ConnectedUsers users;
 
-    @Inject
     public LogoutHandler(final ConnectedUsers users) {
         this.users = users;
     }

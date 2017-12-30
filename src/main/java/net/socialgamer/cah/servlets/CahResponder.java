@@ -16,7 +16,7 @@ public abstract class CahResponder extends BaseUriResponder {
         String sid = session.getCookies().read("PYX-Session");
         User user = Sessions.getUser(sid);
 
-        String op = params.getFirst(Constants.AjaxRequest.OP.toString());
+        String op = params.get(Constants.AjaxRequest.OP.toString());
         if (op == null || op.isEmpty()) throw new CahException(Constants.ErrorCode.OP_NOT_SPECIFIED);
 
         boolean skipUserCheck = Objects.equals(op, Constants.AjaxOperation.REGISTER.toString()) || Objects.equals(op, Constants.AjaxOperation.FIRST_LOAD.toString());

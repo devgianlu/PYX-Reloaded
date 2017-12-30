@@ -2,35 +2,42 @@ package net.socialgamer.cah.servlets;
 
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
-public class Parameters extends HashMap<String, List<String>> {
+public class Parameters extends HashMap<String, String> {
 
-    public Parameters(NanoHTTPD.IHTTPSession session) {
-        super(session.getParameters());
+    private Parameters() {
+    }
+
+    public static Parameters fromSession(NanoHTTPD.IHTTPSession session) throws IOException, NanoHTTPD.ResponseException {
+        Map<String, String> body = new HashMap<>();
+        session.parseBody(body);
+
+        Parameters params = new Parameters();
+        for (NameValuePair pair : URLEncodedUtils.parse(body.get("postData"), Charset.forName("UTF-8")))
+            params.put(pair.getName(), pair.getValue());
+
+        return params;
     }
 
     @Nullable
-    public String getFirst(Constants.AjaxRequest key) {
-        return getFirst(key.toString());
+    public String get(Constants.AjaxRequest key) {
+        return get(key.toString());
     }
 
-    @Nullable
-    public String getFirst(String key) {
-        List<String> values = get(key);
-        if (values != null && !values.isEmpty()) return values.get(0);
-        else return null;
+    public boolean getBoolean(Constants.AjaxRequest key, boolean fallback) {
+        return getBoolean(key.toString(), fallback);
     }
 
-    public boolean getFirstBoolean(Constants.AjaxRequest key, boolean fallback) {
-        return getFirstBoolean(key.toString(), fallback);
-    }
-
-    public boolean getFirstBoolean(String key, boolean fallback) {
-        String val = getFirst(key);
+    public boolean getBoolean(String key, boolean fallback) {
+        String val = get(key);
         if (val == null) return false;
 
         try {

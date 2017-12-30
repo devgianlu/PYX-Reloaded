@@ -3,10 +3,7 @@ package net.socialgamer.cah.handlers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import fi.iki.elonen.NanoHTTPD;
-import net.socialgamer.cah.CahModule.IncludeInactiveCardsets;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ReconnectNextAction;
@@ -21,12 +18,11 @@ import java.util.List;
 public class FirstLoadHandler extends BaseHandler {
     public static final String OP = AjaxOperation.FIRST_LOAD.toString();
     private final Session hibernateSession;
-    private final Provider<Boolean> includeInactiveCardsetsProvider;
+    private final Boolean includeInactiveCardsets;
 
-    @Inject
-    public FirstLoadHandler(final Session hibernateSession, @IncludeInactiveCardsets final Provider<Boolean> includeInactiveCardsetsProvider) {
+    public FirstLoadHandler(Session hibernateSession, Boolean includeInactiveCardsets) {
         this.hibernateSession = hibernateSession;
-        this.includeInactiveCardsetsProvider = includeInactiveCardsetsProvider;
+        this.includeInactiveCardsets = includeInactiveCardsets;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class FirstLoadHandler extends BaseHandler {
         try {
             Transaction transaction = hibernateSession.beginTransaction();
             List<PyxCardSet> cardSets = hibernateSession
-                    .createQuery(PyxCardSet.getCardsetQuery(includeInactiveCardsetsProvider.get()))
+                    .createQuery(PyxCardSet.getCardsetQuery(includeInactiveCardsets))
                     .setReadOnly(true)
                     .setCacheable(true)
                     .list();

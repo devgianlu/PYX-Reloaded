@@ -2,7 +2,6 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -21,14 +20,13 @@ public class ScoreHandler extends BaseHandler {
     public static final String OP = AjaxOperation.SCORE.toString();
     private final ConnectedUsers connectedUsers;
 
-    @Inject
     public ScoreHandler(final ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
     }
 
     @Override
     public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
-        String argsStr = params.getFirst(AjaxRequest.MESSAGE);
+        String argsStr = params.get(AjaxRequest.MESSAGE);
         String[] args = (argsStr == null || argsStr.isEmpty()) ? new String[0] : argsStr.trim().split(" ");
 
         User target = (args.length > 0) ? connectedUsers.getUser(args[0]) : user;
@@ -41,8 +39,7 @@ public class ScoreHandler extends BaseHandler {
         if (player == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
 
         if (user.isAdmin() && args.length == 2) {
-            // TODO
-            // for now only admins can change scores. could possibly extend this to let the host do it,
+            // TODO: for now only admins can change scores. could possibly extend this to let the host do it,
             // provided it's for a player in the same game and it does a game-wide announcement.
             try {
                 int offset = Integer.parseInt(args[1]);

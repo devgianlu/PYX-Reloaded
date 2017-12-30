@@ -19,7 +19,7 @@ public abstract class GameHandler extends BaseHandler {
 
     @Override
     public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
-        String gameIdStr = params.getFirst(AjaxRequest.GAME_ID);
+        String gameIdStr = params.get(AjaxRequest.GAME_ID);
         if (gameIdStr == null || gameIdStr.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_GAME_SPECIFIED);
 
         int gameId;
