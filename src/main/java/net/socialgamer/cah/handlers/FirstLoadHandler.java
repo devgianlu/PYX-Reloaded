@@ -41,12 +41,12 @@ import java.util.Map;
 
 
 /**
- * Handler called for first invocation after a client loads. This can be used to restore a game in
+ * BaseHandler called for first invocation after a client loads. This can be used to restore a game in
  * progress if the browser reloads.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class FirstLoadHandler extends Handler {
+public class FirstLoadHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.FIRST_LOAD.toString();
 

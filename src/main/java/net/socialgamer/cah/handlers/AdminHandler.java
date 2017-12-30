@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public abstract class AdminHandler extends Handler {
+public abstract class AdminHandler extends BaseHandler {
 
     @Override
     public Map<ReturnableData, Object> handle(final RequestWrapper request, final HttpSession session) {

@@ -37,12 +37,12 @@ import java.util.Map;
 
 
 /**
- * Handler superclass for handlers that require a game. This finds the game and makes sure it's
+ * BaseHandler superclass for handlers that require a game. This finds the game and makes sure it's
  * valid and specified.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public abstract class GameHandler extends Handler {
+public abstract class GameHandler extends BaseHandler {
 
     protected GameManager gameManager;
 

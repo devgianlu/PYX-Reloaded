@@ -46,7 +46,7 @@ import java.util.Map;
 
 /**
  * Servlet implementation class CahServlet.
- *
+ * <p>
  * Superclass for all CAH servlets. Provides utility methods to return errors and data, and to log.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
@@ -98,11 +98,11 @@ public abstract class CahServlet extends HttpServlet {
                     && (op.equals(AjaxOperation.REGISTER.toString())
                     || op.equals(AjaxOperation.FIRST_LOAD.toString()));
             if (!skipSessionUserCheck && hSession.getAttribute(SessionAttribute.USER) == null) {
-                returnError(user, response.getWriter(), ErrorCode.NOT_REGISTERED, serial);
+                returnError(response.getWriter(), ErrorCode.NOT_REGISTERED, serial);
             } else if (user != null && !user.isValid()) {
                 // user probably pinged out, or possibly kicked by admin
                 hSession.invalidate();
-                returnError(user, response.getWriter(), ErrorCode.SESSION_EXPIRED, serial);
+                returnError(response.getWriter(), ErrorCode.SESSION_EXPIRED, serial);
             } else {
                 try {
                     handleRequest(request, response, hSession);
@@ -113,7 +113,7 @@ public abstract class CahServlet extends HttpServlet {
             }
         } catch (final IllegalStateException ise) {
             // session invalidated, so pretend they don't have one.
-            returnError(null, response.getWriter(), ErrorCode.NO_SESSION, serial);
+            returnError(response.getWriter(), ErrorCode.NO_SESSION, serial);
         }
     }
 
@@ -121,10 +121,8 @@ public abstract class CahServlet extends HttpServlet {
      * @return Whether verbose logging is enabled.
      */
     private boolean verboseDebug() {
-        final Boolean verboseDebugObj = (Boolean) getServletContext().getAttribute(
-                StartupUtils.VERBOSE_DEBUG);
-        final boolean verboseDebug = verboseDebugObj != null && verboseDebugObj.booleanValue();
-        return verboseDebug;
+        final Boolean verboseDebugObj = (Boolean) getServletContext().getAttribute(StartupUtils.VERBOSE_DEBUG);
+        return verboseDebugObj != null && verboseDebugObj;
     }
 
     /**
@@ -143,13 +141,12 @@ public abstract class CahServlet extends HttpServlet {
     /**
      * Return an error to the client.
      *
-     * @param user   User that caused the error.
      * @param writer Response writer to send the error data to.
      * @param code   Error code to return to client.
      * @param serial Request serial number from client.
      */
     @SuppressWarnings("unchecked")
-    protected void returnError(@Nullable final User user, final PrintWriter writer,
+    protected void returnError(final PrintWriter writer,
                                final ErrorCode code, final int serial) {
         final JSONObject ret = new JSONObject();
         ret.put(AjaxResponse.ERROR, Boolean.TRUE);

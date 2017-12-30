@@ -39,7 +39,7 @@ import java.util.Map;
 
 
 /**
- * Handler for the judge selecting a winning card.
+ * BaseHandler for the judge selecting a winning card.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

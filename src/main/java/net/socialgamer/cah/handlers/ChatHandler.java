@@ -37,11 +37,11 @@ import java.util.Map;
 
 
 /**
- * Handler for chat messages.
+ * BaseHandler for chat messages.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class ChatHandler extends Handler {
+public class ChatHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.CHAT.toString();
 

@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to stop a game.
+ * BaseHandler to stop a game.
  */
 public class StopGameHandler extends GameWithPlayerHandler {
 

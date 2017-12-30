@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class KickHandler extends Handler {
+public class KickHandler extends BaseHandler {
     public static final String OP = AjaxOperation.KICK.toString();
     protected final Logger logger = Logger.getLogger(KickHandler.class);
     private final ConnectedUsers connectedUsers;

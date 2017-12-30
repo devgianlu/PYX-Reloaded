@@ -38,11 +38,11 @@ import java.util.Map;
 
 
 /**
- * Handler to log out of the server.
+ * BaseHandler to log out of the server.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class LogoutHandler extends Handler {
+public class LogoutHandler extends BaseHandler {
 
     public final static String OP = AjaxOperation.LOG_OUT.toString();
 

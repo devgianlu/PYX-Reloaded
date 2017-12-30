@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to start a game.
+ * BaseHandler to start a game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

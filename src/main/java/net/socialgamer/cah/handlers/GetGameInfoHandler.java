@@ -38,7 +38,7 @@ import java.util.Map;
 
 
 /**
- * Handler to get a game's information.
+ * BaseHandler to get a game's information.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

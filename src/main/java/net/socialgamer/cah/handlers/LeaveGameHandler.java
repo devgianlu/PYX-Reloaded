@@ -37,7 +37,7 @@ import java.util.Map;
 
 
 /**
- * Handler to leave a game.
+ * BaseHandler to leave a game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

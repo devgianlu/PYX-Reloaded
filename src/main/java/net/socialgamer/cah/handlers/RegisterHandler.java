@@ -43,11 +43,11 @@ import java.util.regex.Pattern;
 
 
 /**
- * Handler to register a name with the server and get connected.
+ * BaseHandler to register a name with the server and get connected.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class RegisterHandler extends Handler {
+public class RegisterHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.REGISTER.toString();
 

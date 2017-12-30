@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to play a card.
+ * BaseHandler to play a card.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

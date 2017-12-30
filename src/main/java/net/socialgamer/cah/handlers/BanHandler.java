@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class BanHandler extends Handler {
+public class BanHandler extends BaseHandler {
     public static final String OP = AjaxOperation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
     private final ConnectedUsers connectedUsers;

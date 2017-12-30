@@ -38,7 +38,7 @@ import java.util.Map;
 
 
 /**
- * Handler for chat messages.
+ * BaseHandler for chat messages.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

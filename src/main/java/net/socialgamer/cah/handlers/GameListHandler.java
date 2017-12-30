@@ -38,11 +38,11 @@ import java.util.*;
 
 
 /**
- * Handler to get a list of active games.
+ * BaseHandler to get a list of active games.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class GameListHandler extends Handler {
+public class GameListHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.GAME_LIST.toString();
 

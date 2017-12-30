@@ -35,7 +35,7 @@ import java.util.Map;
 
 
 /**
- * Handler superclass for handlers that require a game and a user in that game. Ensures the game id
+ * BaseHandler superclass for handlers that require a game and a user in that game. Ensures the game id
  * is valid, finds the game, and ensures that the client is actually in that game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)

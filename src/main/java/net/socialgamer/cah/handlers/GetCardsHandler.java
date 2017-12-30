@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to get the Black, White, and hand cards for a particular game and player in the game.
+ * BaseHandler to get the Black, White, and hand cards for a particular game and player in the game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

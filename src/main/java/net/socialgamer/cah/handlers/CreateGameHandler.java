@@ -36,11 +36,11 @@ import java.util.Map;
 
 
 /**
- * Handler to create a new game.
+ * BaseHandler to create a new game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class CreateGameHandler extends Handler {
+public class CreateGameHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.CREATE_GAME.toString();
 

@@ -36,11 +36,11 @@ import java.util.*;
 
 
 /**
- * Handler to get the names of all players connected to the server.
+ * BaseHandler to get the names of all players connected to the server.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-public class NamesHandler extends Handler {
+public class NamesHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.NAMES.toString();
 

@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to join a game.
+ * BaseHandler to join a game.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ScoreHandler extends Handler {
+public class ScoreHandler extends BaseHandler {
 
     public static final String OP = AjaxOperation.SCORE.toString();
 

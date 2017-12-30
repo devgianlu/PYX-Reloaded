@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * Handler to spectate a game.
+ * BaseHandler to spectate a game.
  *
  * @author Gavin Lambert (cah@mirality.co.nz)
  */
