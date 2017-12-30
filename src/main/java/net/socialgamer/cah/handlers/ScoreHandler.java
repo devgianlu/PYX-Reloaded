@@ -1,22 +1,24 @@
 package net.socialgamer.cah.handlers;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import net.socialgamer.cah.Constants.*;
-import net.socialgamer.cah.RequestWrapper;
+import fi.iki.elonen.NanoHTTPD;
+import net.socialgamer.cah.Constants.AjaxOperation;
+import net.socialgamer.cah.Constants.AjaxRequest;
+import net.socialgamer.cah.Constants.AjaxResponse;
+import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Player;
 import net.socialgamer.cah.data.User;
-
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
+import net.socialgamer.cah.servlets.BaseUriResponder;
+import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.Parameters;
 
 
 public class ScoreHandler extends BaseHandler {
-
     public static final String OP = AjaxOperation.SCORE.toString();
-
     private final ConnectedUsers connectedUsers;
 
     @Inject
@@ -25,41 +27,34 @@ public class ScoreHandler extends BaseHandler {
     }
 
     @Override
-    public Map<ReturnableData, Object> handle(final RequestWrapper request, final HttpSession session) {
-        final User user = (User) session.getAttribute(SessionAttribute.USER);
-        assert (user != null);
-        final String params = request.getParameter(AjaxRequest.MESSAGE);
-        final String[] args = (params == null || params.isEmpty()) ? new String[0] : params.trim()
-                .split(" ");
+    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
+        String argsStr = params.getFirst(AjaxRequest.MESSAGE);
+        String[] args = (argsStr == null || argsStr.isEmpty()) ? new String[0] : argsStr.trim().split(" ");
 
-        final User target = (args.length > 0) ? connectedUsers.getUser(args[0]) : user;
-        if (null == target) {
-            return error(ErrorCode.NO_SUCH_USER);
-        }
-        final Game game = target.getGame();
-        if (null == game) {
-            return error(ErrorCode.INVALID_GAME);
-        }
-        final Player player = game.getPlayerForUser(target);
-        if (null == player) {
-            return error(ErrorCode.INVALID_GAME);
-        }
+        User target = (args.length > 0) ? connectedUsers.getUser(args[0]) : user;
+        if (target == null) throw new CahResponder.CahException(ErrorCode.NO_SUCH_USER);
 
-        final Map<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
+        Game game = target.getGame();
+        if (game == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
+
+        Player player = game.getPlayerForUser(target);
+        if (player == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
 
         if (user.isAdmin() && args.length == 2) {
-            // for now only admins can change scores.  could possibly extend this to let the host do it,
-            // provided it's for a player in the same game and it does a gamewide announcement.
+            // TODO
+            // for now only admins can change scores. could possibly extend this to let the host do it,
+            // provided it's for a player in the same game and it does a game-wide announcement.
             try {
-                final int offset = Integer.parseInt(args[1]);
+                int offset = Integer.parseInt(args[1]);
                 player.increaseScore(offset);
                 game.notifyPlayerInfoChange(player);
-            } catch (final NumberFormatException e) {
-                return error(ErrorCode.BAD_REQUEST);
+            } catch (final NumberFormatException ex) {
+                throw new CahResponder.CahException(ErrorCode.BAD_REQUEST, ex);
             }
         }
-        data.put(AjaxResponse.PLAYER_INFO, game.getPlayerInfo(player));
 
-        return data;
+        JsonObject obj = new JsonObject();
+        obj.add(AjaxResponse.PLAYER_INFO.toString(), game.getPlayerInfoJson(player));
+        return obj;
     }
 }

@@ -20,4 +20,8 @@ public final class Sessions {
     public static void invalidate(String sid) {
         sessions.remove(sid);
     }
+
+    public static void add(User user) {
+        sessions.put(user.getSessionId(), user);
+    }
 }

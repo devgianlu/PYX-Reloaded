@@ -1,5 +1,6 @@
 package net.socialgamer.cah.data;
 
+import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.BlackCardData;
 
 import java.util.HashMap;
@@ -42,6 +43,16 @@ public abstract class BlackCard {
         cardData.put(BlackCardData.PICK, getPick());
         cardData.put(BlackCardData.WATERMARK, getWatermark());
         return cardData;
+    }
+
+    public final JsonObject getClientDataJson() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(BlackCardData.ID.toString(), getId());
+        obj.addProperty(BlackCardData.TEXT.toString(), getText());
+        obj.addProperty(BlackCardData.DRAW.toString(), getDraw());
+        obj.addProperty(BlackCardData.PICK.toString(), getPick());
+        obj.addProperty(BlackCardData.WATERMARK.toString(), getWatermark());
+        return obj;
     }
 
     @Override

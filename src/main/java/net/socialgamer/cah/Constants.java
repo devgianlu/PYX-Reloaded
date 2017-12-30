@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * Constants needed on both the CAH server and client. This file is examined with reflection to
  * produce a Javascript version for the client to use.
- *
+ * <p>
  * All of the enums in here take a string in their constructor to define the over-the-wire value to
  * be used to represent that enum value. This allows for verbose names while debugging, and short
  * names to reduce traffic and latency, by only having to change it in one place for both the server
@@ -53,8 +53,6 @@ public class Constants {
         {
             add("0:0:0:0:0:0:0:1");
             add("127.0.0.1");
-            // ajanata
-            add("107.218.154.202");
         }
     };
 

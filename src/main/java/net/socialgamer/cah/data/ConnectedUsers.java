@@ -97,6 +97,7 @@ public class ConnectedUsers {
      * @return {@code null} if the user was added, or an {@link ErrorCode} explaining why the user was
      * rejected.
      */
+    @Nullable
     public ErrorCode checkAndAdd(final User user) {
         final int maxUsers = maxUsersProvider.get();
         synchronized (users) {

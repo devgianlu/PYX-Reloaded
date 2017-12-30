@@ -12,8 +12,8 @@ public class App extends RouterNanoHTTPD {
     public void addMappings() {
         super.addMappings();
         addRoute("/AjaxServlet", AjaxResponder.class);
-        addRoute("/LongPollServlet", );
-        addRoute("/Schema", );
+        addRoute("/LongPollServlet", LongPollResponder.class);
+        addRoute("/Schema", SchemaResponder.class);
 
         // TODO: JavascriptConfigServlet
     }

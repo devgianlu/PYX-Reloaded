@@ -1,5 +1,6 @@
 package net.socialgamer.cah.db;
 
+import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.CardSetData;
 import net.socialgamer.cah.data.CardSet;
 import org.hibernate.Session;
@@ -10,7 +11,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -118,22 +118,19 @@ public class PyxCardSet extends CardSet {
         this.weight = weight;
     }
 
-    /**
-     * Get the JSON representation of this card set's metadata. This method will not cause
-     * lazy-loading of the card collections.
-     *
-     * @return Client representation of this card set.
-     */
-    public Map<CardSetData, Object> getClientMetadata(final Session hibernateSession) {
-        final Map<CardSetData, Object> cardSetData = getCommonClientMetadata();
+    public JsonObject getClientMetadataJson(final Session hibernateSession) {
+        JsonObject json = getCommonClientMetadataJson();
+
         final Number blackCount = (Number) hibernateSession
                 .createQuery("select count(*) from PyxCardSet cs join cs.blackCards where cs.id = :id")
                 .setParameter("id", id).setCacheable(true).uniqueResult();
-        cardSetData.put(CardSetData.BLACK_CARDS_IN_DECK, blackCount);
+        json.addProperty(CardSetData.BLACK_CARDS_IN_DECK.toString(), blackCount);
+
         final Number whiteCount = (Number) hibernateSession
                 .createQuery("select count(*) from PyxCardSet cs join cs.whiteCards where cs.id = :id")
                 .setParameter("id", id).setCacheable(true).uniqueResult();
-        cardSetData.put(CardSetData.WHITE_CARDS_IN_DECK, whiteCount);
-        return cardSetData;
+        json.addProperty(CardSetData.WHITE_CARDS_IN_DECK.toString(), whiteCount);
+
+        return json;
     }
 }

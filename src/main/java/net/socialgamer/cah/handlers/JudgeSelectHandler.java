@@ -1,50 +1,19 @@
-/**
- * Copyright (c) 2012, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.handlers;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
-import net.socialgamer.cah.Constants.ReturnableData;
-import net.socialgamer.cah.RequestWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.Parameters;
 
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
-
-
-/**
- * BaseHandler for the judge selecting a winning card.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
 public class JudgeSelectHandler extends GameWithPlayerHandler {
-
     public static final String OP = AjaxOperation.JUDGE_SELECT.toString();
 
     @Inject
@@ -53,26 +22,19 @@ public class JudgeSelectHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public Map<ReturnableData, Object> handleWithUserInGame(final RequestWrapper request,
-                                                            final HttpSession session, final User user, final Game game) {
-        final Map<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
+    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
+        String cardIdStr = params.getFirst(AjaxRequest.CARD_ID);
+        if (cardIdStr == null || cardIdStr.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_CARD_SPECIFIED);
 
-        final int cardId;
-
-        if (request.getParameter(AjaxRequest.CARD_ID) == null) {
-            return error(ErrorCode.NO_CARD_SPECIFIED);
-        }
+        int cardId;
         try {
-            cardId = Integer.parseInt(request.getParameter(AjaxRequest.CARD_ID));
-        } catch (final NumberFormatException nfe) {
-            return error(ErrorCode.INVALID_CARD);
+            cardId = Integer.parseInt(cardIdStr);
+        } catch (NumberFormatException ex) {
+            throw new CahResponder.CahException(ErrorCode.INVALID_CARD, ex);
         }
 
-        final ErrorCode ec = game.judgeCard(user, cardId);
-        if (ec != null) {
-            return error(ec);
-        } else {
-            return data;
-        }
+        final ErrorCode errorCode = game.judgeCard(user, cardId);
+        if (errorCode != null) throw new CahResponder.CahException(errorCode);
+        else return new JsonObject();
     }
 }

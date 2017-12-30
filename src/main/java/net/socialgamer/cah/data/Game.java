@@ -23,10 +23,14 @@
 
 package net.socialgamer.cah.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.socialgamer.cah.CahModule.UniqueId;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.GameManager.GameId;
@@ -36,6 +40,7 @@ import net.socialgamer.cah.task.SafeTimerTask;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,12 +54,12 @@ import java.util.concurrent.TimeUnit;
  * Game data and logic class. Games are simple finite state machines, with 3 states that wait for
  * user input, and 3 transient states that it quickly passes through on the way back to a waiting
  * state:
- *
+ * <p>
  * ......Lobby.----------->.Dealing.(transient).-------->.Playing
  * .......^........................^.........................|....................
  * .......|.v----.Win.(transient).<+------.Judging.<---------+....................
  * .....Reset.(transient)
- *
+ * <p>
  * Lobby is the default state. When the game host sends a start game event, the game moves to the
  * Dealing state, where it deals out cards to every player and automatically moves into the Playing
  * state. After all players have played a card, the game moves to Judging and waits for the judge to
@@ -181,6 +186,26 @@ public class Game {
     }
 
     /**
+     * Convert a list of {@code WhiteCard}s to data suitable for sending to a client.
+     *
+     * @param cards Cards to convert to client data.
+     * @return Client representation of {@code cards}.
+     */
+    private static List<Map<WhiteCardData, Object>> getWhiteCardData(List<WhiteCard> cards) {
+        final List<Map<WhiteCardData, Object>> data = new ArrayList<>(cards.size());
+        for (final WhiteCard card : cards) {
+            data.add(card.getClientData());
+        }
+        return data;
+    }
+
+    private static JsonArray getWhiteCardsDataJson(List<WhiteCard> cards) {
+        JsonArray json = new JsonArray(cards.size());
+        for (WhiteCard card : cards) json.add(card.getClientDataJson());
+        return json;
+    }
+
+    /**
      * Add a player to the game.
      * <p>
      * Synchronizes on {@link #players}.
@@ -211,6 +236,10 @@ public class Game {
 
         // Don't do this anymore, it was driving up a crazy amount of traffic.
         // gameManager.broadcastGameListRefresh();
+    }
+
+    public boolean isPasswordCorrect(String userPassword) {
+        return getPassword() == null || getPassword().isEmpty() || Objects.equals(userPassword, getPassword());
     }
 
     /**
@@ -320,8 +349,7 @@ public class Game {
      * @throws TooManySpectatorsException Thrown if this game is at its maximum spectator capacity.
      * @throws IllegalStateException      Thrown if {@code user} is already in a game.
      */
-    public void addSpectator(final User user) throws TooManySpectatorsException,
-            IllegalStateException {
+    public void addSpectator(final User user) throws TooManySpectatorsException, IllegalStateException {
         logger.info(String.format("%s joined game %d as a spectator.", user.toString(), id));
         synchronized (spectators) {
             if (spectators.size() >= options.spectatorLimit) {
@@ -472,6 +500,33 @@ public class Game {
         return getInfo(false);
     }
 
+    @Nullable
+    public JsonObject getInfoJson(boolean includePassword) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.ID.toString(), id);
+
+        // This is probably happening because the game ceases to exist in the middle of getting the
+        // game list. Just return nothing.
+        if (host == null) return null; // FIXME
+
+        obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
+        obj.addProperty(GameInfo.STATE.toString(), state.toString());
+        obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
+        obj.addProperty(GameInfo.HAS_PASSWORD.toString(), options.password != null && !options.password.equals(""));
+
+        JsonArray playerNames = new JsonArray();
+        for (Player player : players.toArray(new Player[players.size()]))
+            playerNames.add(player.getUser().getNickname());
+        obj.add(GameInfo.PLAYERS.toString(), playerNames);
+
+        JsonArray spectatorNames = new JsonArray();
+        for (final User spectator : spectators.toArray(new User[spectators.size()]))
+            spectatorNames.add(spectator.getNickname());
+        obj.add(GameInfo.SPECTATORS.toString(), spectatorNames);
+
+        return obj;
+    }
+
     /**
      * Get information about this game.
      * <br/>
@@ -483,7 +538,7 @@ public class Game {
      */
     @Nullable
     public Map<GameInfo, Object> getInfo(final boolean includePassword) {
-        final Map<GameInfo, Object> info = new HashMap<GameInfo, Object>();
+        final Map<GameInfo, Object> info = new HashMap<>();
         info.put(GameInfo.ID, id);
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
@@ -496,14 +551,14 @@ public class Game {
         info.put(GameInfo.HAS_PASSWORD, options.password != null && !options.password.equals(""));
 
         final Player[] playersCopy = players.toArray(new Player[players.size()]);
-        final List<String> playerNames = new ArrayList<String>(playersCopy.length);
+        final List<String> playerNames = new ArrayList<>(playersCopy.length);
         for (final Player player : playersCopy) {
             playerNames.add(player.getUser().getNickname());
         }
         info.put(GameInfo.PLAYERS, playerNames);
 
         final User[] spectatorsCopy = spectators.toArray(new User[spectators.size()]);
-        final List<String> spectatorNames = new ArrayList<String>(spectatorsCopy.length);
+        final List<String> spectatorNames = new ArrayList<>(spectatorsCopy.length);
         for (final User spectator : spectatorsCopy) {
             spectatorNames.add(spectator.getNickname());
         }
@@ -512,24 +567,18 @@ public class Game {
         return info;
     }
 
-    /**
-     * Synchronizes on {@link #players}.
-     *
-     * @return Player information for every player in this game: Name, score, status.
-     */
-    public List<Map<GamePlayerInfo, Object>> getAllPlayerInfo() {
-        final List<Map<GamePlayerInfo, Object>> info;
-        final Player[] playersCopy = players.toArray(new Player[players.size()]);
-        info = new ArrayList<Map<GamePlayerInfo, Object>>(playersCopy.length);
-        for (final Player player : playersCopy) {
-            final Map<GamePlayerInfo, Object> playerInfo = getPlayerInfo(player);
-            info.add(playerInfo);
+    public JsonElement getAllPlayersInfoJson() {
+        JsonArray json = new JsonArray(players.size());
+        for (Player player : players.toArray(new Player[players.size()])) {
+            JsonObject obj = getPlayerInfoJson(player);
+            if (obj != null) json.add(obj);
         }
-        return info;
+
+        return json;
     }
 
     public final List<Player> getPlayers() {
-        final List<Player> copy = new ArrayList<Player>(players.size());
+        final List<Player> copy = new ArrayList<>(players.size());
         copy.addAll(players);
         return copy;
     }
@@ -541,7 +590,7 @@ public class Game {
      * @return Information for {@code player}: Name, score, status.
      */
     public Map<GamePlayerInfo, Object> getPlayerInfo(final Player player) {
-        final Map<GamePlayerInfo, Object> playerInfo = new HashMap<GamePlayerInfo, Object>();
+        final Map<GamePlayerInfo, Object> playerInfo = new HashMap<>();
         // TODO make sure this can't happen in the first place
         if (player == null) {
             return playerInfo;
@@ -551,6 +600,16 @@ public class Game {
         playerInfo.put(GamePlayerInfo.STATUS, getPlayerStatus(player).toString());
 
         return playerInfo;
+    }
+
+    @Nullable
+    public JsonObject getPlayerInfoJson(Player player) {
+        JsonObject obj = new JsonObject();
+        if (player == null) return null; // FIXME
+        obj.addProperty(GamePlayerInfo.NAME.toString(), player.getUser().getNickname());
+        obj.addProperty(GamePlayerInfo.SCORE.toString(), player.getScore());
+        obj.addProperty(GamePlayerInfo.STATUS.toString(), getPlayerStatus(player).toString());
+        return obj;
     }
 
     /**
@@ -1209,6 +1268,17 @@ public class Game {
         }
     }
 
+    @Nullable
+    public JsonObject getBlackCardJson() {
+        synchronized (blackCardLock) {
+            if (blackCard != null) {
+                return blackCard.getClientDataJson();
+            } else {
+                return null;
+            }
+        }
+    }
+
     /**
      * @return The "real" white cards played.
      */
@@ -1229,6 +1299,19 @@ public class Game {
         }
     }
 
+    private JsonArray getWhiteCardsJson() {
+        if (state != GameState.JUDGING) {
+            return new JsonArray();
+        } else {
+            List<List<WhiteCard>> shuffledPlayedCards = new ArrayList<>(playedCards.cards());
+            Collections.shuffle(shuffledPlayedCards);
+
+            JsonArray json = new JsonArray(shuffledPlayedCards.size());
+            for (final List<WhiteCard> cards : shuffledPlayedCards) json.add(getWhiteCardsDataJson(cards));
+            return json;
+        }
+    }
+
     /**
      * @param user User to return white cards for.
      * @return The white cards the specified user can see, i.e., theirs and face-down cards for
@@ -1239,14 +1322,13 @@ public class Game {
         if (state == GameState.JUDGING) {
             return getWhiteCards();
         } else if (state != GameState.PLAYING) {
-            return new ArrayList<List<Map<WhiteCardData, Object>>>();
+            return new ArrayList<>();
         } else {
             // getPlayerForUser synchronizes on players. This has caused a deadlock in the past.
             // Good idea to not nest synchronizes if possible anyway.
             final Player player = getPlayerForUser(user);
             synchronized (playedCards) {
-                final List<List<Map<WhiteCardData, Object>>> cardData =
-                        new ArrayList<List<Map<WhiteCardData, Object>>>(playedCards.size());
+                final List<List<Map<WhiteCardData, Object>>> cardData = new ArrayList<>(playedCards.size());
                 int faceDownCards = playedCards.size();
                 if (playedCards.hasPlayer(player)) {
                     cardData.add(getWhiteCardData(playedCards.getCards(player)));
@@ -1254,26 +1336,38 @@ public class Game {
                 }
                 // TODO make this figure out how many blank cards in each spot, for multi-play cards
                 while (faceDownCards-- > 0) {
-                    cardData.add(Arrays.asList(WhiteCard.getFaceDownCardClientData()));
+                    cardData.add(Collections.singletonList(WhiteCard.getFaceDownCardClientData()));
                 }
                 return cardData;
             }
         }
     }
 
-    /**
-     * Convert a list of {@code WhiteCard}s to data suitable for sending to a client.
-     *
-     * @param cards Cards to convert to client data.
-     * @return Client representation of {@code cards}.
-     */
-    private List<Map<WhiteCardData, Object>> getWhiteCardData(final List<WhiteCard> cards) {
-        final List<Map<WhiteCardData, Object>> data =
-                new ArrayList<Map<WhiteCardData, Object>>(cards.size());
-        for (final WhiteCard card : cards) {
-            data.add(card.getClientData());
+    public JsonArray getWhiteCardsJson(final User user) {
+        // if we're in judge mode, return all of the cards and ignore which user is asking
+        if (state == GameState.JUDGING) {
+            return getWhiteCardsJson();
+        } else if (state != GameState.PLAYING) {
+            return new JsonArray();
+        } else {
+            // FIXME: getPlayerForUser synchronizes on players. This has caused a deadlock in the past.
+            // Good idea to not nest synchronizes if possible anyway.
+            final Player player = getPlayerForUser(user);
+            synchronized (playedCards) {
+                JsonArray json = new JsonArray(playedCards.size());
+                int faceDownCards = playedCards.size();
+                if (playedCards.hasPlayer(player)) {
+                    json.add(getWhiteCardsDataJson(playedCards.getCards(player)));
+                    faceDownCards--;
+                }
+
+                // TODO make this figure out how many blank cards in each spot, for multi-play cards
+                while (faceDownCards-- > 0)
+                    json.add(Utils.singletonJsonArray(WhiteCard.getFaceDownCardClientDataJson()));
+
+                return json;
+            }
         }
-        return data;
     }
 
     /**
@@ -1306,6 +1400,19 @@ public class Game {
             }
         } else {
             return new ArrayList<Map<WhiteCardData, Object>>(0);
+        }
+    }
+
+    @NotNull
+    public JsonArray getHandJson(User user) {
+        final Player player = getPlayerForUser(user);
+        if (player != null) {
+            final List<WhiteCard> hand = player.getHand();
+            synchronized (hand) {
+                return getWhiteCardsDataJson(hand);
+            }
+        } else {
+            return new JsonArray();
         }
     }
 
@@ -1347,6 +1454,7 @@ public class Game {
      * {@code user} is the judge, etc.), or {@code null} if there was no error and the play
      * was successful.
      */
+    @Nullable
     public ErrorCode playCard(final User user, final int cardId, final String cardText) {
         final Player player = getPlayerForUser(user);
         if (player != null) {
@@ -1397,6 +1505,7 @@ public class Game {
      * @param cardId Selected card ID.
      * @return Error code if there is an error, or null if success.
      */
+    @Nullable
     public ErrorCode judgeCard(final User judge, final int cardId) {
         final Player cardPlayer;
         synchronized (judgeLock) {
@@ -1461,6 +1570,7 @@ public class Game {
 
         return null;
     }
+
 
     /**
      * Exception to be thrown when there are too many players in a game.

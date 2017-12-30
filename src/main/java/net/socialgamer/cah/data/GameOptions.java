@@ -23,8 +23,10 @@
 
 package net.socialgamer.cah.data;
 
+import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.GameOptionData;
 import net.socialgamer.cah.JsonWrapper;
+import net.socialgamer.cah.Utils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +53,7 @@ public class GameOptions {
     public static final int MIN_BLANK_CARD_LIMIT = 0;
     public static final int DEFAULT_BLANK_CARD_LIMIT = 0;
     public static final int MAX_BLANK_CARD_LIMIT = 30;
-    public final Set<Integer> cardSetIds = new HashSet<Integer>();
+    public final Set<Integer> cardSetIds = new HashSet<>();
     // These are the default values new games get.
     public int blanksInDeck = DEFAULT_BLANK_CARD_LIMIT;
     public int playerLimit = DEFAULT_PLAYER_LIMIT;
@@ -129,6 +131,20 @@ public class GameOptions {
         }
 
         return info;
+    }
+
+    public JsonObject toJson(boolean includePassword) {
+        JsonObject obj = new JsonObject();
+
+        obj.add(GameOptionData.CARD_SETS.toString(), Utils.toJsonArray(cardSetIds));
+        obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
+        obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
+        obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
+        obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
+        obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
+        if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
+
+        return obj;
     }
 
     /**
