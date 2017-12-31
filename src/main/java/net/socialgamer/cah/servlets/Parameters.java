@@ -19,7 +19,10 @@ public class Parameters extends HashMap<String, String> {
         session.parseBody(new HashMap<>());
 
         Parameters params = new Parameters();
-        for (NameValuePair pair : URLEncodedUtils.parse(session.getQueryParameterString(), Charset.forName("UTF-8")))
+        String queries = session.getQueryParameterString();
+        if (queries == null || queries.isEmpty()) return params;
+
+        for (NameValuePair pair : URLEncodedUtils.parse(queries, Charset.forName("UTF-8")))
             params.put(pair.getName(), pair.getValue());
 
         return params;
