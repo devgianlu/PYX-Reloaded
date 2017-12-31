@@ -75,7 +75,7 @@ public class ConnectedUsers {
                     broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
 
-                metrics.userConnect(user.getPersistentId(), user.getSessionId(), null, user.getAgentName(), user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
+                metrics.userConnect(user.getPersistentId(), user.getSessionId(), user.getAgentName(), user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
                 return null;
             }
         }

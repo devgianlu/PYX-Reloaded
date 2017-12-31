@@ -6,15 +6,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -28,18 +33,23 @@ public class CardcastService {
      * Base URL to the Cardcast API.
      */
     private static final String BASE_URL = "https://" + HOSTNAME + "/v1/decks/";
+
     /**
      * URL to the Cardcast API for information about a card set. The only format replacement is the
      * string deck ID.
      */
     private static final String CARD_SET_INFO_URL_FORMAT_STRING = BASE_URL + "%s";
+
     /**
      * URL to the Cardcast API for cards in a card set. The only format replacement is the string
      * deck ID.
      */
     private static final String CARD_SET_CARDS_URL_FORMAT_STRING = CARD_SET_INFO_URL_FORMAT_STRING + "/cards";
 
-    private static final int GET_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(3);
+    /**
+     * Connection timeout
+     */
+    private static final int TIMEOUT = (int) TimeUnit.SECONDS.toMillis(3);
 
     /**
      * How long to cache nonexistent card sets, or after an error occurs while querying for the card
@@ -53,6 +63,13 @@ public class CardcastService {
     private static final long VALID_SET_CACHE_LIFETIME = TimeUnit.MINUTES.toMillis(15);
     private static final Pattern validIdPattern = Pattern.compile("[A-Z0-9]{5}");
     private static final Map<String, SoftReference<CardcastCacheEntry>> cache = Collections.synchronizedMap(new HashMap<String, SoftReference<CardcastCacheEntry>>());
+    private static final HttpClient client = HttpClients.custom()
+            .setDefaultRequestConfig(RequestConfig.custom()
+                    .setConnectTimeout(TIMEOUT)
+                    .setSocketTimeout(TIMEOUT)
+                    .setConnectionRequestTimeout(TIMEOUT)
+                    .build())
+            .build();
 
     @Nullable
     private CardcastCacheEntry checkCache(String setId) {
@@ -102,9 +119,9 @@ public class CardcastService {
                 cacheMissingSet(setId);
                 return null;
             }
+
             CardcastDeck deck = new CardcastDeck(StringEscapeUtils.escapeXml11(name), setId, StringEscapeUtils.escapeXml11(description));
 
-            // load up the cards
             JsonArray blacks = cards.getAsJsonArray("calls");
             if (blacks != null) {
                 for (JsonElement black : blacks) {
@@ -178,38 +195,24 @@ public class CardcastService {
         cachePut(setId, null, INVALID_SET_CACHE_LIFETIME);
     }
 
+    @Nullable
     private String getUrlContent(String urlStr) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
-        conn.setDoInput(true);
-        conn.setDoOutput(false);
-        conn.setRequestMethod("GET");
-        conn.setInstanceFollowRedirects(true);
-        conn.setReadTimeout(GET_TIMEOUT);
-        conn.setConnectTimeout(GET_TIMEOUT);
+        HttpResponse resp = client.execute(new HttpGet(urlStr));
 
-        int code = conn.getResponseCode();
-        if (HttpURLConnection.HTTP_OK != code) {
-            LOG.error(String.format("Got HTTP response code %d from Cardcast for %s", code, urlStr));
+        StatusLine sl = resp.getStatusLine();
+        if (sl.getStatusCode() != HttpStatus.SC_OK) {
+            LOG.error(String.format("Got HTTP response code %s from Cardcast for %s", sl, urlStr));
             return null;
         }
 
-        String contentType = conn.getContentType();
+        HttpEntity entity = resp.getEntity();
+        String contentType = entity.getContentType().getValue();
         if (!Objects.equals(contentType, "application/json")) {
             LOG.error(String.format("Got content-type %s from Cardcast for %s", contentType, urlStr));
             return null;
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-            StringBuilder builder = new StringBuilder(4096);
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-                builder.append('\n');
-            }
-
-            return builder.toString();
-        }
+        return EntityUtils.toString(entity);
     }
 
     private class CardcastCacheEntry {
