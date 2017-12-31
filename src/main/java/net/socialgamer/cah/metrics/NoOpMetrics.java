@@ -1,6 +1,5 @@
 package net.socialgamer.cah.metrics;
 
-import com.maxmind.geoip2.model.CityResponse;
 import net.socialgamer.cah.data.BlackCard;
 import net.socialgamer.cah.data.CardSet;
 import net.socialgamer.cah.data.WhiteCard;
@@ -18,7 +17,6 @@ import java.util.Map;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class NoOpMetrics implements Metrics {
-
     private static final Logger LOG = Logger.getLogger(NoOpMetrics.class);
 
     @Override
@@ -27,35 +25,27 @@ public class NoOpMetrics implements Metrics {
     }
 
     @Override
-    public void serverStart(final String startupId) {
+    public void serverStart(String startupId) {
         LOG.trace(String.format("serverStarted(%s)", startupId));
     }
 
     @Override
-    public void userConnect(final String persistentId, final String sessionId, final CityResponse geoIp,
-                            final String agentName, final String agentType, final String agentOs,
-                            final String agentLanguage) {
-        LOG.trace(String.format("newUser(%s, %s, %s, %s, %s, %s, %s)", persistentId, sessionId, geoIp,
-                agentName, agentType, agentOs, agentLanguage));
+    public void userConnect(String persistentId, String sessionId, String agentName, String agentType, String agentOs, String agentLanguage) {
+        LOG.trace(String.format("newUser(%s, %s, %s, %s, %s, %s)", persistentId, sessionId, agentName, agentType, agentOs, agentLanguage));
     }
 
     @Override
-    public void userDisconnect(final String sessionId) {
+    public void userDisconnect(String sessionId) {
         LOG.trace(String.format("userDisconnect(%s)", sessionId));
     }
 
     @Override
-    public void gameStart(final String gameId, final Collection<CardSet> decks, final int blanks,
-                          final int maxPlayers, final int scoreGoal, final boolean hasPassword) {
-        LOG.trace(String.format("gameStart(%s, %s, %d, %d, %d, %s)", gameId, Arrays.toString(decks.toArray()), blanks,
-                maxPlayers, scoreGoal, hasPassword));
+    public void gameStart(String gameId, Collection<CardSet> decks, int blanks, int maxPlayers, int scoreGoal, boolean hasPassword) {
+        LOG.trace(String.format("gameStart(%s, %s, %d, %d, %d, %s)", gameId, Arrays.toString(decks.toArray()), blanks, maxPlayers, scoreGoal, hasPassword));
     }
 
     @Override
-    public void roundComplete(final String gameId, final String roundId, final String judgeSessionId,
-                              final String winnerSessionId, final BlackCard blackCard,
-                              final Map<String, List<WhiteCard>> cards) {
-        LOG.trace(String.format("roundJudged(%s, %s, %s, %s, %s, %s)", gameId, roundId, judgeSessionId,
-                winnerSessionId, blackCard, cards));
+    public void roundComplete(String gameId, String roundId, String judgeSessionId, String winnerSessionId, BlackCard blackCard, Map<String, List<WhiteCard>> cards) {
+        LOG.trace(String.format("roundJudged(%s, %s, %s, %s, %s, %s)", gameId, roundId, judgeSessionId, winnerSessionId, blackCard, cards));
     }
 }
