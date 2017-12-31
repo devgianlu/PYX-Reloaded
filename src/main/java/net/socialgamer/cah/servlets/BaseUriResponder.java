@@ -36,7 +36,7 @@ public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
                     for (String key : data.keySet()) obj.add(key, data.get(key));
                 }
 
-                return NanoHTTPD.newFixedLengthResponse(ex.status, "application/json", obj.toString()); // TODO: May return additional error info
+                return NanoHTTPD.newFixedLengthResponse(ex.status, "application/json", obj.toString());
             }
 
             return NanoHTTPD.newFixedLengthResponse(ex.status, null, null);
@@ -70,12 +70,12 @@ public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
     public static class StatusException extends Exception {
         private final NanoHTTPD.Response.IStatus status;
 
-        public StatusException(NanoHTTPD.Response.IStatus status) {
+        StatusException(NanoHTTPD.Response.IStatus status) {
             super(status.getRequestStatus() + ": " + status.getDescription());
             this.status = status;
         }
 
-        public StatusException(NanoHTTPD.Response.IStatus status, Throwable cause) {
+        StatusException(NanoHTTPD.Response.IStatus status, Throwable cause) {
             super(status.getRequestStatus() + ": " + status.getDescription(), cause);
             this.status = status;
         }

@@ -8,7 +8,7 @@ public class CardcastWhiteCard extends WhiteCard {
     private final String text;
     private final String deckId;
 
-    public CardcastWhiteCard(final int id, final String text, final String deckId) {
+    CardcastWhiteCard(final int id, final String text, final String deckId) {
         this.id = id;
         this.text = text;
         this.deckId = deckId;

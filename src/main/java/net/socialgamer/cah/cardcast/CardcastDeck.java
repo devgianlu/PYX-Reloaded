@@ -13,7 +13,7 @@ public class CardcastDeck extends CardSet {
     private final Set<CardcastBlackCard> blackCards = new HashSet<>();
     private final Set<CardcastWhiteCard> whiteCards = new HashSet<>();
 
-    public CardcastDeck(final String name, final String code, final String description) {
+    CardcastDeck(String name, String code, String description) {
         this.name = name;
         this.code = code;
         this.description = description;

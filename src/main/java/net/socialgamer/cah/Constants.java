@@ -1,26 +1,3 @@
-/**
- * Copyright (c) 2012-2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah;
 
 import net.socialgamer.cah.data.Game;
@@ -30,25 +7,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
 import java.util.Set;
 
-
-/**
- * Constants needed on both the CAH server and client. This file is examined with reflection to
- * produce a Javascript version for the client to use.
- * <p>
- * All of the enums in here take a string in their constructor to define the over-the-wire value to
- * be used to represent that enum value. This allows for verbose names while debugging, and short
- * names to reduce traffic and latency, by only having to change it in one place for both the server
- * and client.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
 public class Constants {
 
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
 
-    @SuppressWarnings("serial")
     public static final Set<String> ADMIN_IP_ADDRESSES = new HashSet<String>() {
         {
             add("0:0:0:0:0:0:0:1");
@@ -746,12 +710,5 @@ public class Constants {
      */
     @Retention(RetentionPolicy.RUNTIME)
     public @interface DuplicationAllowed {
-    }
-
-    /**
-     * Attributes stored in a client session.
-     */
-    public class SessionAttribute {
-        public static final String USER = "user";
     }
 }

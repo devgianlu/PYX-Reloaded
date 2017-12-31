@@ -70,17 +70,16 @@ public class GameManager {
      */
     public Game createGameWithPlayer(final User user) throws IllegalStateException {
         synchronized (games) {
-            final Game game = createGame();
+            Game game = createGame();
             if (game == null) return null;
 
             try {
                 game.addPlayer(user);
-                logger.info(String.format("Created new game %d by user %s.",
-                        game.getId(), user.toString()));
-            } catch (final IllegalStateException ise) {
+                logger.info(String.format("Created new game %d by user %s.", game.getId(), user.toString()));
+            } catch (IllegalStateException ise) {
                 destroyGame(game.getId());
                 throw ise;
-            } catch (final TooManyPlayersException tmpe) {
+            } catch (TooManyPlayersException tmpe) {
                 // this should never happen -- we just made the game
                 throw new Error("Impossible exception: Too many players in new game.", tmpe);
             }
@@ -99,19 +98,17 @@ public class GameManager {
      *
      * @param gameId ID of game to destroy.
      */
-    public void destroyGame(final int gameId) {
+    public void destroyGame(int gameId) {
         synchronized (games) {
             final Game game = games.remove(gameId);
-            if (game == null) {
-                return;
-            }
+            if (game == null) return;
+
             // if the prospective next id isn't valid, set it to the id we just removed
-            if (nextId == -1 || games.containsKey(nextId)) {
-                nextId = gameId;
-            }
+            if (nextId == -1 || games.containsKey(nextId)) nextId = gameId;
+
             // remove the players from the game
-            final List<User> usersToRemove = game.getUsers();
-            for (final User user : usersToRemove) {
+            List<User> usersToRemove = game.getUsers();
+            for (User user : usersToRemove) {
                 game.removePlayer(user);
                 game.removeSpectator(user);
             }

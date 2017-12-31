@@ -66,16 +66,13 @@ public class ConnectedUsers {
     public ErrorCode checkAndAdd(User user) {
         synchronized (users) {
             if (this.hasUser(user.getNickname())) {
-                logger.info(String.format("Rejecting existing username %s from %s", user.toString(),
-                        user.getHostname()));
+                logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
                 return ErrorCode.NICK_IN_USE;
             } else if (users.size() >= maxUsers && !user.isAdmin()) {
-                logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)",
-                        user.toString(), users.size(), maxUsers));
+                logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)", user.toString(), users.size(), maxUsers));
                 return ErrorCode.TOO_MANY_USERS;
             } else {
-                logger.info(String.format("New user %s from %s (admin=%b)", user.toString(),
-                        user.getHostname(), user.isAdmin()));
+                logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
                 if (broadcastConnectsAndDisconnects) {
                     JsonObject obj = new JsonObject();
@@ -83,6 +80,7 @@ public class ConnectedUsers {
                     obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
                     broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
+
                 // log them in the metrics
                 CityResponse geo = null;
                 try {
@@ -92,6 +90,7 @@ public class ConnectedUsers {
                     logger.warn(String.format("Unable to get address for user %s (hostname: %s)",
                             user.getNickname(), user.getHostname()), e);
                 }
+
                 metrics.userConnect(user.getPersistentId(), user.getSessionId(), geo, user.getAgentName(),
                         user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
 
@@ -156,31 +155,32 @@ public class ConnectedUsers {
     public void checkForPingAndIdleTimeouts() {
         final Map<User, DisconnectReason> removedUsers = new HashMap<>();
         synchronized (users) {
-            final Iterator<User> iterator = users.values().iterator();
+            Iterator<User> iterator = users.values().iterator();
             while (iterator.hasNext()) {
-                final User u = iterator.next();
+                User user = iterator.next();
+
                 DisconnectReason reason = null;
-                if (System.nanoTime() - u.getLastHeardFrom() > PING_TIMEOUT) {
+                if (System.nanoTime() - user.getLastHeardFrom() > PING_TIMEOUT) {
                     reason = DisconnectReason.PING_TIMEOUT;
-                } else if (!u.isAdmin() && System.nanoTime() - u.getLastUserAction() > IDLE_TIMEOUT) {
+                } else if (!user.isAdmin() && System.nanoTime() - user.getLastUserAction() > IDLE_TIMEOUT) {
                     reason = DisconnectReason.IDLE_TIMEOUT;
                 }
-                if (null != reason) {
-                    removedUsers.put(u, reason);
+
+                if (reason != null) {
+                    removedUsers.put(user, reason);
                     iterator.remove();
                 }
             }
         }
 
         // Do this later to not keep users locked
-        for (final Entry<User, DisconnectReason> entry : removedUsers.entrySet()) {
+        for (Entry<User, DisconnectReason> entry : removedUsers.entrySet()) {
             try {
                 entry.getKey().noLongerValid();
                 notifyRemoveUser(entry.getKey(), entry.getValue());
-                logger.info(String.format("Automatically kicking user %s due to %s", entry.getKey(),
-                        entry.getValue()));
-            } catch (final Exception e) {
-                logger.error("Unable to remove pinged-out user", e);
+                logger.info(String.format("Automatically kicking user %s due to %s", entry.getKey(), entry.getValue()));
+            } catch (Exception ex) {
+                logger.error("Unable to remove pinged-out user", ex);
             }
         }
     }
@@ -207,10 +207,10 @@ public class ConnectedUsers {
     public void broadcastToList(Collection<User> broadcastTo, MessageType type, JsonObject masterData) {
         // TODO I think this synchronized block is pointless.
         synchronized (users) {
-            for (final User u : broadcastTo) {
+            for (User user : broadcastTo) {
                 JsonObject obj = Utils.singletonJsonObject(LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
                 for (String key : masterData.keySet()) obj.add(key, masterData.get(key));
-                u.enqueueMessage(new QueuedMessage(type, obj));
+                user.enqueueMessage(new QueuedMessage(type, obj));
             }
         }
     }

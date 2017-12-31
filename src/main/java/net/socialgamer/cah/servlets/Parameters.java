@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 
-public class Parameters extends HashMap<String, String> {
+public final class Parameters extends HashMap<String, String> {
 
     private Parameters() {
     }

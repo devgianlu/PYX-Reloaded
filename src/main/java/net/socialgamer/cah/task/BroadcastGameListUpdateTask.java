@@ -7,7 +7,6 @@ import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 
 public class BroadcastGameListUpdateTask extends SafeTimerTask {
-
     private final ConnectedUsers users;
     private volatile boolean needsUpdate = false;
 
