@@ -11,13 +11,14 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.GameOptions;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CHANGE_GAME_OPTIONS.toString();
 
-    public ChangeGameOptionHandler(final GameManager gameManager) {
+    public ChangeGameOptionHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

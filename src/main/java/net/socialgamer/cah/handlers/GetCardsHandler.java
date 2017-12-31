@@ -8,12 +8,13 @@ import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class GetCardsHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.GET_CARDS.toString();
 
-    public GetCardsHandler(final GameManager gameManager) {
+    public GetCardsHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

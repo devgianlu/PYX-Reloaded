@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Parameters extends HashMap<String, String> {
 
@@ -17,11 +16,10 @@ public class Parameters extends HashMap<String, String> {
     }
 
     public static Parameters fromSession(NanoHTTPD.IHTTPSession session) throws IOException, NanoHTTPD.ResponseException {
-        Map<String, String> body = new HashMap<>();
-        session.parseBody(body);
+        session.parseBody(new HashMap<>());
 
         Parameters params = new Parameters();
-        for (NameValuePair pair : URLEncodedUtils.parse(body.get("postData"), Charset.forName("UTF-8")))
+        for (NameValuePair pair : URLEncodedUtils.parse(session.getQueryParameterString(), Charset.forName("UTF-8")))
             params.put(pair.getName(), pair.getValue());
 
         return params;

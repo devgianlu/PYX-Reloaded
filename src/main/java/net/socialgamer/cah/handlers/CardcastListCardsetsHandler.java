@@ -12,6 +12,7 @@ import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
@@ -19,7 +20,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CARDCAST_LIST_CARDSETS.toString();
     private final CardcastService cardcastService;
 
-    public CardcastListCardsetsHandler(final GameManager gameManager, final CardcastService cardcastService) {
+    public CardcastListCardsetsHandler(@Annotations.GameManager GameManager gameManager, @Annotations.CardcastService CardcastService cardcastService) {
         super(gameManager);
         this.cardcastService = cardcastService;
     }

@@ -9,6 +9,7 @@ import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -16,7 +17,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 public class PlayCardHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.PLAY_CARD.toString();
 
-    public PlayCardHandler(final GameManager gameManager) {
+    public PlayCardHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

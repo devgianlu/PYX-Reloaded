@@ -10,13 +10,14 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Game.TooManySpectatorsException;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class SpectateGameHandler extends GameHandler {
     public static final String OP = AjaxOperation.SPECTATE_GAME.toString();
 
-    public SpectateGameHandler(final GameManager gameManager) {
+    public SpectateGameHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

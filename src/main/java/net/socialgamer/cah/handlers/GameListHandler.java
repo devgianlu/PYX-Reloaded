@@ -9,6 +9,7 @@ import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class GameListHandler extends BaseHandler {
@@ -16,7 +17,7 @@ public class GameListHandler extends BaseHandler {
     private final GameManager gameManager;
     private final int maxGames;
 
-    public GameListHandler(GameManager gameManager, int maxGames) {
+    public GameListHandler(@Annotations.GameManager GameManager gameManager, @Annotations.MaxGames int maxGames) {
         this.gameManager = gameManager;
         this.maxGames = maxGames;
     }

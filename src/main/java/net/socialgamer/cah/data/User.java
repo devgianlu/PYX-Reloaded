@@ -234,6 +234,6 @@ public class User {
     }
 
     public interface Factory {
-        User create(String nickname, String hostname, boolean isAdmin, String persistentId, String clientLanguage, String clientAgent);
+        User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent);
     }
 }

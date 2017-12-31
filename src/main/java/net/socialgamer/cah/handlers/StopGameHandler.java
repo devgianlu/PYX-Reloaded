@@ -9,6 +9,7 @@ import net.socialgamer.cah.Constants.GameState;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
@@ -17,7 +18,7 @@ public class StopGameHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.STOP_GAME.toString();
     protected final Logger logger = Logger.getLogger(GameWithPlayerHandler.class);
 
-    public StopGameHandler(final GameManager gameManager) {
+    public StopGameHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

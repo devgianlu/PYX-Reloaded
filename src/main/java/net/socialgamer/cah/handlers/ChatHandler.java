@@ -8,6 +8,7 @@ import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.BaseUriResponder;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
@@ -16,7 +17,7 @@ public class ChatHandler extends BaseHandler {
     public static final String OP = AjaxOperation.CHAT.toString();
     private final ConnectedUsers users;
 
-    public ChatHandler(final ConnectedUsers users) {
+    public ChatHandler(@Annotations.ConnectedUsers ConnectedUsers users) {
         this.users = users;
     }
 

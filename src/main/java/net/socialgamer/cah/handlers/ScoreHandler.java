@@ -11,6 +11,7 @@ import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Player;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.BaseUriResponder;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
@@ -20,7 +21,7 @@ public class ScoreHandler extends BaseHandler {
     public static final String OP = AjaxOperation.SCORE.toString();
     private final ConnectedUsers connectedUsers;
 
-    public ScoreHandler(final ConnectedUsers connectedUsers) {
+    public ScoreHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
     }
 

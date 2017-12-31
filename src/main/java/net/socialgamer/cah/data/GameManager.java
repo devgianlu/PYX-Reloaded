@@ -9,16 +9,14 @@ import java.util.*;
 
 /**
  * Manage games for the server.
- * <p>
- * This is also a Guice provider for game ids.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class GameManager {
     private static final Logger logger = Logger.getLogger(GameManager.class);
-    private final Integer maxGames;
+    private final int maxGames;
     private final Map<Integer, Game> games = new TreeMap<>();
-    private final Game game;
+    private final GameProvider gameProvider;
     private final BroadcastGameListUpdateTask broadcastUpdate;
 
     /**
@@ -29,11 +27,11 @@ public class GameManager {
     /**
      * Create a new game manager.
      *
-     * @param game     Provider for new {@code Game} instances.
-     * @param maxGames Provider for maximum number of games allowed on the server.
+     * @param gameProvider Provider for new {@code Game} instances.
+     * @param maxGames     Provider for maximum number of games allowed on the server.
      */
-    public GameManager(Game game, Integer maxGames, BroadcastGameListUpdateTask broadcastUpdate) {
-        this.game = game;
+    public GameManager(GameProvider gameProvider, int maxGames, BroadcastGameListUpdateTask broadcastUpdate) {
+        this.gameProvider = gameProvider;
         this.maxGames = maxGames;
         this.broadcastUpdate = broadcastUpdate;
     }
@@ -51,6 +49,7 @@ public class GameManager {
     private Game createGame() {
         synchronized (games) {
             if (games.size() >= getMaxGames()) return null;
+            Game game = gameProvider.create(this);
             if (game.getId() < 0) return null;
             games.put(game.getId(), game);
             return game;
@@ -137,16 +136,16 @@ public class GameManager {
      *
      * @return Next game id, or {@code -1} if the maximum number of games are in progress.
      */
-    public Integer getNextGameId() {
+    public int getNextGameId() {
         synchronized (games) {
             if (games.size() >= getMaxGames()) return -1;
 
             if (!games.containsKey(nextId) && nextId >= 0) {
-                final int ret = nextId;
+                int ret = nextId;
                 nextId = candidateGameId(ret);
                 return ret;
             } else {
-                final int ret = candidateGameId();
+                int ret = candidateGameId();
                 nextId = candidateGameId(ret);
                 return ret;
             }
@@ -201,5 +200,9 @@ public class GameManager {
 
     Map<Integer, Game> getGames() {
         return games;
+    }
+
+    public interface GameProvider {
+        Game create(GameManager manager);
     }
 }

@@ -9,6 +9,7 @@ import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ReconnectNextAction;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.db.PyxCardSet;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,7 +21,7 @@ public class FirstLoadHandler extends BaseHandler {
     private final Session hibernateSession;
     private final Boolean includeInactiveCardsets;
 
-    public FirstLoadHandler(Session hibernateSession, Boolean includeInactiveCardsets) {
+    public FirstLoadHandler(@Annotations.HibernateSession Session hibernateSession, @Annotations.IncludeInactiveCardsets boolean includeInactiveCardsets) {
         this.hibernateSession = hibernateSession;
         this.includeInactiveCardsets = includeInactiveCardsets;
     }

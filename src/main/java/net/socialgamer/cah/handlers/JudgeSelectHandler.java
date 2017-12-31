@@ -9,13 +9,14 @@ import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class JudgeSelectHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.JUDGE_SELECT.toString();
 
-    public JudgeSelectHandler(final GameManager gameManager) {
+    public JudgeSelectHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

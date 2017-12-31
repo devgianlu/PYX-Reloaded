@@ -9,34 +9,26 @@ import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.data.ConnectedUsers;
+import net.socialgamer.cah.data.UniqueIds;
 import net.socialgamer.cah.data.User;
-import net.socialgamer.cah.servlets.BaseUriResponder;
-import net.socialgamer.cah.servlets.CahResponder;
-import net.socialgamer.cah.servlets.Parameters;
-import net.socialgamer.cah.servlets.Sessions;
-import org.apache.http.HttpHeaders;
+import net.socialgamer.cah.servlets.*;
 
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class RegisterHandler extends BaseHandler {
     public static final String OP = AjaxOperation.REGISTER.toString();
     private static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
     private final ConnectedUsers users;
-    private final Set<String> banList;
     private final User.Factory userFactory;
-    private final String persistentId;
 
-    public RegisterHandler(ConnectedUsers users, Set<String> banList, User.Factory userFactory, String persistentId) {
+    public RegisterHandler(@Annotations.ConnectedUsers ConnectedUsers users, @Annotations.UserFactory User.Factory userFactory) {
         this.users = users;
-        this.banList = banList;
         this.userFactory = userFactory;
-        this.persistentId = persistentId;
     }
 
     @Override
     public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
-        if (banList.contains(session.getRemoteIpAddress())) throw new CahResponder.CahException(ErrorCode.BANNED);
+        if (BanList.contains(session.getRemoteIpAddress())) throw new CahResponder.CahException(ErrorCode.BANNED);
 
         String nickname = params.get(AjaxRequest.NICKNAME);
         if (nickname == null) throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
@@ -45,13 +37,13 @@ public class RegisterHandler extends BaseHandler {
             throw new CahResponder.CahException(ErrorCode.RESERVED_NICK);
 
         String pid = params.get(AjaxRequest.PERSISTENT_ID);
-        if (pid == null || pid.isEmpty()) pid = persistentId; // TODO: This is stupid, you removed the provider
+        if (pid == null || pid.isEmpty()) pid = UniqueIds.getNewRandomID();
 
         user = userFactory.create(nickname,
                 session.getRemoteIpAddress(),
                 Constants.ADMIN_IP_ADDRESSES.contains(session.getRemoteIpAddress()), pid,
-                session.getHeaders().get(HttpHeaders.ACCEPT_LANGUAGE),
-                session.getHeaders().get(HttpHeaders.USER_AGENT));
+                session.getHeaders().get("accept-language"),
+                session.getHeaders().get("user-agent"));
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {

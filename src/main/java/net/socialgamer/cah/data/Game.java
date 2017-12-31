@@ -9,6 +9,7 @@ import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.metrics.Metrics;
+import net.socialgamer.cah.servlets.Provider;
 import net.socialgamer.cah.task.SafeTimerTask;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -102,7 +103,7 @@ public class Game {
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
-    private final Session session;
+    private final Provider<Session> sessionProvider;
     private final Object blackCardLock = new Object();
     private final GameOptions options = new GameOptions();
 
@@ -137,29 +138,15 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(Integer id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Session session, CardcastService cardcastService, Metrics metrics) {
+    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Provider<Session> sessionProvider, CardcastService cardcastService, Metrics metrics) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
-        this.session = session;
+        this.sessionProvider = sessionProvider;
         this.cardcastService = cardcastService;
         this.metrics = metrics;
         this.state = GameState.LOBBY;
-    }
-
-    /**
-     * Convert a list of {@code WhiteCard}s to data suitable for sending to a client.
-     *
-     * @param cards Cards to convert to client data.
-     * @return Client representation of {@code cards}.
-     */
-    private static List<Map<WhiteCardData, Object>> getWhiteCardData(List<WhiteCard> cards) {
-        final List<Map<WhiteCardData, Object>> data = new ArrayList<>(cards.size());
-        for (final WhiteCard card : cards) {
-            data.add(card.getClientData());
-        }
-        return data;
     }
 
     private static JsonArray getWhiteCardsDataJson(List<WhiteCard> cards) {
@@ -618,6 +605,7 @@ public class Game {
      * clients would prevent that from happening!
      */
     public boolean start() {
+        Session session = sessionProvider.get();
 
         try {
             if (state != GameState.LOBBY || !hasEnoughCards(session)) {
@@ -633,7 +621,7 @@ public class Game {
                 started = false;
             }
             if (started) {
-                currentUniqueId = UniqueIDs.getNewRandomID();
+                currentUniqueId = UniqueIds.getNewRandomID();
                 logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
                                 + "max players, %d max spectators, %d score limit, players %s, unique %s.",
                         id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
@@ -1397,7 +1385,7 @@ public class Game {
 
         final Map<String, List<WhiteCard>> cardsBySessionId = new HashMap<>();
         playedCards.cardsByUser().forEach((key, value) -> cardsBySessionId.put(key.getSessionId(), value));
-        metrics.roundComplete(currentUniqueId, UniqueIDs.getNewRandomID(), judge.getSessionId(), cardPlayer.getUser().getSessionId(), blackCard, cardsBySessionId);
+        metrics.roundComplete(currentUniqueId, UniqueIds.getNewRandomID(), judge.getSessionId(), cardPlayer.getUser().getSessionId(), blackCard, cardsBySessionId);
         return null;
     }
 

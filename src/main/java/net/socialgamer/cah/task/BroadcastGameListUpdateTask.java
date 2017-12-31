@@ -6,7 +6,6 @@ import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 
-// TODO: Schedule this
 public class BroadcastGameListUpdateTask extends SafeTimerTask {
 
     private final ConnectedUsers users;

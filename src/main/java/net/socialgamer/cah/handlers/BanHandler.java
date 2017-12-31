@@ -8,21 +8,19 @@ import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
+import net.socialgamer.cah.servlets.BanList;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
-
-import java.util.Set;
 
 public class BanHandler extends AdminHandler {
     public static final String OP = AjaxOperation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
     private final ConnectedUsers connectedUsers;
-    private final Set<String> banList;
 
-    public BanHandler(ConnectedUsers connectedUsers, Set<String> banList) {
+    public BanHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
-        this.banList = banList;
     }
 
     @Override
@@ -47,7 +45,7 @@ public class BanHandler extends AdminHandler {
             logger.info(String.format("Banning %s by request of %s", banIp, user.getNickname()));
         }
 
-        banList.add(banIp);
+        BanList.add(banIp);
         return new JsonObject();
     }
 }

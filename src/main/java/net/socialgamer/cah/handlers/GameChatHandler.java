@@ -9,13 +9,14 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class GameChatHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.GAME_CHAT.toString();
 
-    public GameChatHandler(final GameManager gameManager) {
+    public GameChatHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 

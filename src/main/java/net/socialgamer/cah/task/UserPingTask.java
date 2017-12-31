@@ -10,12 +10,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  *
  * @author Andy Janata (ajanata@gmail.com)
  */
-// TODO: Schedule this
 public class UserPingTask extends SafeTimerTask {
     private final ConnectedUsers users;
     private final ScheduledThreadPoolExecutor globalTimer;
 
-    public UserPingTask(final ConnectedUsers users, final ScheduledThreadPoolExecutor globalTimer) {
+    public UserPingTask(ConnectedUsers users, ScheduledThreadPoolExecutor globalTimer) {
         this.users = users;
         this.globalTimer = globalTimer;
     }

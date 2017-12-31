@@ -11,6 +11,7 @@ import net.socialgamer.cah.data.CardSet;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.hibernate.Session;
@@ -22,7 +23,7 @@ public class StartGameHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.START_GAME.toString();
     private final Session hibernateSession;
 
-    public StartGameHandler(final GameManager gameManager, final Session session) {
+    public StartGameHandler(@Annotations.GameManager GameManager gameManager, @Annotations.HibernateSession Session session) {
         super(gameManager);
         this.hibernateSession = session;
     }

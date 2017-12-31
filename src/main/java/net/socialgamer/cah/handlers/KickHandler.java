@@ -8,6 +8,7 @@ import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
@@ -17,7 +18,7 @@ public class KickHandler extends AdminHandler {
     protected final Logger logger = Logger.getLogger(KickHandler.class);
     private final ConnectedUsers connectedUsers;
 
-    public KickHandler(final ConnectedUsers connectedUsers) {
+    public KickHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
     }
 

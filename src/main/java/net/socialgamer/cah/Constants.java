@@ -287,15 +287,9 @@ public class Constants {
         GAME_FULL("gf", "That game is full. Join another."),
         INVALID_CARD("ic", "Invalid card specified."),
         INVALID_GAME("ig", "Invalid game specified."),
-        /**
-         * TODO this probably should be pulled in from a static inside the RegisterHandler.
-         */
         INVALID_NICK("in", "Nickname must contain only upper and lower case letters, " +
                 "numbers, or underscores, must be 3 to 30 characters long, and must not start with a " +
                 "number."),
-        /**
-         * TODO this probably should be pulled in from a static inside the ChatHandler.
-         */
         MESSAGE_TOO_LONG("mtl", "Messages cannot be longer than " + CHAT_MAX_LENGTH + " characters."),
         NICK_IN_USE("niu", "Nickname is already in use."),
         NO_CARD_SPECIFIED("ncs", "No card specified."),
