@@ -8,22 +8,16 @@ import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ReconnectNextAction;
 import net.socialgamer.cah.data.User;
+import net.socialgamer.cah.db.LoadedCards;
 import net.socialgamer.cah.db.PyxCardSet;
-import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import java.util.List;
+import java.util.Set;
 
 public class FirstLoadHandler extends BaseHandler {
     public static final String OP = AjaxOperation.FIRST_LOAD.toString();
-    private final Session hibernateSession;
-    private final Boolean includeInactiveCardsets;
 
-    public FirstLoadHandler(@Annotations.HibernateSession Session hibernateSession, @Annotations.IncludeInactiveCardsets boolean includeInactiveCardsets) {
-        this.hibernateSession = hibernateSession;
-        this.includeInactiveCardsets = includeInactiveCardsets;
+    public FirstLoadHandler() {
     }
 
     @Override
@@ -47,23 +41,10 @@ public class FirstLoadHandler extends BaseHandler {
             }
         }
 
-        // FIXME: Cards shouldn't be loaded every time
-
-        try {
-            Transaction transaction = hibernateSession.beginTransaction();
-            List<PyxCardSet> cardSets = hibernateSession
-                    .createQuery(PyxCardSet.getCardsetQuery(includeInactiveCardsets))
-                    .setReadOnly(true)
-                    .setCacheable(true)
-                    .list();
-
-            JsonArray json = new JsonArray(cardSets.size());
-            for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson(hibernateSession));
-            obj.add(AjaxResponse.CARD_SETS.toString(), json);
-            transaction.commit();
-        } finally {
-            hibernateSession.close();
-        }
+        Set<PyxCardSet> cardSets = LoadedCards.getLoadedSets();
+        JsonArray json = new JsonArray(cardSets.size());
+        for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson());
+        obj.add(AjaxResponse.CARD_SETS.toString(), json);
 
         return obj;
     }
