@@ -3,6 +3,7 @@ package net.socialgamer.cah.handlers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import fi.iki.elonen.NanoHTTPD;
+import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -28,10 +29,11 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     @Override
     public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
         JsonArray array = new JsonArray();
-        for (final String deckId : game.getCardcastDeckIds().toArray(new String[0])) {
-            final CardcastDeck deck = cardcastService.loadSet(deckId);
-            // FIXME we need a way to tell the user which one is broken.
-            if (deck == null) throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND);
+        for (String deckId : game.getCardcastDeckIds().toArray(new String[0])) {
+            CardcastDeck deck = cardcastService.loadSet(deckId);
+            if (deck == null)
+                throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND, Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(), deckId));
+
             array.add(deck.getClientMetadataJson());
         }
 

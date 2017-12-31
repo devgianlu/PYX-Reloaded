@@ -169,6 +169,8 @@ public class Constants {
         BLACK_CARD("bc"),
         @DuplicationAllowed
         CARD_ID(AjaxRequest.CARD_ID),
+        @DuplicationAllowed
+        CARDCAST_ID("cci"),
         CARD_SETS("css"),
         ERROR("e"),
         ERROR_CODE("ec"),
