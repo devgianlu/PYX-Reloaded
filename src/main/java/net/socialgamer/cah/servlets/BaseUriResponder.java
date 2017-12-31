@@ -7,21 +7,29 @@ import fi.iki.elonen.router.RouterNanoHTTPD;
 import net.socialgamer.cah.Constants;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static net.socialgamer.cah.Utils.methodNotAllowed;
 
 public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
+    protected final static Logger logger = Logger.getLogger(BaseUriResponder.class.getSimpleName());
+    protected final Map<String, String> headers = new HashMap<>();
 
     @Override
     public final NanoHTTPD.Response post(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
         try {
             JsonElement json = handleRequest(uriResource, Parameters.fromSession(session), session);
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/json", json.toString());
+
+            NanoHTTPD.Response resp = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/json", json.toString());
+            for (Map.Entry<String, String> header : headers.entrySet())
+                resp.addHeader(header.getKey(), header.getValue());
+            return resp;
         } catch (StatusException ex) {
             if (ex instanceof CahResponder.CahException) {
                 JsonObject obj = new JsonObject();
-                obj.addProperty(Constants.AjaxResponse.ERROR_CODE.toString(), ((CahResponder.CahException) ex).code.getString());
+                obj.addProperty(Constants.AjaxResponse.ERROR_CODE.toString(), ((CahResponder.CahException) ex).code.toString());
 
                 JsonObject data = ((CahResponder.CahException) ex).data;
                 if (data != null) {
@@ -33,7 +41,6 @@ public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
 
             return NanoHTTPD.newFixedLengthResponse(ex.status, null, null);
         } catch (IOException | NanoHTTPD.ResponseException ex) {
-            ex.printStackTrace(); // TODO
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, null, null);
         }
     }

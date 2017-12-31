@@ -6,7 +6,7 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.data.User;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -17,8 +17,6 @@ public abstract class CahResponder extends BaseUriResponder {
         User user = Sessions.getUser(sid);
 
         String op = params.get(Constants.AjaxRequest.OP.toString());
-        if (op == null || op.isEmpty()) throw new CahException(Constants.ErrorCode.OP_NOT_SPECIFIED);
-
         boolean skipUserCheck = Objects.equals(op, Constants.AjaxOperation.REGISTER.toString()) || Objects.equals(op, Constants.AjaxOperation.FIRST_LOAD.toString());
         if (!skipUserCheck && user == null) {
             throw new CahException(Constants.ErrorCode.NOT_REGISTERED);
@@ -30,7 +28,7 @@ public abstract class CahResponder extends BaseUriResponder {
         }
     }
 
-    protected abstract JsonElement handleRequest(@NotNull String op, User user, Parameters params, NanoHTTPD.IHTTPSession session) throws StatusException;
+    protected abstract JsonElement handleRequest(@Nullable String op, @Nullable User user, Parameters params, NanoHTTPD.IHTTPSession session) throws StatusException;
 
     public static class CahException extends StatusException {
         public final Constants.ErrorCode code;

@@ -233,7 +233,7 @@ public class User {
         return lastMessageTimes;
     }
 
-    public interface Factory {
-        User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent);
+    public abstract static class Factory {
+        public abstract User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent);
     }
 }

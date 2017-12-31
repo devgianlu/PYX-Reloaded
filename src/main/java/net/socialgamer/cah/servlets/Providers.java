@@ -19,17 +19,10 @@ public final class Providers {
     };
 
     static {
-        // providers.put(Annotations.HibernateSession.class, (Provider<Session>) HibernateUtil.instance.sessionFactory::openSession); FIXME
-
-        add(Annotations.UserFactory.class, new Provider<User.Factory>() {
+        add(Annotations.UserFactory.class, (Provider<User.Factory>) () -> new User.Factory() {
             @Override
-            public User.Factory get() {
-                return new User.Factory() {
-                    @Override
-                    public User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent) {
-                        return new User(nickname, hostname, isAdmin, persistentId, Sessions.generateNewId(), clientLanguage == null ? "" : clientLanguage, clientAgent == null ? "" : clientAgent);
-                    }
-                };
+            public User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent) {
+                return new User(nickname, hostname, isAdmin, persistentId, Sessions.generateNewId(), clientLanguage == null ? "" : clientLanguage, clientAgent == null ? "" : clientAgent);
             }
         });
     }

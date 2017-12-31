@@ -7,7 +7,7 @@ import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.User;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ public class LongPollResponder extends CahResponder {
     private static final int WAIT_FOR_MORE_DELAY = 50;
 
     @Override
-    protected JsonElement handleRequest(@NotNull String op, User user, Parameters params, NanoHTTPD.IHTTPSession session) {
+    protected JsonElement handleRequest(@Nullable String op, @Nullable User user, Parameters params, NanoHTTPD.IHTTPSession session) {
         final long start = System.nanoTime();
         // Pick a random timeout point between [TIMEOUT_BASE, TIMEOUT_BASE + TIMEOUT_RANDOMNESS)
         // nanoseconds from now.

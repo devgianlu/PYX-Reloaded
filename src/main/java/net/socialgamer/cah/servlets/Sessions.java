@@ -38,7 +38,8 @@ public final class Sessions {
         sessions.remove(sid);
     }
 
-    public static void add(User user) {
+    public static String add(User user) {
         sessions.put(user.getSessionId(), user);
+        return user.getSessionId();
     }
 }

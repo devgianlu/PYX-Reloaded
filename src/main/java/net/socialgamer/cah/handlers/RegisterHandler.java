@@ -47,7 +47,7 @@ public class RegisterHandler extends BaseHandler {
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {
-            Sessions.add(user);
+            setHeader("Set-Cookie", "PYX-Session=" + Sessions.add(user));
 
             JsonObject obj = new JsonObject();
             obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
