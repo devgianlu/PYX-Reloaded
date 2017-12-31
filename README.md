@@ -1,17 +1,6 @@
 Pretend You're Xyzzy
 ===================
-
-A Cards Against Humanity clone, server and web client. See WebContent/license.html for full details.
-
-Note: This project is only known to work with Tomcat 7, all other versions are unsupported. 
-Currently, the only way to build PYX is using Maven via ```mvn clean package war:war``` in the project's directory.
-
-
-If you're doing ```mvn clean package jetty:run```, you now need to add ```-Dmaven.buildNumber.doCheck=false -Dmaven.buildNumber.doUpdate=false``` to make the buildnumber plugin allow you to run with uncommited changes.
-
-
-For GeoIP functions to work, download http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz somewhere, gunzip it, and update the geoip.db value in build.properties to point to it.
-
+A fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, and major changes in the backend. Finished product will have material design, work fairly decently on mobile devices, and have server that is self-contained instead of depending on Tomcat.
 
 TODO
 ====
@@ -20,4 +9,4 @@ TODO
 - Fix present bugs
 - Better card loading system
 
-If you have any other please open an issue or a pull request.
+If you have any others please open an issue or a pull request.
