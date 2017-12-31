@@ -27,9 +27,8 @@ public class AjaxResponder extends CahResponder {
                 Parameter[] parameters = constructor.getParameters();
                 Object[] objects = new Object[parameters.length];
 
-                for (int i = 0; i < parameters.length; i++) {
+                for (int i = 0; i < parameters.length; i++)
                     objects[i] = Providers.get(parameters[i].getAnnotations()[0].annotationType()).get();
-                }
 
                 handler = (BaseHandler) constructor.newInstance(objects);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {

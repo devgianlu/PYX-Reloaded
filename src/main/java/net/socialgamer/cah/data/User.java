@@ -106,7 +106,7 @@ public class User {
      * @return The next {@code maxElements} messages queued for this user.
      */
     public Collection<QueuedMessage> getNextQueuedMessages(final int maxElements) {
-        final ArrayList<QueuedMessage> c = new ArrayList<QueuedMessage>(maxElements);
+        final ArrayList<QueuedMessage> c = new ArrayList<>(maxElements);
         synchronized (queuedMessageSynchronization) {
             queuedMessages.drainTo(c, maxElements);
         }

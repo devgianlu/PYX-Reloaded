@@ -21,10 +21,7 @@ public abstract class BlackCard {
 
     @Override
     public final boolean equals(final Object other) {
-        if (!(other instanceof BlackCard)) {
-            return false;
-        }
-        return ((BlackCard) other).getId() == getId();
+        return other instanceof BlackCard && ((BlackCard) other).getId() == getId();
     }
 
     @Override
@@ -36,7 +33,7 @@ public abstract class BlackCard {
      * @return Client representation of this card.
      */
     public final Map<BlackCardData, Object> getClientData() {
-        final Map<BlackCardData, Object> cardData = new HashMap<BlackCardData, Object>();
+        final Map<BlackCardData, Object> cardData = new HashMap<>();
         cardData.put(BlackCardData.ID, getId());
         cardData.put(BlackCardData.TEXT, getText());
         cardData.put(BlackCardData.DRAW, getDraw());

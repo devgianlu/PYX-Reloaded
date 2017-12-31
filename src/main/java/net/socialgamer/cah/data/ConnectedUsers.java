@@ -37,7 +37,7 @@ public class ConnectedUsers {
     /**
      * Key (username) must be stored in lower-case to facilitate case-insensitivity in nicks.
      */
-    private final Map<String, User> users = new HashMap<String, User>();
+    private final Map<String, User> users = new HashMap<>();
 
     public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers, GeoIP geoIp, Metrics metrics) {
         this.broadcastConnectsAndDisconnects = broadcastConnectsAndDisconnects;
@@ -154,7 +154,7 @@ public class ConnectedUsers {
      * but have not actually done anything for a long time.
      */
     public void checkForPingAndIdleTimeouts() {
-        final Map<User, DisconnectReason> removedUsers = new HashMap<User, DisconnectReason>();
+        final Map<User, DisconnectReason> removedUsers = new HashMap<>();
         synchronized (users) {
             final Iterator<User> iterator = users.values().iterator();
             while (iterator.hasNext()) {

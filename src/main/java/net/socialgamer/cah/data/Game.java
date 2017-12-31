@@ -84,7 +84,7 @@ public class Game {
     private final static Set<String> FINITE_PLAYTIMES;
 
     static {
-        final Set<String> finitePlaytimes = new TreeSet<String>(Arrays.asList(
+        final Set<String> finitePlaytimes = new TreeSet<>(Arrays.asList(
                 "0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x"));
         FINITE_PLAYTIMES = Collections.unmodifiableSet(finitePlaytimes);
     }
@@ -271,6 +271,7 @@ public class Game {
 
             return players.size() == 0;
         }
+
         return false;
     }
 
@@ -794,7 +795,8 @@ public class Game {
                 JsonObject obj = new JsonObject();
                 obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.HURRY_UP.toString());
                 obj.addProperty(LongPollResponse.GAME_ID.toString(), this.id);
-                getJudge().getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
+                Player judge = getJudge();
+                if (judge != null) judge.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
             }
 
             // 10 seconds to finish playing
@@ -1193,11 +1195,8 @@ public class Game {
      */
     @Nullable
     private Player getJudge() {
-        if (judgeIndex >= 0 && judgeIndex < players.size()) {
-            return players.get(judgeIndex);
-        } else {
-            return null;
-        }
+        if (judgeIndex >= 0 && judgeIndex < players.size()) return players.get(judgeIndex);
+        else return null;
     }
 
     /**

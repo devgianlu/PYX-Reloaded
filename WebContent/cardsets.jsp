@@ -45,7 +45,7 @@ Administration tools.
         return;
     }
 
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
 
     Session hibernateSession = HibernateUtil.instance.sessionFactory.openSession();
 
@@ -115,11 +115,11 @@ Administration tools.
                         editCardSet.setWeight(weight);
                         editCardSet.setActive("on".equals(activeParam));
                         editCardSet.setBaseDeck("on".equals(baseDeckParam));
-                        List<Integer> blackCardIds = new ArrayList<Integer>(selectedBlackCardsParam.length);
+                        List<Integer> blackCardIds = new ArrayList<>(selectedBlackCardsParam.length);
                         for (String bc : selectedBlackCardsParam) {
                             blackCardIds.add(Integer.parseInt(bc));
                         }
-                        List<Integer> whiteCardIds = new ArrayList<Integer>(selectedWhiteCardsParam.length);
+                        List<Integer> whiteCardIds = new ArrayList<>(selectedWhiteCardsParam.length);
                         for (String wc : selectedWhiteCardsParam) {
                             whiteCardIds.add(Integer.parseInt(wc));
                         }
