@@ -26,6 +26,12 @@ public class Preferences extends HashMap<String, JsonElement> {
         }
     }
 
+    public MinDefaultMax getMinDefaultMax(String key, int min, int def, int max) {
+        JsonElement obj = get(key);
+        if (obj == null) return new MinDefaultMax(min, def, max);
+        else return new MinDefaultMax(obj.getAsJsonObject());
+    }
+
     public String getString(String key, String fallback) {
         JsonElement obj = get(key);
         if (obj == null) return fallback;
@@ -36,5 +42,23 @@ public class Preferences extends HashMap<String, JsonElement> {
         JsonElement obj = get(key);
         if (obj == null) return fallback;
         else return obj.getAsInt();
+    }
+
+    public static class MinDefaultMax {
+        public final int min;
+        public final int def;
+        public final int max;
+
+        private MinDefaultMax(int min, int def, int max) {
+            this.min = min;
+            this.def = def;
+            this.max = max;
+        }
+
+        private MinDefaultMax(JsonObject obj) {
+            min = obj.get("min").getAsInt();
+            def = obj.get("default").getAsInt();
+            max = obj.get("max").getAsInt();
+        }
     }
 }

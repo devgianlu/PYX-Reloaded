@@ -3,6 +3,7 @@ package net.socialgamer.cah.data;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.socialgamer.cah.Constants.GameOptionData;
+import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 
 import java.util.HashMap;
@@ -11,30 +12,28 @@ import java.util.Map;
 import java.util.Set;
 
 public class GameOptions {
-    // TODO move these out to pyx.properties
-    public static final int MIN_SCORE_LIMIT = 4;
-    public static final int DEFAULT_SCORE_LIMIT = 8;
-    public static final int MAX_SCORE_LIMIT = 69;
-    public static final int MIN_PLAYER_LIMIT = 3;
-    public static final int DEFAULT_PLAYER_LIMIT = 10;
-    public static final int MAX_PLAYER_LIMIT = 20;
-    public static final int MIN_SPECTATOR_LIMIT = 0;
-    public static final int DEFAULT_SPECTATOR_LIMIT = 10;
-    public static final int MAX_SPECTATOR_LIMIT = 20;
-    public static final int MIN_BLANK_CARD_LIMIT = 0;
-    public static final int DEFAULT_BLANK_CARD_LIMIT = 0;
-    public static final int MAX_BLANK_CARD_LIMIT = 30;
     public final Set<Integer> cardSetIds = new HashSet<>();
     // These are the default values new games get.
-    public int blanksInDeck = DEFAULT_BLANK_CARD_LIMIT;
-    public int playerLimit = DEFAULT_PLAYER_LIMIT;
-    public int spectatorLimit = DEFAULT_SPECTATOR_LIMIT;
-    public int scoreGoal = DEFAULT_SCORE_LIMIT;
+    public int blanksInDeck;
+    public int playerLimit;
+    public int spectatorLimit;
+    public int scoreGoal;
     public String password = "";
     public String timerMultiplier = "1.0x";
 
-    public static GameOptions deserialize(String text) {
-        GameOptions options = new GameOptions();
+    GameOptions(Preferences preferences) {
+        Preferences.MinDefaultMax blankCards = preferences.getMinDefaultMax("blankCardsLimit", 0, 0, 30);
+        blanksInDeck = blankCards.def;
+        Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
+        scoreGoal = score.def;
+        Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
+        playerLimit = player.def;
+        Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
+        spectatorLimit = spectator.def;
+    }
+
+    public static GameOptions deserialize(Preferences preferences, String text) {
+        GameOptions options = new GameOptions(preferences);
         if (text == null || text.isEmpty()) return options;
 
         JsonObject json = new JsonParser().parse(text).getAsJsonObject();
@@ -43,10 +42,15 @@ public class GameOptions {
             if (!cardSetId.isEmpty()) options.cardSetIds.add(Integer.parseInt(cardSetId));
         }
 
-        options.blanksInDeck = Math.max(MIN_BLANK_CARD_LIMIT, Math.min(MAX_BLANK_CARD_LIMIT, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
-        options.playerLimit = Math.max(MIN_PLAYER_LIMIT, Math.min(MAX_PLAYER_LIMIT, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
-        options.spectatorLimit = Math.max(MIN_SPECTATOR_LIMIT, Math.min(MAX_SPECTATOR_LIMIT, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
-        options.scoreGoal = Math.max(MIN_SCORE_LIMIT, Math.min(MAX_SCORE_LIMIT, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
+        Preferences.MinDefaultMax blankCards = preferences.getMinDefaultMax("blankCardsLimit", 0, 0, 30);
+        Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
+        Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
+        Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
+
+        options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
+        options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
+        options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
+        options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
         options.timerMultiplier = Utils.optString(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
         options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
 
@@ -66,6 +70,7 @@ public class GameOptions {
             this.cardSetIds.clear();
             this.cardSetIds.addAll(newOptions.cardSetIds);
         }
+
         this.blanksInDeck = newOptions.blanksInDeck;
         this.password = newOptions.password;
         this.timerMultiplier = newOptions.timerMultiplier;

@@ -34,6 +34,8 @@ public class Server {
         int maxUsers = preferences.getInt("maxUsers", 400);
         int port = preferences.getInt("port", 80);
 
+        Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
+
         Metrics metrics = new NoOpMetrics();
         ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
 
@@ -53,7 +55,7 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager(manager -> new Game(manager.getNextGameId(), connectedUsers, manager, globalTimer, cardcastService, metrics), 100, updateGameListTask);
+        GameManager gameManager = new GameManager(manager -> new Game(manager.getNextGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService, metrics), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
         new App(port).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);

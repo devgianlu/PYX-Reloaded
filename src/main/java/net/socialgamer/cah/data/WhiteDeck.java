@@ -5,7 +5,7 @@ import java.util.*;
 
 /**
  * Deck of White Cards.
- *
+ * <p>
  * This class is thread-safe.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
@@ -18,11 +18,11 @@ public class WhiteDeck {
     /**
      * Create a new white card deck, loading the cards from the database and shuffling them.
      */
-    public WhiteDeck(Collection<CardSet> cardSets, int numBlanks) {
+    WhiteDeck(Collection<CardSet> cardSets, int numBlanks) {
         Set<WhiteCard> allCards = new HashSet<>();
         for (CardSet cardSet : cardSets) allCards.addAll(cardSet.getWhiteCards());
         deck = new ArrayList<>(allCards);
-        for (int i = 0; i < numBlanks && i < GameOptions.MAX_BLANK_CARD_LIMIT; i++) deck.add(createBlankCard());
+        for (int i = 0; i < numBlanks; i++) deck.add(createBlankCard());
         Collections.shuffle(deck);
         discard = new ArrayList<>(deck.size());
     }

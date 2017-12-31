@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
@@ -102,7 +103,7 @@ public class Game {
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
     private final Object blackCardLock = new Object();
-    private final GameOptions options = new GameOptions();
+    private final GameOptions options;
 
     // All of these delays could be moved to pyx.properties.
     private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
@@ -135,11 +136,12 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, CardcastService cardcastService, Metrics metrics) {
+    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService, Metrics metrics) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
+        this.options = new GameOptions(preferences);
         this.cardcastService = cardcastService;
         this.metrics = metrics;
         this.state = GameState.LOBBY;
@@ -404,7 +406,7 @@ public class Game {
         return options.password;
     }
 
-    public void updateGameSettings(final GameOptions newOptions) {
+    public void updateGameSettings(GameOptions newOptions) {
         this.options.update(newOptions);
         notifyGameOptionsChanged();
     }

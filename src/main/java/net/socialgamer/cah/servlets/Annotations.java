@@ -23,7 +23,7 @@ public final class Annotations {
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface HibernateSession {
+    public @interface Preferences {
     }
 
     @Target(ElementType.PARAMETER)

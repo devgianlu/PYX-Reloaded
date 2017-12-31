@@ -7,6 +7,7 @@ import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Constants.GameState;
+import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.GameOptions;
@@ -17,9 +18,11 @@ import net.socialgamer.cah.servlets.Parameters;
 
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     public static final String OP = AjaxOperation.CHANGE_GAME_OPTIONS.toString();
+    private final Preferences preferences;
 
-    public ChangeGameOptionHandler(@Annotations.GameManager GameManager gameManager) {
+    public ChangeGameOptionHandler(@Annotations.GameManager GameManager gameManager, @Annotations.Preferences Preferences preferences) {
         super(gameManager);
+        this.preferences = preferences;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
 
         try {
             String value = params.get(AjaxRequest.GAME_OPTIONS);
-            GameOptions options = GameOptions.deserialize(value);
+            GameOptions options = GameOptions.deserialize(preferences, value);
             String oldPassword = game.getPassword();
             game.updateGameSettings(options);
 
