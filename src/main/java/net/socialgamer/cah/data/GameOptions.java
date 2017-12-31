@@ -1,7 +1,7 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.socialgamer.cah.Constants.GameOptionData;
 import net.socialgamer.cah.Utils;
 
@@ -33,11 +33,11 @@ public class GameOptions {
     public String password = "";
     public String timerMultiplier = "1.0x";
 
-    public static GameOptions deserialize(final String text) {
+    public static GameOptions deserialize(String text) {
         GameOptions options = new GameOptions();
         if (text == null || text.isEmpty()) return options;
 
-        JsonObject json = new Gson().toJsonTree(text).getAsJsonObject();
+        JsonObject json = new JsonParser().parse(text).getAsJsonObject();
         String[] cardSetsParsed = json.get(GameOptionData.CARD_SETS.toString()).getAsString().split(",");
         for (String cardSetId : cardSetsParsed) {
             if (!cardSetId.isEmpty()) options.cardSetIds.add(Integer.parseInt(cardSetId));
@@ -58,7 +58,7 @@ public class GameOptions {
      *
      * @param newOptions The new options to use.
      */
-    public void update(final GameOptions newOptions) {
+    public void update(GameOptions newOptions) {
         this.scoreGoal = newOptions.scoreGoal;
         this.playerLimit = newOptions.playerLimit;
         this.spectatorLimit = newOptions.spectatorLimit;

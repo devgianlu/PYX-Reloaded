@@ -1,9 +1,9 @@
 package net.socialgamer.cah.cardcast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -74,6 +74,8 @@ public class CardcastService {
             LOG.info(String.format("Cache miss: %s", setId));
         }
 
+        JsonParser parser = new JsonParser();
+
         try {
             String infoContent = getUrlContent(String.format(CARD_SET_INFO_URL_FORMAT_STRING, setId));
             if (infoContent == null) {
@@ -82,7 +84,7 @@ public class CardcastService {
                 return null;
             }
 
-            JsonObject info = new Gson().toJsonTree(infoContent).getAsJsonObject();
+            JsonObject info = parser.parse(infoContent).getAsJsonObject();
 
             String cardContent = getUrlContent(String.format(CARD_SET_CARDS_URL_FORMAT_STRING, setId));
             if (cardContent == null) {
@@ -91,7 +93,7 @@ public class CardcastService {
                 return null;
             }
 
-            JsonObject cards = new Gson().toJsonTree(cardContent).getAsJsonObject();
+            JsonObject cards = parser.parse(cardContent).getAsJsonObject();
 
             String name = info.get("name").getAsString();
             String description = info.get("description").getAsString();
