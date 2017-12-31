@@ -5,6 +5,7 @@ import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -20,11 +21,6 @@ public class GameManager {
     private final BroadcastGameListUpdateTask broadcastUpdate;
 
     /**
-     * Potential next game id.
-     */
-    private int nextId = 0;
-
-    /**
      * Create a new game manager.
      *
      * @param gameProvider Provider for new {@code Game} instances.
@@ -34,6 +30,10 @@ public class GameManager {
         this.gameProvider = gameProvider;
         this.maxGames = maxGames;
         this.broadcastUpdate = broadcastUpdate;
+    }
+
+    public static int generateGameId() {
+        return ThreadLocalRandom.current().nextInt();
     }
 
     private int getMaxGames() {
@@ -103,9 +103,6 @@ public class GameManager {
             final Game game = games.remove(gameId);
             if (game == null) return;
 
-            // if the prospective next id isn't valid, set it to the id we just removed
-            if (nextId == -1 || games.containsKey(nextId)) nextId = gameId;
-
             // remove the players from the game
             List<User> usersToRemove = game.getUsers();
             for (User user : usersToRemove) {
@@ -126,59 +123,10 @@ public class GameManager {
     }
 
     /**
-     * Get an unused game ID, or -1 if the maximum number of games are in progress. This should not be
-     * called in such a case, though!
-     * <p>
-     * TODO: make this not suck (!!)
-     *
-     * @return Next game id, or {@code -1} if the maximum number of games are in progress.
-     */
-    public int getNextGameId() {
-        synchronized (games) {
-            if (games.size() >= getMaxGames()) return -1;
-
-            if (!games.containsKey(nextId) && nextId >= 0) {
-                int ret = nextId;
-                nextId = candidateGameId(ret);
-                return ret;
-            } else {
-                int ret = candidateGameId();
-                nextId = candidateGameId(ret);
-                return ret;
-            }
-        }
-    }
-
-    private int candidateGameId() {
-        return candidateGameId(-1);
-    }
-
-    /**
-     * Try to guess a good candidate for the next game id.
-     *
-     * @param skip An id to skip over.
-     * @return A guess for the next game id.
-     */
-    private int candidateGameId(int skip) {
-        synchronized (games) {
-            int maxGames = getMaxGames();
-            if (games.size() >= maxGames) return -1;
-
-            for (int i = 0; i < maxGames; i++) {
-                if (i == skip) continue;
-                if (!games.containsKey(i)) return i;
-            }
-
-            return -1;
-        }
-    }
-
-    /**
      * @return A copy of the list of all current games.
      */
     public Collection<Game> getGameList() {
         synchronized (games) {
-            // return a copy
             return new ArrayList<>(games.values());
         }
     }
