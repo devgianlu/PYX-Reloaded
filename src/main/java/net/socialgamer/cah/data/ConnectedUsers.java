@@ -1,20 +1,16 @@
 package net.socialgamer.cah.data;
 
 import com.google.gson.JsonObject;
-import com.maxmind.geoip2.model.CityResponse;
 import net.socialgamer.cah.Constants.DisconnectReason;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Constants.LongPollEvent;
 import net.socialgamer.cah.Constants.LongPollResponse;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
-import net.socialgamer.cah.metrics.GeoIP;
 import net.socialgamer.cah.metrics.Metrics;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -32,17 +28,15 @@ public class ConnectedUsers {
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
     private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
-    private final GeoIP geoIp;
     private final Metrics metrics;
     /**
      * Key (username) must be stored in lower-case to facilitate case-insensitivity in nicks.
      */
     private final Map<String, User> users = new HashMap<>();
 
-    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers, GeoIP geoIp, Metrics metrics) {
+    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers, Metrics metrics) {
         this.broadcastConnectsAndDisconnects = broadcastConnectsAndDisconnects;
         this.maxUsers = maxUsers;
-        this.geoIp = geoIp;
         this.metrics = metrics;
     }
 
@@ -81,19 +75,7 @@ public class ConnectedUsers {
                     broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
 
-                // log them in the metrics
-                CityResponse geo = null;
-                try {
-                    final InetAddress addr = InetAddress.getByName(user.getHostname());
-                    geo = geoIp.getInfo(addr);
-                } catch (final UnknownHostException e) {
-                    logger.warn(String.format("Unable to get address for user %s (hostname: %s)",
-                            user.getNickname(), user.getHostname()), e);
-                }
-
-                metrics.userConnect(user.getPersistentId(), user.getSessionId(), geo, user.getAgentName(),
-                        user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
-
+                metrics.userConnect(user.getPersistentId(), user.getSessionId(), null, user.getAgentName(), user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
                 return null;
             }
         }
