@@ -12,8 +12,8 @@ public final class LoadedCards {
     private static final Set<PyxBlackCard> blackCards = new HashSet<>();
     private static Connection conn;
 
-    public static void load() throws SQLException {
-        conn = DriverManager.getConnection("jdbc:sqlite:pyx.sqlite");
+    public static void load(String path) throws SQLException {
+        conn = DriverManager.getConnection("jdbc:sqlite:" + path);
         loadWhiteCards();
         loadBlackCards();
         loadSets();

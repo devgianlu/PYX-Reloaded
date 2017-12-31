@@ -15,14 +15,24 @@ public class Preferences extends HashMap<String, JsonElement> {
         for (String key : obj.keySet()) put(key, obj.get(key));
     }
 
+    private Preferences() {
+    }
+
     public static Preferences load() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("preferences.json")), Charset.forName("UTF-8")))) {
-            StringBuilder builder = new StringBuilder();
+        File file = new File("preferences.json");
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")))) {
+                StringBuilder builder = new StringBuilder();
 
-            String line;
-            while ((line = reader.readLine()) != null) builder.append(line);
+                String line;
+                while ((line = reader.readLine()) != null) builder.append(line);
 
-            return new Preferences(builder.toString());
+                return new Preferences(builder.toString());
+            }
+        } else {
+            //noinspection ResultOfMethodCallIgnored
+            file.createNewFile();
+            return new Preferences();
         }
     }
 

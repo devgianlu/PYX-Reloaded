@@ -37,7 +37,7 @@ public class Server {
         Metrics metrics = new NoOpMetrics();
         ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
 
-        LoadedCards.load();
+        LoadedCards.load(preferences.getString("pyxDb", "pyx.sqlite"));
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers, metrics);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
