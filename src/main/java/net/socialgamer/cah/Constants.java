@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Constants {
-
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
@@ -59,7 +58,7 @@ public class Constants {
 
     /**
      * The next thing the client should do during reconnect phase.
-     * <p>
+     *
      * Leaving these as longer strings as they are only used once per client.
      */
     public enum ReconnectNextAction {
@@ -89,36 +88,107 @@ public class Constants {
      * Valid client request operations.
      */
     public enum AjaxOperation {
-        ADMIN_SET_VERBOSE_LOG("svl"),
+        /**
+         * Ban a user from the server
+         * <p>
+         * Admin only
+         */
         BAN("b"),
+        /**
+         * Add a Cardcast deck to the current game
+         */
         CARDCAST_ADD_CARDSET("cac"),
+        /**
+         * List current available Cardcast decks in the game
+         */
         CARDCAST_LIST_CARDSETS("clc"),
+        /**
+         * Remove a Cardcast deck from the current game
+         */
         CARDCAST_REMOVE_CARDSET("crc"),
+        /**
+         * Change the game options
+         */
         CHANGE_GAME_OPTIONS("cgo"),
+        /**
+         * Send a message on the global chat
+         */
         CHAT("c"),
+        /**
+         * Create a game
+         */
         CREATE_GAME("cg"),
+        /**
+         * Try to resume user session and returns available card sets
+         */
         FIRST_LOAD("fl"),
+        /**
+         * Send a message on the game chat
+         */
         GAME_CHAT("GC"),
+        /**
+         * List all available games
+         */
         GAME_LIST("ggl"),
         /**
          * Get all cards for a particular game: black, hand, and round white cards.
          */
         GET_CARDS("gc"),
+        /**
+         * Get current game info: players, spectators, game options, status, host, id
+         */
         GET_GAME_INFO("ggi"),
+        /**
+         * Join a game, may require password
+         */
         JOIN_GAME("jg"),
+        /**
+         * Spectate a game, may require password
+         */
         SPECTATE_GAME("vg"),
+        /**
+         * Select the winning card, judge only
+         */
         JUDGE_SELECT("js"),
+        /**
+         * Kick a user from the server
+         *
+         * Admin only
+         */
         KICK("K"),
+        /**
+         * Leave the current game (both for player and spectator)
+         */
         LEAVE_GAME("lg"),
+        /**
+         * Log out and invalidate the current session
+         */
         LOG_OUT("lo"),
         /**
          * Get the names of all clients connected to the server.
          */
         NAMES("gn"),
+        /**
+         * Play card, non-judge player only
+         */
         PLAY_CARD("pc"),
+        /**
+         * Register with a nickname, set PYX-Session
+         */
         REGISTER("r"),
+        /**
+         * Change a player score
+         *
+         * Admin only
+         */
         SCORE("SC"),
+        /**
+         * Start the game, checking the requirements
+         */
         START_GAME("sg"),
+        /**
+         * Stop the game
+         */
         STOP_GAME("Sg");
 
         private final String op;
@@ -246,16 +316,13 @@ public class Constants {
         @DuplicationAllowed
         BANNED(DisconnectReason.BANNED, "Banned."),
         CANNOT_JOIN_ANOTHER_GAME("cjag", "You cannot join another game."),
-        CARDCAST_CANNOT_FIND("ccf", "Cannot find Cardcast deck with given ID. If you just added this"
-                + " deck to Cardcast, wait a few minutes and try again."),
+        CARDCAST_CANNOT_FIND("ccf", "Cannot find Cardcast deck with given ID. If you just added this deck to Cardcast, wait a few minutes and try again."),
         CARDCAST_INVALID_ID("cii", "Invalid Cardcast ID. Must be exactly 5 characters."),
         DO_NOT_HAVE_CARD("dnhc", "You don't have that card."),
         GAME_FULL("gf", "That game is full. Join another."),
         INVALID_CARD("ic", "Invalid card specified."),
         INVALID_GAME("ig", "Invalid game specified."),
-        INVALID_NICK("in", "Nickname must contain only upper and lower case letters, " +
-                "numbers, or underscores, must be 3 to 30 characters long, and must not start with a " +
-                "number."),
+        INVALID_NICK("in", "Nickname must contain only upper and lower case letters, numbers, or underscores, must be 3 to 30 characters long, and must not start with a number."),
         MESSAGE_TOO_LONG("mtl", "Messages cannot be longer than " + CHAT_MAX_LENGTH + " characters."),
         NICK_IN_USE("niu", "Nickname is already in use."),
         NO_CARD_SPECIFIED("ncs", "No card specified."),
@@ -265,9 +332,7 @@ public class Constants {
         NO_SESSION("ns", "Session not detected. Make sure you have cookies enabled."),
         NO_SUCH_USER("nsu", "No such user."),
         NOT_ADMIN("na", "You are not an administrator."),
-        NOT_ENOUGH_CARDS("nec", "You must add card sets containing at least "
-                + Game.MINIMUM_BLACK_CARDS + " black cards and " + Game.MINIMUM_WHITE_CARDS_PER_PLAYER
-                + " times the player limit white cards."),
+        NOT_ENOUGH_CARDS("nec", "You must add card sets containing at least " + Game.MINIMUM_BLACK_CARDS + " black cards and " + Game.MINIMUM_WHITE_CARDS_PER_PLAYER + " times the player limit white cards."),
         NOT_ENOUGH_PLAYERS("nep", "There are not enough players to start the game."),
         NOT_GAME_HOST("ngh", "Only the game host can do that."),
         NOT_IN_THAT_GAME("nitg", "You are not in that game."),
@@ -276,13 +341,11 @@ public class Constants {
         NOT_YOUR_TURN("nyt", "It is not your turn to play a card."),
         OP_NOT_SPECIFIED("ons", "Operation not specified."),
         RESERVED_NICK("rn", "That nick is reserved."),
-        SERVER_ERROR("serr", "An error occured on the server."),
+        SERVER_ERROR("serr", "An error occurred on the server."),
         SESSION_EXPIRED("se", "Your session has expired. Refresh the page."),
         TOO_FAST("tf", "You are chatting too fast. Wait a few seconds and try again."),
-        TOO_MANY_GAMES("tmg", "There are too many games already in progress. Either join " +
-                "an existing game, or wait for one to become available."),
-        TOO_MANY_USERS("tmu", "There are too many users connected. Either join another server, or " +
-                "wait for a user to disconnect."),
+        TOO_MANY_GAMES("tmg", "There are too many games already in progress. Either join an existing game, or wait for one to become available."),
+        TOO_MANY_USERS("tmu", "There are too many users connected. Either join another server, or wait for a user to disconnect."),
         WRONG_PASSWORD("wp", "That password is incorrect.");
 
         private final String code;
@@ -325,32 +388,92 @@ public class Constants {
         CARDCAST_REMOVE_CARDSET(AjaxOperation.CARDCAST_REMOVE_CARDSET),
         @DuplicationAllowed
         CHAT(AjaxOperation.CHAT),
+        /**
+         * The black deck has been reshuffled
+         */
         GAME_BLACK_RESHUFFLE("gbr"),
+        /**
+         * The judge left the game
+         */
         GAME_JUDGE_LEFT("gjl"),
+        /**
+         * Skipped judge
+         */
         GAME_JUDGE_SKIPPED("gjs"),
+        /**
+         * Client should refresh games list
+         */
         GAME_LIST_REFRESH("glr"),
+        /**
+         * Game options changed
+         */
         GAME_OPTIONS_CHANGED("goc"),
+        /**
+         * A player's info changed
+         */
         GAME_PLAYER_INFO_CHANGE("gpic"),
+        /**
+         * A new player joined the game
+         */
         GAME_PLAYER_JOIN("gpj"),
+        /**
+         * Kicked from game for being idle too much
+         */
         GAME_PLAYER_KICKED_IDLE("gpki"),
+        /**
+         * A player joined the game
+         */
         GAME_PLAYER_LEAVE("gpl"),
+        /**
+         * A player has been skipped for being idle
+         */
         GAME_PLAYER_SKIPPED("gps"),
+        /**
+         * A spectator joined the game
+         */
         GAME_SPECTATOR_JOIN("gvj"),
+        /**
+         * A spectator left the game
+         */
         GAME_SPECTATOR_LEAVE("gvl"),
+        /**
+         * Round completed
+         */
         GAME_ROUND_COMPLETE("grc"),
+        /**
+         * The game state changed
+         */
         GAME_STATE_CHANGE("gsc"),
+        /**
+         * The white deck has been reshuffled
+         */
         GAME_WHITE_RESHUFFLE("gwr"),
+        /**
+         * Your cards
+         */
         HAND_DEAL("hd"),
+        /**
+         * Play or you'll be skipped!
+         */
         HURRY_UP("hu"),
         @DuplicationAllowed
         KICKED(DisconnectReason.KICKED),
+        /**
+         * A player has been kicked from the game for being idle too many rounds
+         */
         KICKED_FROM_GAME_IDLE("kfgi"),
+        /**
+         * A new player joined the server
+         */
         NEW_PLAYER("np"),
         /**
-         * There has been no other action to inform the client about in a certain timeframe, so inform
+         * There has been no other action to inform the client about in a certain time frame, so inform
          * the client that we have nothing to inform them so the client doesn't think we went away.
          */
         NOOP("_"),
+        /**
+         * A player has left the server
+         */
         PLAYER_LEAVE("pl");
 
         private final String event;
@@ -711,6 +834,6 @@ public class Constants {
      * flagging it as an invalid reuse.
      */
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface DuplicationAllowed {
+    @interface DuplicationAllowed {
     }
 }

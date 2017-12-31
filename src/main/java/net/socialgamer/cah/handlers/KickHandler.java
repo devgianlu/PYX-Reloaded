@@ -28,7 +28,7 @@ public class KickHandler extends AdminHandler {
         if (nickname == null || nickname.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
 
         final User kickUser = connectedUsers.getUser(nickname);
-        if (null == kickUser) throw new CahResponder.CahException(ErrorCode.NO_SUCH_USER);
+        if (kickUser == null) throw new CahResponder.CahException(ErrorCode.NO_SUCH_USER);
 
         kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, Utils.singletonJsonObject(LongPollResponse.EVENT.toString(), LongPollEvent.KICKED.toString())));
 
