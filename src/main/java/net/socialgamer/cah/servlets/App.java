@@ -26,11 +26,12 @@ public class App extends RouterNanoHTTPD {
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
 
     private final String cors;
-    private final List<File> rootDirs = Collections.singletonList(new File("./WebContent"));
+    private final List<File> rootDirs;
 
-    public App(int port, @Nullable String cors) {
+    public App(int port, File webRoot, @Nullable String cors) {
         super(port);
         this.cors = cors;
+        this.rootDirs = Collections.singletonList(webRoot);
 
         setAsyncRunner(new BoundRunner(Executors.newCachedThreadPool()));
         addMappings();

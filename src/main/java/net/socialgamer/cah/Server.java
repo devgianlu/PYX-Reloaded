@@ -13,6 +13,7 @@ import net.socialgamer.cah.servlets.Providers;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import net.socialgamer.cah.task.UserPingTask;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -53,6 +54,6 @@ public class Server {
         GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        new App(port, preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        new App(port, new File(preferences.getString("webContent", "./WebContent")), preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
     }
 }
