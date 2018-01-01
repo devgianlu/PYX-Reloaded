@@ -1,55 +1,59 @@
-/**
- * Copyright (c) 2012, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import fi.iki.elonen.NanoHTTPD;
+import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.ConnectedUsers;
+import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
+import net.socialgamer.cah.db.LoadedCards;
+import net.socialgamer.cah.servlets.Annotations;
+import net.socialgamer.cah.servlets.App;
+import net.socialgamer.cah.servlets.Provider;
+import net.socialgamer.cah.servlets.Providers;
+import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
+import net.socialgamer.cah.task.UserPingTask;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-/**
- * I believe this class is not actually used nor required.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
-@Singleton
 public class Server {
-    private final ConnectedUsers users;
-    private final GameManager gameManager;
+    private static final long PING_START_DELAY = TimeUnit.SECONDS.toMillis(60);
+    private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
+    private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
+    private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
 
-    @Inject
-    public Server(final ConnectedUsers connectedUsers, final GameManager gameManager) {
-        users = connectedUsers;
-        this.gameManager = gameManager;
-    }
+    public static void main(String[] args) throws IOException, SQLException {
+        Preferences preferences = Preferences.load();
+        int maxGames = preferences.getInt("maxGames", 100);
+        int maxUsers = preferences.getInt("maxUsers", 400);
+        int port = preferences.getInt("port", 80);
 
-    public ConnectedUsers getConnectedUsers() {
-        return this.users;
-    }
+        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
 
-    public GameManager getGameManager() {
-        return this.gameManager;
+        Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
+
+        LoadedCards.load(preferences.getString("pyxDb", "pyx.sqlite"));
+
+        ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
+        Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
+
+        BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
+        globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
+
+        UserPingTask userPingTask = new UserPingTask(connectedUsers, globalTimer);
+        globalTimer.scheduleAtFixedRate(userPingTask, PING_START_DELAY, PING_CHECK_DELAY, TimeUnit.MILLISECONDS);
+
+        Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
+
+        CardcastService cardcastService = new CardcastService();
+        Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
+
+        GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
+        Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
+
+        new App(port, new File(preferences.getString("webContent", "./WebContent")), preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
     }
 }

@@ -6,11 +6,10 @@ import java.util.Map;
 
 
 public class Handlers {
-    public final static Map<String, Class<? extends Handler>> LIST;
+    public final static Map<String, Class<? extends BaseHandler>> LIST;
 
     static {
-        LIST = new HashMap<String, Class<? extends Handler>>();
-        LIST.put(AdminSetVerboseLog.OP, AdminSetVerboseLog.class);
+        LIST = new HashMap<>();
         LIST.put(BanHandler.OP, BanHandler.class);
         LIST.put(CardcastAddCardsetHandler.OP, CardcastAddCardsetHandler.class);
         LIST.put(CardcastListCardsetsHandler.OP, CardcastListCardsetsHandler.class);

@@ -1,57 +1,21 @@
-/**
- * Copyright (c) 2012-2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.maxmind.geoip2.model.CityResponse;
-import net.socialgamer.cah.CahModule.BroadcastConnectsAndDisconnects;
-import net.socialgamer.cah.CahModule.MaxUsers;
-import net.socialgamer.cah.Constants.*;
+import com.google.gson.JsonObject;
+import net.socialgamer.cah.Constants.DisconnectReason;
+import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.Constants.LongPollEvent;
+import net.socialgamer.cah.Constants.LongPollResponse;
+import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
-import net.socialgamer.cah.metrics.GeoIP;
-import net.socialgamer.cah.metrics.Metrics;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * Class that holds all users connected to the server, and provides functions to operate on said
- * list.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
-@Singleton
 public class ConnectedUsers {
-
     /**
      * Duration of a ping timeout, in nanoseconds.
      */
@@ -61,31 +25,23 @@ public class ConnectedUsers {
      */
     public static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toNanos(60);
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
-    final Provider<Boolean> broadcastConnectsAndDisconnectsProvider;
-    final Provider<Integer> maxUsersProvider;
-    final GeoIP geoIp;
-    final Metrics metrics;
+    private final boolean broadcastConnectsAndDisconnects;
+    private final int maxUsers;
     /**
      * Key (username) must be stored in lower-case to facilitate case-insensitivity in nicks.
      */
-    private final Map<String, User> users = new HashMap<String, User>();
+    private final Map<String, User> users = new HashMap<>();
 
-    @Inject
-    public ConnectedUsers(
-            @BroadcastConnectsAndDisconnects final Provider<Boolean> broadcastConnectsAndDisconnectsProvider,
-            @MaxUsers final Provider<Integer> maxUsersProvider, final GeoIP geoIp,
-            final Metrics metrics) {
-        this.broadcastConnectsAndDisconnectsProvider = broadcastConnectsAndDisconnectsProvider;
-        this.maxUsersProvider = maxUsersProvider;
-        this.geoIp = geoIp;
-        this.metrics = metrics;
+    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers) {
+        this.broadcastConnectsAndDisconnects = broadcastConnectsAndDisconnects;
+        this.maxUsers = maxUsers;
     }
 
     /**
      * @param userName User name to check.
      * @return True if {@code userName} is a connected user.
      */
-    public boolean hasUser(final String userName) {
+    public boolean hasUser(String userName) {
         return users.containsKey(userName.toLowerCase());
     }
 
@@ -97,38 +53,24 @@ public class ConnectedUsers {
      * @return {@code null} if the user was added, or an {@link ErrorCode} explaining why the user was
      * rejected.
      */
-    public ErrorCode checkAndAdd(final User user) {
-        final int maxUsers = maxUsersProvider.get();
+    @Nullable
+    public ErrorCode checkAndAdd(User user) {
         synchronized (users) {
             if (this.hasUser(user.getNickname())) {
-                logger.info(String.format("Rejecting existing username %s from %s", user.toString(),
-                        user.getHostname()));
+                logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
                 return ErrorCode.NICK_IN_USE;
             } else if (users.size() >= maxUsers && !user.isAdmin()) {
-                logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)",
-                        user.toString(), users.size(), maxUsers));
+                logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)", user.toString(), users.size(), maxUsers));
                 return ErrorCode.TOO_MANY_USERS;
             } else {
-                logger.info(String.format("New user %s from %s (admin=%b)", user.toString(),
-                        user.getHostname(), user.isAdmin()));
+                logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
-                if (broadcastConnectsAndDisconnectsProvider.get()) {
-                    final HashMap<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
-                    data.put(LongPollResponse.EVENT, LongPollEvent.NEW_PLAYER.toString());
-                    data.put(LongPollResponse.NICKNAME, user.getNickname());
-                    broadcastToAll(MessageType.PLAYER_EVENT, data);
+                if (broadcastConnectsAndDisconnects) {
+                    JsonObject obj = new JsonObject();
+                    obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.NEW_PLAYER.toString());
+                    obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+                    broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
-                // log them in the metrics
-                CityResponse geo = null;
-                try {
-                    final InetAddress addr = InetAddress.getByName(user.getHostname());
-                    geo = geoIp.getInfo(addr);
-                } catch (final UnknownHostException e) {
-                    logger.warn(String.format("Unable to get address for user %s (hostname: %s)",
-                            user.getNickname(), user.getHostname()), e);
-                }
-                metrics.userConnect(user.getPersistentId(), user.getSessionId(), geo, user.getAgentName(),
-                        user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
 
                 return null;
             }
@@ -142,7 +84,7 @@ public class ConnectedUsers {
      * @param user   User to remove.
      * @param reason Reason the user is being removed.
      */
-    public void removeUser(final User user, final DisconnectReason reason) {
+    public void removeUser(User user, DisconnectReason reason) {
         synchronized (users) {
             if (users.containsKey(user.getNickname())) {
                 logger.info(String.format("Removing user %s because %s", user.toString(), reason));
@@ -160,7 +102,7 @@ public class ConnectedUsers {
      * @return User, or null.
      */
     @Nullable
-    public User getUser(final String nickname) {
+    public User getUser(String nickname) {
         return users.get(nickname.toLowerCase());
     }
 
@@ -170,17 +112,15 @@ public class ConnectedUsers {
      * @param user   User that has left.
      * @param reason Reason why the user has left.
      */
-    private void notifyRemoveUser(final User user, final DisconnectReason reason) {
+    private void notifyRemoveUser(User user, DisconnectReason reason) {
         // Games are informed about the user leaving when the user object is marked invalid.
-        if (broadcastConnectsAndDisconnectsProvider.get()) {
-            final HashMap<ReturnableData, Object> data = new HashMap<ReturnableData, Object>();
-            data.put(LongPollResponse.EVENT, LongPollEvent.PLAYER_LEAVE.toString());
-            data.put(LongPollResponse.NICKNAME, user.getNickname());
-            data.put(LongPollResponse.REASON, reason.toString());
-            broadcastToAll(MessageType.PLAYER_EVENT, data);
+        if (broadcastConnectsAndDisconnects) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.PLAYER_LEAVE.toString());
+            obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
+            obj.addProperty(LongPollResponse.REASON.toString(), reason.toString());
+            broadcastToAll(MessageType.PLAYER_EVENT, obj);
         }
-
-        metrics.userDisconnect(user.getSessionId());
     }
 
     /**
@@ -189,32 +129,34 @@ public class ConnectedUsers {
      * but have not actually done anything for a long time.
      */
     public void checkForPingAndIdleTimeouts() {
-        final Map<User, DisconnectReason> removedUsers = new HashMap<User, DisconnectReason>();
+        final Map<User, DisconnectReason> removedUsers = new HashMap<>();
         synchronized (users) {
-            final Iterator<User> iterator = users.values().iterator();
+            Iterator<User> iterator = users.values().iterator();
             while (iterator.hasNext()) {
-                final User u = iterator.next();
+                User user = iterator.next();
+
                 DisconnectReason reason = null;
-                if (System.nanoTime() - u.getLastHeardFrom() > PING_TIMEOUT) {
+                if (System.nanoTime() - user.getLastHeardFrom() > PING_TIMEOUT) {
                     reason = DisconnectReason.PING_TIMEOUT;
-                } else if (!u.isAdmin() && System.nanoTime() - u.getLastUserAction() > IDLE_TIMEOUT) {
+                } else if (!user.isAdmin() && System.nanoTime() - user.getLastUserAction() > IDLE_TIMEOUT) {
                     reason = DisconnectReason.IDLE_TIMEOUT;
                 }
-                if (null != reason) {
-                    removedUsers.put(u, reason);
+
+                if (reason != null) {
+                    removedUsers.put(user, reason);
                     iterator.remove();
                 }
             }
         }
+
         // Do this later to not keep users locked
-        for (final Entry<User, DisconnectReason> entry : removedUsers.entrySet()) {
+        for (Entry<User, DisconnectReason> entry : removedUsers.entrySet()) {
             try {
                 entry.getKey().noLongerValid();
                 notifyRemoveUser(entry.getKey(), entry.getValue());
-                logger.info(String.format("Automatically kicking user %s due to %s", entry.getKey(),
-                        entry.getValue()));
-            } catch (final Exception e) {
-                logger.error("Unable to remove pinged-out user", e);
+                logger.info(String.format("Automatically kicking user %s due to %s", entry.getKey(), entry.getValue()));
+            } catch (Exception ex) {
+                logger.error("Unable to remove pinged-out user", ex);
             }
         }
     }
@@ -226,8 +168,7 @@ public class ConnectedUsers {
      *                   priority.
      * @param masterData Message data to broadcast.
      */
-    public void broadcastToAll(final MessageType type,
-                               final HashMap<ReturnableData, Object> masterData) {
+    public void broadcastToAll(MessageType type, JsonObject masterData) {
         broadcastToList(users.values(), type, masterData);
     }
 
@@ -239,15 +180,13 @@ public class ConnectedUsers {
      *                    priority.
      * @param masterData  Message data to broadcast.
      */
-    public void broadcastToList(final Collection<User> broadcastTo, final MessageType type,
-                                final HashMap<ReturnableData, Object> masterData) {
+    public void broadcastToList(Collection<User> broadcastTo, MessageType type, JsonObject masterData) {
         // TODO I think this synchronized block is pointless.
         synchronized (users) {
-            for (final User u : broadcastTo) {
-                @SuppressWarnings("unchecked") final Map<ReturnableData, Object> data = (Map<ReturnableData, Object>) masterData.clone();
-                data.put(LongPollResponse.TIMESTAMP, System.currentTimeMillis());
-                final QueuedMessage qm = new QueuedMessage(type, data);
-                u.enqueueMessage(qm);
+            for (User user : broadcastTo) {
+                JsonObject obj = Utils.singletonJsonObject(LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
+                for (String key : masterData.keySet()) obj.add(key, masterData.get(key));
+                user.enqueueMessage(new QueuedMessage(type, obj));
             }
         }
     }
@@ -257,7 +196,7 @@ public class ConnectedUsers {
      */
     public Collection<User> getUsers() {
         synchronized (users) {
-            return new ArrayList<User>(users.values());
+            return new ArrayList<>(users.values());
         }
     }
 }
