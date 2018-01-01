@@ -10,13 +10,11 @@ import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.db.PyxCardSet;
-import net.socialgamer.cah.metrics.Metrics;
 import net.socialgamer.cah.task.SafeTimerTask;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -107,7 +105,6 @@ public class Game {
 
     // All of these delays could be moved to pyx.properties.
     private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
-    private final Metrics metrics;
     /**
      * Lock object to prevent judging during idle judge detection and vice-versa.
      */
@@ -136,14 +133,13 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService, Metrics metrics) {
+    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
         this.options = new GameOptions(preferences);
         this.cardcastService = cardcastService;
-        this.metrics = metrics;
         this.state = GameState.LOBBY;
     }
 
@@ -603,7 +599,6 @@ public class Game {
                 whiteDeck = loadWhiteDeck(cardSets);
             }
 
-            metrics.gameStart(currentUniqueId, cardSets, options.blanksInDeck, options.playerLimit, options.scoreGoal, !StringUtils.isBlank(options.password));
             startNextRound();
             gameManager.broadcastGameListRefresh();
         }
@@ -1290,7 +1285,6 @@ public class Game {
 
         Map<String, List<WhiteCard>> cardsBySessionId = new HashMap<>();
         playedCards.cardsByUser().forEach((key, value) -> cardsBySessionId.put(key.getSessionId(), value));
-        metrics.roundComplete(currentUniqueId, UniqueIds.getNewRandomID(), judge.getSessionId(), cardPlayer.getUser().getSessionId(), blackCard, cardsBySessionId);
         return null;
     }
 

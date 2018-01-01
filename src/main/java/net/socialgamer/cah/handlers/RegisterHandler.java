@@ -41,9 +41,7 @@ public class RegisterHandler extends BaseHandler {
 
         user = userFactory.create(nickname,
                 session.getRemoteIpAddress(),
-                Constants.ADMIN_IP_ADDRESSES.contains(session.getRemoteIpAddress()), pid,
-                session.getHeaders().get("accept-language"),
-                session.getHeaders().get("user-agent"));
+                Constants.ADMIN_IP_ADDRESSES.contains(session.getRemoteIpAddress()), pid);
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {

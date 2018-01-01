@@ -2,7 +2,6 @@ package net.socialgamer.cah.servlets;
 
 import net.socialgamer.cah.data.User;
 
-import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +20,8 @@ public final class Providers {
     static {
         add(Annotations.UserFactory.class, (Provider<User.Factory>) () -> new User.Factory() {
             @Override
-            public User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent) {
-                return new User(nickname, hostname, isAdmin, persistentId, Sessions.generateNewId(), clientLanguage == null ? "" : clientLanguage, clientAgent == null ? "" : clientAgent);
+            public User create(String nickname, String hostname, boolean isAdmin, String persistentId) {
+                return new User(nickname, hostname, isAdmin, persistentId, Sessions.generateNewId());
             }
         });
     }

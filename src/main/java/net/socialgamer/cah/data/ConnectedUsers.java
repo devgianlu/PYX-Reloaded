@@ -7,10 +7,9 @@ import net.socialgamer.cah.Constants.LongPollEvent;
 import net.socialgamer.cah.Constants.LongPollResponse;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
-import net.socialgamer.cah.metrics.Metrics;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -28,16 +27,14 @@ public class ConnectedUsers {
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
     private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
-    private final Metrics metrics;
     /**
      * Key (username) must be stored in lower-case to facilitate case-insensitivity in nicks.
      */
     private final Map<String, User> users = new HashMap<>();
 
-    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers, Metrics metrics) {
+    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers) {
         this.broadcastConnectsAndDisconnects = broadcastConnectsAndDisconnects;
         this.maxUsers = maxUsers;
-        this.metrics = metrics;
     }
 
     /**
@@ -75,7 +72,6 @@ public class ConnectedUsers {
                     broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
 
-                metrics.userConnect(user.getPersistentId(), user.getSessionId(), user.getAgentName(), user.getAgentType(), user.getAgentOs(), user.getAgentLanguage());
                 return null;
             }
         }
@@ -125,8 +121,6 @@ public class ConnectedUsers {
             obj.addProperty(LongPollResponse.REASON.toString(), reason.toString());
             broadcastToAll(MessageType.PLAYER_EVENT, obj);
         }
-
-        metrics.userDisconnect(user.getSessionId());
     }
 
     /**

@@ -1,9 +1,8 @@
 package net.socialgamer.cah.data;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.service.UADetectorServiceFactory;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -21,8 +20,6 @@ public class User {
     private final boolean isAdmin;
     private final String persistentId;
     private final String sessionId;
-    private final String clientLanguage;
-    private final ReadableUserAgent agent;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
     private long lastHeardFrom = 0;
     private long lastUserAction = 0;
@@ -41,14 +38,12 @@ public class User {
      * @param persistentId This user's persistent (cross-session) ID.
      * @param sessionId    The unique ID of this session for this server instance.
      */
-    public User(String nickname, String hostname, boolean isAdmin, String persistentId, String sessionId, String clientLanguage, String clientAgent) {
+    public User(String nickname, String hostname, boolean isAdmin, String persistentId, String sessionId) {
         this.nickname = nickname;
         this.hostname = hostname;
         this.isAdmin = isAdmin;
         this.persistentId = persistentId;
         this.sessionId = sessionId;
-        this.clientLanguage = clientLanguage;
-        this.agent = UADetectorServiceFactory.getResourceModuleParser().parse(clientAgent);
         this.queuedMessages = new PriorityBlockingQueue<>();
     }
 
@@ -140,22 +135,6 @@ public class User {
         return hostname;
     }
 
-    public String getAgentName() {
-        return agent.getName();
-    }
-
-    public String getAgentType() {
-        return agent.getDeviceCategory().getName();
-    }
-
-    public String getAgentOs() {
-        return agent.getOperatingSystem().getName();
-    }
-
-    public String getAgentLanguage() {
-        return clientLanguage.split(",")[0];
-    }
-
     @Override
     public String toString() {
         return getNickname();
@@ -234,6 +213,6 @@ public class User {
     }
 
     public abstract static class Factory {
-        public abstract User create(String nickname, String hostname, boolean isAdmin, String persistentId, @Nullable String clientLanguage, @Nullable String clientAgent);
+        public abstract User create(String nickname, String hostname, boolean isAdmin, String persistentId);
     }
 }

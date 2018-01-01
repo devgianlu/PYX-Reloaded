@@ -4,8 +4,8 @@ import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;

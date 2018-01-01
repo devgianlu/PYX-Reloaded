@@ -3,8 +3,8 @@ package net.socialgamer.cah.servlets;
 import net.socialgamer.cah.data.User;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
