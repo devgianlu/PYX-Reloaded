@@ -53,6 +53,6 @@ public class Server {
         GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        new App(port).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        new App(port, preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
     }
 }
