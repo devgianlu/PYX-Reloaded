@@ -10,10 +10,10 @@ public class CardcastDeck extends CardSet {
     private final String name;
     private final String code;
     private final String description;
-    private final Set<CardcastBlackCard> blackCards = new HashSet<CardcastBlackCard>();
-    private final Set<CardcastWhiteCard> whiteCards = new HashSet<CardcastWhiteCard>();
+    private final Set<CardcastBlackCard> blackCards = new HashSet<>();
+    private final Set<CardcastWhiteCard> whiteCards = new HashSet<>();
 
-    public CardcastDeck(final String name, final String code, final String description) {
+    CardcastDeck(String name, String code, String description) {
         this.name = name;
         this.code = code;
         this.description = description;

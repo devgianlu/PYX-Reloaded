@@ -42,7 +42,7 @@ public class UpdateHandlerList {
      * superclasses, the interface definition, and the list of handlers itself.
      */
     private static final List<String> EXCLUDE = Arrays.asList("AdminHandler", "GameHandler",
-            "GameWithPlayerHandler", "Handler", "Handlers");
+            "GameWithPlayerHandler", "BaseHandler", "Handlers");
 
     /**
      * Run the handler list update. This program's working directory should be the base directory of
@@ -66,10 +66,10 @@ public class UpdateHandlerList {
         writer.println();
         writer.println();
         writer.println("public class Handlers {");
-        writer.println("  public final static Map<String, Class<? extends Handler>> LIST;");
+        writer.println("  public final static Map<String, Class<? extends BaseHandler>> LIST;");
         writer.println();
         writer.println("  static {");
-        writer.println("    LIST = new HashMap<String, Class<? extends Handler>>();");
+        writer.println("    LIST = new HashMap<String, Class<? extends BaseHandler>>();");
 
         final File d = new File(dir);
         final File[] files = d.listFiles();

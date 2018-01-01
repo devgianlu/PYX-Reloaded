@@ -1,81 +1,44 @@
-/**
- * Copyright (c) 2012, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
-import com.google.inject.BindingAnnotation;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 import net.socialgamer.cah.data.Game.TooManyPlayersException;
-import net.socialgamer.cah.data.GameManager.GameId;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
  * Manage games for the server.
  *
- * This is also a Guice provider for game ids.
- *
  * @author Andy Janata (ajanata@socialgamer.net)
  */
-@Singleton
-@GameId
-public class GameManager implements Provider<Integer> {
+public class GameManager {
     private static final Logger logger = Logger.getLogger(GameManager.class);
-
-    private final Provider<Integer> maxGamesProvider;
-    private final Map<Integer, Game> games = new TreeMap<Integer, Game>();
-    private final Provider<Game> gameProvider;
+    private final int maxGames;
+    private final Map<Integer, Game> games = new TreeMap<>();
+    private final GameProvider gameProvider;
     private final BroadcastGameListUpdateTask broadcastUpdate;
-
-    /**
-     * Potential next game id.
-     */
-    private int nextId = 0;
 
     /**
      * Create a new game manager.
      *
-     * @param gameProvider     Provider for new {@code Game} instances.
-     * @param maxGamesProvider Provider for maximum number of games allowed on the server.
+     * @param gameProvider Provider for new {@code Game} instances.
+     * @param maxGames     Provider for maximum number of games allowed on the server.
      */
-    @Inject
-    public GameManager(final Provider<Game> gameProvider,
-                       @MaxGames final Provider<Integer> maxGamesProvider,
-                       final BroadcastGameListUpdateTask broadcastUpdate) {
+    public GameManager(GameProvider gameProvider, int maxGames, BroadcastGameListUpdateTask broadcastUpdate) {
         this.gameProvider = gameProvider;
-        this.maxGamesProvider = maxGamesProvider;
+        this.maxGames = maxGames;
         this.broadcastUpdate = broadcastUpdate;
     }
 
+    public static int generateGameId() {
+        return ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
+    }
+
     private int getMaxGames() {
-        return maxGamesProvider.get();
+        return maxGames;
     }
 
     /**
@@ -86,13 +49,9 @@ public class GameManager implements Provider<Integer> {
      */
     private Game createGame() {
         synchronized (games) {
-            if (games.size() >= getMaxGames()) {
-                return null;
-            }
-            final Game game = gameProvider.get();
-            if (game.getId() < 0) {
-                return null;
-            }
+            if (games.size() >= getMaxGames()) return null;
+            Game game = gameProvider.create(this);
+            if (game.getId() < 0) return null;
             games.put(game.getId(), game);
             return game;
         }
@@ -110,23 +69,23 @@ public class GameManager implements Provider<Integer> {
      * @return Newly created game, or {@code null} if the maximum number of games are in progress.
      * @throws IllegalStateException If the user is already in a game and cannot join another.
      */
-    public Game createGameWithPlayer(final User user) throws IllegalStateException {
+    @Nullable
+    public Game createGameWithPlayer(User user) throws IllegalStateException {
         synchronized (games) {
-            final Game game = createGame();
-            if (game == null) {
-                return null;
-            }
+            Game game = createGame();
+            if (game == null) return null;
+
             try {
                 game.addPlayer(user);
-                logger.info(String.format("Created new game %d by user %s.",
-                        game.getId(), user.toString()));
-            } catch (final IllegalStateException ise) {
+                logger.info(String.format("Created new game %d by user %s.", game.getId(), user.toString()));
+            } catch (IllegalStateException ise) {
                 destroyGame(game.getId());
                 throw ise;
-            } catch (final TooManyPlayersException tmpe) {
+            } catch (TooManyPlayersException tmpe) {
                 // this should never happen -- we just made the game
                 throw new Error("Impossible exception: Too many players in new game.", tmpe);
             }
+
             broadcastGameListRefresh();
             return game;
         }
@@ -141,19 +100,14 @@ public class GameManager implements Provider<Integer> {
      *
      * @param gameId ID of game to destroy.
      */
-    public void destroyGame(final int gameId) {
+    public void destroyGame(int gameId) {
         synchronized (games) {
             final Game game = games.remove(gameId);
-            if (game == null) {
-                return;
-            }
-            // if the prospective next id isn't valid, set it to the id we just removed
-            if (nextId == -1 || games.containsKey(nextId)) {
-                nextId = gameId;
-            }
+            if (game == null) return;
+
             // remove the players from the game
-            final List<User> usersToRemove = game.getUsers();
-            for (final User user : usersToRemove) {
+            List<User> usersToRemove = game.getUsers();
+            for (User user : usersToRemove) {
                 game.removePlayer(user);
                 game.removeSpectator(user);
             }
@@ -171,66 +125,11 @@ public class GameManager implements Provider<Integer> {
     }
 
     /**
-     * Get an unused game ID, or -1 if the maximum number of games are in progress. This should not be
-     * called in such a case, though!
-     * <p>
-     * TODO: make this not suck
-     *
-     * @return Next game id, or {@code -1} if the maximum number of games are in progress.
-     */
-    @Override
-    public Integer get() {
-        synchronized (games) {
-            if (games.size() >= getMaxGames()) {
-                return -1;
-            }
-            if (!games.containsKey(nextId) && nextId >= 0) {
-                final int ret = nextId;
-                nextId = candidateGameId(ret);
-                return ret;
-            } else {
-                final int ret = candidateGameId();
-                nextId = candidateGameId(ret);
-                return ret;
-            }
-        }
-    }
-
-    private int candidateGameId() {
-        return candidateGameId(-1);
-    }
-
-    /**
-     * Try to guess a good candidate for the next game id.
-     *
-     * @param skip An id to skip over.
-     * @return A guess for the next game id.
-     */
-    private int candidateGameId(final int skip) {
-        synchronized (games) {
-            final int maxGames = getMaxGames();
-            if (games.size() >= maxGames) {
-                return -1;
-            }
-            for (int i = 0; i < maxGames; i++) {
-                if (i == skip) {
-                    continue;
-                }
-                if (!games.containsKey(i)) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-    }
-
-    /**
      * @return A copy of the list of all current games.
      */
     public Collection<Game> getGameList() {
         synchronized (games) {
-            // return a copy
-            return new ArrayList<Game>(games.values());
+            return new ArrayList<>(games.values());
         }
     }
 
@@ -246,18 +145,11 @@ public class GameManager implements Provider<Integer> {
         }
     }
 
-    // @VisibileForTesting
     Map<Integer, Game> getGames() {
         return games;
     }
 
-    @BindingAnnotation
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface GameId {
-    }
-
-    @BindingAnnotation
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface MaxGames {
+    public interface GameProvider {
+        Game create(GameManager manager);
     }
 }

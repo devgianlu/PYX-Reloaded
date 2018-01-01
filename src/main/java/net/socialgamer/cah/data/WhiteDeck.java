@@ -1,26 +1,3 @@
-/**
- * Copyright (c) 2012, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
 import java.util.*;
@@ -28,7 +5,7 @@ import java.util.*;
 
 /**
  * Deck of White Cards.
- *
+ * <p>
  * This class is thread-safe.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
@@ -41,17 +18,13 @@ public class WhiteDeck {
     /**
      * Create a new white card deck, loading the cards from the database and shuffling them.
      */
-    public WhiteDeck(final Collection<CardSet> cardSets, final int numBlanks) {
-        final Set<WhiteCard> allCards = new HashSet<WhiteCard>();
-        for (final CardSet cardSet : cardSets) {
-            allCards.addAll(cardSet.getWhiteCards());
-        }
-        deck = new ArrayList<WhiteCard>(allCards);
-        for (int i = 0; i < numBlanks && i < GameOptions.MAX_BLANK_CARD_LIMIT; i++) {
-            deck.add(createBlankCard());
-        }
+    WhiteDeck(Collection<CardSet> cardSets, int numBlanks) {
+        Set<WhiteCard> allCards = new HashSet<>();
+        for (CardSet cardSet : cardSets) allCards.addAll(cardSet.getWhiteCards());
+        deck = new ArrayList<>(allCards);
+        for (int i = 0; i < numBlanks; i++) deck.add(createBlankCard());
         Collections.shuffle(deck);
-        discard = new ArrayList<WhiteCard>(deck.size());
+        discard = new ArrayList<>(deck.size());
     }
 
     /**
@@ -60,7 +33,7 @@ public class WhiteDeck {
      * @param card Card to check.
      * @return True if the card is a blank card.
      */
-    public static boolean isBlankCard(final WhiteCard card) {
+    public static boolean isBlankCard(WhiteCard card) {
         return card instanceof BlankWhiteCard;
     }
 
@@ -71,12 +44,9 @@ public class WhiteDeck {
      * @throws OutOfCardsException There are no more cards in the deck.
      */
     public synchronized WhiteCard getNextCard() throws OutOfCardsException {
-        if (deck.size() == 0) {
-            throw new OutOfCardsException();
-        }
+        if (deck.size() == 0) throw new OutOfCardsException();
         // we have an ArrayList here, so this is faster
-        final WhiteCard card = deck.remove(deck.size() - 1);
-        return card;
+        return deck.remove(deck.size() - 1);
     }
 
     /**
@@ -84,12 +54,11 @@ public class WhiteDeck {
      *
      * @param card Card to add to discard pile.
      */
-    public synchronized void discard(final WhiteCard card) {
+    public synchronized void discard(WhiteCard card) {
         if (card != null) {
-            if (isBlankCard(card)) {
-                // clear any player text
-                ((BlankWhiteCard) card).clear();
-            }
+            // clear any player text
+            if (isBlankCard(card)) ((BlankWhiteCard) card).clear();
+
             discard.add(card);
         }
     }
@@ -109,8 +78,7 @@ public class WhiteDeck {
      * @return A newly created blank card.
      */
     private WhiteCard createBlankCard() {
-        final WhiteCard blank = new BlankWhiteCard(--lastBlankCardId);
-        return blank;
+        return new BlankWhiteCard(--lastBlankCardId);
     }
 
     public synchronized int totalCount() {

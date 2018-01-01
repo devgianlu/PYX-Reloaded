@@ -1,61 +1,42 @@
 package net.socialgamer.cah.db;
 
-import net.socialgamer.cah.Constants.CardSetData;
 import net.socialgamer.cah.data.CardSet;
-import org.hibernate.Session;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-
-@Entity
-@Table(name = "card_set")
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PyxCardSet extends CardSet {
-
-    @ManyToMany
-    @JoinTable(
-            name = "card_set_black_card",
-            joinColumns = {@JoinColumn(name = "card_set_id")},
-            inverseJoinColumns = {@JoinColumn(name = "black_card_id")})
-    @LazyCollection(LazyCollectionOption.TRUE)
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private final Set<PyxBlackCard> blackCards;
-    @ManyToMany
-    @JoinTable(
-            name = "card_set_white_card",
-            joinColumns = {@JoinColumn(name = "card_set_id")},
-            inverseJoinColumns = {@JoinColumn(name = "white_card_id")})
-    @LazyCollection(LazyCollectionOption.TRUE)
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private final Set<PyxWhiteCard> whiteCards;
-    @Id
-    @GeneratedValue
-    private int id;
-    private String name;
-    private String description;
-    private boolean active;
-    private boolean base_deck;
-    private int weight;
+    private final int id;
+    private final String name;
+    private final String description;
+    private final boolean active;
+    private final boolean base_deck;
+    private final int weight;
 
-    public PyxCardSet() {
-        blackCards = new HashSet<PyxBlackCard>();
-        whiteCards = new HashSet<PyxWhiteCard>();
+    public PyxCardSet(ResultSet resultSet) throws SQLException {
+        id = resultSet.getInt("id");
+        name = resultSet.getString("name");
+        active = resultSet.getInt("active") == 1;
+        base_deck = resultSet.getInt("base_deck") == 1;
+        description = resultSet.getString("description");
+        weight = resultSet.getInt("weight");
+
+        blackCards = new HashSet<>();
+        whiteCards = new HashSet<>();
     }
 
-    public static String getCardsetQuery(final boolean includeInactive) {
-        if (includeInactive) {
-            return "from PyxCardSet order by weight, id";
-        } else {
-            return "from PyxCardSet where active = true order by weight, id";
-        }
+    public static List<PyxCardSet> loadCardSets(Set<Integer> ids) {
+        List<PyxCardSet> sets = new ArrayList<>();
+        for (PyxCardSet set : LoadedCards.getLoadedSets())
+            if (ids.contains(set.id)) sets.add(set);
+
+        return sets;
     }
 
     @Override
@@ -63,17 +44,9 @@ public class PyxCardSet extends CardSet {
         return name;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     @Override
     public boolean isActive() {
         return active;
-    }
-
-    public void setActive(final boolean active) {
-        this.active = active;
     }
 
     @Override
@@ -96,44 +69,13 @@ public class PyxCardSet extends CardSet {
         return base_deck;
     }
 
-    public void setBaseDeck(final boolean baseDeck) {
-        this.base_deck = baseDeck;
-    }
-
     @Override
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
     @Override
     public int getWeight() {
         return weight;
-    }
-
-    public void setWeight(final int weight) {
-        this.weight = weight;
-    }
-
-    /**
-     * Get the JSON representation of this card set's metadata. This method will not cause
-     * lazy-loading of the card collections.
-     *
-     * @return Client representation of this card set.
-     */
-    public Map<CardSetData, Object> getClientMetadata(final Session hibernateSession) {
-        final Map<CardSetData, Object> cardSetData = getCommonClientMetadata();
-        final Number blackCount = (Number) hibernateSession
-                .createQuery("select count(*) from PyxCardSet cs join cs.blackCards where cs.id = :id")
-                .setParameter("id", id).setCacheable(true).uniqueResult();
-        cardSetData.put(CardSetData.BLACK_CARDS_IN_DECK, blackCount);
-        final Number whiteCount = (Number) hibernateSession
-                .createQuery("select count(*) from PyxCardSet cs join cs.whiteCards where cs.id = :id")
-                .setParameter("id", id).setCacheable(true).uniqueResult();
-        cardSetData.put(CardSetData.WHITE_CARDS_IN_DECK, whiteCount);
-        return cardSetData;
     }
 }

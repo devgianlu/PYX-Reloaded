@@ -1,91 +1,58 @@
-/**
- * Copyright (c) 2012, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.socialgamer.cah.Constants.GameOptionData;
-import net.socialgamer.cah.JsonWrapper;
+import net.socialgamer.cah.Preferences;
+import net.socialgamer.cah.Utils;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
-/**
- * Options for an individual game.
- *
- * @author Gavin Lambert (uecasm)
- */
 public class GameOptions {
-    // TODO move these out to pyx.properties
-    public static final int MIN_SCORE_LIMIT = 4;
-    public static final int DEFAULT_SCORE_LIMIT = 8;
-    public static final int MAX_SCORE_LIMIT = 69;
-    public static final int MIN_PLAYER_LIMIT = 3;
-    public static final int DEFAULT_PLAYER_LIMIT = 10;
-    public static final int MAX_PLAYER_LIMIT = 20;
-    public static final int MIN_SPECTATOR_LIMIT = 0;
-    public static final int DEFAULT_SPECTATOR_LIMIT = 10;
-    public static final int MAX_SPECTATOR_LIMIT = 20;
-    public static final int MIN_BLANK_CARD_LIMIT = 0;
-    public static final int DEFAULT_BLANK_CARD_LIMIT = 0;
-    public static final int MAX_BLANK_CARD_LIMIT = 30;
-    public final Set<Integer> cardSetIds = new HashSet<Integer>();
+    public final Set<Integer> cardSetIds = new HashSet<>();
     // These are the default values new games get.
-    public int blanksInDeck = DEFAULT_BLANK_CARD_LIMIT;
-    public int playerLimit = DEFAULT_PLAYER_LIMIT;
-    public int spectatorLimit = DEFAULT_SPECTATOR_LIMIT;
-    public int scoreGoal = DEFAULT_SCORE_LIMIT;
+    public int blanksInDeck;
+    public int playerLimit;
+    public int spectatorLimit;
+    public int scoreGoal;
     public String password = "";
     public String timerMultiplier = "1.0x";
 
-    public static GameOptions deserialize(final String text) {
-        final GameOptions options = new GameOptions();
+    GameOptions(Preferences preferences) {
+        Preferences.MinDefaultMax blankCards = preferences.getMinDefaultMax("blankCardsLimit", 0, 0, 30);
+        blanksInDeck = blankCards.def;
+        Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
+        scoreGoal = score.def;
+        Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
+        playerLimit = player.def;
+        Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
+        spectatorLimit = spectator.def;
+    }
 
-        if (text == null || text.isEmpty()) {
-            return options;
+    public static GameOptions deserialize(Preferences preferences, String text) {
+        GameOptions options = new GameOptions(preferences);
+        if (text == null || text.isEmpty()) return options;
+
+        JsonObject json = new JsonParser().parse(text).getAsJsonObject();
+        String[] cardSetsParsed = json.get(GameOptionData.CARD_SETS.toString()).getAsString().split(",");
+        for (String cardSetId : cardSetsParsed) {
+            if (!cardSetId.isEmpty()) options.cardSetIds.add(Integer.parseInt(cardSetId));
         }
 
-        final JsonWrapper json = new JsonWrapper(text);
+        Preferences.MinDefaultMax blankCards = preferences.getMinDefaultMax("blankCardsLimit", 0, 0, 30);
+        Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
+        Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
+        Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
 
-        final String[] cardSetsParsed = json.getString(GameOptionData.CARD_SETS, "").split(",");
-        for (final String cardSetId : cardSetsParsed) {
-            if (!cardSetId.isEmpty()) {
-                options.cardSetIds.add(Integer.parseInt(cardSetId));
-            }
-        }
-
-        options.blanksInDeck = Math.max(MIN_BLANK_CARD_LIMIT, Math.min(MAX_BLANK_CARD_LIMIT,
-                json.getInteger(GameOptionData.BLANKS_LIMIT, options.blanksInDeck)));
-        options.playerLimit = Math.max(MIN_PLAYER_LIMIT, Math.min(MAX_PLAYER_LIMIT,
-                json.getInteger(GameOptionData.PLAYER_LIMIT, options.playerLimit)));
-        options.spectatorLimit = Math.max(MIN_SPECTATOR_LIMIT, Math.min(MAX_SPECTATOR_LIMIT,
-                json.getInteger(GameOptionData.SPECTATOR_LIMIT, options.spectatorLimit)));
-        options.scoreGoal = Math.max(MIN_SCORE_LIMIT, Math.min(MAX_SCORE_LIMIT,
-                json.getInteger(GameOptionData.SCORE_LIMIT, options.scoreGoal)));
-        options.timerMultiplier = json.getString(GameOptionData.TIMER_MULTIPLIER, options.timerMultiplier);
-        options.password = json.getString(GameOptionData.PASSWORD, options.password);
+        options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
+        options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
+        options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
+        options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
+        options.timerMultiplier = Utils.optString(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
+        options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
 
         return options;
     }
@@ -95,7 +62,7 @@ public class GameOptions {
      *
      * @param newOptions The new options to use.
      */
-    public void update(final GameOptions newOptions) {
+    public void update(GameOptions newOptions) {
         this.scoreGoal = newOptions.scoreGoal;
         this.playerLimit = newOptions.playerLimit;
         this.spectatorLimit = newOptions.spectatorLimit;
@@ -103,6 +70,7 @@ public class GameOptions {
             this.cardSetIds.clear();
             this.cardSetIds.addAll(newOptions.cardSetIds);
         }
+
         this.blanksInDeck = newOptions.blanksInDeck;
         this.password = newOptions.password;
         this.timerMultiplier = newOptions.timerMultiplier;
@@ -116,7 +84,7 @@ public class GameOptions {
      * @return This game's general information: ID, host, state, player list, etc.
      */
     public Map<GameOptionData, Object> serialize(final boolean includePassword) {
-        final Map<GameOptionData, Object> info = new HashMap<GameOptionData, Object>();
+        final Map<GameOptionData, Object> info = new HashMap<>();
 
         info.put(GameOptionData.CARD_SETS, cardSetIds);
         info.put(GameOptionData.BLANKS_LIMIT, blanksInDeck);
@@ -124,23 +92,34 @@ public class GameOptions {
         info.put(GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
         info.put(GameOptionData.SCORE_LIMIT, scoreGoal);
         info.put(GameOptionData.TIMER_MULTIPLIER, timerMultiplier);
-        if (includePassword) {
-            info.put(GameOptionData.PASSWORD, password);
-        }
+        if (includePassword) info.put(GameOptionData.PASSWORD, password);
 
         return info;
+    }
+
+    public JsonObject toJson(boolean includePassword) {
+        JsonObject obj = new JsonObject();
+
+        obj.add(GameOptionData.CARD_SETS.toString(), Utils.toJsonArray(cardSetIds));
+        obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
+        obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
+        obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
+        obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
+        obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
+        if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
+
+        return obj;
     }
 
     /**
      * @return Selected card set IDs which are local to PYX, for querying the database.
      */
     public Set<Integer> getPyxCardSetIds() {
-        final Set<Integer> pyxCardSetIds = new HashSet<Integer>();
-        for (final Integer cardSetId : cardSetIds) {
-            if (cardSetId > 0) {
-                pyxCardSetIds.add(cardSetId);
-            }
+        Set<Integer> pyxCardSetIds = new HashSet<>();
+        for (Integer cardSetId : cardSetIds) {
+            if (cardSetId > 0) pyxCardSetIds.add(cardSetId);
         }
+
         return pyxCardSetIds;
     }
 }

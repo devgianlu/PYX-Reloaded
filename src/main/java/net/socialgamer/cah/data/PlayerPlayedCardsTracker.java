@@ -1,26 +1,3 @@
-/**
- * Copyright (c) 2012-2017, Andy Janata
- * All rights reserved.
- * <p>
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- * <p>
- * * Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * <p>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package net.socialgamer.cah.data;
 
 import java.util.*;
@@ -38,11 +15,11 @@ public class PlayerPlayedCardsTracker {
     /**
      * Forward mapping of player to cards.
      */
-    private final Map<Player, List<WhiteCard>> playerCardMap = new HashMap<Player, List<WhiteCard>>();
+    private final Map<Player, List<WhiteCard>> playerCardMap = new HashMap<>();
     /**
      * Reverse mapping of cards to player.
      */
-    private final Map<Integer, Player> reverseIdMap = new HashMap<Integer, Player>();
+    private final Map<Integer, Player> reverseIdMap = new HashMap<>();
 
     /**
      * Add a played card to the mappings.
@@ -51,11 +28,7 @@ public class PlayerPlayedCardsTracker {
      * @param card   The card the player played.
      */
     public synchronized void addCard(final Player player, final WhiteCard card) {
-        List<WhiteCard> cards = playerCardMap.get(player);
-        if (cards == null) {
-            cards = new ArrayList<WhiteCard>(3);
-            playerCardMap.put(player, cards);
-        }
+        List<WhiteCard> cards = playerCardMap.computeIfAbsent(player, k -> new ArrayList<>(3));
         reverseIdMap.put(card.getId(), player);
         cards.add(card);
     }
@@ -97,9 +70,7 @@ public class PlayerPlayedCardsTracker {
      */
     public synchronized List<WhiteCard> remove(final Player player) {
         final List<WhiteCard> cards = playerCardMap.remove(player);
-        if (cards != null && cards.size() > 0) {
-            reverseIdMap.remove(cards.get(0).getId());
-        }
+        if (cards != null && cards.size() > 0) reverseIdMap.remove(cards.get(0).getId());
         return cards;
     }
 

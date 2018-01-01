@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 
 public abstract class SafeTimerTask implements Runnable {
-
     private static final Logger logger = Logger.getLogger(SafeTimerTask.class);
 
     @Override
@@ -17,5 +16,4 @@ public abstract class SafeTimerTask implements Runnable {
     }
 
     public abstract void process();
-
 }
