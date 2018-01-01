@@ -152,7 +152,7 @@ public class Constants {
         JUDGE_SELECT("js"),
         /**
          * Kick a user from the server
-         *
+         * <p>
          * Admin only
          */
         KICK("K"),
