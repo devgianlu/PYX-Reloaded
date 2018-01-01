@@ -4,6 +4,7 @@ import net.socialgamer.cah.data.Game.TooManyPlayersException;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,7 +34,7 @@ public class GameManager {
     }
 
     public static int generateGameId() {
-        return ThreadLocalRandom.current().nextInt();
+        return ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     }
 
     private int getMaxGames() {
@@ -68,7 +69,8 @@ public class GameManager {
      * @return Newly created game, or {@code null} if the maximum number of games are in progress.
      * @throws IllegalStateException If the user is already in a game and cannot join another.
      */
-    public Game createGameWithPlayer(final User user) throws IllegalStateException {
+    @Nullable
+    public Game createGameWithPlayer(User user) throws IllegalStateException {
         synchronized (games) {
             Game game = createGame();
             if (game == null) return null;

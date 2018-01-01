@@ -29,6 +29,7 @@ public abstract class BaseUriResponder implements RouterNanoHTTPD.UriResponder {
         } catch (StatusException ex) {
             if (ex instanceof CahResponder.CahException) {
                 JsonObject obj = new JsonObject();
+                obj.addProperty(Constants.AjaxResponse.ERROR.toString(), true);
                 obj.addProperty(Constants.AjaxResponse.ERROR_CODE.toString(), ((CahResponder.CahException) ex).code.toString());
 
                 JsonObject data = ((CahResponder.CahException) ex).data;
