@@ -1,2 +1,78 @@
 <!DOCTYPE html>
-<html></html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="./css/material.min.css">
+  <script src="./js/material.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <span class="mdl-layout-title">Pretend You're Xyzzy Reloaded</span>
+      <div class="mdl-layout-spacer"></div>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">PYX Reloaded</span>
+    <nav class="mdl-navigation">
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+    <style>
+      .wide-card.mdl-card {
+        width: 612px;
+      }
+    </style>
+    <div class="page-content" align="center" style="margin-top:10px;">
+      <div class="wide-card mdl-card mdl-shadow--2dp">
+
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
+	</div>
+
+        <div class="mdl-card__supporting-text">
+          <form action="#">
+            <div class="mdl-textfield mdl-js-textfield" align="center">
+              <input class="mdl-textfield__input" type="text" id="nickname">
+              <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
+            </div>
+          </form>
+        </div>
+
+          <div class="mdl-card__actions mdl-card--border" align="right">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              Take me to the lobby!!
+            </a>
+          </div>
+	</div><br>
+
+      <div class="wide-card mdl-card mdl-shadow--2dp">
+
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
+	</div>
+
+        <div class="mdl-card__supporting-text">
+          <p style="text-align:left;">
+            PYX Reloaded is a fork of the original game overhauled and revamped by @mgagemorgan and @devgianlu on GitHub.
+
+            The goal of this project is to overhaul the entire interface, and revamp the backend so that it works out-of-the-box.
+            Eventually, there are goals for social media integration, accounts, chat features and administration thereof, and mobile support.
+            @devgianlu has an Android client that works great and is recommended for anyone on Android.
+          </p>
+        </div>
+
+          <div class="mdl-card__actions mdl-card--border" align="right">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='https://github.com/devgianlu/PretendYoureXyzzy/';">
+              We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img src="./images/octicons/logo-github.svg">!!
+            </a>
+          </div>
+	</div>
+
+  </div>
+  </main>
+</div>
+
+</html>
