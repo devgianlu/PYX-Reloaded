@@ -11,7 +11,7 @@
   .filter-input.mdl-textfield__input {
     border-bottom: 1px solid white;
   }
-  .mdl-textfield__label {
+  .filter-input-text.mdl-textfield__label {
     color: white;
   }
 
@@ -26,7 +26,7 @@
           <form action="#">
             <div class="mdl-textfield mdl-js-textfield">
               <input class="filter-input mdl-textfield__input" type="text" id="nickname">
-              <label class="mdl-textfield__label" for="nickname">Filter games by keyword...</label>
+              <label class="filter-input-text mdl-textfield__label" for="nickname">Filter games by keyword...</label>
             </div>
           </form>
       <div class="mdl-layout-spacer"></div>
@@ -48,47 +48,119 @@
       }
     </style>
     <div class="page-content" align="center" style="margin-top:10px;">
-      <div class="wide-card mdl-card mdl-shadow--2dp">
+      <div class="mdl-grid">
 
+      <div class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
         <div class="mdl-card__title">
-          <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
+          <h2 class="mdl-card__title-text">{{Name of Player's Game}}</h2>
 	</div>
 
-        <div class="mdl-card__supporting-text">
-          <form action="#">
-            <div class="mdl-textfield mdl-js-textfield" align="center">
-              <input class="mdl-textfield__input" type="text" id="nickname">
-              <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
-            </div>
-          </form>
+        <div class="mdl-card__supporting-text" align="left">
+          <b>Playing: </b><br>
+          <b>Spectating: </b><br>
+          <b>Goal: </b><br>
+          <b>Card Decks Used: </b><br>
+          <b>Progress Status: (Is game started or not?)</b><br>
         </div>
 
           <div class="mdl-card__actions mdl-card--border" align="right">
             <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
-              Take me to the lobby!!
+              JOIN
+            </a>
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              SPCTATE
             </a>
           </div>
-	</div><br>
-
-      <div class="wide-card mdl-card mdl-shadow--2dp">
-
-        <div class="mdl-card__title">
-          <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
 	</div>
 
-        <div class="mdl-card__supporting-text">
-          <p style="text-align:left;">
-            PYX Reloaded is a fork of the original game overhauled and revamped by @mgagemorgan and @devgianlu on GitHub.
+      <div class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">{{Name of Player's Game}}</h2>
+	</div>
 
-            The goal of this project is to overhaul the entire interface, and revamp the backend so that it works out-of-the-box.
-            Eventually, there are goals for social media integration, accounts, chat features and administration thereof, and mobile support.
-            @devgianlu has an Android client that works great and is recommended for anyone on Android.
-          </p>
+        <div class="mdl-card__supporting-text" align="left">
+          <b>Playing: </b><br>
+          <b>Spectating: </b><br>
+          <b>Goal: </b><br>
+          <b>Card Decks Used: </b><br>
+          <b>Progress Status: (Is game started or not?)</b><br>
         </div>
 
           <div class="mdl-card__actions mdl-card--border" align="right">
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='https://github.com/devgianlu/PretendYoureXyzzy/';">
-              We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img src="./images/octicons/logo-github.svg">!!
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              JOIN
+            </a>
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              SPCTATE
+            </a>
+          </div>
+	</div>
+
+      <div class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">{{Name of Player's Game}}</h2>
+	</div>
+
+        <div class="mdl-card__supporting-text" align="left">
+          <b>Playing: </b><br>
+          <b>Spectating: </b><br>
+          <b>Goal: </b><br>
+          <b>Card Decks Used: </b><br>
+          <b>Progress Status: (Is game started or not?)</b><br>
+        </div>
+
+          <div class="mdl-card__actions mdl-card--border" align="right">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              JOIN
+            </a>
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              SPCTATE
+            </a>
+          </div>
+	</div>
+
+      <div class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">{{Name of Player's Game}}</h2>
+	</div>
+
+        <div class="mdl-card__supporting-text" align="left">
+          <b>Playing: </b><br>
+          <b>Spectating: </b><br>
+          <b>Goal: </b><br>
+          <b>Card Decks Used: </b><br>
+          <b>Progress Status: (Is game started or not?)</b><br>
+        </div>
+
+          <div class="mdl-card__actions mdl-card--border" align="right">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              JOIN
+            </a>
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              SPCTATE
+            </a>
+          </div>
+	</div>
+
+      <div class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">{{Name of Player's Game}}</h2>
+	</div>
+
+        <div class="mdl-card__supporting-text" align="left">
+          <b>Playing: </b><br>
+          <b>Spectating: </b><br>
+          <b>Goal: </b><br>
+          <b>Card Decks Used: </b><br>
+          <b>Progress Status: (Is game started or not?)</b><br>
+        </div>
+
+          <div class="mdl-card__actions mdl-card--border" align="right">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              JOIN
+            </a>
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="window.location='lobbies.html';">
+              SPCTATE
             </a>
           </div>
 	</div>
