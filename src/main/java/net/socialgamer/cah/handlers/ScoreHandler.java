@@ -16,7 +16,6 @@ import net.socialgamer.cah.servlets.BaseUriResponder;
 import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 
-
 public class ScoreHandler extends BaseHandler {
     public static final String OP = AjaxOperation.SCORE.toString();
     private final ConnectedUsers connectedUsers;
@@ -27,10 +26,13 @@ public class ScoreHandler extends BaseHandler {
 
     @Override
     public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
+        if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
+
         String argsStr = params.get(AjaxRequest.MESSAGE);
         String[] args = (argsStr == null || argsStr.isEmpty()) ? new String[0] : argsStr.trim().split(" ");
+        if (args.length != 2) throw new CahResponder.CahException(ErrorCode.BAD_REQUEST);
 
-        User target = (args.length > 0) ? connectedUsers.getUser(args[0]) : user;
+        User target = connectedUsers.getUser(args[0]);
         if (target == null) throw new CahResponder.CahException(ErrorCode.NO_SUCH_USER);
 
         Game game = target.getGame();
@@ -39,16 +41,12 @@ public class ScoreHandler extends BaseHandler {
         Player player = game.getPlayerForUser(target);
         if (player == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
 
-        if (user.isAdmin() && args.length == 2) {
-            // TODO: for now only admins can change scores. could possibly extend this to let the host do it,
-            // provided it's for a player in the same game and it does a game-wide announcement.
-            try {
-                int offset = Integer.parseInt(args[1]);
-                player.increaseScore(offset);
-                game.notifyPlayerInfoChange(player);
-            } catch (final NumberFormatException ex) {
-                throw new CahResponder.CahException(ErrorCode.BAD_REQUEST, ex);
-            }
+        try {
+            int offset = Integer.parseInt(args[1]);
+            player.increaseScore(offset);
+            game.notifyPlayerInfoChange(player);
+        } catch (final NumberFormatException ex) {
+            throw new CahResponder.CahException(ErrorCode.BAD_REQUEST, ex);
         }
 
         JsonObject obj = new JsonObject();

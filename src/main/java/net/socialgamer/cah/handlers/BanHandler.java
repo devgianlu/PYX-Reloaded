@@ -2,6 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import fi.iki.elonen.NanoHTTPD;
 import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
@@ -14,7 +15,7 @@ import net.socialgamer.cah.servlets.CahResponder;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
 
-public class BanHandler extends AdminHandler {
+public class BanHandler extends BaseHandler {
     public static final String OP = AjaxOperation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
     private final ConnectedUsers connectedUsers;
@@ -24,7 +25,7 @@ public class BanHandler extends AdminHandler {
     }
 
     @Override
-    public JsonElement handleAsAdmin(User user, Parameters params) throws CahResponder.CahException {
+    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
         if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
 
         String nickname = params.get(AjaxRequest.NICKNAME);

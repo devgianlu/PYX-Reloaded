@@ -4,20 +4,11 @@ import net.socialgamer.cah.data.Game;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Constants {
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
-
-    public static final Set<String> ADMIN_IP_ADDRESSES = new HashSet<String>() {
-        {
-            add("0:0:0:0:0:0:0:1");
-            add("127.0.0.1");
-        }
-    };
 
     /**
      * Reason why a client disconnected.
@@ -218,7 +209,8 @@ public class Constants {
         PASSWORD("pw"),
         PERSISTENT_ID("pid"),
         SERIAL("s"),
-        WALL("wall");
+        WALL("wall"),
+        ADMIN_TOKEN("at");
 
         private final String field;
 
@@ -268,7 +260,11 @@ public class Constants {
         PLAYER_INFO("pi"),
         @DuplicationAllowed
         SERIAL(AjaxRequest.SERIAL),
-        WHITE_CARDS("wc");
+        WHITE_CARDS("wc"),
+        /**
+         * Whether the user successfully registered as an admin
+         */
+        IS_ADMIN("ia");
 
         private final String field;
 

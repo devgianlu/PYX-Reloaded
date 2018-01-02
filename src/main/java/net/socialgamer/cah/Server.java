@@ -11,6 +11,7 @@ import net.socialgamer.cah.servlets.App;
 import net.socialgamer.cah.servlets.Provider;
 import net.socialgamer.cah.servlets.Providers;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
+import net.socialgamer.cah.task.RefreshAdminTokenTask;
 import net.socialgamer.cah.task.UserPingTask;
 
 import java.io.File;
@@ -24,6 +25,7 @@ public class Server {
     private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
+    private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     public static void main(String[] args) throws IOException, SQLException {
         Preferences preferences = Preferences.load();
@@ -32,6 +34,7 @@ public class Server {
         int port = preferences.getInt("port", 80);
 
         ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
+        globalTimer.scheduleAtFixedRate(new RefreshAdminTokenTask(), 0, REFRESH_ADMIN_TOKEN_DELAY, TimeUnit.MILLISECONDS);
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
