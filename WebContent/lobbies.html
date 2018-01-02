@@ -3,21 +3,42 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./css/material.min.css">
+  <link rel="stylesheet" href="./css/material.css">
   <script src="./js/material.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
+<style>
+  .filter-input.mdl-textfield__input {
+    border-bottom: 1px solid white;
+  }
+  .mdl-textfield__label {
+    color: white;
+  }
 
+</style>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout-title">Pretend You're Xyzzy Reloaded</span>
+       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+         <i class="material-icons">add</i>
+       </button>
       <div class="mdl-layout-spacer"></div>
+          <form action="#">
+            <div class="mdl-textfield mdl-js-textfield">
+              <input class="filter-input mdl-textfield__input" type="text" id="nickname">
+              <label class="mdl-textfield__label" for="nickname">Filter games by keyword...</label>
+            </div>
+          </form>
+      <div class="mdl-layout-spacer"></div>
+       <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+         <i class="material-icons">refresh</i>
+       </button>
     </div>
   </header>
   <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">PYX Reloaded</span>
     <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" href="">Logout</a>
     </nav>
   </div>
   <main class="mdl-layout__content">
