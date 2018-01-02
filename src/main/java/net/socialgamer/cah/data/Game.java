@@ -219,9 +219,8 @@ public class Game {
             }
 
             // If they have a hand, return it to discard pile.
-            if (player.getHand().size() > 0) {
-                List<WhiteCard> hand = player.getHand();
-                for (WhiteCard card : hand) whiteDeck.discard(card);
+            if (player.hand.size() > 0) {
+                for (WhiteCard card : player.hand) whiteDeck.discard(card);
             }
 
             // If they are judge, return all played cards to hand, and move to next judge.
@@ -338,8 +337,8 @@ public class Game {
      */
     private void returnCardsToHand() {
         synchronized (playedCards) {
-            for (final Player p : playedCards.playedPlayers()) {
-                p.getHand().addAll(playedCards.getCards(p));
+            for (Player p : playedCards.playedPlayers()) {
+                p.hand.addAll(playedCards.getCards(p));
                 sendCardsToPlayer(p, playedCards.getCards(p));
             }
 
@@ -433,14 +432,14 @@ public class Game {
         return getInfo(false);
     }
 
-    @Nullable
+    @NotNull
     public JsonObject getInfoJson(boolean includePassword) {
         JsonObject obj = new JsonObject();
         obj.addProperty(GameInfo.ID.toString(), id);
 
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
-        if (host == null) return null; // FIXME
+        if (host == null) return new JsonObject();
 
         obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
@@ -498,10 +497,8 @@ public class Game {
 
     public JsonElement getAllPlayersInfoJson() {
         JsonArray json = new JsonArray(players.size());
-        for (Player player : players.toArray(new Player[players.size()])) {
-            JsonObject obj = getPlayerInfoJson(player);
-            if (obj != null) json.add(obj);
-        }
+        for (Player player : players.toArray(new Player[players.size()]))
+            json.add(getPlayerInfoJson(player));
 
         return json;
     }
@@ -512,10 +509,10 @@ public class Game {
         return copy;
     }
 
-    @Nullable
+    @NotNull
     public JsonObject getPlayerInfoJson(Player player) {
+        if (player == null) return new JsonObject();
         JsonObject obj = new JsonObject();
-        if (player == null) return null; // FIXME
         obj.addProperty(GamePlayerInfo.NAME.toString(), player.getUser().getNickname());
         obj.addProperty(GamePlayerInfo.SCORE.toString(), player.getScore());
         obj.addProperty(GamePlayerInfo.STATUS.toString(), getPlayerStatus(player).toString());
@@ -686,11 +683,10 @@ public class Game {
         state = GameState.DEALING;
         Player[] playersCopy = players.toArray(new Player[players.size()]);
         for (Player player : playersCopy) {
-            List<WhiteCard> hand = player.getHand();
             List<WhiteCard> newCards = new LinkedList<>();
-            while (hand.size() < 10) {
+            while (player.hand.size() < 10) {
                 WhiteCard card = getNextWhiteCard();
-                hand.add(card);
+                player.hand.add(card);
                 newCards.add(card);
             }
 
@@ -724,7 +720,7 @@ public class Game {
                     List<WhiteCard> cards = new ArrayList<>(newBlackCard.getDraw());
                     for (int i = 0; i < newBlackCard.getDraw(); i++) cards.add(getNextWhiteCard());
 
-                    player.getHand().addAll(cards);
+                    player.hand.addAll(cards);
                     sendCardsToPlayer(player, cards);
                 }
             }
@@ -864,7 +860,7 @@ public class Game {
                     // put their cards back
                     List<WhiteCard> returnCards = playedCards.remove(player);
                     if (returnCards != null) {
-                        player.getHand().addAll(returnCards);
+                        player.hand.addAll(returnCards);
                         sendCardsToPlayer(player, returnCards);
                     }
                 }
@@ -961,7 +957,7 @@ public class Game {
         killRoundTimer();
         synchronized (players) {
             for (final Player player : players) {
-                player.getHand().clear();
+                player.hand.clear();
                 player.resetScore();
             }
         }
@@ -1111,16 +1107,14 @@ public class Game {
         }
     }
 
-    public JsonArray getWhiteCardsJson(final User user) {
+    public JsonArray getWhiteCardsJson(User user) {
         // if we're in judge mode, return all of the cards and ignore which user is asking
         if (state == GameState.JUDGING) {
             return getWhiteCardsJson();
         } else if (state != GameState.PLAYING) {
             return new JsonArray();
         } else {
-            // FIXME: getPlayerForUser synchronizes on players. This has caused a deadlock in the past.
-            // Good idea to not nest synchronizes if possible anyway.
-            final Player player = getPlayerForUser(user);
+            Player player = getPlayerForUser(user);
             synchronized (playedCards) {
                 JsonArray json = new JsonArray(playedCards.size());
                 int faceDownCards = playedCards.size();
@@ -1144,7 +1138,7 @@ public class Game {
      * @param player Player to send the cards to.
      * @param cards  The cards to send the player.
      */
-    private void sendCardsToPlayer(final Player player, final List<WhiteCard> cards) {
+    private void sendCardsToPlayer(Player player, List<WhiteCard> cards) {
         JsonObject obj = getEventJson(LongPollEvent.HAND_DEAL);
         obj.add(LongPollResponse.HAND.toString(), getWhiteCardsDataJson(cards));
         player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
@@ -1154,9 +1148,8 @@ public class Game {
     public JsonArray getHandJson(User user) {
         Player player = getPlayerForUser(user);
         if (player != null) {
-            List<WhiteCard> hand = player.getHand();
-            synchronized (hand) {
-                return getWhiteCardsDataJson(hand);
+            synchronized (player.hand) {
+                return getWhiteCardsDataJson(player.hand);
             }
         } else {
             return new JsonArray();
@@ -1204,11 +1197,9 @@ public class Game {
             player.resetSkipCount();
             if (getJudge() == player || state != GameState.PLAYING) return ErrorCode.NOT_YOUR_TURN;
 
-
-            List<WhiteCard> hand = player.getHand();
             WhiteCard playCard = null;
-            synchronized (hand) {
-                Iterator<WhiteCard> iter = hand.iterator();
+            synchronized (player.hand) {
+                Iterator<WhiteCard> iter = player.hand.iterator();
                 while (iter.hasNext()) {
                     WhiteCard card = iter.next();
                     if (card.getId() == cardId) {
