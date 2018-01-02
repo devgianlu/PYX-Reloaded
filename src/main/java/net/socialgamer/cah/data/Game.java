@@ -8,6 +8,7 @@ import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
+import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.db.PyxCardSet;
 import net.socialgamer.cah.task.SafeTimerTask;
@@ -578,28 +579,25 @@ public class Game {
      * game is already started, or doesn't have enough cards, but hopefully callers and
      * clients would prevent that from happening!
      */
-    public boolean start() {
-        if (state != GameState.LOBBY || !hasEnoughCards()) return false;
+    @Nullable
+    public ErrorCode start() throws FailedLoadingSomeCardcastDecks {
+        if (state != GameState.LOBBY) return ErrorCode.ALREADY_STARTED;
+        if (!hasEnoughCards()) return ErrorCode.NOT_ENOUGH_CARDS;
 
-        boolean started;
         int numPlayers = players.size();
         if (numPlayers >= 3) {
             // Pick a random start judge, though the "next" judge will actually go first.
             judgeIndex = (int) (Math.random() * numPlayers);
-            started = true;
-        } else {
-            started = false;
-        }
 
-        if (started) {
             currentUniqueId = UniqueIds.getNewRandomID();
             logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
                             + "max players, %d max spectators, %d score limit, players %s, unique %s.",
                     id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
                     options.spectatorLimit, options.scoreGoal, players, currentUniqueId));
+
             // do this stuff outside the players lock; they will lock players again later for much less
             // time, and not at the same time as trying to lock users, which has caused deadlocks
-            final List<CardSet> cardSets;
+            List<CardSet> cardSets;
             synchronized (options.cardSetIds) {
                 cardSets = loadCardSets();
                 blackDeck = loadBlackDeck(cardSets);
@@ -608,41 +606,40 @@ public class Game {
 
             startNextRound();
             gameManager.broadcastGameListRefresh();
-        }
 
-        return started;
+            return null;
+        } else {
+            return ErrorCode.NOT_ENOUGH_PLAYERS;
+        }
     }
 
     @Nullable
-    public List<CardSet> loadCardSets() {
+    public List<CardSet> loadCardSets() throws FailedLoadingSomeCardcastDecks {
         synchronized (options.cardSetIds) {
-            try {
-                List<CardSet> cardSets = new ArrayList<>();
-                if (!options.getPyxCardSetIds().isEmpty())
-                    cardSets.addAll(PyxCardSet.loadCardSets(options.getPyxCardSetIds()));
+            List<CardSet> cardSets = new ArrayList<>();
+            if (!options.getPyxCardSetIds().isEmpty())
+                cardSets.addAll(PyxCardSet.loadCardSets(options.getPyxCardSetIds()));
 
-                // TODO maybe make card ids longs instead of ints
+            // TODO maybe make card ids longs instead of ints
 
-                // Avoid ConcurrentModificationException
-                for (String cardcastId : cardcastDeckIds.toArray(new String[0])) {
-                    // Ideally, we can assume that anything in that set is going to load, but it is entirely
-                    // possible that the cache has expired and we can't re-load it for some reason, so
-                    // let's be safe.
-                    CardcastDeck cardcastDeck = cardcastService.loadSet(cardcastId);
-                    if (null == cardcastDeck) {
-                        // TODO better way to indicate this to the user
-                        logger.error(String.format("Unable to load %s from Cardcast", cardcastId));
-                        return null;
-                    }
+            FailedLoadingSomeCardcastDecks cardcastException = null;
+            for (String cardcastId : cardcastDeckIds.toArray(new String[0])) {
+                // Ideally, we can assume that anything in that set is going to load, but it is entirely
+                // possible that the cache has expired and we can't re-load it for some reason, so
+                // let's be safe.
+                CardcastDeck cardcastDeck = cardcastService.loadSet(cardcastId);
+                if (cardcastDeck == null) {
+                    if (cardcastException == null) cardcastException = new FailedLoadingSomeCardcastDecks();
+                    cardcastException.failedDecks.add(cardcastId);
 
-                    cardSets.add(cardcastDeck);
+                    logger.error(String.format("Unable to load %s from Cardcast", cardcastId));
                 }
 
-                return cardSets;
-            } catch (Exception ex) {
-                logger.error(String.format("Unable to load cards for game %d", id), ex);
-                return null;
+                if (cardcastDeck != null) cardSets.add(cardcastDeck);
             }
+
+            if (cardcastException != null) throw cardcastException;
+            else return cardSets;
         }
     }
 
@@ -661,7 +658,7 @@ public class Game {
     /**
      * Determine if there are sufficient cards in the selected card sets to start the game.
      */
-    public boolean hasEnoughCards() {
+    public boolean hasEnoughCards() throws FailedLoadingSomeCardcastDecks {
         synchronized (options.cardSetIds) {
             List<CardSet> cardSets = loadCardSets();
             if (cardSets == null || cardSets.isEmpty()) return false;
