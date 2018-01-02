@@ -122,7 +122,6 @@ public class Game {
     private GameState state;
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
-    private String currentUniqueId;
 
     /**
      * Create a new game.
@@ -551,8 +550,7 @@ public class Game {
                 break;
             case ROUND_OVER:
                 if (getJudge() == player) playerStatus = GamePlayerStatus.JUDGE;
-                else if (player.getScore() >= options.scoreGoal)
-                    playerStatus = GamePlayerStatus.WINNER;     // TODO win-by-x
+                else if (didPlayerWonGame(player)) playerStatus = GamePlayerStatus.WINNER;
                 else playerStatus = GamePlayerStatus.IDLE;
                 break;
             default:
@@ -585,7 +583,7 @@ public class Game {
         }
 
         if (started) {
-            currentUniqueId = UniqueIds.getNewRandomID();
+            String currentUniqueId = UniqueIds.getNewRandomID();
             logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
                             + "max players, %d max spectators, %d score limit, players %s, unique %s.",
                     id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
@@ -946,7 +944,7 @@ public class Game {
      * @param lostPlayer True if because there are no long enough people to play a game, false if because the
      *                   previous game finished.
      */
-    public void resetState(final boolean lostPlayer) {
+    public void resetState(boolean lostPlayer) {
         logger.info(String.format("Resetting game %d to lobby (lostPlayer=%b)", id, lostPlayer));
         killRoundTimer();
         synchronized (players) {
@@ -1236,37 +1234,35 @@ public class Game {
      * @return Error code if there is an error, or null if success.
      */
     @Nullable
-    public ErrorCode judgeCard(final User judge, final int cardId) {
-        final Player cardPlayer;
+    public ErrorCode judgeCard(User judge, int cardId) {
+        Player winner;
         synchronized (judgeLock) {
             final Player judgePlayer = getPlayerForUser(judge);
             if (getJudge() != judgePlayer) return ErrorCode.NOT_JUDGE;
             else if (state != GameState.JUDGING) return ErrorCode.NOT_YOUR_TURN;
 
-            // shouldn't ever happen, but just in case...
             if (judgePlayer != null) judgePlayer.resetSkipCount();
 
-            cardPlayer = playedCards.getPlayerForId(cardId);
-            if (cardPlayer == null) return ErrorCode.INVALID_CARD;
+            winner = playedCards.getPlayerForId(cardId);
+            if (winner == null) return ErrorCode.INVALID_CARD;
 
-            cardPlayer.increaseScore();
+            winner.increaseScore();
             state = GameState.ROUND_OVER;
         }
 
-        int clientCardId = playedCards.getCards(cardPlayer).get(0).getId();
+        int clientCardId = playedCards.getCards(winner).get(0).getId();
 
         JsonObject obj = getEventJson(LongPollEvent.GAME_ROUND_COMPLETE);
-        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), cardPlayer.getUser().getNickname());
+        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), winner.getUser().getNickname());
         obj.addProperty(LongPollResponse.WINNING_CARD.toString(), clientCardId);
         obj.addProperty(LongPollResponse.INTERMISSION.toString(), ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         notifyPlayerInfoChange(getJudge());
-        notifyPlayerInfoChange(cardPlayer);
+        notifyPlayerInfoChange(winner);
 
-        // TODO win-by-x option
         synchronized (roundTimerLock) {
-            if (cardPlayer.getScore() >= options.scoreGoal) {
+            if (didPlayerWonGame(winner)) {
                 rescheduleTimer(new SafeTimerTask() {
                     @Override
                     public void process() {
@@ -1286,6 +1282,11 @@ public class Game {
         Map<String, List<WhiteCard>> cardsBySessionId = new HashMap<>();
         playedCards.cardsByUser().forEach((key, value) -> cardsBySessionId.put(key.getSessionId(), value));
         return null;
+    }
+
+    // TODO: Win by X
+    private boolean didPlayerWonGame(Player player) {
+        return player.getScore() >= options.scoreGoal;
     }
 
     /**

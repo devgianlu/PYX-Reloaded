@@ -711,6 +711,7 @@ public class Constants {
         PLAYER_LIMIT("pL"),
         SPECTATOR_LIMIT("vL"),
         SCORE_LIMIT("sl"),
+        WIN_BY("wb"),
         TIMER_MULTIPLIER("tm");
 
         private final String key;

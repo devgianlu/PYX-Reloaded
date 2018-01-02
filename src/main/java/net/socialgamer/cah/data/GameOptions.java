@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class GameOptions {
     public final Set<Integer> cardSetIds = new HashSet<>();
-    // These are the default values new games get.
+    public int winBy;
     public int blanksInDeck;
     public int playerLimit;
     public int spectatorLimit;
@@ -23,13 +23,15 @@ public class GameOptions {
 
     GameOptions(Preferences preferences) {
         Preferences.MinDefaultMax blankCards = preferences.getMinDefaultMax("blankCardsLimit", 0, 0, 30);
-        blanksInDeck = blankCards.def;
+        this.blanksInDeck = blankCards.def;
         Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
-        scoreGoal = score.def;
+        this.scoreGoal = score.def;
         Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
-        playerLimit = player.def;
+        this.playerLimit = player.def;
         Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
-        spectatorLimit = spectator.def;
+        this.spectatorLimit = spectator.def;
+        Preferences.MinDefaultMax winBy = preferences.getMinDefaultMax("winBy", 0, 2, 5);
+        this.winBy = winBy.def;
     }
 
     public static GameOptions deserialize(Preferences preferences, String text) {
@@ -46,11 +48,13 @@ public class GameOptions {
         Preferences.MinDefaultMax score = preferences.getMinDefaultMax("scoreLimit", 4, 8, 69);
         Preferences.MinDefaultMax player = preferences.getMinDefaultMax("playerLimit", 3, 10, 20);
         Preferences.MinDefaultMax spectator = preferences.getMinDefaultMax("spectatorLimit", 0, 10, 20);
+        Preferences.MinDefaultMax winBy = preferences.getMinDefaultMax("winBy", 0, 2, 5);
 
         options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
         options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
         options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
         options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
+        options.winBy = Math.max(winBy.min, Math.min(winBy.max, Utils.optInt(json, GameOptionData.WIN_BY.toString(), options.winBy)));
         options.timerMultiplier = Utils.optString(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
         options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
 
@@ -66,14 +70,15 @@ public class GameOptions {
         this.scoreGoal = newOptions.scoreGoal;
         this.playerLimit = newOptions.playerLimit;
         this.spectatorLimit = newOptions.spectatorLimit;
+        this.winBy = newOptions.winBy;
+        this.blanksInDeck = newOptions.blanksInDeck;
+        this.password = newOptions.password;
+        this.timerMultiplier = newOptions.timerMultiplier;
+
         synchronized (this.cardSetIds) {
             this.cardSetIds.clear();
             this.cardSetIds.addAll(newOptions.cardSetIds);
         }
-
-        this.blanksInDeck = newOptions.blanksInDeck;
-        this.password = newOptions.password;
-        this.timerMultiplier = newOptions.timerMultiplier;
     }
 
     /**
@@ -91,6 +96,7 @@ public class GameOptions {
         info.put(GameOptionData.PLAYER_LIMIT, playerLimit);
         info.put(GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
         info.put(GameOptionData.SCORE_LIMIT, scoreGoal);
+        info.put(GameOptionData.WIN_BY, winBy);
         info.put(GameOptionData.TIMER_MULTIPLIER, timerMultiplier);
         if (includePassword) info.put(GameOptionData.PASSWORD, password);
 
@@ -105,6 +111,7 @@ public class GameOptions {
         obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
         obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
         obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
+        obj.addProperty(GameOptionData.WIN_BY.toString(), winBy);
         obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
         if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
 
