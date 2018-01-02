@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="./js/polling.js"></script>
 <script>
@@ -104,7 +104,7 @@
 
     var games = new List('games-global-container', {
         item: 'game-template',
-        valueNames: ['_host', '_players', '_spectators', '_goal', '_status']
+        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', {'data': ['gid']}]
     });
 
     $('#filter-games').change(function () {
@@ -113,6 +113,8 @@
 
     function loadGamesList() {
         games.clear();
+
+        // TODO: Show loading now
 
         $.post("AjaxServlet?o=ggl").done(function (data) {
             console.log(data);
@@ -125,6 +127,7 @@
 
     function filterGames(query) {
         // FIXME: When filtering the spacing over the cards gets fucked up
+        // TODO: Message when there are no search results
         if (query.length === 0) {
             games.filter(); // Remove all filters
         } else {
@@ -151,6 +154,7 @@
             else spectators = game.V.join(", ");
 
             games.add({
+                "gid": game.gid,
                 "_host": game.H,
                 "_players": players,
                 "_spectators": spectators,
@@ -163,6 +167,7 @@
     function createGame() {
         $.post("AjaxServlet?o=cg").always(function (data) {
             console.log(data);
+            alert("Create game result: " + JSON.stringify(data));
         })
     }
 </script>
