@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.Preferences;
-import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
@@ -505,9 +504,7 @@ public class Game {
     }
 
     public final List<Player> getPlayers() {
-        final List<Player> copy = new ArrayList<>(players.size());
-        copy.addAll(players);
-        return copy;
+        return new ArrayList<>(players);
     }
 
     @NotNull
@@ -614,13 +611,11 @@ public class Game {
     }
 
     @Nullable
-    public List<CardSet> loadCardSets() throws FailedLoadingSomeCardcastDecks {
+    public List<CardSet> loadCardSets() throws FailedLoadingSomeCardcastDecks { // TODO: Optimize usage
         synchronized (options.cardSetIds) {
             List<CardSet> cardSets = new ArrayList<>();
             if (!options.getPyxCardSetIds().isEmpty())
                 cardSets.addAll(PyxCardSet.loadCardSets(options.getPyxCardSetIds()));
-
-            // TODO maybe make card ids longs instead of ints
 
             FailedLoadingSomeCardcastDecks cardcastException = null;
             for (String cardcastId : cardcastDeckIds.toArray(new String[0])) {
@@ -943,17 +938,15 @@ public class Game {
 
     /**
      * Reset the game state to a lobby.
-     * <p>
-     * TODO change the message sent to the client if the game reset due to insufficient players.
      *
      * @param lostPlayer True if because there are no long enough people to play a game, false if because the
      *                   previous game finished.
      */
-    public void resetState(final boolean lostPlayer) {
+    public void resetState(boolean lostPlayer) {
         logger.info(String.format("Resetting game %d to lobby (lostPlayer=%b)", id, lostPlayer));
         killRoundTimer();
         synchronized (players) {
-            for (final Player player : players) {
+            for (Player player : players) {
                 player.hand.clear();
                 player.resetScore();
             }
@@ -968,7 +961,7 @@ public class Game {
         playedCards.clear();
         roundPlayers.clear();
         state = GameState.LOBBY;
-        final Player judge = getJudge();
+        Player judge = getJudge();
         judgeIndex = 0;
 
         JsonObject obj = getEventJson(LongPollEvent.GAME_STATE_CHANGE);
@@ -1104,6 +1097,7 @@ public class Game {
         }
     }
 
+    // this is an array of arrays
     public JsonArray getWhiteCardsJson(User user) {
         // if we're in judge mode, return all of the cards and ignore which user is asking
         if (state == GameState.JUDGING) {
@@ -1113,16 +1107,20 @@ public class Game {
         } else {
             Player player = getPlayerForUser(user);
             synchronized (playedCards) {
-                JsonArray json = new JsonArray(playedCards.size());
                 int faceDownCards = playedCards.size();
+                JsonArray json = new JsonArray(faceDownCards);
+
                 if (playedCards.hasPlayer(player)) {
                     json.add(getWhiteCardsDataJson(playedCards.getCards(player)));
                     faceDownCards--;
                 }
 
-                // TODO make this figure out how many blank cards in each spot, for multi-play cards
-                while (faceDownCards-- > 0)
-                    json.add(Utils.singletonJsonArray(WhiteCard.getFaceDownCardClientDataJson()));
+                int numPick = blackCard == null ? 1 : blackCard.getPick() + blackCard.getDraw();
+                while (faceDownCards-- > 0) {
+                    JsonArray array = new JsonArray(numPick);
+                    for (int i = 0; i < numPick; i++) array.add(WhiteCard.getFaceDownCardClientDataJson());
+                    json.add(array);
+                }
 
                 return json;
             }
