@@ -34,7 +34,7 @@
                     <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
                 </div>
 
-                <div class="mdl-card__supporting-text">
+                <div class="mdl-card__supporting-text" style="padding-bottom: 0">
                     <form onsubmit="register()">
                         <div class="mdl-textfield mdl-js-textfield" align="center">
                             <input class="mdl-textfield__input" type="text" id="nickname">
@@ -88,18 +88,16 @@
     </main>
 </div>
 
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
     function register() {
         var nickname = $("input#nickname").val();
 
-        $.post("AjaxServlet?o=r&n=" + nickname).always(function (data, status) {
-            if (status === "error") {
-                alert("Error data: " + JSON.stringify(data.responseJSON));
-            } else {
-                alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
-                window.location = "lobbies.html";
-            }
+        $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
+            alert("Error data: " + JSON.stringify(data.responseJSON));
+        }).done(function (data) {
+            alert("Success! Data: " + JSON.stringify(data));
+            window.location = "lobbies.html";
         });
     }
 </script>

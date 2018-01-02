@@ -182,4 +182,19 @@
     </main>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="./js/polling.js"></script>
+<script>
+    window.onload = function () {
+        sendPollRequest();
+
+        $.post("AjaxServlet?o=ggl").done(function (data) {
+            alert("Games data: " + JSON.stringify(data));
+        }).fail(function (data) {
+            console.log(data);
+            alert("Error data: " + JSON.stringify(data.responseJSON));
+        })
+    }
+</script>
+
 </html>
