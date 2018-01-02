@@ -41,52 +41,58 @@ import java.util.concurrent.TimeUnit;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class Game {
-    /**
-     * The minimum number of black cards that must be added to a game for it to be able to start.
-     */
-    public final static int MINIMUM_BLACK_CARDS = 50;
-    /**
-     * The minimum number of white cards per player limit slots that must be added to a game for it to
-     * be able to start.
-     * <p>
-     * We need 20 * maxPlayers cards. This allows black cards up to "draw 9" to work correctly.
-     */
-    public final static int MINIMUM_WHITE_CARDS_PER_PLAYER = 20;
-    private static final Logger logger = Logger.getLogger(Game.class);
-    /**
-     * Time, in milliseconds, to delay before starting a new round.
-     */
-    private final static int ROUND_INTERMISSION = 8 * 1000;
-    /**
-     * Duration, in milliseconds, for the minimum timeout a player has to choose a card to play.
-     * Minimum 10 seconds.
-     */
-    private final static int PLAY_TIMEOUT_BASE = 45 * 1000;
-    /**
-     * Duration, in milliseconds, for the additional timeout a player has to choose a card to play,
-     * for each card that must be played. For example, on a PICK 2 card, two times this amount of
-     * time is added to {@code PLAY_TIMEOUT_BASE}.
-     */
-    private final static int PLAY_TIMEOUT_PER_CARD = 15 * 1000;
-    /**
-     * Duration, in milliseconds, for the minimum timeout a judge has to choose a winner.
-     * Minimum combined of this and 2 * {@code JUDGE_TIMEOUT_PER_CARD} is 10 seconds.
-     */
-    private final static int JUDGE_TIMEOUT_BASE = 40 * 1000;
-    /**
-     * Duration, in milliseconds, for the additional timeout a judge has to choose a winning card,
-     * for each additional card that was played in the round. For example, on a PICK 2 card with
-     * 3 non-judge players, 6 times this value is added to {@code JUDGE_TIMEOUT_BASE}.
-     */
-    private final static int JUDGE_TIMEOUT_PER_CARD = 7 * 1000;
-    private final static int MAX_SKIPS_BEFORE_KICK = 2;
     private final static Set<String> FINITE_PLAYTIMES;
+    private static final Logger logger = Logger.getLogger(Game.class);
 
     static {
         final Set<String> finitePlaytimes = new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x"));
         FINITE_PLAYTIMES = Collections.unmodifiableSet(finitePlaytimes);
     }
 
+    /**
+     * The minimum number of black cards that must be added to a game for it to be able to start.
+     */
+    public final int MINIMUM_BLACK_CARDS;
+
+    /**
+     * The minimum number of white cards per player limit slots that must be added to a game for it to
+     * be able to start.
+     * <p>
+     * We need 20 * maxPlayers cards. This allows black cards up to "draw 9" to work correctly.
+     */
+    public final int MINIMUM_WHITE_CARDS_PER_PLAYER;
+
+    /**
+     * Time, in milliseconds, to delay before starting a new round.
+     */
+    private final int ROUND_INTERMISSION;
+
+    /**
+     * Duration, in milliseconds, for the minimum timeout a player has to choose a card to play.
+     * Minimum 10 seconds.
+     */
+    private final int PLAY_TIMEOUT_BASE;
+
+    /**
+     * Duration, in milliseconds, for the additional timeout a player has to choose a card to play,
+     * for each card that must be played. For example, on a PICK 2 card, two times this amount of
+     * time is added to {@code PLAY_TIMEOUT_BASE}.
+     */
+    private final int PLAY_TIMEOUT_PER_CARD;
+
+    /**
+     * Duration, in milliseconds, for the minimum timeout a judge has to choose a winner.
+     * Minimum combined of this and 2 * {@code JUDGE_TIMEOUT_PER_CARD} is 10 seconds.
+     */
+    private final int JUDGE_TIMEOUT_BASE;
+
+    /**
+     * Duration, in milliseconds, for the additional timeout a judge has to choose a winning card,
+     * for each additional card that was played in the round. For example, on a PICK 2 card with
+     * 3 non-judge players, 6 times this value is added to {@code JUDGE_TIMEOUT_BASE}.
+     */
+    private final int JUDGE_TIMEOUT_PER_CARD;
+    private final int MAX_SKIPS_BEFORE_KICK;
     private final int id;
     /**
      * All players present in the game.
@@ -102,8 +108,6 @@ public class Game {
     private final GameManager gameManager;
     private final Object blackCardLock = new Object();
     private final GameOptions options;
-
-    // All of these delays could be moved to pyx.properties.
     private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
     /**
      * Lock object to prevent judging during idle judge detection and vice-versa.
@@ -141,6 +145,15 @@ public class Game {
         this.options = new GameOptions(preferences);
         this.cardcastService = cardcastService;
         this.state = GameState.LOBBY;
+
+        this.MAX_SKIPS_BEFORE_KICK = preferences.getInt("maxSkipsBeforeKick", 2);
+        this.ROUND_INTERMISSION = preferences.getInt("roundIntermission", 8) * 1000;
+        this.MINIMUM_BLACK_CARDS = preferences.getInt("minBlackCards", 50);
+        this.MINIMUM_WHITE_CARDS_PER_PLAYER = preferences.getInt("minWhiteCardsPerPlayer", 20);
+        this.PLAY_TIMEOUT_BASE = preferences.getInt("playTimeoutBase", 45) * 1000;
+        this.JUDGE_TIMEOUT_BASE = preferences.getInt("judgeTimeoutBase", 40) * 1000;
+        this.PLAY_TIMEOUT_PER_CARD = preferences.getInt("playTimeoutPerCard", 15) * 1000;
+        this.JUDGE_TIMEOUT_PER_CARD = preferences.getInt("judgeTimeoutPerCard", 7) * 1000;
     }
 
     private static JsonArray getWhiteCardsDataJson(List<WhiteCard> cards) {
@@ -173,9 +186,6 @@ public class Game {
         JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_JOIN);
         obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
-
-        // Don't do this anymore, it was driving up a crazy amount of traffic.
-        // gameManager.broadcastGameListRefresh();
     }
 
     public boolean isPasswordCorrect(String userPassword) {
