@@ -644,7 +644,7 @@ public class Constants {
     public enum GameState implements Localizable {
         DEALING("d", "In Progress"),
         JUDGING("j", "In Progress"),
-        LOBBY("l", "Not Started"),
+        LOBBY("", "Not Started"),
         PLAYING("p", "In Progress"),
         ROUND_OVER("ro", "In Progress");
 
