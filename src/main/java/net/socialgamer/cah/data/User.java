@@ -17,9 +17,9 @@ public class User {
     private final PriorityBlockingQueue<QueuedMessage> queuedMessages;
     private final Object queuedMessageSynchronization = new Object();
     private final String hostname;
-    private final boolean isAdmin;
     private final String persistentId;
     private final String sessionId;
+    private final boolean admin;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
     private long lastHeardFrom = 0;
     private long lastUserAction = 0;
@@ -34,17 +34,20 @@ public class User {
      *
      * @param nickname     The user's nickname.
      * @param hostname     The user's Internet hostname (which will likely just be their IP address).
-     * @param isAdmin      Whether this user is an admin.
      * @param persistentId This user's persistent (cross-session) ID.
      * @param sessionId    The unique ID of this session for this server instance.
      */
-    public User(String nickname, String hostname, boolean isAdmin, String persistentId, String sessionId) {
+    public User(String nickname, String hostname, String persistentId, String sessionId, boolean admin) {
         this.nickname = nickname;
         this.hostname = hostname;
-        this.isAdmin = isAdmin;
         this.persistentId = persistentId;
         this.sessionId = sessionId;
+        this.admin = admin;
         this.queuedMessages = new PriorityBlockingQueue<>();
+    }
+
+    public boolean isAdmin() {
+        return admin;
     }
 
     /**
@@ -70,7 +73,7 @@ public class User {
      * Wait for a new message to be queued.
      *
      * @param timeout Maximum time to wait in milliseconds.
-     * @throws InterruptedException
+     * @throws InterruptedException should do that
      * @see java.lang.Object#wait(long timeout)
      */
     public void waitForNewMessageNotification(final long timeout) throws InterruptedException {
@@ -107,10 +110,6 @@ public class User {
         }
         c.trimToSize();
         return c;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
     }
 
     public String getSessionId() {
@@ -213,6 +212,6 @@ public class User {
     }
 
     public abstract static class Factory {
-        public abstract User create(String nickname, String hostname, boolean isAdmin, String persistentId);
+        public abstract User create(String nickname, String hostname, boolean admin, String persistentId);
     }
 }

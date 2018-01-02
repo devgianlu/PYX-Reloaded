@@ -1,23 +1,12 @@
 package net.socialgamer.cah;
 
-import net.socialgamer.cah.data.Game;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Constants {
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
-
-    public static final Set<String> ADMIN_IP_ADDRESSES = new HashSet<String>() {
-        {
-            add("0:0:0:0:0:0:0:1");
-            add("127.0.0.1");
-        }
-    };
 
     /**
      * Reason why a client disconnected.
@@ -218,7 +207,8 @@ public class Constants {
         PASSWORD("pw"),
         PERSISTENT_ID("pid"),
         SERIAL("s"),
-        WALL("wall");
+        WALL("wall"),
+        ADMIN_TOKEN("at");
 
         private final String field;
 
@@ -268,7 +258,11 @@ public class Constants {
         PLAYER_INFO("pi"),
         @DuplicationAllowed
         SERIAL(AjaxRequest.SERIAL),
-        WHITE_CARDS("wc");
+        WHITE_CARDS("wc"),
+        /**
+         * Whether the user successfully registered as an admin
+         */
+        IS_ADMIN("ia");
 
         private final String field;
 
@@ -332,7 +326,7 @@ public class Constants {
         NO_SESSION("ns", "Session not detected. Make sure you have cookies enabled."),
         NO_SUCH_USER("nsu", "No such user."),
         NOT_ADMIN("na", "You are not an administrator."),
-        NOT_ENOUGH_CARDS("nec", "You must add card sets containing at least " + Game.MINIMUM_BLACK_CARDS + " black cards and " + Game.MINIMUM_WHITE_CARDS_PER_PLAYER + " times the player limit white cards."),
+        NOT_ENOUGH_CARDS("nec", "You must add card sets to match the game requirements."),
         NOT_ENOUGH_PLAYERS("nep", "There are not enough players to start the game."),
         NOT_GAME_HOST("ngh", "Only the game host can do that."),
         NOT_IN_THAT_GAME("nitg", "You are not in that game."),
@@ -796,7 +790,7 @@ public class Constants {
     /**
      * Enums that implement this interface are valid keys for data returned to clients.
      */
-    public interface ReturnableData {
+    interface ReturnableData {
     }
 
     /**

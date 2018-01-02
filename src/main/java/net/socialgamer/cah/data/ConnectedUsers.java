@@ -181,13 +181,10 @@ public class ConnectedUsers {
      * @param masterData  Message data to broadcast.
      */
     public void broadcastToList(Collection<User> broadcastTo, MessageType type, JsonObject masterData) {
-        // TODO I think this synchronized block is pointless.
-        synchronized (users) {
-            for (User user : broadcastTo) {
-                JsonObject obj = Utils.singletonJsonObject(LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
-                for (String key : masterData.keySet()) obj.add(key, masterData.get(key));
-                user.enqueueMessage(new QueuedMessage(type, obj));
-            }
+        for (User user : broadcastTo) {
+            JsonObject obj = Utils.singletonJsonObject(LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
+            for (String key : masterData.keySet()) obj.add(key, masterData.get(key));
+            user.enqueueMessage(new QueuedMessage(type, obj));
         }
     }
 

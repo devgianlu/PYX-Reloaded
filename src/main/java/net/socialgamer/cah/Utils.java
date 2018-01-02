@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.iki.elonen.NanoHTTPD;
 
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static JsonArray toJsonArray(Set<Integer> set) {
         JsonArray jsonArray = new JsonArray(set.size());
@@ -53,5 +56,16 @@ public class Utils {
         JsonElement element = obj.get(key);
         if (element == null) return fallback;
         else return element.getAsInt();
+    }
+
+    public static String generateAlphanumericString(int length) {
+        StringBuilder builder = new StringBuilder();
+        Random random = ThreadLocalRandom.current();
+        for (int i = 0; i < length; i++) {
+            if (random.nextBoolean()) builder.append(String.valueOf(random.nextInt(10)));
+            else builder.append(ALPHABET.charAt(random.nextInt(26)));
+        }
+
+        return builder.toString();
     }
 }

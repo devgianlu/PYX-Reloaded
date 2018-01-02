@@ -3,10 +3,13 @@ package net.socialgamer.cah.handlers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.iki.elonen.NanoHTTPD;
+import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Constants.ErrorInformation;
 import net.socialgamer.cah.Constants.GameState;
+import net.socialgamer.cah.Utils;
+import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.CardSet;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
@@ -29,18 +32,24 @@ public class StartGameHandler extends GameWithPlayerHandler {
         if (game.getHost() != user) throw new CahResponder.CahException(ErrorCode.NOT_GAME_HOST);
         if (game.getState() != GameState.LOBBY) throw new CahResponder.CahException(ErrorCode.ALREADY_STARTED);
 
-        if (!game.hasEnoughCards()) {
-            final List<CardSet> cardSets = game.loadCardSets();
-            JsonObject obj = new JsonObject();
-            obj.addProperty(ErrorInformation.BLACK_CARDS_PRESENT.toString(), game.loadBlackDeck(cardSets).totalCount());
-            obj.addProperty(ErrorInformation.BLACK_CARDS_REQUIRED.toString(), Game.MINIMUM_BLACK_CARDS);
-            obj.addProperty(ErrorInformation.WHITE_CARDS_PRESENT.toString(), game.loadWhiteDeck(cardSets).totalCount());
-            obj.addProperty(ErrorInformation.WHITE_CARDS_REQUIRED.toString(), game.getRequiredWhiteCardCount());
-            throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_CARDS, obj);
-        } else if (!game.start()) {
-            throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_PLAYERS);
-        } else {
-            return new JsonObject();
+        try {
+            if (!game.hasEnoughCards()) {
+                List<CardSet> cardSets = game.loadCardSets();
+                JsonObject obj = new JsonObject();
+                obj.addProperty(ErrorInformation.BLACK_CARDS_PRESENT.toString(), game.blackCardsCount(cardSets));
+                obj.addProperty(ErrorInformation.BLACK_CARDS_REQUIRED.toString(), game.getRequiredBlackCardCount());
+                obj.addProperty(ErrorInformation.WHITE_CARDS_PRESENT.toString(), game.whiteCardsCount(cardSets));
+                obj.addProperty(ErrorInformation.WHITE_CARDS_REQUIRED.toString(), game.getRequiredWhiteCardCount());
+                throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_CARDS, obj);
+            } else {
+                ErrorCode error = game.start();
+                if (error != null) throw new CahResponder.CahException(error);
+                else return new JsonObject();
+            }
+        } catch (FailedLoadingSomeCardcastDecks ex) {
+            throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
+                    Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
+                            ex.getFailedJson()));
         }
     }
 }

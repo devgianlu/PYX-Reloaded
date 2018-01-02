@@ -78,7 +78,7 @@ public class CardcastService {
         else return soft.get();
     }
 
-    public CardcastDeck loadSet(final String setId) {
+    public CardcastDeck loadSet(String setId) {
         if (!validIdPattern.matcher(setId).matches()) return null;
 
         CardcastCacheEntry cached = checkCache(setId);

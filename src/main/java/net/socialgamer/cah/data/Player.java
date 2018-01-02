@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Player {
     private final User user;
-    private final List<WhiteCard> hand = new LinkedList<>();
+    public final List<WhiteCard> hand = new LinkedList<>();
     private int score = 0;
     private int skipCount = 0;
 
@@ -78,13 +78,6 @@ public class Player {
      */
     public int getSkipCount() {
         return skipCount;
-    }
-
-    /**
-     * @return The backing object for the player's hand (i.e., it can be modified).
-     */
-    public List<WhiteCard> getHand() {
-        return hand;
     }
 
     @Override

@@ -39,9 +39,11 @@ public class RegisterHandler extends BaseHandler {
         String pid = params.get(AjaxRequest.PERSISTENT_ID);
         if (pid == null || pid.isEmpty()) pid = UniqueIds.getNewRandomID();
 
-        user = userFactory.create(nickname,
-                session.getRemoteIpAddress(),
-                Constants.ADMIN_IP_ADDRESSES.contains(session.getRemoteIpAddress()), pid);
+        boolean admin;
+        String adminToken = params.get(Constants.AjaxRequest.ADMIN_TOKEN);
+        admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.current().equals(adminToken);
+
+        user = userFactory.create(nickname, session.getRemoteIpAddress(), admin, pid);
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {
@@ -49,6 +51,7 @@ public class RegisterHandler extends BaseHandler {
 
             JsonObject obj = new JsonObject();
             obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
+            obj.addProperty(AjaxResponse.IS_ADMIN.toString(), admin);
             obj.addProperty(AjaxResponse.PERSISTENT_ID.toString(), pid);
             return obj;
         } else {

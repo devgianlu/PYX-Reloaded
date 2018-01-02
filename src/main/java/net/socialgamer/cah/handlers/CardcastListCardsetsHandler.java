@@ -10,6 +10,7 @@ import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
+import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -29,14 +30,24 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     @Override
     public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
         JsonArray array = new JsonArray();
+
+        FailedLoadingSomeCardcastDecks cardcastException = null;
         for (String deckId : game.getCardcastDeckIds().toArray(new String[0])) {
             CardcastDeck deck = cardcastService.loadSet(deckId);
-            if (deck == null)
-                throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND, Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(), deckId));
+            if (deck == null) {
+                if (cardcastException == null) cardcastException = new FailedLoadingSomeCardcastDecks();
+                cardcastException.failedDecks.add(deckId);
+            }
 
-            array.add(deck.getClientMetadataJson());
+            if (deck != null) array.add(deck.getClientMetadataJson());
         }
 
-        return Utils.singletonJsonObject(AjaxResponse.CARD_SETS.toString(), array);
+        if (cardcastException != null) {
+            throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
+                    Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
+                            Utils.singletonJsonArray(cardcastException.getFailedJson())));
+        } else {
+            return Utils.singletonJsonObject(AjaxResponse.CARD_SETS.toString(), array);
+        }
     }
 }
