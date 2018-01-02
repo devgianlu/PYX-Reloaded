@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/material.min.css">
+    <script src="./js/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<style>
+    .wide-card.mdl-card {
+        width: 512px;
+    }
+</style>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Pretend You're Xyzzy Reloaded</span>
+            <div class="mdl-layout-spacer"></div>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">PYX Reloaded</span>
+        <nav class="mdl-navigation">
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content" align="center" style="margin-top:10px;">
+            <div class="wide-card mdl-card mdl-shadow--2dp">
+
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
+                </div>
+
+                <div class="mdl-card__supporting-text" style="padding-bottom: 0">
+                    <form onsubmit="register()">
+                        <div class="mdl-textfield mdl-js-textfield" align="center">
+                            <input class="mdl-textfield__input" type="text" id="nickname">
+                            <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
+                        </div>
+
+                        <div class="mdl-card__actions mdl-card--border" align="right">
+                            <button type="submit"
+                                    class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                Take me to the lobby!!
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br>
+
+            <div class="wide-card mdl-card mdl-shadow--2dp">
+
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
+                </div>
+
+                <div class="mdl-card__supporting-text">
+                    <p style="text-align:left;">
+                        PYX Reloaded is a fork of the original game overhauled and revamped by <a
+                            href="https://github.com/mgagemorgan" target="_blank">@mgagemorgan</a> and
+                        <a href="https://github.com/devgianlu" target="_blank">@devgianlu</a> on GitHub.
+
+                        The goal of this project is to overhaul the entire interface, and revamp the backend so that it
+                        works out-of-the-box.
+                        Eventually, there are goals for social media integration, accounts, chat features and
+                        administration thereof, and mobile support.
+                        @devgianlu has an <a
+                            href="https://play.google.com/store/apps/details?id=com.gianlu.pretendyourexyzzy"
+                            target="_blank">Android client</a> that works great and is recommended for anyone on
+                        Android.
+                    </p>
+                </div>
+
+                <div class="mdl-card__actions mdl-card--border" align="right">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                       onclick="window.location='https://github.com/devgianlu/PretendYoureXyzzy/';">
+                        We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img
+                            src="./images/octicons/logo-github.svg">!!
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    function register() {
+        var nickname = $("input#nickname").val();
+
+        $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
+            alert("Error data: " + JSON.stringify(data.responseJSON));
+        }).done(function (data) {
+            alert("Success! Data: " + JSON.stringify(data));
+            window.location = "lobbies.html";
+        });
+    }
+</script>
+
+</html>
