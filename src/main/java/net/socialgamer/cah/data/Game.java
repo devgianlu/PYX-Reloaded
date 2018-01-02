@@ -1298,6 +1298,10 @@ public class Game {
         return null;
     }
 
+    public int getRequiredBlackCardCount() {
+        return MINIMUM_BLACK_CARDS;
+    }
+
     /**
      * Exception to be thrown when there are too many players in a game.
      */
