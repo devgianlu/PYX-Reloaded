@@ -215,7 +215,7 @@ public class Game {
 
             // If they are to play this round, remove them from that list.
             if (roundPlayers.remove(player)) {
-                if (startJudging()) judgingState();
+                if (shouldStartJudging()) judgingState();
             }
 
             // If they have a hand, return it to discard pile.
@@ -611,7 +611,7 @@ public class Game {
     }
 
     @Nullable
-    public List<CardSet> loadCardSets() throws FailedLoadingSomeCardcastDecks { // TODO: Optimize usage
+    public List<CardSet> loadCardSets() throws FailedLoadingSomeCardcastDecks {
         synchronized (options.cardSetIds) {
             List<CardSet> cardSets = new ArrayList<>();
             if (!options.getPyxCardSetIds().isEmpty())
@@ -638,11 +638,25 @@ public class Game {
         }
     }
 
-    public BlackDeck loadBlackDeck(List<CardSet> cardSets) {
+    public int blackCardsCount(List<CardSet> cardSets) {
+        int count = 0;
+        for (CardSet cardSet : cardSets) count += cardSet.getBlackCards().size();
+        return count;
+    }
+
+    public int whiteCardsCount(List<CardSet> cardSets) {
+        int count = 0;
+        for (CardSet cardSet : cardSets) count += cardSet.getWhiteCards().size();
+        return count + options.blanksInDeck;
+    }
+
+    @NotNull
+    private BlackDeck loadBlackDeck(List<CardSet> cardSets) {
         return new BlackDeck(cardSets);
     }
 
-    public WhiteDeck loadWhiteDeck(List<CardSet> cardSets) {
+    @NotNull
+    private WhiteDeck loadWhiteDeck(List<CardSet> cardSets) {
         return new WhiteDeck(cardSets, options.blanksInDeck);
     }
 
@@ -656,13 +670,9 @@ public class Game {
     public boolean hasEnoughCards() throws FailedLoadingSomeCardcastDecks {
         synchronized (options.cardSetIds) {
             List<CardSet> cardSets = loadCardSets();
-            if (cardSets == null || cardSets.isEmpty()) return false;
-
-            BlackDeck tempBlackDeck = loadBlackDeck(cardSets);
-            if (tempBlackDeck.totalCount() < MINIMUM_BLACK_CARDS) return false;
-
-            WhiteDeck tempWhiteDeck = loadWhiteDeck(cardSets);
-            return tempWhiteDeck.totalCount() >= getRequiredWhiteCardCount();
+            return cardSets != null && !cardSets.isEmpty()
+                    && blackCardsCount(cardSets) >= MINIMUM_BLACK_CARDS
+                    && whiteCardsCount(cardSets) >= getRequiredWhiteCardCount();
         }
     }
 
@@ -980,7 +990,7 @@ public class Game {
      *
      * @return True if judging should begin.
      */
-    private boolean startJudging() {
+    private boolean shouldStartJudging() {
         if (state != GameState.PLAYING) return false;
 
         if (playedCards.size() == roundPlayers.size()) {
@@ -1212,7 +1222,7 @@ public class Game {
             if (playCard != null) {
                 playedCards.addCard(player, playCard);
                 notifyPlayerInfoChange(player);
-                if (startJudging()) judgingState();
+                if (shouldStartJudging()) judgingState();
                 return null;
             } else {
                 return ErrorCode.DO_NOT_HAVE_CARD;

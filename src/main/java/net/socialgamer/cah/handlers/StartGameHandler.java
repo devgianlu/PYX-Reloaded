@@ -36,9 +36,9 @@ public class StartGameHandler extends GameWithPlayerHandler {
             if (!game.hasEnoughCards()) {
                 List<CardSet> cardSets = game.loadCardSets();
                 JsonObject obj = new JsonObject();
-                obj.addProperty(ErrorInformation.BLACK_CARDS_PRESENT.toString(), game.loadBlackDeck(cardSets).totalCount());
+                obj.addProperty(ErrorInformation.BLACK_CARDS_PRESENT.toString(), game.blackCardsCount(cardSets));
                 obj.addProperty(ErrorInformation.BLACK_CARDS_REQUIRED.toString(), game.getRequiredBlackCardCount());
-                obj.addProperty(ErrorInformation.WHITE_CARDS_PRESENT.toString(), game.loadWhiteDeck(cardSets).totalCount());
+                obj.addProperty(ErrorInformation.WHITE_CARDS_PRESENT.toString(), game.whiteCardsCount(cardSets));
                 obj.addProperty(ErrorInformation.WHITE_CARDS_REQUIRED.toString(), game.getRequiredWhiteCardCount());
                 throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_CARDS, obj);
             } else {
