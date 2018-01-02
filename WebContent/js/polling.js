@@ -5,11 +5,13 @@ function stopPolling() {
 }
 
 // Will automatically start polling
-function sendPollRequest() {
+function sendPollRequest(retry) {
     $.post("LongPollServlet").always(function (data, status) {
         processPollData(data, status);
 
-        if (!shouldStop) sendPollRequest();
+        if (!shouldStop && !retry) {
+            sendPollRequest(status === "error");
+        }
     })
 }
 

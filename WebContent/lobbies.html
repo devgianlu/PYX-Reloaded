@@ -186,7 +186,7 @@
 <script src="./js/polling.js"></script>
 <script>
     window.onload = function () {
-        sendPollRequest();
+        sendPollRequest(false);
 
         $.post("AjaxServlet?o=ggl").done(function (data) {
             alert("Games data: " + JSON.stringify(data));
