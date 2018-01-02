@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class Game {
+    // TODO: Move this to preferences
     /**
      * The minimum number of black cards that must be added to a game for it to be able to start.
      */
@@ -83,36 +84,21 @@ public class Game {
     private final static Set<String> FINITE_PLAYTIMES;
 
     static {
-        final Set<String> finitePlaytimes = new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x"));
-        FINITE_PLAYTIMES = Collections.unmodifiableSet(finitePlaytimes);
+        FINITE_PLAYTIMES = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
     }
 
     private final int id;
-    /**
-     * All players present in the game.
-     */
     private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>(10));
-    /**
-     * Players participating in the current round.
-     */
     private final List<Player> roundPlayers = Collections.synchronizedList(new ArrayList<Player>(9));
     private final PlayerPlayedCardsTracker playedCards = new PlayerPlayedCardsTracker();
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
-    private final Object blackCardLock = new Object();
     private final GameOptions options;
-
-    // All of these delays could be moved to pyx.properties.
     private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
-    /**
-     * Lock object to prevent judging during idle judge detection and vice-versa.
-     */
-    private final Object judgeLock = new Object();
-    /**
-     * Lock to prevent missing timer updates.
-     */
     private final Object roundTimerLock = new Object();
+    private final Object judgeLock = new Object();
+    private final Object blackCardLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
     private final CardcastService cardcastService;
     private Player host;
@@ -157,8 +143,9 @@ public class Game {
      * @throws TooManyPlayersException Thrown if this game is at its maximum player capacity.
      * @throws IllegalStateException   Thrown if {@code user} is already in a game.
      */
-    public void addPlayer(final User user) throws TooManyPlayersException, IllegalStateException {
+    public void addPlayer(User user) throws TooManyPlayersException, IllegalStateException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
+
         synchronized (players) {
             if (options.playerLimit >= 3 && players.size() >= options.playerLimit) throw new TooManyPlayersException();
 
@@ -190,7 +177,7 @@ public class Game {
      * @param user Player to remove from the game.
      * @return True if {@code user} was the last player in the game.
      */
-    public boolean removePlayer(final User user) {
+    public boolean removePlayer(User user) {
         logger.info(String.format("Removing %s from game %d.", user.toString(), id));
 
         boolean wasJudge = false;
@@ -303,7 +290,7 @@ public class Game {
      *
      * @param user Spectator to remove from the game.
      */
-    public void removeSpectator(final User user) {
+    public void removeSpectator(User user) {
         logger.info(String.format("Removing spectator %s from game %d.", user.toString(), id));
         synchronized (spectators) {
             if (!spectators.remove(user)) return;
@@ -519,7 +506,7 @@ public class Game {
      * {@code PLAYING}, {@code JUDGING}, or {@code WINNER}, depending on the game's state and
      * what the player has done.
      */
-    private GamePlayerStatus getPlayerStatus(final Player player) {
+    private GamePlayerStatus getPlayerStatus(Player player) {
         final GamePlayerStatus playerStatus;
 
         switch (state) {
@@ -620,7 +607,7 @@ public class Game {
                     // possible that the cache has expired and we can't re-load it for some reason, so
                     // let's be safe.
                     CardcastDeck cardcastDeck = cardcastService.loadSet(cardcastId);
-                    if (null == cardcastDeck) {
+                    if (cardcastDeck == null) {
                         // TODO better way to indicate this to the user
                         logger.error(String.format("Unable to load %s from Cardcast", cardcastId));
                         return null;
@@ -1099,15 +1086,13 @@ public class Game {
         }
     }
 
-    public JsonArray getWhiteCardsJson(final User user) {
+    public JsonArray getWhiteCardsJson(User user) {
         // if we're in judge mode, return all of the cards and ignore which user is asking
         if (state == GameState.JUDGING) {
             return getWhiteCardsJson();
         } else if (state != GameState.PLAYING) {
             return new JsonArray();
         } else {
-            // FIXME: getPlayerForUser synchronizes on players. This has caused a deadlock in the past.
-            // Good idea to not nest synchronizes if possible anyway.
             final Player player = getPlayerForUser(user);
             synchronized (playedCards) {
                 JsonArray json = new JsonArray(playedCards.size());
@@ -1132,7 +1117,7 @@ public class Game {
      * @param player Player to send the cards to.
      * @param cards  The cards to send the player.
      */
-    private void sendCardsToPlayer(final Player player, final List<WhiteCard> cards) {
+    private void sendCardsToPlayer(Player player, List<WhiteCard> cards) {
         JsonObject obj = getEventJson(LongPollEvent.HAND_DEAL);
         obj.add(LongPollResponse.HAND.toString(), getWhiteCardsDataJson(cards));
         player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, obj));
@@ -1186,7 +1171,7 @@ public class Game {
      * was successful.
      */
     @Nullable
-    public ErrorCode playCard(final User user, final int cardId, final String cardText) {
+    public ErrorCode playCard(User user, int cardId, @Nullable String cardText) {
         final Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
@@ -1284,9 +1269,23 @@ public class Game {
         return null;
     }
 
-    // TODO: Win by X
     private boolean didPlayerWonGame(Player player) {
-        return player.getScore() >= options.scoreGoal;
+        if (player.getScore() >= options.scoreGoal) {
+            if (options.winBy == 0) return true;
+
+            Player highestScore = null;
+            synchronized (players) {
+                for (Player p : players) {
+                    if (player.equals(p)) continue;
+                    if (highestScore == null) highestScore = p;
+                    if (p.getScore() > highestScore.getScore()) highestScore = p;
+                }
+            }
+
+            return highestScore == null || player.getScore() + options.winBy >= highestScore.getScore();
+        } else {
+            return false;
+        }
     }
 
     /**
