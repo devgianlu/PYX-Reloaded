@@ -364,6 +364,7 @@ public class Game {
      * @param player The player whose information has been changed.
      */
     public void notifyPlayerInfoChange(Player player) {
+        if (player == null) return;
         JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_INFO_CHANGE);
         obj.add(LongPollResponse.PLAYER_INFO.toString(), getPlayerInfoJson(player));
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
@@ -432,15 +433,14 @@ public class Game {
         return getInfo(false);
     }
 
-    @NotNull
+    @Nullable
     public JsonObject getInfoJson(boolean includePassword) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(GameInfo.ID.toString(), id);
-
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
-        if (host == null) return new JsonObject();
+        if (host == null) return null;
 
+        JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.ID.toString(), id);
         obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
         obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
@@ -470,7 +470,7 @@ public class Game {
      */
     @Nullable
     public Map<GameInfo, Object> getInfo(boolean includePassword) {
-        final Map<GameInfo, Object> info = new HashMap<>();
+        Map<GameInfo, Object> info = new HashMap<>();
         info.put(GameInfo.ID, id);
 
         // This is probably happening because the game ceases to exist in the middle of getting the
@@ -508,8 +508,7 @@ public class Game {
     }
 
     @NotNull
-    public JsonObject getPlayerInfoJson(Player player) {
-        if (player == null) return new JsonObject();
+    public JsonObject getPlayerInfoJson(@NotNull Player player) {
         JsonObject obj = new JsonObject();
         obj.addProperty(GamePlayerInfo.NAME.toString(), player.getUser().getNickname());
         obj.addProperty(GamePlayerInfo.SCORE.toString(), player.getScore());
