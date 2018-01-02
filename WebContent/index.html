@@ -35,19 +35,19 @@
                 </div>
 
                 <div class="mdl-card__supporting-text">
-                    <form action="#">
+                    <form onsubmit="register()">
                         <div class="mdl-textfield mdl-js-textfield" align="center">
                             <input class="mdl-textfield__input" type="text" id="nickname">
                             <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
                         </div>
-                    </form>
-                </div>
 
-                <div class="mdl-card__actions mdl-card--border" align="right">
-                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                       onclick="window.location='lobbies.html';">
-                        Take me to the lobby!!
-                    </a>
+                        <div class="mdl-card__actions mdl-card--border" align="right">
+                            <button type="submit"
+                                    class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                Take me to the lobby!!
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <br>
@@ -87,5 +87,21 @@
         </div>
     </main>
 </div>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+    function register() {
+        var nickname = $("input#nickname").val();
+
+        $.post("AjaxServlet?o=r&n=" + nickname).always(function (data, status) {
+            if (status === "error") {
+                alert("Error data: " + JSON.stringify(data.responseJSON));
+            } else {
+                alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+                window.location = "lobbies.html";
+            }
+        });
+    }
+</script>
 
 </html>
