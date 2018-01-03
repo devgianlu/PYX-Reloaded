@@ -679,6 +679,8 @@ public class Constants {
         HAS_PASSWORD("hp"),
         PLAYERS("P"),
         SPECTATORS("V"),
+        LIKES("lk"),
+        DISLIKES("dlk"),
         STATE("S");
 
         private final String key;

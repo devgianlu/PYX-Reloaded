@@ -52,7 +52,7 @@ public class Game {
     /**
      * The minimum number of black cards that must be added to a game for it to be able to start.
      */
-    public final int MINIMUM_BLACK_CARDS;
+    private final int MINIMUM_BLACK_CARDS;
 
     /**
      * The minimum number of white cards per player limit slots that must be added to a game for it to
@@ -60,7 +60,7 @@ public class Game {
      * <p>
      * We need 20 * maxPlayers cards. This allows black cards up to "draw 9" to work correctly.
      */
-    public final int MINIMUM_WHITE_CARDS_PER_PLAYER;
+    private final int MINIMUM_WHITE_CARDS_PER_PLAYER;
 
     /**
      * Time, in milliseconds, to delay before starting a new round.
@@ -119,6 +119,8 @@ public class Game {
     private final Object roundTimerLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
     private final CardcastService cardcastService;
+    private final Set<User> likes = Collections.synchronizedSet(new HashSet<>());
+    private final Set<User> dislikes = Collections.synchronizedSet(new HashSet<>());
     private Player host;
     private BlackDeck blackDeck;
     private BlackCard blackCard;
@@ -163,6 +165,22 @@ public class Game {
     }
 
     /**
+     * Count valid users and also remove invalid ones
+     *
+     * @param users the users to count
+     * @return number of valid users
+     */
+    private static int countValidUsers(Iterable<User> users) {
+        int count = 0;
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().isValid()) count++;
+            else iterator.remove();
+        }
+        return count;
+    }
+
+    /**
      * Add a player to the game.
      * <p>
      * Synchronizes on {@link #players}.
@@ -171,7 +189,7 @@ public class Game {
      * @throws TooManyPlayersException Thrown if this game is at its maximum player capacity.
      * @throws IllegalStateException   Thrown if {@code user} is already in a game.
      */
-    public void addPlayer(final User user) throws TooManyPlayersException, IllegalStateException {
+    public void addPlayer(User user) throws TooManyPlayersException, IllegalStateException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
         synchronized (players) {
             if (options.playerLimit >= 3 && players.size() >= options.playerLimit) throw new TooManyPlayersException();
@@ -186,6 +204,32 @@ public class Game {
         JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_JOIN);
         obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
+    }
+
+    public int getLikes() {
+        synchronized (likes) {
+            return countValidUsers(likes);
+        }
+    }
+
+    public int getDislikes() {
+        synchronized (dislikes) {
+            return countValidUsers(dislikes);
+        }
+    }
+
+    public void likeGame(User user) {
+        if (!likes.contains(user)) {
+            if (dislikes.contains(user)) dislikes.remove(user);
+            likes.add(user);
+        }
+    }
+
+    public void dislikeGame(User user) {
+        if (!dislikes.contains(user)) {
+            if (likes.contains(user)) likes.remove(user);
+            dislikes.add(user);
+        }
     }
 
     public boolean isPasswordCorrect(String userPassword) {
@@ -441,6 +485,8 @@ public class Game {
 
         JsonObject obj = new JsonObject();
         obj.addProperty(GameInfo.ID.toString(), id);
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
         obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
         obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
