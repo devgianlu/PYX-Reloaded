@@ -70,6 +70,18 @@
         <div id="game-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+
+                <div class="mdl-layout-spacer"></div>
+
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                        onclick="likeGame(this); return false;">
+                    <i class="material-icons">thumb_up</i>
+                </button>
+
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                        onclick="dislikeGame(this); return false;">
+                    <i class="material-icons">thumb_down</i>
+                </button>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">
@@ -114,7 +126,7 @@
 
     var games = new List('games-global-container', {
         item: 'game-template',
-        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', {'data': ['gid', 'hp']}]
+        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', {'data': ['gid', 'hp', 'like', 'dislike']}]
     });
 
     $('#filter-games').change(function () {
@@ -216,6 +228,8 @@
             games.add({
                 "gid": game.gid,
                 "hp": game.hp,
+                "like": game.iLK,
+                "dislike": game.iDLK,
                 "_host": game.H,
                 "_decks": decks,
                 "_players": players,
@@ -224,6 +238,24 @@
                 "_status": status
             });
         }
+
+        var gamesContainer = $('#games-list');
+
+        gamesContainer.find('div[data-like] i:contains("up")').each(function () {
+            var button = $(this).parent();
+            var like = button.parent().parent().attr("data-like");
+
+            if (like === "true") button.addClass('mdl-button--raised');
+            else button.removeClass('mdl-button--raised');
+        });
+
+        gamesContainer.find('div[data-dislike] i:contains("down")').each(function () {
+            var button = $(this).parent();
+            var dislike = button.parent().parent().attr("data-dislike");
+
+            if (dislike === "true") button.addClass('mdl-button--raised');
+            else button.removeClass('mdl-button--raised');
+        })
     }
 
     function deckIdsToNames(ids) {
@@ -246,6 +278,40 @@
             console.log(data);
             alert("Create game result: " + JSON.stringify(data));
         })
+    }
+
+    function updateLikeDislike(likeButton, disLikeButton, data) {
+        if (likeButton === undefined) likeButton = disLikeButton.previousElementSibling;
+        else if (disLikeButton === undefined) disLikeButton = likeButton.nextElementSibling;
+        else return;
+
+        if (data.iLK) $(likeButton).addClass('mdl-button--raised');
+        else $(likeButton).removeClass('mdl-button--raised');
+
+        if (data.iDLK) $(disLikeButton).addClass('mdl-button--raised');
+        else $(disLikeButton).removeClass('mdl-button--raised');
+    }
+
+    function likeGame(button) {
+        var gid = button.parentElement.parentElement.getAttribute('data-gid');
+
+        $.post("AjaxServlet?o=lk&gid=" + gid).done(function (data) {
+            updateLikeDislike(button, undefined, data);
+            console.log(data);
+        }).fail(function (data) {
+            console.log(data);
+        });
+    }
+
+    function dislikeGame(button) {
+        var gid = button.parentElement.parentElement.getAttribute('data-gid');
+
+        $.post("AjaxServlet?o=dlk&gid=" + gid).done(function (data) {
+            updateLikeDislike(undefined, button, data);
+            console.log(data);
+        }).fail(function (data) {
+            console.log(data);
+        });
     }
 </script>
 

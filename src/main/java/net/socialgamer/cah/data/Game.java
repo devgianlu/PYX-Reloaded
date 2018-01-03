@@ -181,6 +181,15 @@ public class Game {
         return count;
     }
 
+    private static void toggleLikeDislike(Set<User> one, Set<User> other, User user) {
+        if (!one.contains(user)) {
+            if (other.contains(user)) other.remove(user);
+            one.add(user);
+        } else {
+            one.remove(user);
+        }
+    }
+
     /**
      * Add a player to the game.
      * <p>
@@ -219,25 +228,29 @@ public class Game {
         }
     }
 
-    public JsonObject getLikesInfoJson() {
+    public JsonObject getLikesInfoJson(User user) {
         JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+        obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
         obj.addProperty(GameInfo.LIKES.toString(), getLikes());
         obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
         return obj;
     }
 
-    public void likeGame(User user) {
-        if (!likes.contains(user)) {
-            if (dislikes.contains(user)) dislikes.remove(user);
-            likes.add(user);
-        }
+    private boolean userDislikes(User user) {
+        return dislikes.contains(user);
     }
 
-    public void dislikeGame(User user) {
-        if (!dislikes.contains(user)) {
-            if (likes.contains(user)) likes.remove(user);
-            dislikes.add(user);
-        }
+    private boolean userLikes(User user) {
+        return likes.contains(user);
+    }
+
+    public void toggleLikeGame(User user) {
+        toggleLikeDislike(likes, dislikes, user);
+    }
+
+    public void toggleDislikeGame(User user) {
+        toggleLikeDislike(dislikes, likes, user);
     }
 
     public boolean isPasswordCorrect(String userPassword) {
@@ -427,7 +440,7 @@ public class Game {
      */
     private void notifyGameOptionsChanged() {
         JsonObject obj = getEventJson(LongPollEvent.GAME_OPTIONS_CHANGED);
-        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(true));
+        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(null, true));
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
     }
 
@@ -486,7 +499,7 @@ public class Game {
     }
 
     @Nullable
-    public JsonObject getInfoJson(boolean includePassword) {
+    public JsonObject getInfoJson(@Nullable User user, boolean includePassword) {
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
         if (host == null) return null;
@@ -499,6 +512,11 @@ public class Game {
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
         obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
         obj.addProperty(GameInfo.HAS_PASSWORD.toString(), options.password != null && !options.password.equals(""));
+
+        if (user != null) {
+            obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+            obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+        }
 
         JsonArray playerNames = new JsonArray();
         for (Player player : players.toArray(new Player[players.size()]))
@@ -578,7 +596,7 @@ public class Game {
      * {@code PLAYING}, {@code JUDGING}, or {@code WINNER}, depending on the game's state and
      * what the player has done.
      */
-    private GamePlayerStatus getPlayerStatus(final Player player) {
+    private GamePlayerStatus getPlayerStatus(Player player) {
         final GamePlayerStatus playerStatus;
 
         switch (state) {

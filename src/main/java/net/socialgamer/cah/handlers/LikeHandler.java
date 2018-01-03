@@ -18,7 +18,7 @@ public class LikeHandler extends GameHandler {
 
     @Override
     public JsonElement handle(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) {
-        game.likeGame(user);
-        return game.getLikesInfoJson();
+        game.toggleLikeGame(user);
+        return game.getLikesInfoJson(user);
     }
 }

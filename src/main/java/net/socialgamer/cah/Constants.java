@@ -688,6 +688,8 @@ public class Constants {
         PLAYERS("P"),
         SPECTATORS("V"),
         LIKES("LK"),
+        I_LIKE("iLK"),
+        I_DISLIKE("iDLK"),
         DISLIKES("DLK"),
         STATE("S");
 
