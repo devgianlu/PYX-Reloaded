@@ -36,8 +36,7 @@ public class PlayCardHandler extends GameWithPlayerHandler {
         String text = params.get(AjaxRequest.MESSAGE);
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
-        final ErrorCode errorCode = game.playCard(user, cardId, text);
-        if (errorCode != null) throw new CahResponder.CahException(errorCode);
-        else return new JsonObject();
+        game.playCard(user, cardId, text);
+        return new JsonObject();
     }
 }

@@ -90,13 +90,31 @@
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
+    window.onload = function () {
+        $.post("AjaxServlet?o=fl").fail(function (data) {
+            alert("Error data: " + JSON.stringify(data));
+        }).done(function (data) {
+            console.log(data);
+
+            localStorage['css'] = JSON.stringify(data.css);
+
+            if (data.ip) {
+                if (data.next === "game") {
+                    window.location = "lobbies.html?gid=" + data.gid;
+                } else {
+                    window.location = "lobbies.html";
+                }
+            }
+        });
+    };
+
     function register() {
         var nickname = $("input#nickname").val();
 
         $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
-            alert("Error data: " + JSON.stringify(data.responseJSON));
+            alert("Error data: " + JSON.stringify(data));
         }).done(function (data) {
-            alert("Success! Data: " + JSON.stringify(data));
+            console.log(data);
             window.location = "lobbies.html";
         });
     }
