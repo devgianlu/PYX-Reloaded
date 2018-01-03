@@ -45,17 +45,13 @@ public class RegisterHandler extends BaseHandler {
 
         user = userFactory.create(nickname, session.getRemoteIpAddress(), admin, pid);
 
-        ErrorCode errorCode = users.checkAndAdd(user);
-        if (errorCode == null) {
-            setHeader("Set-Cookie", "PYX-Session=" + Sessions.add(user));
+        users.checkAndAdd(user);
+        setHeader("Set-Cookie", "PYX-Session=" + Sessions.add(user));
 
-            JsonObject obj = new JsonObject();
-            obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
-            obj.addProperty(AjaxResponse.IS_ADMIN.toString(), admin);
-            obj.addProperty(AjaxResponse.PERSISTENT_ID.toString(), pid);
-            return obj;
-        } else {
-            throw new CahResponder.CahException(errorCode);
-        }
+        JsonObject obj = new JsonObject();
+        obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
+        obj.addProperty(AjaxResponse.IS_ADMIN.toString(), admin);
+        obj.addProperty(AjaxResponse.PERSISTENT_ID.toString(), pid);
+        return obj;
     }
 }

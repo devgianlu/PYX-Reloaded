@@ -84,8 +84,7 @@ public class GameOptions {
      * @return This game's general information: ID, host, state, player list, etc.
      */
     public Map<GameOptionData, Object> serialize(final boolean includePassword) {
-        final Map<GameOptionData, Object> info = new HashMap<>();
-
+        Map<GameOptionData, Object> info = new HashMap<>();
         info.put(GameOptionData.CARD_SETS, cardSetIds);
         info.put(GameOptionData.BLANKS_LIMIT, blanksInDeck);
         info.put(GameOptionData.PLAYER_LIMIT, playerLimit);
@@ -93,13 +92,11 @@ public class GameOptions {
         info.put(GameOptionData.SCORE_LIMIT, scoreGoal);
         info.put(GameOptionData.TIMER_MULTIPLIER, timerMultiplier);
         if (includePassword) info.put(GameOptionData.PASSWORD, password);
-
         return info;
     }
 
     public JsonObject toJson(boolean includePassword) {
         JsonObject obj = new JsonObject();
-
         obj.add(GameOptionData.CARD_SETS.toString(), Utils.toJsonArray(cardSetIds));
         obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
         obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
@@ -107,7 +104,6 @@ public class GameOptions {
         obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
         obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
         if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
-
         return obj;
     }
 
@@ -116,7 +112,7 @@ public class GameOptions {
      */
     public Set<Integer> getPyxCardSetIds() {
         Set<Integer> pyxCardSetIds = new HashSet<>();
-        for (Integer cardSetId : cardSetIds) {
+        for (int cardSetId : cardSetIds) {
             if (cardSetId > 0) pyxCardSetIds.add(cardSetId);
         }
 

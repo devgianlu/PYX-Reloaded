@@ -5,14 +5,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.iki.elonen.NanoHTTPD;
 
+import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    public static JsonArray toJsonArray(Set<Integer> set) {
+    public static JsonArray toJsonArray(Collection<Integer> set) {
         JsonArray jsonArray = new JsonArray(set.size());
         for (int item : set) jsonArray.add(item);
         return jsonArray;

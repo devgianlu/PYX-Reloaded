@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/material.css">
+    <script src="./js/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<style>
+    .filter-input.mdl-textfield__input {
+        border-bottom: 1px solid white;
+    }
+
+    .filter-input-text.mdl-textfield__label {
+        color: white;
+    }
+
+    .wide-card.mdl-card {
+        width: 512px;
+    }
+
+    .fab-bottom-right {
+        margin: 32px;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        z-index: 99;
+    }
+</style>
+
+<div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Games - Pretend You're Xyzzy Reloaded</span>
+            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+                <label class="mdl-button mdl-js-button mdl-button--icon" for="filter-games">
+                    <i class="material-icons">search</i>
+                </label>
+                <div class="mdl-textfield__expandable-holder">
+                    <input class="filter-input mdl-textfield__input" type="text" name="sample" id="filter-games">
+                </div>
+            </div>
+            <button class="mdl-button mdl-js-button mdl-button--icon" onclick="loadGamesList()">
+                <i class="material-icons">refresh</i>
+            </button>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">PYX Reloaded</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="">Logout</a>
+        </nav>
+    </div>
+    <main id="games-list" class="mdl-layout__content">
+        <div class="page-content list" align="center" style="margin-top:10px;">
+            <div class="mdl-grid" style="justify-content: center">
+                <!-- Games list -->
+            </div>
+        </div>
+    </main>
+    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
+            onclick="createGame()">
+        <i class="material-icons">add</i>
+    </button>
+
+    <div style="display: none">
+        <div id="game-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+            </div>
+
+            <div class="mdl-card__supporting-text" align="left">
+                <b>Players: </b><i class="_players"></i><br>
+                <b>Spectators: </b><i class="_spectators"></i><br>
+                <b>Goal: </b><i class="_goal"></i><br>
+                <b>Decks: </b><i class="_decks"><!-- FIXME: May overflow --></i><br>
+                <b>Status: </b><i class="_status"></i><br>
+            </div>
+
+            <div class="mdl-card__actions mdl-card--border" align="right">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   onclick="joinGame(this.parentElement.parentElement); return false;">
+                    JOIN
+                </a>
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   onclick="spectateGame(this.parentElement.parentElement); return false;">
+                    SPECTATE
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+<script src="./js/polling.js"></script>
+<script>
+    window.onload = function () {
+        sendPollRequest(false);
+        loadGamesList();
+
+        var gid = getURLParameter('gid');
+        if (gid !== undefined) {
+            postJoinSpectate(gid) // No need to join or spectate, just move the UI there
+        }
+    };
+
+    function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+    }
+
+    var games = new List('games-global-container', {
+        item: 'game-template',
+        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', {'data': ['gid', 'hp']}]
+    });
+
+    $('#filter-games').change(function () {
+        filterGames($(this).val())
+    });
+
+    function askPassword() {
+        return prompt("Enter the game password:", "");
+    }
+
+    function joinGame(element) {
+        var gid = element.getAttribute('data-gid');
+        var hp = element.getAttribute('data-hp');
+
+        var password = "";
+        if (hp === true) password = askPassword();
+
+        $.post("AjaxServlet?o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
+            console.log(data);
+            alert("Joined game: " + JSON.stringify(data));
+        }).fail(function (data) {
+            console.log(data);
+            alert("Error data: " + JSON.stringify(data));
+        })
+    }
+
+    function spectateGame(element) {
+        var gid = element.getAttribute('data-gid');
+        var hp = element.getAttribute('data-hp');
+
+        var password = "";
+        if (hp === true) password = askPassword();
+
+        $.post("AjaxServlet?o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
+            console.log(data);
+            alert("Spectating game: " + JSON.stringify(data));
+            postJoinSpectate(gid)
+        }).fail(function (data) {
+            console.log(data);
+            alert("Error data: " + JSON.stringify(data));
+        })
+    }
+
+    function postJoinSpectate(gid) {
+        // TODO: Show game UI
+    }
+
+    function loadGamesList() {
+        games.clear();
+
+        // TODO: Show loading now
+
+        $.post("AjaxServlet?o=ggl").done(function (data) {
+            console.log(data);
+            populateGamesList(data.gl);
+        }).fail(function (data) {
+            console.log(data);
+            alert("Error data: " + JSON.stringify(data));
+        })
+    }
+
+    function filterGames(query) {
+        // FIXME: When filtering the spacing over the cards gets fucked up
+        // TODO: Message when there are no search results
+        if (query.length === 0) {
+            games.filter(); // Remove all filters
+        } else {
+            games.filter(function (item) {
+                return item.values()._host.indexOf(query) !== -1;
+            })
+        }
+    }
+
+    function populateGamesList(gamesList) {
+        for (var i = 0; i < gamesList.length; i++) {
+            var game = gamesList[i];
+
+            var status;
+            if (game.S === "l") status = "lobby";
+            else status = "started";
+
+            var decksNames = deckIdsToNames(game.go.css);
+            var decks;
+            if (decksNames.length === 0) decks = "none";
+            else decks = decksNames.join(", ");
+
+            var players;
+            if (game.P.length === 0) players = "none";
+            else players = game.P.join(", ");
+
+            players += " (" + game.P.length + "/" + game.go.pL + ")";
+
+            var spectators;
+            if (game.V.length === 0) spectators = "none";
+            else spectators = game.V.join(", ");
+
+            spectators += " (" + game.V.length + "/" + game.go.vL + ")";
+
+            games.add({
+                "gid": game.gid,
+                "hp": game.hp,
+                "_host": game.H,
+                "_decks": decks,
+                "_players": players,
+                "_spectators": spectators,
+                "_goal": game.go.sl,
+                "_status": status
+            });
+        }
+    }
+
+    function deckIdsToNames(ids) {
+        var names = [];
+        var css = localStorage["css"];
+        if (css === undefined) return ids; // Shouldn't happen
+        var json = JSON.parse(css);
+
+        for (var i = 0; i < ids.length; i++) {
+            for (var j = 0; j < json.length; j++) {
+                if (ids[i] === json[j].cid) names[i] = json[j].csn;
+            }
+        }
+
+        return names;
+    }
+
+    function createGame() {
+        $.post("AjaxServlet?o=cg").always(function (data) {
+            console.log(data);
+            alert("Create game result: " + JSON.stringify(data));
+        })
+    }
+</script>
+
+</html>
