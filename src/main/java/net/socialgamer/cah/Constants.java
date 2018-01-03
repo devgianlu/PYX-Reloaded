@@ -178,7 +178,15 @@ public class Constants {
         /**
          * Stop the game
          */
-        STOP_GAME("Sg");
+        STOP_GAME("Sg"),
+        /**
+         * Like a game
+         */
+        LIKE("lk"),
+        /**
+         * Dislike a game
+         */
+        DISLIKE("dlk");
 
         private final String op;
 
@@ -679,8 +687,8 @@ public class Constants {
         HAS_PASSWORD("hp"),
         PLAYERS("P"),
         SPECTATORS("V"),
-        LIKES("lk"),
-        DISLIKES("dlk"),
+        LIKES("LK"),
+        DISLIKES("DLK"),
         STATE("S");
 
         private final String key;

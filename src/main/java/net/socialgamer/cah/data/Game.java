@@ -218,6 +218,13 @@ public class Game {
         }
     }
 
+    public JsonObject getLikesInfoJson() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
+        return obj;
+    }
+
     public void likeGame(User user) {
         if (!likes.contains(user)) {
             if (dislikes.contains(user)) dislikes.remove(user);
