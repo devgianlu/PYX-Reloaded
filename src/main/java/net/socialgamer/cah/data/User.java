@@ -191,7 +191,7 @@ public class User {
      * @param game Game in which this user is playing.
      * @throws IllegalStateException Thrown if this user is already in another game.
      */
-    void joinGame(final Game game) throws IllegalStateException {
+    void joinGame(Game game) throws IllegalStateException {
         if (currentGame != null) throw new IllegalStateException("User is already in a game.");
         currentGame = game;
     }
@@ -203,7 +203,7 @@ public class User {
      *
      * @param game Game from which to remove the user.
      */
-    void leaveGame(final Game game) {
+    void leaveGame(Game game) {
         if (currentGame == game) currentGame = null;
     }
 
