@@ -15,3 +15,48 @@ function populateDropdown(dropdown, dgo) {
     }
 }
 
+function populateTimeMultiplier(dropdown, tm) {
+    console.log(tm);
+
+    for (var i = 0; i < tm.values.length; i++) {
+        var option = document.createElement("option");
+        var val = tm.values[i];
+        option.setAttribute("value", val);
+        if (val === tm.default) option.setAttribute("selected", '');
+        option.innerHTML = val;
+        dropdown.appendChild(option);
+    }
+}
+
+function loadCardSets(container, css) {
+    var setsList = [];
+    for (var i = 0; i < css.length; i++) {
+        var set = css[i];
+        setsList.push({
+            "_name": set.csn,
+            "w": set.w,
+            "cid": set.cid
+        });
+    }
+
+    setsList.sort(function (a, b) {
+        return a.w - b.w;
+    });
+
+    var sets = new List('deck_select', {
+        item: 'card-set-template',
+        valueNames: ['_name', {'data': ['cid']}]
+    });
+
+    sets.clear();
+    sets.add(setsList, function (items) {
+        for (var i = 0; i < items.length; i++) {
+            var cid = items[i].values().cid;
+            var item = $(items[i].elm);
+
+            //item.find('input.deck1').attr("id", "deck_" + cid);
+            item.attr("for", "deck_" + cid);
+        }
+    })
+}
+

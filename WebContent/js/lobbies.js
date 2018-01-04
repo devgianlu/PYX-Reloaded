@@ -182,6 +182,7 @@ function deckIdsToNames(ids) {
 }
 
 function showCreateGameDialog() {
+    createGame();
     var dialog = document.querySelector('#dialog');
     if (!dialog.showModal) {
         dialogPolyfill.registerDialog(dialog);

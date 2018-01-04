@@ -43,19 +43,19 @@
         </nav>
     </div>
 
-    <main class="mdl-layout__content">
+    <main id="main" class="mdl-layout__content">
         <div class="page-content" align="center" style="margin-top:10px;">
             <div id="lobbyBox" class="mdl-grid list" style="justify-content: center">
                 <!-- Games list  -->
             </div>
         </div>
     </main>
-
+    <div id="creationWrapper">
     <button id="createGame"
             class="dialog-button mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
             onclick="showCreateGameDialog()">
         <i class="material-icons">add</i>
-    </button>
+    </button></div>
 
     <dialog id="dialog" class="mdl-dialog">
         <h4 class="mdl-dialog__title">Start a New Game</h4>
@@ -118,9 +118,10 @@
 
             <div class="mdl-card__actions mdl-card--border" align="right">
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                   onclick="joinGame(this.parentElement.parentElement); return false;">
+                   onclick="$('#main').html(''); $('#creationWrapper').html('');; joinGame(this.parentElement.parentElement); return false;">
                     JOIN
                 </a>
+                
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
                    onclick="spectateGame(this.parentElement.parentElement); return false;">
                     SPECTATE
