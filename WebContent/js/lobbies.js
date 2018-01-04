@@ -2,9 +2,12 @@ var games = undefined;
 
 window.onload = function () {
     var dgo = JSON.parse(localStorage['dgo']);
-    populateDropdown(document.getElementById("goal"), dgo.sl);
+    populateDropdown(document.getElementById("scoreLimit"), dgo.sl);
     populateDropdown(document.getElementById("playersLimit"), dgo.pL);
     populateDropdown(document.getElementById("spectatorsLimit"), dgo.vL);
+    populateDropdown(document.getElementById("blanksLimit"), dgo.bl);
+    populateTimeMultiplier(document.getElementById("timeMultiplier"), dgo.tm);
+    loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
 
     sendPollRequest(false);
     loadGamesList();
@@ -190,21 +193,22 @@ function showCreateGameDialog() {
 
     dialog.showModal();
 
-    createGame(); // Shouldn't be there
-}
-
-function createGame() {
-    $.post("AjaxServlet?o=cg").always(function (data) {
-        console.log(data);
-        // alert("Create game result: " + JSON.stringify(data));
-    });
-
     //// Temporary stuff
     var copy = document.getElementById('game-info-template');
     var newCard = document.createElement("div");
     newCard.className = "mdl-cell mdl-cell--12-col wide-card mdl-card mdl-shadow--3dp";
     newCard.innerHTML = copy.innerHTML;
     document.getElementById("lobbyBox").appendChild(newCard);
+}
+
+function createGame() {
+    $.post("AjaxServlet?o=cg").done(function (data) {
+        postJoinSpectate(data.gid);
+        loadGamesList();
+    }).fail(function (data) {
+        console.log(data);
+        alert("Error create game: " + JSON.stringify(data));
+    });
 }
 
 function updateLikeDislike(likeButton, disLikeButton, data) {

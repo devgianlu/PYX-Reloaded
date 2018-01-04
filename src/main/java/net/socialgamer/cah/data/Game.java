@@ -42,13 +42,7 @@ import java.util.concurrent.TimeUnit;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class Game {
-    private final static Set<String> FINITE_PLAYTIMES;
     private static final Logger logger = Logger.getLogger(Game.class);
-
-    static {
-        final Set<String> finitePlaytimes = new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x"));
-        FINITE_PLAYTIMES = Collections.unmodifiableSet(finitePlaytimes);
-    }
 
     /**
      * The minimum number of black cards that must be added to a game for it to be able to start.
@@ -816,7 +810,7 @@ public class Game {
         double factor = 1.0d;
         String tm = options.timerMultiplier;
         if (tm.equals("Unlimited")) return Integer.MAX_VALUE;
-        if (FINITE_PLAYTIMES.contains(tm)) factor = Double.valueOf(tm.substring(0, tm.length() - 1));
+        if (GameOptions.VALID_TIME_MULTIPLIERS.contains(tm)) factor = Double.valueOf(tm.substring(0, tm.length() - 1));
         long retval = Math.round(base * factor);
         if (retval > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int) retval;

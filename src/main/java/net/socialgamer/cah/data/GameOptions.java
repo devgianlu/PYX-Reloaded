@@ -1,15 +1,13 @@
 package net.socialgamer.cah.data;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.socialgamer.cah.Constants.GameOptionData;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GameOptions {
     public static final int DEFAULT_SCORE_MIN = 4;
@@ -24,14 +22,16 @@ public class GameOptions {
     public static final int DEFAULT_BLANKS_MIN = 0;
     public static final int DEFAULT_BLANKS_DEF = 0;
     public static final int DEFAULT_BLANKS_MAX = 30;
+    public static final String DEFAULT_TIME_MULTIPLIER = "1x";
+    public static final Set<String> VALID_TIME_MULTIPLIERS = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
+
     public final Set<Integer> cardSetIds = new HashSet<>();
-    // These are the default values new games get.
     public int blanksInDeck;
     public int playerLimit;
     public int spectatorLimit;
     public int scoreGoal;
     public String password = "";
-    public String timerMultiplier = "1.0x";
+    public String timerMultiplier = "1x";
 
     GameOptions(Preferences preferences) {
         blanksInDeck = getBlanksLimit(preferences).def;
@@ -40,13 +40,23 @@ public class GameOptions {
         spectatorLimit = getSpectatorLimit(preferences).def;
     }
 
-    public static JsonObject getMinDefaultMaxJson(Preferences preferences) {
+    public static JsonObject getOptionsDefaultsJson(Preferences preferences) {
         JsonObject obj = new JsonObject();
         obj.add(GameOptionData.BLANKS_LIMIT.toString(), getBlanksLimit(preferences).toJson());
         obj.add(GameOptionData.PLAYER_LIMIT.toString(), getPlayerLimit(preferences).toJson());
         obj.add(GameOptionData.SPECTATOR_LIMIT.toString(), getSpectatorLimit(preferences).toJson());
         obj.add(GameOptionData.SCORE_LIMIT.toString(), getScoreLimit(preferences).toJson());
+
+        JsonObject tm = new JsonObject();
+        tm.add("values", getTimeMultiplierValidValues());
+        tm.addProperty("default", DEFAULT_TIME_MULTIPLIER);
+        obj.add(GameOptionData.TIMER_MULTIPLIER.toString(), tm);
+
         return obj;
+    }
+
+    public static JsonArray getTimeMultiplierValidValues() {
+        return Utils.toStringsJsonArray(VALID_TIME_MULTIPLIERS);
     }
 
     private static Preferences.MinDefaultMax getBlanksLimit(Preferences preferences) {
@@ -130,7 +140,7 @@ public class GameOptions {
 
     public JsonObject toJson(boolean includePassword) {
         JsonObject obj = new JsonObject();
-        obj.add(GameOptionData.CARD_SETS.toString(), Utils.toJsonArray(cardSetIds));
+        obj.add(GameOptionData.CARD_SETS.toString(), Utils.toIntsJsonArray(cardSetIds));
         obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
         obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
         obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
