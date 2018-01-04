@@ -9,7 +9,7 @@ function populateDropdown(dropdown, dgo) {
     for (var i = dgo.min; i <= dgo.max; i++) {
         var option = document.createElement("option");
         option.setAttribute("value", i);
-        if (i === dgo.default) option.setAttribute("selected", undefined);
+        if (i === dgo.default) option.setAttribute("selected", '');
         option.innerHTML = i;
         dropdown.appendChild(option);
     }
