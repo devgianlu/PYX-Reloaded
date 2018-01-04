@@ -141,10 +141,26 @@ function deckIdsToNames(ids) {
     return names;
 }
 
+function createGameDialog() {
+    var dialogButton = document.querySelector('.dialog-button');
+    var dialog = document.querySelector('#dialog');
+    dialogButton.addEventListener('click', function() {
+       dialog.showModal();
+    });
+    dialog.querySelector('button:not([disabled])')
+    .addEventListener('click', function() {
+      dialog.close();
+    });
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+}
+
 function createGame() {
+        createGameDialog();
     $.post("AjaxServlet?o=cg").always(function (data) {
         console.log(data);
-        alert("Create game result: " + JSON.stringify(data));
+        //alert("Create game result: " + JSON.stringify(data));
     })
 
     var copy = document.getElementById('game-info-template');

@@ -9,8 +9,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
     <script src="./js/polling.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css" />
     <script src="./js/lobbies.js"></script>
+    <script src="./js/dialog-polyfill.js"></script>
 </head>
 
 <div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -45,10 +48,34 @@
         </div>
     </main>
 
-    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
+    <button id="createGame" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right dialog-button"
             onclick="createGame()">
         <i class="material-icons">add</i>
     </button>
+
+<dialog id="dialog" class="mdl-dialog" width="512px">
+  <h3 class="mdl-dialog__title">Start a New Game</h3>
+  <div class="mdl-dialog__content">
+     Score limit: <select>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="2">3</option>
+                    <option value="2">4</option>
+                    <option value="2">5</option>
+                    <option value="2">6</option>
+                    <option value="2">7</option>
+                    <option value="2">8</option>
+                    <option value="2">9</option>
+                    <option value="2">10</option>
+		  </select>
+  </div>
+
+  <div class="mdl-dialog__actions">
+    <button type="button" class="mdl-button">Close</button>
+    <button type="button" class="mdl-button" disabled>Disabled action</button>
+  </div>
+</dialog>
+
 
     <div style="display: none">
         <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">

@@ -17,3 +17,7 @@
     right: 0;
     z-index: 99;
 }
+
+.mdl-dialog {
+    width: 300px;
+}
