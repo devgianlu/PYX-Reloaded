@@ -51,7 +51,7 @@ public class FirstLoadHandler extends BaseHandler {
         for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson());
         obj.add(AjaxResponse.CARD_SETS.toString(), json);
 
-        obj.add(AjaxResponse.DEFAULT_GAME_OPTIONS.toString(), GameOptions.getMinDefaultMaxJson(preferences));
+        obj.add(AjaxResponse.DEFAULT_GAME_OPTIONS.toString(), GameOptions.getOptionsDefaultsJson(preferences));
 
         return obj;
     }

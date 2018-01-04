@@ -60,65 +60,45 @@
     <dialog id="dialog" class="mdl-dialog">
         <h4 class="mdl-dialog__title">Start a New Game</h4>
 	<div class="view" style="overflow:scroll; overflow-x: hidden; height:75vh;">
-        <div class="mdl-dialog__content"><div class="pref-card mdl-card mdl-shadow--3dp">
-            <p><label for="goal">Goal: </label><select id="goal"></select></p>
-            <p><label for="playersLimit">Players Limit: </label><select id="playersLimit"></select></p>
-            <p><label for="spectatorsLimit">Spectators Limit: </label><select id="spectatorsLimit"></select></p>
-            <p><label for="timeLimit">Time Limit: </label><select id="timeLimit"></select></p>
-        </div><br>
-        <!-- If this can be removed and dynamically, I'm all for it, so long as the switches are there. --@mgagemorgan -->
-        <div id="deck_select" style="justify-content: left; text-align: left;" class="mdl-card mdl-shadow--3dp pref-card">
-            <h5>Card Sets</h5>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck1">
-              <input type="checkbox" id="deck1" class="mdl-switch__input">
-              <span class="mdl-switch__label">First Version</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck2">
-              <input type="checkbox" id="deck2" class="mdl-switch__input">
-              <span class="mdl-switch__label">Second Version</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck3">
-              <input type="checkbox" id="deck3" class="mdl-switch__input">
-              <span class="mdl-switch__label">Third Version</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck4">
-              <input type="checkbox" id="deck4" class="mdl-switch__input">
-              <span class="mdl-switch__label">The First Expansion Pack</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck5">
-              <input type="checkbox" id="deck5" class="mdl-switch__input">
-              <span class="mdl-switch__label">The Second Expansion Pack</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck5">
-              <input tyseparate-items pe="checkbox" id="deck6" class="mdl-switch__input">
-              <span class="mdl-switch__label">The Third Expansion Pack</span>
-            </label><br>
-            <label class="separate-items mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck6">
-              <input type="checkbox" id="deck7" class="mdl-switch__input">
-              <span class="mdl-switch__label">The Fourth Expansion Pack</span>
-            </label><br>
-            
-        </div></div></div>
-        
+        <div class="mdl-dialog__content">
+            <div class="pref-card mdl-card mdl-shadow--3dp">
+                <h5>General</h5>
+                <p><label for="scoreLimit">Goal: </label><select id="scoreLimit"></select></p>
+                <p><label for="playersLimit">Players Limit: </label><select id="playersLimit"></select></p>
+                <p><label for="spectatorsLimit">Spectators Limit: </label><select id="spectatorsLimit"></select></p>
+                <p><label for="blanksLimit">Blank cards: </label><select id="blanksLimit"></select></p>
+                <p><label for="timeMultiplier">Time Multiplier: </label><select id="timeMultiplier"></select></p>
+            </div>
+            <br>
+
+            <div id="deck_select" style="justify-content: left; text-align: left;"
+                 class="mdl-card mdl-shadow--3dp pref-card">
+                <h5>Card Sets</h5>
+                <div class="list"><!-- FIXME: checkboxes aren't clickable--></div>
+            </div>
+        </div></div>
+
         <div class="mdl-dialog__actions">
-            <button type="button" class="move-right mdl-button">Close</button>
+            <button type="button" class="mdl-button">Close</button>
         </div>
     </dialog>
 
     <div style="display: none">
-        <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--3dp">
+        <label id="card-set-template" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck1">
+            <input type="checkbox" id="deck1" class="mdl-switch__input">
+            <span class="mdl-switch__label _name">{{Name of Card Set}}</span>
+            <!-- TODO: tooltip to show deck details (description, white/black cards number) -->
+        </label>
 
+        <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--3dp">
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
-
                 <div class="mdl-layout-spacer"></div>
-
                 <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="likeGame(this); return false;">
                     <i class="material-icons">thumb_up</i>
                 </button>
                 <div class="mdl-tooltip _likes">0</div>
-
                 <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
@@ -149,3 +129,4 @@
 </div>
 
 </html>
+
