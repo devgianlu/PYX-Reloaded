@@ -1,9 +1,36 @@
+#widecard {
+    width: 512px;
+}
+
+#setup {
+    width: 50vw;
+}
+
+#gh {
+    padding-bottom: 3vh;
+}
+
+#enter {
+    border-bottom: 0.5px solid lightgray;
+    margin-bottom: 1px;
+    padding-bottom: none;
+}
+
+.enter {
+    margin-left: 15vw;
+    padding-top: 0;
+}
+
 .filter-input.mdl-textfield__input {
     border-bottom: 1px solid white;
 }
 
 .filter-input-text.mdl-textfield__label {
     color: white;
+}
+
+.wider-card.mdc-card {
+    width: 512px;
 }
 
 .wide-card.mdl-card {
@@ -31,44 +58,44 @@ dialog.mdl-dialog {
     padding-top: 2px;
 }
 
-      .mdc-toolbar-demo {
-        margin: 0px;
-      }
-      .demo-paragraph {
-        margin: 0px;
-        padding: 20px 28px;
-      }
-      @media (max-width: 599px) {
-        .demo-paragraph {
-          padding: 16px;
-        }
-      }
-      /* Ensure layout covers the entire screen. */
-      html {
-        height: 100%;
-      }
+.mdc-toolbar-demo {
+    margin: 0;
+}
+.demo-paragraph {
+    margin: 0;
+    padding: 20px 28px;
+}
+@media (max-width: 599px) {
+    .demo-paragraph {
+        padding: 16px;
+    }
+}
+/* Ensure layout covers the entire screen. */
+html {
+    height: 100%;
+}
 
-      /* Place drawer and content side by side. */
-      .demo-body {
-        display: flex;
-        flex-direction: row;
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        height: 100%;
-        width: 100%;
-      }
+/* Place drawer and content side by side. */
+.demo-body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
 
-      /* Stack toolbar and main on top of each other. */
-      .demo-content {
-        display: inline-flex;
-        flex-direction: column;
-        flex-grow: 1;
-        height: 100%;
-        box-sizing: border-box;
-      }
+/* Stack toolbar and main on top of each other. */
+.demo-content {
+    display: inline-flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    box-sizing: border-box;
+}
 
-      .demo-main {
-        padding-left: 16px;
-      }
+.demo-main {
+    padding-left: 16px;
+}
 

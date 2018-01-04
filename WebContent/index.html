@@ -6,10 +6,12 @@
     <script src="./node_modules/material-components-web/dist/material-components-web.js"></script>
     <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css">
     <link rel="stylesheet" href="node_modules/@material/toolbar/dist/mdc.toolbar.css">
+    <link rel="stylesheet" href="node_modules/@material/card/dist/mdc.card.css">
+    <link rel="stylesheet" href="node_modules/@material/card/dist/mdc.button.css">
     <link rel="stylesheet" href="./css/pyx-reloaded.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>
-    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css" />
+    <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
     <script src="node_modules/@material/toolbar/dist/mdc.toolbar.js"></script>
@@ -29,126 +31,116 @@
 </style>
 
 <!-- MDC Toolbar & Drawer Start Here -->
-  <body id="games-global-container" class="mdc-typography demo-body">
+
+<body id="games-global-container" class="mdc-typography demo-body">
     <aside class="mdc-persistent-drawer">
-      <nav class="mdc-persistent-drawer__drawer">
-        <div class="mdc-persistent-drawer__toolbar-spacer"></div>
-        <div class="mdc-list-group">
-          <nav class="mdc-list">
-              <a class="mdc-list-item" href="#">
+        <nav class="mdc-persistent-drawer__drawer">
+            <h5 class="mdc-title" style="text-align:center">PYX Reloaded</h5>
+            <div class="mdc-list-group">
+                <nav class="mdc-list">
+                    <a class="mdc-list-item" href="#">
                 Logout
               </a>
-            </nav>
-          </div>
-      </nav>
+                </nav>
+            </div>
+        </nav>
     </aside>
     <div class="demo-content">
-      <header class="mdc-toolbar mdc-elevation--z4">
-        <div class="mdc-toolbar__row">
-          <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-            <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
-            <span class="mdc-toolbar__title catalog-title">PYX Reloaded</span>
-          </section>
-        </div>
-    <script src="./js/mdc_mods.js"></script>
-      </header>
-<!-- MDC Toolbar & Drawer End Here -->
-
-    <main class="mdl-layout__content">
-        <div class="page-content" align="center" style="margin-top:20px;">
-            <div class="wide-card mdl-card mdl-shadow--3dp">
-
-                <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
-                </div>
-
-                <div class="mdl-card__supporting-text" style="padding-bottom: 0">
-                    <form onsubmit="register(); return false;">
-                        <div class="mdl-textfield mdl-js-textfield" align="center">
-                            <input class="mdl-textfield__input" type="text" id="nickname">
-                            <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
-                        </div>
-
-                        <div class="mdl-card__actions mdl-card--border" align="right">
-                            <button type="submit"
-                                    class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                                Take me to the lobby!!
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        <header class="mdc-toolbar mdc-elevation--z4">
+            <div class="mdc-toolbar__row">
+                <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                    <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
+                    <span class="mdc-toolbar__title catalog-title">PYX Reloaded</span>
+                </section>
             </div>
-            <br>
+            <script src="./js/mdc_mods.js"></script>
+        </header>
+        <!-- MDC Toolbar & Drawer End Here -->
 
-            <div class="wide-card mdl-card mdl-shadow--3dp">
+        <main class="mdl-layout__content">
+            <div class="page-content" align="center" style="margin-top:20px;">
 
-                <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
+                <!-- Start of MDC card -->
+                <div id="widecard">
+                    <div class="mdc-card">
+                        <section class="mdc-card__primary">
+                            <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
+                        </section>
+                        <section class="mdc-card__supporting-text">
+                            <form onsubmit="register(); return false;">
+                                <div class="mdl-textfield mdl-js-textfield" align="center">
+                                    <input class="mdl-textfield__input" type="text" id="nickname">
+                                    <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
+                                </div>
+                            </form>
+                        </section>
+                        <div align="right">
+                            <button type="submit" class="enter mdc-button mdc-button--compact" style="align:right; margin: 1vw;">Take me to the lobby!!!</button>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="mdl-card__supporting-text">
-                    <p style="text-align:left;">
-                        PYX Reloaded is a fork of the original game overhauled and revamped by <a
-                            href="https://github.com/mgagemorgan" target="_blank">@mgagemorgan</a> and
-                        <a href="https://github.com/devgianlu" target="_blank">@devgianlu</a> on GitHub.
-
-                        The goal of this project is to overhaul the entire interface, and revamp the backend so that it
-                        works out-of-the-box.
-                        Eventually, there are goals for social media integration, accounts, chat features and
-                        administration thereof, and mobile support.
-                        @devgianlu has an <a
-                            href="https://play.google.com/store/apps/details?id=com.gianlu.pretendyourexyzzy"
-                            target="_blank">Android client</a> that works great and is recommended for anyone on
-                        Android.
-                    </p>
-                </div>
-
-                <div class="mdl-card__actions mdl-card--border" align="right">
-                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                       onclick="window.location='https://github.com/devgianlu/PretendYoureXyzzy/';">
+                <!-- End of MDC card -->
+                <br>
+                <!-- Start of MDC card -->
+                <div id="widecard">
+                    <div class="mdc-card mdc-elevation--4">
+                        <section class="mdc-card__primary">
+                            <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
+                        </section>
+                        <section class="mdc-card__supporting-text">
+                            <p style="text-align:left;">
+                                PYX Reloaded is a fork of the original game overhauled and revamped by <a href="https://github.com/mgagemorgan" target="_blank">@mgagemorgan</a> and
+                                <a href="https://github.com/devgianlu" target="_blank">@devgianlu</a> on GitHub. The goal of this project is to overhaul the entire interface, and revamp the backend so that it works out-of-the-box. Eventually, there are goals for social media integration, accounts, chat features and administration thereof, and mobile support. @devgianlu has an <a href="https://play.google.com/store/apps/details?id=com.gianlu.pretendyourexyzzy" target="_blank">Android client</a> that works great and is recommended for anyone on Android.
+                            </p>
+                        </section>
+                        <div align="right">
+                            <button id="gh" class="enter mdc-button mdc-button--compact" style="align:right; margin: 1vw;" onclick="window.location='https://github.com/devgianlu/PYX-Reloaded/';">
                         We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img
                             src="./images/octicons/logo-github.svg">!!
-                    </a>
+</button>
+                        </div>
+                    </div>
                 </div>
+                <!-- End of MDC card -->
+
             </div>
+        </main>
+    </div>
 
-        </div>
-    </main>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script>
-    window.onload = function () {
-        $.post("AjaxServlet?o=fl").fail(function (data) {
-            alert("Error data: " + JSON.stringify(data));
-        }).done(function (data) {
-            console.log(data);
-
-            localStorage['css'] = JSON.stringify(data.css);
-            localStorage['dgo'] = JSON.stringify(data.dgo);
-
-            if (data.ip) {
-                if (data.next === "game") {
-                    window.location = "lobbies.html?gid=" + data.gid;
-                } else {
-                    window.location = "lobbies.html";
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script>
+        window.onload = function () {
+            $.post("AjaxServlet?o=fl").fail(function (data) {
+                alert("Error data: " + JSON.stringify(data));
+            }).done(function (data) {
+                console.log(data);
+    
+                localStorage['css'] = JSON.stringify(data.css);
+                localStorage['dgo'] = JSON.stringify(data.dgo);
+    
+                if (data.ip) {
+                    if (data.next === "game") {
+                        window.location = "lobbies.html?gid=" + data.gid;
+                    } else {
+                        window.location = "lobbies.html";
+                    }
                 }
-            }
-        });
-    };
+            });
+        };
+    
+        function register() {
+            var nickname = $("input#nickname").val();
+    
+            $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
+                alert("Error data: " + JSON.stringify(data));
+            }).done(function (data) {
+                console.log(data);
+                window.location = "lobbies.html";
+            });
+        }
+    </script>
 
-    function register() {
-        var nickname = $("input#nickname").val();
-
-        $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
-            alert("Error data: " + JSON.stringify(data));
-        }).done(function (data) {
-            console.log(data);
-            window.location = "lobbies.html";
-        });
-    }
-</script>
-
-</div>
+    </div>
 </body>
+
 </html>
