@@ -48,12 +48,14 @@
             </button>
         </div>
     </header>
+
     <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">PYX Reloaded</span>
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="">Logout</a>
         </nav>
     </div>
+
     <main id="games-list" class="mdl-layout__content">
         <div class="page-content list" align="center" style="margin-top:10px;">
             <div class="mdl-grid" style="justify-content: center">
@@ -61,6 +63,7 @@
             </div>
         </div>
     </main>
+
     <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
             onclick="createGame()">
         <i class="material-icons">add</i>
@@ -201,6 +204,7 @@
     }
 
     function populateGamesList(gamesList) {
+        var items = [];
         for (var i = 0; i < gamesList.length; i++) {
             var game = gamesList[i];
 
@@ -225,7 +229,7 @@
 
             spectators += " (" + game.V.length + "/" + game.go.vL + ")";
 
-            games.add({
+            items.push({
                 "gid": game.gid,
                 "hp": game.hp,
                 "like": game.iLK,
@@ -239,23 +243,20 @@
             });
         }
 
-        var gamesContainer = $('#games-list');
+        games.clear();
+        games.add(items, function (items) {
+            for (var i = 0; i < items.length; i++) {
+                var card = $(items[i].elm);
 
-        gamesContainer.find('div[data-like] i:contains("up")').each(function () {
-            var button = $(this).parent();
-            var like = button.parent().parent().attr("data-like");
+                var likeButton = card.find('button:has(i:contains("up"))');
+                if (card.attr("data-like") === "true") likeButton.addClass('mdl-button--raised');
+                else likeButton.removeClass('mdl-button--raised');
 
-            if (like === "true") button.addClass('mdl-button--raised');
-            else button.removeClass('mdl-button--raised');
+                var dislikeButton = card.find('button:has(i:contains("down"))');
+                if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdl-button--raised');
+                else dislikeButton.removeClass('mdl-button--raised');
+            }
         });
-
-        gamesContainer.find('div[data-dislike] i:contains("down")').each(function () {
-            var button = $(this).parent();
-            var dislike = button.parent().parent().attr("data-dislike");
-
-            if (dislike === "true") button.addClass('mdl-button--raised');
-            else button.removeClass('mdl-button--raised');
-        })
     }
 
     function deckIdsToNames(ids) {
