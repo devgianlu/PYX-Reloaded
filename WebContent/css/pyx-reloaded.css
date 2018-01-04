@@ -18,6 +18,6 @@
     z-index: 99;
 }
 
-.mdl-dialog {
-    width: 300px;
+dialog.mdl-dialog {
+    width: 600px;
 }

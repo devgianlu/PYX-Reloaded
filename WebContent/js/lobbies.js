@@ -142,22 +142,24 @@ function deckIdsToNames(ids) {
 }
 
 function createGameDialog() {
+  (function() {
+    'use strict';
     var dialogButton = document.querySelector('.dialog-button');
     var dialog = document.querySelector('#dialog');
-    dialogButton.addEventListener('click', function() {
-       dialog.showModal();
-    });
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
     dialog.querySelector('button:not([disabled])')
     .addEventListener('click', function() {
       dialog.close();
     });
-    if (! dialog.showModal) {
-      dialogPolyfill.registerDialog(dialog);
-    }
+    dialogButton.addEventListener('click', function() {
+       dialog.showModal();
+    });
+  }());
 }
 
 function createGame() {
-        createGameDialog();
     $.post("AjaxServlet?o=cg").always(function (data) {
         console.log(data);
         //alert("Create game result: " + JSON.stringify(data));

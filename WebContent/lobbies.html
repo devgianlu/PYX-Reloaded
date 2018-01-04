@@ -13,7 +13,7 @@
     <script src="./js/polling.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css" />
     <script src="./js/lobbies.js"></script>
-    <script src="./js/dialog-polyfill.js"></script>
+    <script src="./js/new_game.js"></script>
 </head>
 
 <div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -48,34 +48,23 @@
         </div>
     </main>
 
-    <button id="createGame" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right dialog-button"
-            onclick="createGame()">
+    <button id="createGame" class="dialog-button mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right" onclick="  createGame()">
         <i class="material-icons">add</i>
     </button>
 
-<dialog id="dialog" class="mdl-dialog" width="512px">
-  <h3 class="mdl-dialog__title">Start a New Game</h3>
-  <div class="mdl-dialog__content">
-     Score limit: <select>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="2">3</option>
-                    <option value="2">4</option>
-                    <option value="2">5</option>
-                    <option value="2">6</option>
-                    <option value="2">7</option>
-                    <option value="2">8</option>
-                    <option value="2">9</option>
-                    <option value="2">10</option>
-		  </select>
-  </div>
+    <dialog id="dialog" class="mdl-dialog">
+        <h4 class="mdl-dialog__title">Start a New Game</h4>
+        <div class="mdl-dialog__content">
+            <p id="rounds"><b>Score Limit:  </b> </p>
+            <p id="players"><b>Player Limit:  <b> </p>
+            <p id="spectators"><b>Spectator Limit:</b> </p>
+        </div>
 
-  <div class="mdl-dialog__actions">
-    <button type="button" class="mdl-button">Close</button>
-    <button type="button" class="mdl-button" disabled>Disabled action</button>
-  </div>
-</dialog>
-
+        <div class="mdl-dialog__actions">
+            <button type="button" class="mdl-button">Close</button>
+        </div>
+    </dialog>
+    <script>createGameDialog();</script>
 
     <div style="display: none">
         <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
@@ -84,12 +73,10 @@
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
                 <div class="mdl-layout-spacer"></div>
 
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                        onclick="likeGame(this); return false;">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent" onclick="likeGame(this); return false;">
                     <i class="material-icons">thumb_up</i>
                 </button>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                        onclick="dislikeGame(this); return false;">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent" onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
                 </button>
             </div>
@@ -103,17 +90,15 @@
             </div>
 
             <div class="mdl-card__actions mdl-card--border" align="right">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                   onclick="joinGame(this.parentElement.parentElement); return false;">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="joinGame(this.parentElement.parentElement); return false;">
                     JOIN
                 </a>
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                   onclick="spectateGame(this.parentElement.parentElement); return false;">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="spectateGame(this.parentElement.parentElement); return false;">
                     SPECTATE
                 </a>
             </div>
         </div>
     </div>
 </div>
-
+    <script src="./js/dialog-polyfill.js"></script>
 </html>
