@@ -11,10 +11,10 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
     <script src="./js/dialog-polyfill.js"></script>
-    <script src="./js/material.min.js"></script>
     <script src="./js/polling.js"></script>
     <script src="./js/new_game.js"></script>
     <script src="./js/lobbies.js"></script>
+    <script src="./js/material.min.js"></script>
 </head>
 
 <div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -68,12 +68,14 @@
                 <p><label for="blanksLimit">Blank cards: </label><select id="blanksLimit"></select></p>
                 <p><label for="timeMultiplier">Time Multiplier: </label><select id="timeMultiplier"></select></p>
             </div>
+
             <br>
 
             <div id="deck_select" style="justify-content: left; text-align: left;"
                  class="mdl-card mdl-shadow--3dp pref-card">
                 <h5>Card Sets</h5>
-                <div class="list"><!-- FIXME: checkboxes aren't clickable--></div>
+
+                <div class="list"></div>
             </div>
         </div>
 
@@ -83,8 +85,8 @@
     </dialog>
 
     <div style="display: none">
-        <label id="card-set-template" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck1">
-            <input type="checkbox" id="deck1" class="mdl-switch__input">
+        <label id="card-set-template" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck_">
+            <input type="checkbox" id="deck_" class="mdl-switch__input">
             <span class="mdl-switch__label _name">{{Name of Card Set}}</span>
             <!-- TODO: tooltip to show deck details (description, white/black cards number) -->
         </label>
@@ -93,16 +95,16 @@
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
                 <div class="mdl-layout-spacer"></div>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                <button id="like_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="likeGame(this); return false;">
                     <i class="material-icons">thumb_up</i>
                 </button>
-                <div class="mdl-tooltip _likes">0</div>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                <div class="mdl-tooltip _likes" data-mdl-for="like_">0</div>
+                <button id="dislike_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
                 </button>
-                <div class="mdl-tooltip _dislikes">0</div>
+                <div class="mdl-tooltip _dislikes" data-mdl-for="dislike_">0</div>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">

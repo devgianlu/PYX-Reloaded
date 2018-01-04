@@ -16,8 +16,6 @@ function populateDropdown(dropdown, dgo) {
 }
 
 function populateTimeMultiplier(dropdown, tm) {
-    console.log(tm);
-
     for (var i = 0; i < tm.values.length; i++) {
         var option = document.createElement("option");
         var val = tm.values[i];
@@ -43,7 +41,7 @@ function loadCardSets(container, css) {
         return a.w - b.w;
     });
 
-    var sets = new List('deck_select', {
+    var sets = new List(container, {
         item: 'card-set-template',
         valueNames: ['_name', {'data': ['cid']}]
     });
@@ -57,6 +55,6 @@ function loadCardSets(container, css) {
             item.find('input.mdl-switch__input').attr("id", "deck_" + cid);
             item.attr("for", "deck_" + cid);
         }
-    })
+    });
 }
 
