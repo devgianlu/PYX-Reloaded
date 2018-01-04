@@ -2,16 +2,6 @@ window.onload = function () {
     sendPollRequest(false);
     loadGamesList();
 
-    var dialogButton = document.querySelector('.dialog-button');
-    var dialog = document.querySelector('#dialog');
-    if (!dialog.showModal) dialogPolyfill.registerDialog(dialog);
-    dialog.querySelector('button:not([disabled])').addEventListener('click', function () {
-        dialog.close();
-    });
-    dialogButton.addEventListener('click', function () {
-        dialog.showModal();
-    });
-
     var gid = getURLParameter('gid');
     if (gid !== undefined) {
         postJoinSpectate(gid) // No need to join or spectate, just move the UI there
@@ -179,10 +169,25 @@ function deckIdsToNames(ids) {
     return names;
 }
 
+function showCreateGameDialog() {
+    var dialog = document.querySelector('#dialog');
+    if (!dialog.showModal) {
+        dialogPolyfill.registerDialog(dialog);
+    }
+
+    dialog.querySelector('button:not([disabled])').addEventListener('click', function () {
+        dialog.close();
+    });
+
+    dialog.showModal();
+
+    createGame(); // Shouldn't be there
+}
+
 function createGame() {
     $.post("AjaxServlet?o=cg").always(function (data) {
         console.log(data);
-        //alert("Create game result: " + JSON.stringify(data));
+        // alert("Create game result: " + JSON.stringify(data));
     });
 
     //// Temporary stuff
