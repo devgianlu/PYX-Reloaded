@@ -14,9 +14,3 @@ function populateDropdown(dropdown, min, max) {
     }
 }
 
-window.onload = function () {
-    populateDropdown(document.getElementById("goal"), 4, 69);
-    populateDropdown(document.getElementById("playersLimit"), 3, 20);
-    populateDropdown(document.getElementById("spectatorsLimit"), 3, 20);
-};
-

@@ -1,4 +1,10 @@
+var games = undefined;
+
 window.onload = function () {
+    populateDropdown(document.getElementById("goal"), 4, 69);
+    populateDropdown(document.getElementById("playersLimit"), 3, 20);
+    populateDropdown(document.getElementById("spectatorsLimit"), 3, 20);
+
     sendPollRequest(false);
     loadGamesList();
 
@@ -11,12 +17,6 @@ window.onload = function () {
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
-
-var games = new List('games-global-container', {
-    item: 'game-info-template',
-    valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
-        {'data': ['gid', 'hp', 'like', 'dislike']}]
-});
 
 $('#filter-games').change(function () {
     filterGames($(this).val())
@@ -64,6 +64,14 @@ function postJoinSpectate(gid) {
 }
 
 function loadGamesList() {
+    if (games === undefined) {
+        games = new List('games-global-container', {
+            item: 'game-info-template',
+            valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
+                {'data': ['gid', 'hp', 'like', 'dislike']}]
+        });
+    }
+
     games.clear();
 
     // TODO: Show loading now
