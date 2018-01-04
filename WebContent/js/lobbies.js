@@ -153,3 +153,37 @@ function createGame() {
     newCard.innerHTML = copy.innerHTML;
     document.getElementById("lobbyBox").appendChild(newCard);
 }
+
+function updateLikeDislike(likeButton, disLikeButton, data) {
+    if (likeButton === undefined) likeButton = disLikeButton.previousElementSibling;
+    else if (disLikeButton === undefined) disLikeButton = likeButton.nextElementSibling;
+    else return;
+
+    if (data.iLK) $(likeButton).addClass('mdl-button--raised');
+    else $(likeButton).removeClass('mdl-button--raised');
+
+    if (data.iDLK) $(disLikeButton).addClass('mdl-button--raised');
+    else $(disLikeButton).removeClass('mdl-button--raised');
+}
+
+function likeGame(button) {
+    var gid = button.parentElement.parentElement.getAttribute('data-gid');
+
+    $.post("AjaxServlet?o=lk&gid=" + gid).done(function (data) {
+        updateLikeDislike(button, undefined, data);
+        console.log(data);
+    }).fail(function (data) {
+        console.log(data);
+    });
+}
+
+function dislikeGame(button) {
+    var gid = button.parentElement.parentElement.getAttribute('data-gid');
+
+    $.post("AjaxServlet?o=dlk&gid=" + gid).done(function (data) {
+        updateLikeDislike(undefined, button, data);
+        console.log(data);
+    }).fail(function (data) {
+        console.log(data);
+    });
+}

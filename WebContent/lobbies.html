@@ -52,8 +52,19 @@
 
     <div style="display: none">
         <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+                <div class="mdl-layout-spacer"></div>
+
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                        onclick="likeGame(this); return false;">
+                    <i class="material-icons">thumb_up</i>
+                </button>
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                        onclick="dislikeGame(this); return false;">
+                    <i class="material-icons">thumb_down</i>
+                </button>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">
