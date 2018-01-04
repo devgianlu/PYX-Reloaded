@@ -1,5 +1,4 @@
-build
-build.properties
 target
-ssl/
 .idea/
+WebContent/node_modules/
+WebContent/.backup/
