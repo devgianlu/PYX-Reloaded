@@ -11,9 +11,7 @@
 }
 
 .pref-card.mdl-card {
-    padding-left: 10vw;
-    padding-right: 10vw;
-    padding-top: 1vw;
+    padding: 1vw;
     width: 35vw;
 }
 
@@ -27,6 +25,10 @@
 
 dialog.mdl-dialog {
     width: 600px;
+}
+
+#deck_select {
+    padding-top: 2px;
 }
 
 
