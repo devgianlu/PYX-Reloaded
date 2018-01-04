@@ -59,11 +59,13 @@
 
     <dialog id="dialog" class="mdl-dialog">
         <h4 class="mdl-dialog__title">Start a New Game</h4>
-        <div class="mdl-dialog__content">
+        <div class="mdl-dialog__content"><div class="pref-card mdl-card mdl-shadow--3dp">
             <p><label for="goal">Goal: </label><select id="goal"></select></p>
             <p><label for="playersLimit">Players Limit: </label><select id="playersLimit"></select></p>
             <p><label for="spectatorsLimit">Spectators Limit: </label><select id="spectatorsLimit"></select></p>
-        </div>
+            <p><label for="timeLimit">Time Limit: </label><select id="timeLimit"></select></p>
+
+        </div></div>
 
         <div class="mdl-dialog__actions">
             <button type="button" class="mdl-button">Close</button>
@@ -71,7 +73,7 @@
     </dialog>
 
     <div style="display: none">
-        <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+        <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--3dp">
 
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>

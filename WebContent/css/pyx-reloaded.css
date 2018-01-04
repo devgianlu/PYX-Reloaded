@@ -10,6 +10,13 @@
     width: 512px;
 }
 
+.pref-card.mdl-card {
+    padding-left: 10vw;
+    padding-right: 10vw;
+    padding-top: 1vw;
+    width: 35vw;
+}
+
 .fab-bottom-right {
     margin: 32px;
     position: absolute;
@@ -21,3 +28,5 @@
 dialog.mdl-dialog {
     width: 600px;
 }
+
+
