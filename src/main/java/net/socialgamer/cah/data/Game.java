@@ -53,7 +53,7 @@ public class Game {
     /**
      * The minimum number of black cards that must be added to a game for it to be able to start.
      */
-    public final int MINIMUM_BLACK_CARDS;
+    private final int MINIMUM_BLACK_CARDS;
 
     /**
      * The minimum number of white cards per player limit slots that must be added to a game for it to
@@ -61,7 +61,7 @@ public class Game {
      * <p>
      * We need 20 * maxPlayers cards. This allows black cards up to "draw 9" to work correctly.
      */
-    public final int MINIMUM_WHITE_CARDS_PER_PLAYER;
+    private final int MINIMUM_WHITE_CARDS_PER_PLAYER;
 
     /**
      * Time, in milliseconds, to delay before starting a new round.
@@ -120,6 +120,8 @@ public class Game {
     private final Object roundTimerLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
     private final CardcastService cardcastService;
+    private final Set<User> likes = Collections.synchronizedSet(new HashSet<>());
+    private final Set<User> dislikes = Collections.synchronizedSet(new HashSet<>());
     private Player host;
     private BlackDeck blackDeck;
     private BlackCard blackCard;
@@ -164,6 +166,31 @@ public class Game {
     }
 
     /**
+     * Count valid users and also remove invalid ones
+     *
+     * @param users the users to count
+     * @return number of valid users
+     */
+    private static int countValidUsers(Iterable<User> users) {
+        int count = 0;
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().isValid()) count++;
+            else iterator.remove();
+        }
+        return count;
+    }
+
+    private static void toggleLikeDislike(Set<User> one, Set<User> other, User user) {
+        if (!one.contains(user)) {
+            if (other.contains(user)) other.remove(user);
+            one.add(user);
+        } else {
+            one.remove(user);
+        }
+    }
+
+    /**
      * Add a player to the game.
      * <p>
      * Synchronizes on {@link #players}.
@@ -172,7 +199,7 @@ public class Game {
      * @throws TooManyPlayersException Thrown if this game is at its maximum player capacity.
      * @throws IllegalStateException   Thrown if {@code user} is already in a game.
      */
-    public void addPlayer(final User user) throws TooManyPlayersException, IllegalStateException {
+    public void addPlayer(User user) throws TooManyPlayersException, IllegalStateException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
         synchronized (players) {
             if (options.playerLimit >= 3 && players.size() >= options.playerLimit) throw new TooManyPlayersException();
@@ -187,6 +214,43 @@ public class Game {
         JsonObject obj = getEventJson(LongPollEvent.GAME_PLAYER_JOIN);
         obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
+    }
+
+    public int getLikes() {
+        synchronized (likes) {
+            return countValidUsers(likes);
+        }
+    }
+
+    public int getDislikes() {
+        synchronized (dislikes) {
+            return countValidUsers(dislikes);
+        }
+    }
+
+    public JsonObject getLikesInfoJson(User user) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+        obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
+        return obj;
+    }
+
+    private boolean userDislikes(User user) {
+        return dislikes.contains(user);
+    }
+
+    private boolean userLikes(User user) {
+        return likes.contains(user);
+    }
+
+    public void toggleLikeGame(User user) {
+        toggleLikeDislike(likes, dislikes, user);
+    }
+
+    public void toggleDislikeGame(User user) {
+        toggleLikeDislike(dislikes, likes, user);
     }
 
     public boolean isPasswordCorrect(String userPassword) {
@@ -376,7 +440,7 @@ public class Game {
      */
     private void notifyGameOptionsChanged() {
         JsonObject obj = getEventJson(LongPollEvent.GAME_OPTIONS_CHANGED);
-        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(true));
+        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(null, true));
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
     }
 
@@ -435,17 +499,24 @@ public class Game {
     }
 
     @Nullable
-    public JsonObject getInfoJson(boolean includePassword) {
+    public JsonObject getInfoJson(@Nullable User user, boolean includePassword) {
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
         if (host == null) return null;
 
         JsonObject obj = new JsonObject();
         obj.addProperty(GameInfo.ID.toString(), id);
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
         obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
         obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
         obj.addProperty(GameInfo.HAS_PASSWORD.toString(), options.password != null && !options.password.equals(""));
+
+        if (user != null) {
+            obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+            obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+        }
 
         JsonArray playerNames = new JsonArray();
         for (Player player : players.toArray(new Player[players.size()]))
@@ -525,7 +596,7 @@ public class Game {
      * {@code PLAYING}, {@code JUDGING}, or {@code WINNER}, depending on the game's state and
      * what the player has done.
      */
-    private GamePlayerStatus getPlayerStatus(final Player player) {
+    private GamePlayerStatus getPlayerStatus(Player player) {
         final GamePlayerStatus playerStatus;
 
         switch (state) {

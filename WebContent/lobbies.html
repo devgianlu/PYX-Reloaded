@@ -5,13 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/material.css">
     <link rel="stylesheet" href="./css/pyx-reloaded.css">
-    <script src="./js/material.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>
-    <script src="./js/dialog-polyfill.js"></script>
 </head>
 
 <div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -48,8 +43,7 @@
         </div>
     </main>
 
-    <button id="createGame"
-            class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
+    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
             onclick="createGameDialog()">
         <i class="material-icons">add</i>
     </button>
@@ -83,16 +77,20 @@
 
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+
                 <div class="mdl-layout-spacer"></div>
 
                 <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="likeGame(this); return false;">
                     <i class="material-icons">thumb_up</i>
                 </button>
+                <div class="mdl-tooltip _likes">0</div>
+
                 <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
                         onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
                 </button>
+                <div class="mdl-tooltip _dislikes">0</div>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">
@@ -117,6 +115,11 @@
     </div>
 </div>
 
+<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+<script src="./js/dialog-polyfill.js"></script>
+<script src="./js/material.min.js"></script>
 <script src="./js/polling.js"></script>
 <script src="./js/lobbies.js"></script>
 
