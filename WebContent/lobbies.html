@@ -39,42 +39,43 @@
     </div>
     <main id="games-list" class="mdl-layout__content">
         <div class="page-content list" align="center" style="margin-top:10px;">
-            <div class="mdl-grid" style="justify-content: left">
+            <div id="lobbyBox" class="mdl-grid" style="justify-content: center">
                 <!-- Games list -->
-                <div style="display: none">
-                <div id="game-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--3dp">
-                    <div class="mdl-card__title">
-                        <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
-                    </div>
-
-                    <div class="mdl-card__supporting-text" align="left">
-                        <b>Players: </b><i class="_players"></i><br>
-                        <b>Spectators: </b><i class="_spectators"></i><br>
-                        <b>Goal: </b><i class="_goal"></i><br>
-                        <b>Decks: </b><i class="_decks"><!-- FIXME: May overflow --></i><br>
-                        <b>Status: </b><i class="_status"></i><br>
-                    </div>
-
-                    <div class="mdl-card__actions mdl-card--border" align="right">
-                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                           onclick="joinGame(this.parentElement.parentElement); return false;">
-                            JOIN
-                        </a>
-                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                           onclick="spectateGame(this.parentElement.parentElement); return false;">
-                            SPECTATE
-                        </a>
-                    </div>
-                </div>
-            </div></div>
+            </div>
         </div>
-    </div>
     </main>
+
     <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right"
             onclick="createGame()">
         <i class="material-icons">add</i>
     </button>
 
+    <div style="display: none">
+        <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+            </div>
+
+            <div class="mdl-card__supporting-text" align="left">
+                <b>Players: </b><i class="_players"></i><br>
+                <b>Spectators: </b><i class="_spectators"></i><br>
+                <b>Goal: </b><i class="_goal"></i><br>
+                <b>Decks: </b><i class="_decks"><!-- FIXME: May overflow --></i><br>
+                <b>Status: </b><i class="_status"></i><br>
+            </div>
+
+            <div class="mdl-card__actions mdl-card--border" align="right">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   onclick="joinGame(this.parentElement.parentElement); return false;">
+                    JOIN
+                </a>
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   onclick="spectateGame(this.parentElement.parentElement); return false;">
+                    SPECTATE
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 </html>

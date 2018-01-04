@@ -146,4 +146,10 @@ function createGame() {
         console.log(data);
         alert("Create game result: " + JSON.stringify(data));
     })
+
+    var copy = document.getElementById('game-info-template');
+    var newCard = document.createElement("div");
+    newCard.className = "mdl-cell mdl-cell--12-col wide-card mdl-card mdl-shadow--3dp";
+    newCard.innerHTML = copy.innerHTML;
+    document.getElementById("lobbyBox").appendChild(newCard);
 }
