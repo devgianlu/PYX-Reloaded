@@ -14,7 +14,6 @@
     <script src="./js/polling.js"></script>
     <script src="./js/new_game.js"></script>
     <script src="./js/lobbies.js"></script>
-    <script src="./js/material.min.js"></script>
 </head>
 
 <div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -85,7 +84,9 @@
         </div></div>
 
         <div class="mdl-dialog__actions">
-            <button type="button" onclick="$('#main').html(''); $('#creationWrapper').html('');" class="mdl-button">Start</button>
+            <button type="button" onclick="$('#main').html(''); $('#creationWrapper').html('');" 
+                    class="mdl-button mdl-js-button mdl-button--primary">Start</button>
+            <button type="button" class="mdl-button close">Cancel</button>
         </div>
     </dialog>
 
@@ -95,7 +96,7 @@
             <span class="mdl-switch__label _name">{{Name of Card Set}}</span>
             <!-- TODO: tooltip to show deck details (description, white/black cards number) -->
         </label>
-
+    <script src="./js/material.min.js"></script>
         <div id="game-info-template" class="mdl-cell mdl-cell--6-col wide-card mdl-card mdl-shadow--3dp">
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
@@ -134,6 +135,5 @@
         </div>
     </div>
 </div>
-
 </html>
 

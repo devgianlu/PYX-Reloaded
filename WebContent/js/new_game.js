@@ -52,7 +52,7 @@ function loadCardSets(container, css) {
             var cid = items[i].values().cid;
             var item = $(items[i].elm);
 
-            //item.find('input.deck1').attr("id", "deck_" + cid);
+            item.find('.mdl-js-switch').attr("id", "deck_" + cid);
             item.attr("for", "deck_" + cid);
         }
     });

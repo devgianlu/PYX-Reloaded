@@ -188,7 +188,7 @@ function showCreateGameDialog() {
         dialogPolyfill.registerDialog(dialog);
     }
 
-    dialog.querySelector('button:not([disabled])').addEventListener('click', function () {
+    dialog.querySelector('.close').addEventListener('click', function () {
         dialog.close();
     });
 
