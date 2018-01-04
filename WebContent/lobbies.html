@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/material.css">
     <link rel="stylesheet" href="./css/pyx-reloaded.css">
-    <script src="./js/material.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+    <script src="./js/dialog-polyfill.js"></script>
+    <script src="./js/material.min.js"></script>
     <script src="./js/polling.js"></script>
-    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css" />
     <script src="./js/lobbies.js"></script>
     <script src="./js/new_game.js"></script>
 </head>
@@ -34,20 +35,21 @@
             </button>
         </div>
     </header>
+
     <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">PYX Reloaded</span>
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="">Logout</a>
         </nav>
     </div>
-    <main id="games-list" class="mdl-layout__content">
-        <div class="page-content list" align="center" style="margin-top:10px;">
-            <div id="lobbyBox" class="mdl-grid" style="justify-content: center">
+
+    <main class="mdl-layout__content">
+        <div class="page-content" align="center" style="margin-top:10px;">
+            <div id="lobbyBox" class="mdl-grid list" style="justify-content: center">
                 <!-- Games list  -->
             </div>
         </div>
     </main>
-
     <button id="createGame" class="dialog-button mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right" onclick="  createGame()">
         <i class="material-icons">add</i>
     </button>
@@ -71,14 +73,20 @@
 
             <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text _host">{{Name of Player's Game}}</h2>
+
                 <div class="mdl-layout-spacer"></div>
 
                 <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent" onclick="likeGame(this); return false;">
                     <i class="material-icons">thumb_up</i>
                 </button>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent" onclick="dislikeGame(this); return false;">
+
+                <div class="mdl-tooltip _likes">0</div>
+
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
+                        onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
                 </button>
+                <div class="mdl-tooltip _dislikes">0</div>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">
@@ -100,5 +108,5 @@
         </div>
     </div>
 </div>
-    <script src="./js/dialog-polyfill.js"></script>
+
 </html>
