@@ -1,0 +1,19 @@
+.filter-input.mdl-textfield__input {
+    border-bottom: 1px solid white;
+}
+
+.filter-input-text.mdl-textfield__label {
+    color: white;
+}
+
+.wide-card.mdl-card {
+    width: 512px;
+}
+
+.fab-bottom-right {
+    margin: 32px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 99;
+}
