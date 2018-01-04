@@ -5,10 +5,11 @@
  #3 - Happy hacking!!
  **/
 
-function populateDropdown(dropdown, min, max) {
-    for (var i = min; i <= max; i++) {
+function populateDropdown(dropdown, dgo) {
+    for (var i = dgo.min; i <= dgo.max; i++) {
         var option = document.createElement("option");
         option.setAttribute("value", i);
+        if (i === dgo.default) option.setAttribute("selected", undefined);
         option.innerHTML = i;
         dropdown.appendChild(option);
     }

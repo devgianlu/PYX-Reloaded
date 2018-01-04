@@ -1,9 +1,10 @@
 var games = undefined;
 
 window.onload = function () {
-    populateDropdown(document.getElementById("goal"), 4, 69);
-    populateDropdown(document.getElementById("playersLimit"), 3, 20);
-    populateDropdown(document.getElementById("spectatorsLimit"), 3, 20);
+    var dgo = JSON.parse(localStorage['dgo']);
+    populateDropdown(document.getElementById("goal"), dgo.sl);
+    populateDropdown(document.getElementById("playersLimit"), dgo.pL);
+    populateDropdown(document.getElementById("spectatorsLimit"), dgo.vL);
 
     sendPollRequest(false);
     loadGamesList();

@@ -233,7 +233,7 @@ public class Constants {
     /**
      * Keys for client request responses.
      */
-    public enum AjaxResponse implements ReturnableData {
+    public enum AjaxResponse {
         BLACK_CARD("bc"),
         @DuplicationAllowed
         CARD_ID(AjaxRequest.CARD_ID),
@@ -247,6 +247,7 @@ public class Constants {
         GAME_INFO("gi"),
         @DuplicationAllowed
         GAME_OPTIONS(AjaxRequest.GAME_OPTIONS),
+        DEFAULT_GAME_OPTIONS("dgo"),
         GAMES("gl"),
         HAND("h"),
         /**
@@ -288,7 +289,7 @@ public class Constants {
         }
     }
 
-    public enum ErrorInformation implements ReturnableData {
+    public enum ErrorInformation {
         BLACK_CARDS_PRESENT("bcp"),
         BLACK_CARDS_REQUIRED("bcr"),
         WHITE_CARDS_PRESENT("wcp"),
@@ -497,7 +498,7 @@ public class Constants {
     /**
      * Data keys that can be in a long poll response.
      */
-    public enum LongPollResponse implements ReturnableData {
+    public enum LongPollResponse {
         @DuplicationAllowed
         BLACK_CARD(AjaxResponse.BLACK_CARD),
         CARDCAST_DECK_INFO("cdi"),
@@ -797,12 +798,6 @@ public class Constants {
         public String getString2() {
             return message2;
         }
-    }
-
-    /**
-     * Enums that implement this interface are valid keys for data returned to clients.
-     */
-    interface ReturnableData {
     }
 
     /**
