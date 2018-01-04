@@ -1,0 +1,120 @@
+//
+// Copyright 2016 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+@import "@material/ripple/mixins";
+@import "@material/theme/mixins";
+@import "./mixins";
+@import "./variables";
+
+// postcss-bem-linter: define checkbox
+
+.mdc-checkbox {
+  @include mdc-checkbox-base_;
+  @include mdc-checkbox-ink-color($mdc-checkbox-mark-color);
+  @include mdc-checkbox-focus-indicator-color($mdc-checkbox-baseline-theme-color);
+  @include mdc-ripple-surface;
+  @include mdc-states($mdc-checkbox-baseline-theme-color);
+  @include mdc-ripple-radius($mdc-checkbox-ripple-radius);
+  @include mdc-checkbox-container-colors();
+
+  @include mdc-theme-dark {
+    @include mdc-checkbox-container-colors($unmarked-stroke-color: $mdc-checkbox-border-color-dark);
+  }
+}
+
+// Needed to disable hover effects on CSS-only (non-JS) checkboxes
+.mdc-checkbox--disabled {
+  @include mdc-checkbox--disabled_;
+}
+
+// JS checkbox
+.mdc-checkbox--upgraded {
+  .mdc-checkbox__background,
+  .mdc-checkbox__checkmark,
+  .mdc-checkbox__checkmark__path,
+  .mdc-checkbox__mixedmark {
+    @include mdc-checkbox__child--upgraded_;
+  }
+}
+
+.mdc-checkbox--anim {
+  @include mdc-checkbox--anim_;
+}
+
+.mdc-checkbox__background {
+  @include mdc-checkbox__background_;
+
+  .mdc-checkbox__native-control:enabled:checked ~ &,
+  .mdc-checkbox__native-control:enabled:indeterminate ~ & {
+    @include mdc-checkbox__background--marked_;
+  }
+}
+
+// The frame's ::before element is used as a focus indicator for the checkbox
+.mdc-checkbox__background::before {
+  @include mdc-checkbox__focus-indicator_;
+
+  .mdc-checkbox__native-control:focus ~ & {
+    @include mdc-checkbox__focus-indicator--focused_;
+  }
+
+  .mdc-ripple-upgraded--unbounded & {
+    @include mdc-checkbox__focus-indicator--ripple-upgraded-unbounded_;
+  }
+}
+
+.mdc-checkbox__native-control {
+  @include mdc-checkbox__native-control_;
+
+  &:disabled {
+    @include mdc-checkbox--disabled_;
+  }
+}
+
+.mdc-checkbox__checkmark {
+  @include mdc-checkbox__checkmark_;
+
+  .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background & {
+    @include mdc-checkbox__checkmark--checked_;
+  }
+
+  .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background & {
+    @include mdc-checkbox__checkmark--indeterminate_;
+  }
+}
+
+.mdc-checkbox__checkmark__path {
+  @include mdc-checkbox__checkmark__path_;
+
+  .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background &,
+  .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background & {
+    @include mdc-checkbox__checkmark__path--marked_;
+  }
+}
+
+.mdc-checkbox__mixedmark {
+  @include mdc-checkbox__mixedmark_;
+
+  .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background & {
+    @include mdc-checkbox__mixedmark--checked_;
+  }
+
+  .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background & {
+    @include mdc-checkbox__mixedmark--indeterminate_;
+  }
+}
+
+// postcss-bem-linter: end
