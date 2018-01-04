@@ -85,6 +85,10 @@
                         onclick="dislikeGame(this); return false;">
                     <i class="material-icons">thumb_down</i>
                 </button>
+
+                <div class="mdl-tooltip _likes">0</div>
+
+                <div class="mdl-tooltip _dislikes">0</div>
             </div>
 
             <div class="mdl-card__supporting-text" align="left">
@@ -129,7 +133,8 @@
 
     var games = new List('games-global-container', {
         item: 'game-template',
-        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', {'data': ['gid', 'hp', 'like', 'dislike']}]
+        valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
+            {'data': ['gid', 'hp', 'like', 'dislike']}]
     });
 
     $('#filter-games').change(function () {
@@ -232,6 +237,8 @@
             items.push({
                 "gid": game.gid,
                 "hp": game.hp,
+                "_likes": game.LK,
+                "_dislikes": game.DLK,
                 "like": game.iLK,
                 "dislike": game.iDLK,
                 "_host": game.H,
@@ -246,6 +253,7 @@
         games.clear();
         games.add(items, function (items) {
             for (var i = 0; i < items.length; i++) {
+                var gid = items[i].values().gid;
                 var card = $(items[i].elm);
 
                 var likeButton = card.find('button:has(i:contains("up"))');
@@ -255,6 +263,12 @@
                 var dislikeButton = card.find('button:has(i:contains("down"))');
                 if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdl-button--raised');
                 else dislikeButton.removeClass('mdl-button--raised');
+
+                likeButton.attr("id", "like_" + gid);
+                dislikeButton.attr("id", "dislike_" + gid);
+
+                card.find('._likes').attr("data-mdl-for", "like_" + gid);
+                card.find('._dislikes').attr("data-mdl-for", "dislike_" + gid);
             }
         });
     }
