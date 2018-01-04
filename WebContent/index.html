@@ -3,9 +3,23 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./node_modules/material-components-web/dist/material-components-web.js"></script>
+    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css">
+    <link rel="stylesheet" href="node_modules/@material/toolbar/dist/mdc.toolbar.css">
+    <link rel="stylesheet" href="./css/pyx-reloaded.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+    <script src="node_modules/@material/toolbar/dist/mdc.toolbar.js"></script>
+    <script src="node_modules/@material/drawer/dist/mdc.drawer.js"></script>
+    <script src="./js/dialog-polyfill.js"></script>
+    <script src="./js/polling.js"></script>
+    <script src="./js/new_game.js"></script>
+    <script src="./js/lobbies.js"></script>
     <link rel="stylesheet" href="./css/material.min.css">
     <script src="./js/material.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <style>
@@ -14,21 +28,35 @@
     }
 </style>
 
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-            <span class="mdl-layout-title">Pretend You're Xyzzy Reloaded</span>
-            <div class="mdl-layout-spacer"></div>
+<!-- MDC Toolbar & Drawer Start Here -->
+  <body id="games-global-container" class="mdc-typography demo-body">
+    <aside class="mdc-persistent-drawer">
+      <nav class="mdc-persistent-drawer__drawer">
+        <div class="mdc-persistent-drawer__toolbar-spacer"></div>
+        <div class="mdc-list-group">
+          <nav class="mdc-list">
+              <a class="mdc-list-item" href="#">
+                Logout
+              </a>
+            </nav>
+          </div>
+      </nav>
+    </aside>
+    <div class="demo-content">
+      <header class="mdc-toolbar mdc-elevation--z4">
+        <div class="mdc-toolbar__row">
+          <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+            <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
+            <span class="mdc-toolbar__title catalog-title">PYX Reloaded</span>
+          </section>
         </div>
-    </header>
-    <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">PYX Reloaded</span>
-        <nav class="mdl-navigation">
-        </nav>
-    </div>
+    <script src="./js/mdc_mods.js"></script>
+      </header>
+<!-- MDC Toolbar & Drawer End Here -->
+
     <main class="mdl-layout__content">
-        <div class="page-content" align="center" style="margin-top:10px;">
-            <div class="wide-card mdl-card mdl-shadow--2dp">
+        <div class="page-content" align="center" style="margin-top:20px;">
+            <div class="wide-card mdl-card mdl-shadow--3dp">
 
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
@@ -52,7 +80,7 @@
             </div>
             <br>
 
-            <div class="wide-card mdl-card mdl-shadow--2dp">
+            <div class="wide-card mdl-card mdl-shadow--3dp">
 
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
@@ -121,4 +149,6 @@
     }
 </script>
 
+</div>
+</body>
 </html>

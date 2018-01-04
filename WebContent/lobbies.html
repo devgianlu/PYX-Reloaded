@@ -3,6 +3,9 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./node_modules/material-components-web/dist/material-components-web.js"></script>
+    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css">
+    <link rel="stylesheet" href="node_modules/@material/toolbar/dist/mdc.toolbar.css">
     <link rel="stylesheet" href="./css/material.css">
     <link rel="stylesheet" href="./css/pyx-reloaded.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -10,39 +13,41 @@
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+    <script src="node_modules/@material/toolbar/dist/mdc.toolbar.js"></script>
+    <script src="node_modules/@material/drawer/dist/mdc.drawer.js"></script>
     <script src="./js/dialog-polyfill.js"></script>
     <script src="./js/polling.js"></script>
     <script src="./js/new_game.js"></script>
     <script src="./js/lobbies.js"></script>
 </head>
 
-<div id="games-global-container" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-            <span class="mdl-layout-title">Games - PYX Reloaded</span>
-            <div class="mdl-layout-spacer"></div>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
-                <label class="mdl-button mdl-js-button mdl-button--icon" for="filter-games">
-                    <i class="material-icons">search</i>
-                </label>
-                <div class="mdl-textfield__expandable-holder">
-                    <input class="filter-input mdl-textfield__input" type="text" name="sample" id="filter-games">
-                </div>
-            </div>
-            <button class="mdl-button mdl-js-button mdl-button--icon" onclick="loadGamesList()">
-                <i class="material-icons">refresh</i>
-            </button>
+<!-- MDC Toolbar & Drawer Start Here -->
+  <body id="games-global-container" class="mdc-typography demo-body">
+    <aside class="mdc-persistent-drawer">
+      <nav class="mdc-persistent-drawer__drawer">
+        <div class="mdc-persistent-drawer__toolbar-spacer"></div>
+        <div class="mdc-list-group">
+          <nav class="mdc-list">
+              <a class="mdc-list-item" href="#">
+                Logout
+              </a>
+            </nav>
+          </div>
+      </nav>
+    </aside>
+    <div class="demo-content">
+      <header class="mdc-toolbar mdc-elevation--z4">
+        <div class="mdc-toolbar__row">
+          <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+            <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
+            <span class="mdc-toolbar__title catalog-title">Games - PYX Reloaded</span>
+          </section>
         </div>
-    </header>
+    <script src="./js/mdc_mods.js"></script>
+      </header>
+<!-- MDC Toolbar & Drawer End Here -->
 
-    <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">PYX Reloaded</span>
-        <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" href="">Logout</a>
-        </nav>
-    </div>
-
-    <main id="main" class="mdl-layout__content">
+    <main id="main">
         <div class="page-content" align="center" style="margin-top:10px;">
             <div id="lobbyBox" class="mdl-grid list" style="justify-content: center">
                 <!-- Games list  -->
@@ -135,5 +140,7 @@
         </div>
     </div>
 </div>
+    </div>
+</body>
 </html>
 
