@@ -47,7 +47,7 @@ public class Constants {
 
     /**
      * The next thing the client should do during reconnect phase.
-     *
+     * <p>
      * Leaving these as longer strings as they are only used once per client.
      */
     public enum ReconnectNextAction {
@@ -167,7 +167,7 @@ public class Constants {
         REGISTER("r"),
         /**
          * Change a player score
-         *
+         * <p>
          * Admin only
          */
         SCORE("SC"),
