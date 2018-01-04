@@ -13,7 +13,7 @@ function getURLParameter(name) {
 }
 
 var games = new List('games-global-container', {
-    item: 'game-template',
+    item: 'game-info-template',
     valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', {'data': ['gid', 'hp']}]
 });
 
@@ -142,32 +142,28 @@ function deckIdsToNames(ids) {
 }
 
 function createGameDialog() {
-    var dialogButton = document.querySelector('.dialog-button');
-    var dialog = document.querySelector('#dialog');
-    dialogButton.addEventListener('click', function() {
-       dialog.showModal();
-    });
+    var dialog = document.getElementById('dialog');
+
     dialog.querySelector('button:not([disabled])')
-    .addEventListener('click', function() {
-      dialog.close();
-    });
-    if (! dialog.showModal) {
-      dialogPolyfill.registerDialog(dialog);
-    }
-}
+        .addEventListener('click', function () {
+            dialog.close();
+        });
 
-function createGame() {
-        createGameDialog();
-    $.post("AjaxServlet?o=cg").always(function (data) {
-        console.log(data);
-        //alert("Create game result: " + JSON.stringify(data));
-    })
+    if (!dialog.showModal()) dialogPolyfill.registerDialog(dialog);
 
+    //// Temporary stuff
     var copy = document.getElementById('game-info-template');
     var newCard = document.createElement("div");
     newCard.className = "mdl-cell mdl-cell--12-col wide-card mdl-card mdl-shadow--3dp";
     newCard.innerHTML = copy.innerHTML;
     document.getElementById("lobbyBox").appendChild(newCard);
+}
+
+function createGame() {
+    $.post("AjaxServlet?o=cg").always(function (data) {
+        console.log(data);
+        alert("Create game result: " + JSON.stringify(data));
+    });
 }
 
 function updateLikeDislike(likeButton, disLikeButton, data) {
