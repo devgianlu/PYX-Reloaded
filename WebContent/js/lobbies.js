@@ -153,8 +153,8 @@ function populateGamesList(gamesList) {
         items.push({
             "gid": game.gid,
             "hp": game.hp,
-            "_likes": game.LK,
-            "_dislikes": game.DLK,
+            "_likes": game.LK + (game.LK === 1 ? " LIKE" : " LIKES"),
+            "_dislikes": game.DLK + (game.DLK === 1 ? " DISLIKE" : " DISLIKES"),
             "like": game.iLK,
             "dislike": game.iDLK,
             "_host": game.H,
@@ -172,13 +172,13 @@ function populateGamesList(gamesList) {
             var gid = items[i].values().gid;
             var card = $(items[i].elm);
 
-            var likeButton = card.find('button:has(i:contains("up"))');
-            if (card.attr("data-like") === "true") likeButton.addClass('mdl-button--raised');
-            else likeButton.removeClass('mdl-button--raised');
+            var likeButton = card.find('._likes');
+            if (card.attr("data-like") === "true") likeButton.addClass('mdc-button--raised');
+            else likeButton.removeClass('mdc-button--raised');
 
-            var dislikeButton = card.find('button:has(i:contains("down"))');
-            if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdl-button--raised');
-            else dislikeButton.removeClass('mdl-button--raised');
+            var dislikeButton = card.find('._dislikes');
+            if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
+            else dislikeButton.removeClass('mdc-button--raised');
 
             likeButton.attr("id", "like_" + gid);
             dislikeButton.attr("id", "dislike_" + gid);
@@ -222,20 +222,22 @@ function createGame() {
 
 function updateLikeDislike(likeButton, disLikeButton, data) {
     if (likeButton === undefined) {
-        likeButton = $(disLikeButton.parentElement).find('button[id^=like_]');
+        likeButton = $(disLikeButton.parentElement).find('._likes');
         disLikeButton = $(disLikeButton);
     } else if (disLikeButton === undefined) {
-        disLikeButton = $(likeButton.parentElement).find('button[id^=dislike_]');
+        disLikeButton = $(likeButton.parentElement).find('._dislikes');
         likeButton = $(likeButton);
     } else {
         return;
     }
 
-    if (data.iLK) likeButton.addClass('mdl-button--raised');
-    else likeButton.removeClass('mdl-button--raised');
+    if (data.iLK) likeButton.addClass('mdc-button--raised');
+    else likeButton.removeClass('mdc-button--raised');
+    likeButton.text(data.LK + (data.LK === 1 ? " LIKE" : " LIKES"));
 
-    if (data.iDLK) disLikeButton.addClass('mdl-button--raised');
-    else disLikeButton.removeClass('mdl-button--raised');
+    if (data.iDLK) disLikeButton.addClass('mdc-button--raised');
+    else disLikeButton.removeClass('mdc-button--raised');
+    disLikeButton.text(data.DLK + (data.DLK === 1 ? " DISLIKE" : " DISLIKES"));
 }
 
 function likeGame(button) {

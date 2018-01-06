@@ -118,18 +118,16 @@
     </div>
 
     <div id="game-info-template" class="mdc-layout-grid__cell mdc-card">
-        <section class="mdc-card__primary">
-            <h1 class="mdc-card__title mdc-card__title--large _host">{{Name of Player's Game}}</h1>
-            <button id="like_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                    onclick="likeGame(this);">
-                <i class="material-icons">thumb_up</i>
+        <section class="mdc-card__primary" style="display: inline-flex;">
+            <h1 class="mdc-card__title mdc-card__title--large _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
+            <button class="mdc-button mdc-button--dense mdc-button--compact _likes" onclick="likeGame(this);"
+                    style="margin-top: 8px; margin-right: 8px">
+                LIKE
             </button>
-            <div class="mdl-tooltip _likes" data-mdl-for="like_">0</div>
-            <button id="dislike_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                    onclick="dislikeGame(this);">
-                <i class="material-icons">thumb_down</i>
+            <button class="mdc-button mdc-button--dense mdc-button--compact _dislikes" onclick="dislikeGame(this);"
+                    style="margin-top: 8px">
+                DISLIKE
             </button>
-            <div class="mdl-tooltip _dislikes" data-mdl-for="dislike_">0</div>
         </section>
 
         <section class="mdc-card__supporting-text">
