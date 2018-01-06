@@ -54,7 +54,7 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
+        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
         new App(port, new File(preferences.getString("webContent", "./WebContent")), preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);

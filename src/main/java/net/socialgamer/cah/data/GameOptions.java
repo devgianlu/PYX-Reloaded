@@ -1,11 +1,13 @@
 package net.socialgamer.cah.data;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.socialgamer.cah.Constants.GameOptionData;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -33,7 +35,7 @@ public class GameOptions {
     public String password = "";
     public String timerMultiplier = "1x";
 
-    GameOptions(Preferences preferences) {
+    private GameOptions(Preferences preferences) {
         blanksInDeck = getBlanksLimit(preferences).def;
         scoreGoal = getScoreLimit(preferences).def;
         playerLimit = getPlayerLimit(preferences).def;
@@ -75,14 +77,15 @@ public class GameOptions {
         return preferences.getMinDefaultMax("scoreLimit", DEFAULT_SCORE_MIN, DEFAULT_SCORE_DEF, DEFAULT_SCORE_MAX);
     }
 
+    @NotNull
     public static GameOptions deserialize(Preferences preferences, String text) {
         GameOptions options = new GameOptions(preferences);
         if (text == null || text.isEmpty()) return options;
 
         JsonObject json = new JsonParser().parse(text).getAsJsonObject();
-        String[] cardSetsParsed = json.get(GameOptionData.CARD_SETS.toString()).getAsString().split(",");
-        for (String cardSetId : cardSetsParsed) {
-            if (!cardSetId.isEmpty()) options.cardSetIds.add(Integer.parseInt(cardSetId));
+        JsonArray cardSetIds = json.getAsJsonArray(GameOptionData.CARD_SETS.toString());
+        if (cardSetIds != null) {
+            for (JsonElement cardSetId : cardSetIds) options.cardSetIds.add(cardSetId.getAsInt());
         }
 
         Preferences.MinDefaultMax blankCards = getBlanksLimit(preferences);

@@ -5,7 +5,14 @@
  #3 - Happy hacking!!
  **/
 
+function clearElement(elm) {
+    while (elm.firstChild) {
+        elm.removeChild(elm.firstChild);
+    }
+}
+
 function populateDropdown(dropdown, dgo) {
+    clearElement(dropdown);
     for (var i = dgo.min; i <= dgo.max; i++) {
         var option = document.createElement("option");
         option.setAttribute("value", i);
@@ -16,6 +23,7 @@ function populateDropdown(dropdown, dgo) {
 }
 
 function populateTimeMultiplier(dropdown, tm) {
+    clearElement(dropdown);
     for (var i = 0; i < tm.values.length; i++) {
         var option = document.createElement("option");
         var val = tm.values[i];
@@ -58,3 +66,30 @@ function loadCardSets(container, css) {
     });
 }
 
+function getSelectedCardSets(container) {
+    var list = container.querySelector('.list');
+    var selected = [];
+    for (var i = 0; i < list.children.length; i++) {
+        var cardSet = list.children[i];
+        var checkbox = cardSet.querySelector('input');
+        if (checkbox.checked) {
+            selected.push(cardSet.getAttribute("data-cid"));
+        }
+    }
+
+    return selected;
+}
+
+function getDropdownSelectedValue(dropdown) {
+    return dropdown.options[dropdown.selectedIndex].value;
+}
+
+function resetCreateGameDialog() {
+    var dgo = JSON.parse(localStorage['dgo']);
+    populateDropdown(document.getElementById("scoreLimit"), dgo.sl);
+    populateDropdown(document.getElementById("playersLimit"), dgo.pL);
+    populateDropdown(document.getElementById("spectatorsLimit"), dgo.vL);
+    populateDropdown(document.getElementById("blanksLimit"), dgo.bl);
+    populateTimeMultiplier(document.getElementById("timeMultiplier"), dgo.tm);
+    loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
+}

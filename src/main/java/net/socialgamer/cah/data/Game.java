@@ -123,7 +123,6 @@ public class Game {
     private GameState state;
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
-    private String currentUniqueId;
 
     /**
      * Create a new game.
@@ -134,12 +133,12 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
+    public Game(int id, GameOptions options, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
-        this.options = new GameOptions(preferences);
+        this.options = options;
         this.cardcastService = cardcastService;
         this.state = GameState.LOBBY;
 
@@ -646,11 +645,10 @@ public class Game {
             // Pick a random start judge, though the "next" judge will actually go first.
             judgeIndex = (int) (Math.random() * numPlayers);
 
-            currentUniqueId = UniqueIds.getNewRandomID();
             logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
-                            + "max players, %d max spectators, %d score limit, players %s, unique %s.",
+                            + "max players, %d max spectators, %d score limit, players %s.",
                     id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
-                    options.spectatorLimit, options.scoreGoal, players, currentUniqueId));
+                    options.spectatorLimit, options.scoreGoal, players));
 
             // do this stuff outside the players lock; they will lock players again later for much less
             // time, and not at the same time as trying to lock users, which has caused deadlocks

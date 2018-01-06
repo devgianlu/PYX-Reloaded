@@ -6,7 +6,22 @@ var games = new List('games-global-container', {
 
 var createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
 createGameDialog.listen('MDCDialog:accept', function () {
-    createGame();
+    var scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
+    var playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
+    var spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
+    var blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
+    var timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
+
+    var go = {
+        "vL": spectatorLimit,
+        "pL": playerLimit,
+        "sl": scoreLimit,
+        "bl": blanksLimit,
+        "tm": timeMultiplier,
+        "css": getSelectedCardSets(document.getElementById('deck_select'))
+    };
+
+    createGame(go);
 });
 createGameDialog.listen('MDCDialog:cancel', function () {
     // Do nothing
@@ -18,14 +33,6 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
 });
 
 window.onload = function () {
-    var dgo = JSON.parse(localStorage['dgo']);
-    populateDropdown(document.getElementById("scoreLimit"), dgo.sl);
-    populateDropdown(document.getElementById("playersLimit"), dgo.pL);
-    populateDropdown(document.getElementById("spectatorsLimit"), dgo.vL);
-    populateDropdown(document.getElementById("blanksLimit"), dgo.bl);
-    populateTimeMultiplier(document.getElementById("timeMultiplier"), dgo.tm);
-    loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
-
     sendPollRequest(false);
     loadGamesList();
 
@@ -88,8 +95,6 @@ function postJoinSpectate(gid) {
 
 function loadGamesList() {
     games.clear();
-
-    // TODO: Show loading now
 
     $.post("AjaxServlet?o=ggl").done(function (data) {
         console.log(data);
@@ -200,11 +205,12 @@ function deckIdsToNames(ids) {
 }
 
 function showCreateGameDialog() {
+    resetCreateGameDialog();
     createGameDialog.show();
 }
 
-function createGame() {
-    $.post("AjaxServlet?o=cg").done(function (data) {
+function createGame(go) {
+    $.post("AjaxServlet?o=cg&go=" + JSON.stringify(go)).done(function (data) {
         postJoinSpectate(data.gid);
         loadGamesList();
     }).fail(function (data) {
