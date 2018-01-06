@@ -169,7 +169,6 @@ function populateGamesList(gamesList) {
     games.clear();
     games.add(items, function (items) {
         for (var i = 0; i < items.length; i++) {
-            var gid = items[i].values().gid;
             var card = $(items[i].elm);
 
             var likeButton = card.find('._likes');
@@ -179,12 +178,6 @@ function populateGamesList(gamesList) {
             var dislikeButton = card.find('._dislikes');
             if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
             else dislikeButton.removeClass('mdc-button--raised');
-
-            likeButton.attr("id", "like_" + gid);
-            dislikeButton.attr("id", "dislike_" + gid);
-
-            card.find('._likes').attr("data-mdl-for", "like_" + gid);
-            card.find('._dislikes').attr("data-mdl-for", "dislike_" + gid);
         }
     });
 
