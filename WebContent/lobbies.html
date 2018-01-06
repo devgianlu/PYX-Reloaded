@@ -10,25 +10,17 @@
 </head>
 
 <body id="games-global-container" class="mdc-typography">
-<aside class="mdc-persistent-drawer">
-    <nav class="mdc-persistent-drawer__drawer">
-        <h5 class="mdc-title" style="text-align:center">PYX Reloaded</h5>
-        <div class="mdc-list-group">
-            <nav class="mdc-list">
-                <a id="setup" class="mdc-list-item" href="#">
-                    Logout
-                </a>
-            </nav>
-        </div>
-    </nav>
-</aside>
-
 <div class="page-content">
     <header class="mdc-toolbar mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
-                <span class="mdc-toolbar__title catalog-title">Games - PYX Reloaded</span>
+                <button class="material-icons mdc-toolbar__menu-icon">menu</button>
+                <span class="mdc-toolbar__title">Games - PYX Reloaded</span>
+            </section>
+
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="logout();">exit_to_app</button>
             </section>
         </div>
     </header>
@@ -50,6 +42,24 @@
         <span class="mdc-fab__icon">add</span>
     </button>
 </div>
+
+<aside class="mdc-temporary-drawer" id="drawer">
+    <nav class="mdc-temporary-drawer__drawer">
+        <header class="mdc-temporary-drawer__header">
+            <div class="mdc-temporary-drawer__header-content">
+                Header here
+            </div>
+        </header>
+        <nav id="icon-with-text-demo" class="mdc-temporary-drawer__content mdc-list">
+            <a class="mdc-list-item mdc-temporary-drawer--selected" href="#">
+                <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">inbox</i>Inbox
+            </a>
+            <a class="mdc-list-item" href="#">
+                <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">star</i>Star
+            </a>
+        </nav>
+    </nav>
+</aside>
 
 <aside class="mdc-dialog" id="createGameDialog">
     <div class="mdc-dialog__surface">
@@ -145,6 +155,7 @@
 <script src="js/polling.js"></script>
 <script src="js/new_game.js"></script>
 <script src="js/lobbies.js"></script>
+<script>window.mdc.autoInit();</script>
 
 </body>
 </html>

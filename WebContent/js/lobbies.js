@@ -12,6 +12,15 @@ createGameDialog.listen('MDCDialog:cancel', function () {
     // Do nothing
 });
 
+var drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
+document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
+    drawer.open = true
+});
+
+$('#filter-games').change(function () {
+    filterGames($(this).val())
+});
+
 window.onload = function () {
     var dgo = JSON.parse(localStorage['dgo']);
     populateDropdown(document.getElementById("scoreLimit"), dgo.sl);
@@ -34,9 +43,11 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
-$('#filter-games').change(function () {
-    filterGames($(this).val())
-});
+function logout() {
+    $.post("AjaxServlet?o=lo").always(function (data) {
+        window.location = "/";
+    });
+}
 
 function askPassword() {
     return prompt("Enter the game password:", "");
