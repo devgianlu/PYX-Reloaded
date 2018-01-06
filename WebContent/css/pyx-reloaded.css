@@ -49,7 +49,7 @@ html {
 }
 
 /* Place drawer and content side by side. */
-.demo-body {
+body {
     display: flex;
     flex-direction: row;
     padding: 0;
@@ -60,15 +60,11 @@ html {
 }
 
 /* Stack toolbar and main on top of each other. */
-.demo-content {
+.page-content {
     display: inline-flex;
     flex-direction: column;
     flex-grow: 1;
     height: 100%;
     box-sizing: border-box;
-}
-
-.demo-main {
-    padding-left: 16px;
 }
 

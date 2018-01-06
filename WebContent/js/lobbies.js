@@ -5,6 +5,12 @@ var games = new List('games-global-container', {
 });
 
 var createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
+createGameDialog.listen('MDCDialog:accept', function () {
+    createGame();
+});
+createGameDialog.listen('MDCDialog:cancel', function () {
+    // Do nothing
+});
 
 window.onload = function () {
     var dgo = JSON.parse(localStorage['dgo']);
@@ -180,7 +186,6 @@ function deckIdsToNames(ids) {
 }
 
 function showCreateGameDialog() {
-    createGame(); // Shouldn't be there
     createGameDialog.show();
 }
 
