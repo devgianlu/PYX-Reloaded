@@ -1,4 +1,10 @@
-var games = undefined;
+var games = new List('games-global-container', {
+    item: 'game-info-template',
+    valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
+        {'data': ['gid', 'hp', 'like', 'dislike']}]
+});
+
+var createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
 
 window.onload = function () {
     var dgo = JSON.parse(localStorage['dgo']);
@@ -68,14 +74,6 @@ function postJoinSpectate(gid) {
 }
 
 function loadGamesList() {
-    if (games === undefined) {
-        games = new List('games-global-container', {
-            item: 'game-info-template',
-            valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
-                {'data': ['gid', 'hp', 'like', 'dislike']}]
-        });
-    }
-
     games.clear();
 
     // TODO: Show loading now
@@ -182,24 +180,8 @@ function deckIdsToNames(ids) {
 }
 
 function showCreateGameDialog() {
-    createGame();
-    var dialog = document.querySelector('#dialog');
-    if (!dialog.showModal) {
-        dialogPolyfill.registerDialog(dialog);
-    }
-
-    dialog.querySelector('.close').addEventListener('click', function () {
-        dialog.close();
-    });
-
-    dialog.showModal();
-
-    //// Temporary stuff
-    var copy = document.getElementById('game-info-template');
-    var newCard = document.createElement("div");
-    newCard.className = "mdl-cell mdl-cell--12-col wide-card mdl-card mdl-shadow--3dp";
-    newCard.innerHTML = copy.innerHTML;
-    document.getElementById("lobbyBox").appendChild(newCard);
+    createGame(); // Shouldn't be there
+    createGameDialog.show();
 }
 
 function createGame() {

@@ -1,62 +1,31 @@
-.mdc-card {
+.wide-card {
     width: 75vh;
     margin: 1em auto;
+}
+
+.mdc-dialog__body .mdc-card {
+    margin-top: 24px;
+}
+
+#createGameDialog .mdc-dialog__body--scrollable {
+    max-height: 60vh;
 }
 
 main {
     overflow-y: auto;
 }
 
-#setup {
-    width: 50vw;
-}
-
-#enter {
-    border-bottom: 0.5px solid lightgray;
-    margin-bottom: 1px;
-    padding-bottom: 0;
-}
-
-.enter {
-    margin-left: 15vw;
-    padding-top: 0;
-}
-
-.filter-input.mdl-textfield__input {
-    border-bottom: 1px solid white;
-}
-
-.filter-input-text.mdl-textfield__label {
-    color: white;
-}
-
-.wider-card.mdc-card {
-    width: 512px;
-}
-
-.wide-card.mdl-card {
-    width: 512px;
-}
-
-.pref-card.mdl-card {
-    padding: 1vw;
-    width: 35vw;
-}
-
 .fab-bottom-right {
-    margin: 32px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 99;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
 }
 
-dialog.mdl-dialog {
-    width: 600px;
-}
-
-#deck_select {
-    padding-top: 2px;
+@media (min-width: 1024px) {
+    .fab-bottom-right {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
 }
 
 .mdc-toolbar-demo {
