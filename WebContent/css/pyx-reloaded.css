@@ -1,19 +1,20 @@
 .mdc-card {
-    width: 512px;
+    width: 75vh;
+    margin: 1em auto;
+}
+
+main {
+    overflow-y: auto;
 }
 
 #setup {
     width: 50vw;
 }
 
-#gh {
-    padding-bottom: 3vh;
-}
-
 #enter {
     border-bottom: 0.5px solid lightgray;
     margin-bottom: 1px;
-    padding-bottom: none;
+    padding-bottom: 0;
 }
 
 .enter {
@@ -61,15 +62,18 @@ dialog.mdl-dialog {
 .mdc-toolbar-demo {
     margin: 0;
 }
+
 .demo-paragraph {
     margin: 0;
     padding: 20px 28px;
 }
+
 @media (max-width: 599px) {
     .demo-paragraph {
         padding: 16px;
     }
 }
+
 /* Ensure layout covers the entire screen. */
 html {
     height: 100%;

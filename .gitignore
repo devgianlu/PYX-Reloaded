@@ -2,3 +2,4 @@ target
 .idea/
 WebContent/node_modules/
 WebContent/.backup/
+*.iml

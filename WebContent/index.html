@@ -3,109 +3,97 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="./node_modules/material-components-web/dist/material-components-web.js"></script>
     <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css">
     <link rel="stylesheet" href="node_modules/@material/toolbar/dist/mdc.toolbar.css">
     <link rel="stylesheet" href="node_modules/@material/card/dist/mdc.card.css">
-    <link rel="stylesheet" href="node_modules/@material/card/dist/mdc.button.css">
-    <link rel="stylesheet" href="./css/pyx-reloaded.css">
+    <link rel="stylesheet" href="node_modules/@material/button/dist/mdc.button.css">
+    <link rel="stylesheet" href="css/pyx-reloaded.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>
-    <script src="./js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+    <script src="node_modules/material-components-web/dist/material-components-web.js"></script>
     <script src="node_modules/@material/toolbar/dist/mdc.toolbar.js"></script>
     <script src="node_modules/@material/drawer/dist/mdc.drawer.js"></script>
-    <script src="./js/dialog-polyfill.js"></script>
-    <script src="./js/polling.js"></script>
-    <script src="./js/new_game.js"></script>
-    <script src="./js/lobbies.js"></script>
-    <link rel="stylesheet" href="./css/material.min.css">
-    <script src="./js/material.min.js"></script>
+    <script src="js/new_game.js"></script>
+    <script src="js/lobbies.js"></script>
 </head>
 
-<!-- MDC Toolbar & Drawer Start Here -->
 <body id="games-global-container" class="mdc-typography demo-body">
-<aside class="mdc-persistent-drawer">
-    <nav class="mdc-persistent-drawer__drawer">
-        <h5 class="mdc-title" style="text-align:center">PYX Reloaded</h5>
-        <div class="mdc-list-group">
-            <nav class="mdc-list">
-                <a class="mdc-list-item" href="#">
-                    Logout
-                </a>
-            </nav>
-        </div>
-    </nav>
-</aside>
 <div class="demo-content">
     <header class="mdc-toolbar mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
                 <span class="mdc-toolbar__title catalog-title">PYX Reloaded</span>
             </section>
         </div>
-        <script src="./js/mdc_mods.js"></script>
     </header>
-    <!-- MDC Toolbar & Drawer End Here -->
 
-    <main class="mdl-layout__content">
-        <div class="page-content" align="center" style="margin-top:20px;">
+    <main>
+        <div class="mdc-card">
+            <section class="mdc-card__primary">
+                <h1 class="mdc-card__title mdc-card__title--large">Choose a Nickname to Start!</h1>
+            </section>
+            <section class="mdc-card__supporting-text">
+                <label class="mdc-text-field" data-mdc-auto-init="MDCTextField" style="width: 75%">
+                    <input type="text" class="mdc-text-field__input" id="nickname">
+                    <span class="mdc-text-field__label">Enter nickname here</span>
+                    <div class="mdc-text-field__bottom-line"></div>
+                </label>
+            </section>
+            <section class="mdc-card__actions">
+                <button class="mdc-button mdc-button--compact mdc-card__action"
+                        data-mdc-auto-init="MDCRipple"
+                        onclick="register(); return false;">Take me to the lobby!!!
+                </button>
+            </section>
+        </div>
 
-            <!-- Start of MDC card -->
-            <div class="mdc-card">
-                <section class="mdc-card__primary">
-                    <h2 class="mdl-card__title-text">Choose a Nickname to Start!</h2>
-                </section>
-                <section class="mdc-card__supporting-text">
-                    <div class="mdl-textfield mdl-js-textfield" align="center">
-                        <input class="mdl-textfield__input" type="text" id="nickname">
-                        <label class="mdl-textfield__label" for="nickname">Enter nickname here</label>
-                    </div>
-                </section>
-                <div align="right">
-                    <button class="enter mdc-button mdc-button--compact"
-                            onclick="register(); return false;"
-                            style="align:right; margin: 1vw;">Take me to the lobby!!!
-                    </button>
-                </div>
-            </div>
-            <!-- End of MDC card -->
-            <br>
-            <!-- Start of MDC card -->
-            <div class="mdc-card mdc-elevation--4">
-                <section class="mdc-card__primary">
-                    <h2 class="mdl-card__title-text">About PYX Reloaded</h2>
-                </section>
-                <section class="mdc-card__supporting-text">
-                    <p style="text-align:left;">
-                        PYX Reloaded is a fork of the original game overhauled and revamped by <a
-                            href="https://github.com/mgagemorgan" target="_blank">@mgagemorgan</a> and
-                        <a href="https://github.com/devgianlu" target="_blank">@devgianlu</a> on GitHub. The goal of
-                        this project is to overhaul the entire interface, and revamp the backend so that it works
-                        out-of-the-box. Eventually, there are goals for social media integration, accounts, chat
-                        features and administration thereof, and mobile support. @devgianlu has an <a
-                            href="https://play.google.com/store/apps/details?id=com.gianlu.pretendyourexyzzy"
-                            target="_blank">Android client</a> that works great and is recommended for anyone on
-                        Android.
-                    </p>
-                </section>
-                <div align="right">
-                    <button id="gh" class="enter mdc-button mdc-button--compact" style="align:right; margin: 1vw;"
-                            onclick="window.location='https://github.com/devgianlu/PYX-Reloaded/';">
-                        We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img
-                            src="./images/octicons/logo-github.svg">!!
-                    </button>
-                </div>
-            </div>
-            <!-- End of MDC card -->
+        <div class="mdc-card">
+            <section class="mdc-card__primary">
+                <h2 class="mdc-card__title mdc-card__title--large">About PYX Reloaded</h2>
+            </section>
+            <section class="mdc-card__supporting-text" style="text-align: justify">
+                PYX Reloaded is a fork of the original game overhauled and revamped by <a
+                    href="https://github.com/mgagemorgan" target="_blank">@mgagemorgan</a> and
+                <a href="https://github.com/devgianlu" target="_blank">@devgianlu</a> on GitHub. The goal of
+                this project is to overhaul the entire interface, and revamp the backend so that it works
+                out-of-the-box. Eventually, there are goals for social media integration, accounts, chat
+                features and administration thereof, and mobile support. @devgianlu has an <a
+                    href="https://play.google.com/store/apps/details?id=com.gianlu.pretendyourexyzzy"
+                    target="_blank">Android client</a> that works great and is recommended for anyone on
+                Android.
+            </section>
+            <section class="mdc-card__actions">
+                <a class="mdc-button mdc-button--compact mdc-card__action"
+                   data-mdc-auto-init="MDCRipple"
+                   target="_blank"
+                   href="https://github.com/devgianlu/PYX-Reloaded/">
+                    We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img
+                        src="./images/octicons/logo-github.svg"> !!
+                </a>
+            </section>
         </div>
     </main>
 </div>
 
-<script src="./js/jquery-3.2.1.min.js"></script>
 <script>
+    window.mdc.autoInit();
+
+    var drawerEl = document.querySelector('.mdc-persistent-drawer');
+    var MDCPersistentDrawer = mdc.drawer.MDCPersistentDrawer;
+    var drawer = new MDCPersistentDrawer(drawerEl);
+    document.querySelector('.demo-menu').addEventListener('click', function () {
+        drawer.open = !drawer.open;
+    });
+    drawerEl.addEventListener('MDCPersistentDrawer:open', function () {
+        console.log('Received MDCPersistentDrawer:open');
+    });
+    drawerEl.addEventListener('MDCPersistentDrawer:close', function () {
+        console.log('Received MDCPersistentDrawer:close');
+    });
+
+
     window.onload = function () {
         $.post("AjaxServlet?o=fl").fail(function (data) {
             alert("Error data: " + JSON.stringify(data));
