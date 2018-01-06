@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/pyx-reloaded.css">
 </head>
 
-<body id="games-global-container" class="mdc-typography">
+<body class="mdc-typography">
 <div class="page-content">
     <header class="mdc-toolbar mdc-elevation--z4">
         <div class="mdc-toolbar__row">
@@ -26,9 +26,14 @@
     </header>
 
     <main>
-        <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid" id="games-global-container">
             <div class="mdc-layout-grid__inner list">
                 <!-- Games list  -->
+            </div>
+
+            <div class="message" style="margin-top: 48px">
+                <div class="material-icons md-48 md-dark">info_outline</div>
+                <h3 class="md-dark">No games available.</h3>
             </div>
         </div>
 
@@ -116,12 +121,12 @@
         <section class="mdc-card__primary">
             <h1 class="mdc-card__title mdc-card__title--large _host">{{Name of Player's Game}}</h1>
             <button id="like_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                    onclick="likeGame(this); return false;">
+                    onclick="likeGame(this);">
                 <i class="material-icons">thumb_up</i>
             </button>
             <div class="mdl-tooltip _likes" data-mdl-for="like_">0</div>
             <button id="dislike_" class="mdl-button mdl-js-button mdl-button--icon mdl-button--accent"
-                    onclick="dislikeGame(this); return false;">
+                    onclick="dislikeGame(this);">
                 <i class="material-icons">thumb_down</i>
             </button>
             <div class="mdl-tooltip _dislikes" data-mdl-for="dislike_">0</div>
@@ -137,12 +142,12 @@
 
         <section class="mdc-card__actions">
             <button class="mdc-button mdc-button--compact mdc-card__action"
-                    onclick="joinGame(this.parentElement.parentElement); return false;">
+                    onclick="joinGame(this.parentElement.parentElement);">
                 JOIN
             </button>
 
             <button class="mdc-button mdc-button--compact mdc-card__action"
-                    onclick="spectateGame(this.parentElement.parentElement); return false;">
+                    onclick="spectateGame(this.parentElement.parentElement);">
                 SPECTATE
             </button>
         </section>

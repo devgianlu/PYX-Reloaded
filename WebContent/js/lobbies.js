@@ -17,10 +17,6 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
     drawer.open = true
 });
 
-$('#filter-games').change(function () {
-    filterGames($(this).val())
-});
-
 window.onload = function () {
     var dgo = JSON.parse(localStorage['dgo']);
     populateDropdown(document.getElementById("scoreLimit"), dgo.sl);
@@ -104,8 +100,20 @@ function loadGamesList() {
     })
 }
 
+function toggleNoGamesMessage(visible) {
+    var container = $('#games-global-container');
+    var list = container.find('.list');
+    var message = container.find('.message');
+    if (visible) {
+        list.hide();
+        message.show();
+    } else {
+        list.show();
+        message.hide();
+    }
+}
+
 function filterGames(query) {
-    // FIXME: When filtering the spacing over the cards gets fucked up
     // TODO: Message when there are no search results
     if (query.length === 0) {
         games.filter(); // Remove all filters
@@ -179,6 +187,8 @@ function populateGamesList(gamesList) {
             card.find('._dislikes').attr("data-mdl-for", "dislike_" + gid);
         }
     });
+
+    toggleNoGamesMessage(games.size() === 0);
 }
 
 function deckIdsToNames(ids) {
