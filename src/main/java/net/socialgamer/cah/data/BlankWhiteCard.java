@@ -1,9 +1,11 @@
 package net.socialgamer.cah.data;
 
+import org.jetbrains.annotations.Nullable;
+
 public class BlankWhiteCard extends WhiteCard {
     private static final String BLANK_TEXT = "____";
     private final int id;
-    private String text;
+    private String text = null;
 
     public BlankWhiteCard(final int id) {
         this.id = id;
@@ -16,11 +18,12 @@ public class BlankWhiteCard extends WhiteCard {
     }
 
     @Override
+    @Nullable
     public String getText() {
         return text;
     }
 
-    public void setText(final String text) {
+    public void setText(@Nullable String text) {
         this.text = text;
     }
 

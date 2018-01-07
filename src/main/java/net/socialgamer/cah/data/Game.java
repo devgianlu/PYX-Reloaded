@@ -88,30 +88,24 @@ public class Game {
      */
     private final int JUDGE_TIMEOUT_PER_CARD;
     private final int MAX_SKIPS_BEFORE_KICK;
+    private final static Set<String> FINITE_PLAYTIMES;
+
+    static {
+        FINITE_PLAYTIMES = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
+    }
+
     private final int id;
-    /**
-     * All players present in the game.
-     */
     private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>(10));
-    /**
-     * Players participating in the current round.
-     */
     private final List<Player> roundPlayers = Collections.synchronizedList(new ArrayList<Player>(9));
     private final PlayerPlayedCardsTracker playedCards = new PlayerPlayedCardsTracker();
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
-    private final Object blackCardLock = new Object();
     private final GameOptions options;
     private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
-    /**
-     * Lock object to prevent judging during idle judge detection and vice-versa.
-     */
-    private final Object judgeLock = new Object();
-    /**
-     * Lock to prevent missing timer updates.
-     */
     private final Object roundTimerLock = new Object();
+    private final Object judgeLock = new Object();
+    private final Object blackCardLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
     private final CardcastService cardcastService;
     private final Set<User> likes = Collections.synchronizedSet(new HashSet<>());
@@ -194,6 +188,7 @@ public class Game {
      */
     public void addPlayer(User user) throws TooManyPlayersException, IllegalStateException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
+
         synchronized (players) {
             if (options.playerLimit >= 3 && players.size() >= options.playerLimit) throw new TooManyPlayersException();
 
@@ -259,7 +254,7 @@ public class Game {
      * @param user Player to remove from the game.
      * @return True if {@code user} was the last player in the game.
      */
-    public boolean removePlayer(final User user) {
+    public boolean removePlayer(User user) {
         logger.info(String.format("Removing %s from game %d.", user.toString(), id));
 
         boolean wasJudge = false;
@@ -371,7 +366,7 @@ public class Game {
      *
      * @param user Spectator to remove from the game.
      */
-    public void removeSpectator(final User user) {
+    public void removeSpectator(User user) {
         logger.info(String.format("Removing spectator %s from game %d.", user.toString(), id));
         synchronized (spectators) {
             if (!spectators.remove(user)) return;
@@ -620,8 +615,7 @@ public class Game {
                 break;
             case ROUND_OVER:
                 if (getJudge() == player) playerStatus = GamePlayerStatus.JUDGE;
-                else if (player.getScore() >= options.scoreGoal)
-                    playerStatus = GamePlayerStatus.WINNER;     // TODO win-by-x
+                else if (didPlayerWonGame(player)) playerStatus = GamePlayerStatus.WINNER;
                 else playerStatus = GamePlayerStatus.IDLE;
                 break;
             default:
@@ -1291,7 +1285,7 @@ public class Game {
      * @param cardId Selected card ID.
      */
     public void judgeCard(User judge, int cardId) throws CahResponder.CahException {
-        final Player cardPlayer;
+        Player winner;
         synchronized (judgeLock) {
             final Player judgePlayer = getPlayerForUser(judge);
             if (getJudge() != judgePlayer) throw new CahResponder.CahException(ErrorCode.NOT_JUDGE);
@@ -1300,27 +1294,26 @@ public class Game {
             // shouldn't ever happen, but just in case...
             if (judgePlayer != null) judgePlayer.resetSkipCount();
 
-            cardPlayer = playedCards.getPlayerForId(cardId);
-            if (cardPlayer == null) throw new CahResponder.CahException(ErrorCode.INVALID_CARD);
+            winner = playedCards.getPlayerForId(cardId);
+            if (winner == null) throw new CahResponder.CahException(ErrorCode.INVALID_CARD);
 
-            cardPlayer.increaseScore();
+            winner.increaseScore();
             state = GameState.ROUND_OVER;
         }
 
-        int clientCardId = playedCards.getCards(cardPlayer).get(0).getId();
+        int clientCardId = playedCards.getCards(winner).get(0).getId();
 
         JsonObject obj = getEventJson(LongPollEvent.GAME_ROUND_COMPLETE);
-        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), cardPlayer.getUser().getNickname());
+        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), winner.getUser().getNickname());
         obj.addProperty(LongPollResponse.WINNING_CARD.toString(), clientCardId);
         obj.addProperty(LongPollResponse.INTERMISSION.toString(), ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         notifyPlayerInfoChange(getJudge());
-        notifyPlayerInfoChange(cardPlayer);
+        notifyPlayerInfoChange(winner);
 
-        // TODO win-by-x option
         synchronized (roundTimerLock) {
-            if (cardPlayer.getScore() >= options.scoreGoal) {
+            if (didPlayerWonGame(winner)) {
                 rescheduleTimer(new SafeTimerTask() {
                     @Override
                     public void process() {
@@ -1343,6 +1336,25 @@ public class Game {
 
     public int getRequiredBlackCardCount() {
         return MINIMUM_BLACK_CARDS;
+    }
+
+    private boolean didPlayerWonGame(Player player) {
+        if (player.getScore() >= options.scoreGoal) {
+            if (options.winBy == 0) return true;
+
+            Player highestScore = null;
+            synchronized (players) {
+                for (Player p : players) {
+                    if (player.equals(p)) continue;
+                    if (highestScore == null) highestScore = p;
+                    if (p.getScore() > highestScore.getScore()) highestScore = p;
+                }
+            }
+
+            return highestScore == null || player.getScore() + options.winBy >= highestScore.getScore();
+        } else {
+            return false;
+        }
     }
 
     /**

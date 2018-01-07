@@ -28,6 +28,7 @@ public class GameOptions {
     public static final Set<String> VALID_TIME_MULTIPLIERS = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
 
     public final Set<Integer> cardSetIds = new HashSet<>();
+    public int winBy;
     public int blanksInDeck;
     public int playerLimit;
     public int spectatorLimit;
@@ -92,11 +93,13 @@ public class GameOptions {
         Preferences.MinDefaultMax score = getScoreLimit(preferences);
         Preferences.MinDefaultMax player = getPlayerLimit(preferences);
         Preferences.MinDefaultMax spectator = getSpectatorLimit(preferences);
+        Preferences.MinDefaultMax winBy = preferences.getMinDefaultMax("winBy", 0, 2, 5);
 
         options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
         options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
         options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
         options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
+        options.winBy = Math.max(winBy.min, Math.min(winBy.max, Utils.optInt(json, GameOptionData.WIN_BY.toString(), options.winBy)));
         options.timerMultiplier = Utils.optString(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
         options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
 
@@ -112,14 +115,15 @@ public class GameOptions {
         this.scoreGoal = newOptions.scoreGoal;
         this.playerLimit = newOptions.playerLimit;
         this.spectatorLimit = newOptions.spectatorLimit;
+        this.winBy = newOptions.winBy;
+        this.blanksInDeck = newOptions.blanksInDeck;
+        this.password = newOptions.password;
+        this.timerMultiplier = newOptions.timerMultiplier;
+
         synchronized (this.cardSetIds) {
             this.cardSetIds.clear();
             this.cardSetIds.addAll(newOptions.cardSetIds);
         }
-
-        this.blanksInDeck = newOptions.blanksInDeck;
-        this.password = newOptions.password;
-        this.timerMultiplier = newOptions.timerMultiplier;
     }
 
     /**
@@ -136,6 +140,7 @@ public class GameOptions {
         info.put(GameOptionData.PLAYER_LIMIT, playerLimit);
         info.put(GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
         info.put(GameOptionData.SCORE_LIMIT, scoreGoal);
+        info.put(GameOptionData.WIN_BY, winBy);
         info.put(GameOptionData.TIMER_MULTIPLIER, timerMultiplier);
         if (includePassword) info.put(GameOptionData.PASSWORD, password);
         return info;
@@ -148,6 +153,7 @@ public class GameOptions {
         obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
         obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
         obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
+        obj.addProperty(GameOptionData.WIN_BY.toString(), winBy);
         obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
         if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
         return obj;
