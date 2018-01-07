@@ -24,6 +24,9 @@ public class GameOptions {
     public static final int DEFAULT_BLANKS_MIN = 0;
     public static final int DEFAULT_BLANKS_DEF = 0;
     public static final int DEFAULT_BLANKS_MAX = 30;
+    public static final int DEFAULT_WIN_BY_MIN = 0;
+    public static final int DEFAULT_WIN_BY_DEF = 0;
+    public static final int DEFAULT_WIN_BY_MAX = 5;
     public static final String DEFAULT_TIME_MULTIPLIER = "1x";
     public static final Set<String> VALID_TIME_MULTIPLIERS = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
 
@@ -41,6 +44,7 @@ public class GameOptions {
         scoreGoal = getScoreLimit(preferences).def;
         playerLimit = getPlayerLimit(preferences).def;
         spectatorLimit = getSpectatorLimit(preferences).def;
+        winBy = getWinBy(preferences).def;
     }
 
     public static JsonObject getOptionsDefaultsJson(Preferences preferences) {
@@ -49,6 +53,7 @@ public class GameOptions {
         obj.add(GameOptionData.PLAYER_LIMIT.toString(), getPlayerLimit(preferences).toJson());
         obj.add(GameOptionData.SPECTATOR_LIMIT.toString(), getSpectatorLimit(preferences).toJson());
         obj.add(GameOptionData.SCORE_LIMIT.toString(), getScoreLimit(preferences).toJson());
+        obj.add(GameOptionData.WIN_BY.toString(), getWinBy(preferences).toJson());
 
         JsonObject tm = new JsonObject();
         tm.add("values", getTimeMultiplierValidValues());
@@ -78,6 +83,10 @@ public class GameOptions {
         return preferences.getMinDefaultMax("scoreLimit", DEFAULT_SCORE_MIN, DEFAULT_SCORE_DEF, DEFAULT_SCORE_MAX);
     }
 
+    private static Preferences.MinDefaultMax getWinBy(Preferences preferences) {
+        return preferences.getMinDefaultMax("winBy", DEFAULT_WIN_BY_MIN, DEFAULT_WIN_BY_DEF, DEFAULT_WIN_BY_MAX);
+    }
+
     @NotNull
     public static GameOptions deserialize(Preferences preferences, String text) {
         GameOptions options = new GameOptions(preferences);
@@ -93,7 +102,7 @@ public class GameOptions {
         Preferences.MinDefaultMax score = getScoreLimit(preferences);
         Preferences.MinDefaultMax player = getPlayerLimit(preferences);
         Preferences.MinDefaultMax spectator = getSpectatorLimit(preferences);
-        Preferences.MinDefaultMax winBy = preferences.getMinDefaultMax("winBy", 0, 2, 5);
+        Preferences.MinDefaultMax winBy = getWinBy(preferences);
 
         options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
         options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));

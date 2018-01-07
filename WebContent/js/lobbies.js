@@ -10,6 +10,7 @@ createGameDialog.listen('MDCDialog:accept', function () {
     var playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
     var spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
     var blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
+    var winBy = getDropdownSelectedValue(document.getElementById('winBy'));
     var timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
 
     var go = {
@@ -18,8 +19,11 @@ createGameDialog.listen('MDCDialog:accept', function () {
         "sl": scoreLimit,
         "bl": blanksLimit,
         "tm": timeMultiplier,
+        "wb": winBy,
         "css": getSelectedCardSets(document.getElementById('deck_select'))
     };
+
+    console.log(go);
 
     createGame(go);
 });
@@ -134,6 +138,10 @@ function populateGamesList(gamesList) {
     for (var i = 0; i < gamesList.length; i++) {
         var game = gamesList[i];
 
+        var goal;
+        if (game.go.wb === 0) goal = game.go.sl;
+        else goal = game.go.sl + " (win by " + game.go.wb + ")";
+
         var status;
         if (game.S === "l") status = "lobby";
         else status = "started";
@@ -166,7 +174,7 @@ function populateGamesList(gamesList) {
             "_decks": decks,
             "_players": players,
             "_spectators": spectators,
-            "_goal": game.go.sl,
+            "_goal": goal,
             "_status": status
         });
     }

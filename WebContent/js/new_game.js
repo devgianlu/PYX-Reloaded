@@ -107,6 +107,7 @@ function resetCreateGameDialog() {
     var spectatorsLimitElm = document.getElementById('spectatorsLimit');
     var blanksLimitElm = document.getElementById('blanksLimit');
     var timeMultiplierElm = document.getElementById('timeMultiplier');
+    var winByElm = document.getElementById('winBy');
 
     var dgo = JSON.parse(localStorage['dgo']);
     populateDropdown(scoreLimitElm, dgo.sl);
@@ -114,5 +115,6 @@ function resetCreateGameDialog() {
     populateDropdown(spectatorsLimitElm, dgo.vL);
     populateDropdown(blanksLimitElm, dgo.bl);
     populateTimeMultiplier(timeMultiplierElm, dgo.tm);
+    populateDropdown(winByElm, dgo.wb);
     loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
 }

@@ -88,11 +88,6 @@ public class Game {
      */
     private final int JUDGE_TIMEOUT_PER_CARD;
     private final int MAX_SKIPS_BEFORE_KICK;
-    private final static Set<String> FINITE_PLAYTIMES;
-
-    static {
-        FINITE_PLAYTIMES = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
-    }
 
     private final int id;
     private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>(10));
