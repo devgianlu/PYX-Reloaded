@@ -14,9 +14,11 @@ function clearElement(elm) {
 function populateDropdown(dropdown, dgo) {
     clearElement(dropdown);
     for (var i = dgo.min; i <= dgo.max; i++) {
-        var option = document.createElement("option");
+        var option = document.createElement("li");
         option.setAttribute("value", i);
-        if (i === dgo.default) option.setAttribute("selected", '');
+        option.setAttribute("class", "mdc-list-item");
+        option.setAttribute("role", "option");
+        if (i === dgo.default) option.setAttribute("selected", ''); 
         option.innerHTML = i;
         dropdown.appendChild(option);
     }

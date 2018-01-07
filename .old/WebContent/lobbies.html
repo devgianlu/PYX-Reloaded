@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./node_modules/material-components-web/dist/material-components-web.js"></script>
+    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css">
+    <link rel="stylesheet" href="node_modules/@material/toolbar/dist/mdc.toolbar.css">
+    <link rel="stylesheet" href="./css/material.css">
+    <link rel="stylesheet" href="./css/pyx-reloaded.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css" />
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.2/dialog-polyfill.min.js"></script>
+    <script src="node_modules/@material/toolbar/dist/mdc.toolbar.js"></script>
+    <script src="node_modules/@material/drawer/dist/mdc.drawer.js"></script>
+    <script src="./js/dialog-polyfill.js"></script>
+    <script src="./js/polling.js"></script>
+    <script src="./js/new_game.js"></script>
+    <script src="./js/lobbies.js"></script>
+</head>
+
+<!-- MDC Toolbar & Drawer Start Here -->
+
+<body id="games-global-container" class="mdc-typography demo-body">
+    <aside class="mdc-persistent-drawer">
+        <nav class="mdc-persistent-drawer__drawer">
+            <h5 class="mdc-title" style="text-align:center">PYX Reloaded</h5>
+            <div class="mdc-list-group">
+                <nav class="mdc-list">
+                    <a id="setup" class="mdc-list-item" href="#">
+                Logout
+              </a>
+                </nav>
+            </div>
+        </nav>
+    </aside>
+    <div class="demo-content">
+        <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
+            <div class="mdc-toolbar__row">
+                <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                    <button class="demo-menu material-icons mdc-toolbar__menu-icon">menu</button>
+                    <span class="mdc-toolbar__title catalog-title">Games - PYX Reloaded</span>
+                </section>
+            </div>
+            <script src="./js/mdc_mods.js"></script>
+        </header>
+        <!-- MDC Toolbar & Drawer End Here -->
+      <div class="mdc-toolbar-fixed-adjust"></div>
+
+        <main id="main">
+            <div class="page-content" align="center" style="margin-top:10px;">
+                <div id="lobbyBox" class="mdl-grid list" style="justify-content: center">
+                    <!-- Games list  -->
+                </div>
+
+                <div id="gameBox">
+                    <!-- This is the div where the actual game will be played -->
+                </div>
+            </div>
+        </main>
+<!-- Start new dialog --><div id="canvas">
+<aside id="mdc-dialog-with-list"
+    class="mdc-dialog"
+    role="alertdialog"
+    aria-labelledby="mdc-dialog-with-list-label"
+    aria-describedby="mdc-dialog-with-list-description">
+    <div class="mdc-dialog__surface">
+      <header class="mdc-dialog__header">
+        <h2 id="mdc-dialog-with-list-label" class="mdc-dialog__header__title">
+          Create New Game
+        </h2>
+      </header>
+      <section id="mdc-dialog-with-list-description" class="mdc-dialog__body mdc-dialog__body--scrollable">
+                    <div class="mdc-card pref-card" style="margin-top:1vw; padding-left:1vw;">
+                        <h5>General</h5>
+                        <p><label for="scoreLimit">Goal: </label>
+			<select id="scoreLimit"></select></p>
+                        <p><label for="playersLimit">Players Allowed: </label><select id="playersLimit"></select></p>
+                        <p><label for="spectatorsLimit">Spectators Allowed: </label><select id="spectatorsLimit"></select></p>
+                        <p><label for="blanksLimit">Blank cards: </label><select id="blanksLimit"></select></p>
+                        <p><label for="timeMultiplier">Time Multiplier: </label><select id="timeMultiplier"></select></p>
+                    </div>
+
+                    <br>
+
+                    <div id="deck_select" style="padding-left:1vw; padding-bottom:1vw;justify-content: left; text-align: left;" class="mdc-card pref-card">
+                        <h5>Card Sets</h5>
+
+                        <div class="list"></div>
+                    </div>
+      </section>
+      <footer class="mdc-dialog__footer">
+                <button type="button" class="mdl-button close">Cancel</button>
+                <button type="button" onclick="$('#main').html(''); $('#creationWrapper').html('');" class="mdl-button mdl-js-button mdl-button--primary">Start</button>
+      </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+  </aside></div>
+
+        <div id="creationWrapper">
+            <button id="createGame" class="dialog-button mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect fab-bottom-right" onclick="showCreateGameDialog()">
+        <i class="material-icons">add</i>
+    </button></div>
+
+        <div style="display: none">
+		<div id="borders">
+            <label id="card-set-template" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="deck_">
+            <input type="checkbox" id="deck_" class="mdl-switch__input">
+            <span class="mdl-switch__label _name">{{Name of Card Set}}</span>
+            <!-- TODO: tooltip to show deck details (description, white/black cards number) -->
+        </label>
+            <script src="./js/material.min.js"></script>
+            <div id="game-info-template" width="412" height="312" class="mdl-cell mdl-cell--6-col wide-card mdc-card mdl-shadow--3dp">
+                <div class="mdc-card__title">
+                    <h6 class="mdc-card__title-text _host">{{Name of Player's Game}}</h6>
+
+                <div class="mdc-card__supporting-text" align="left">
+                    <b>Players: </b><i class="_players"></i><br>
+                    <b>Spectators: </b><i class="_spectators"></i><br>
+                    <b>Goal: </b><i class="_goal"></i><br>
+                    <b>Decks: </b><i class="_decks"><!-- FIXME: May overflow --></i><br>
+                    <b>Status: </b><i class="_status"></i><br>
+                </div>
+
+
+
+                <div align="right">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" style="align:right; margin: 1vw;" onclick="$('#main').html(''); $('#creationWrapper').html(''); joinGame(this.parentElement.parentElement); return false;">
+                    JOIN
+                </a>
+
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" style="align:right; margin: 1vw;" onclick="$('#main').html(''); $('#creationWrapper').html(''); spectateGame(this.parentElement.parentElement); return false;">
+                    SPECTATE
+                </a>
+                </div></div></div>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>

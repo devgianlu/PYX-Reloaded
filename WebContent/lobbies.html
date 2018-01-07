@@ -77,11 +77,64 @@
                     <h5 class="mdc-card__title">General</h5>
                 </div>
                 <section class="mdc-card__supporting-text">
-                    <p><label for="scoreLimit">Goal: </label><select id="scoreLimit"></select></p>
-                    <p><label for="playersLimit">Players Limit: </label><select id="playersLimit"></select></p>
-                    <p><label for="spectatorsLimit">Spectators Limit: </label><select id="spectatorsLimit"></select></p>
-                    <p><label for="blanksLimit">Blank cards: </label><select id="blanksLimit"></select></p>
-                    <p><label for="timeMultiplier">Time Multiplier: </label><select id="timeMultiplier"></select></p>
+		<div class="mdc-layout-grid">
+		  <div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell"><div id="goal" class="mdc-select" role="listbox" style="min-width:200px;">
+			  <div class="mdc-select__surface">
+			    <div class="mdc-select__label">Goal:</div>
+			    <div class="mdc-select__selected-text"></div>
+			    <div class="mdc-select__bottom-line"></div>
+			  </div>
+			  <div class="mdc-simple-menu mdc-select__menu">
+			    <ul id="scoreLimit" class="mdc-list mdc-simple-menu__items"></ul>
+			  </div>
+			</div></div>
+		      
+			<div class="mdc-layout-grid__cell"><div id="players" class="mdc-select" role="listbox" style="min-width:200px;">
+			  <div class="mdc-select__surface">
+			    <div class="mdc-select__label">Players Limit:</div>
+			    <div class="mdc-select__selected-text"></div>
+			    <div class="mdc-select__bottom-line"></div>
+			  </div>
+			  <div class="mdc-simple-menu mdc-select__menu">
+			    <ul id="playersLimit" class="mdc-list mdc-simple-menu__items"></ul>
+			  </div>
+			</div></div>
+
+			<div class="mdc-layout-grid__cell"><div id="spectators" class="mdc-select" role="listbox" style="min-width:200px;">
+			  <div class="mdc-select__surface">
+			    <div class="mdc-select__label">Spectators Limit:</div>
+			    <div class="mdc-select__selected-text"></div>
+			    <div class="mdc-select__bottom-line"></div>
+			  </div>
+			  <div class="mdc-simple-menu mdc-select__menu">
+			    <ul id="spectatorsLimit" class="mdc-list mdc-simple-menu__items"></ul>
+			  </div>
+			</div></div>
+
+			<div class="mdc-layout-grid__cell"><div id="blanks" class="mdc-select" role="listbox" style="min-width:200px;">
+			  <div class="mdc-select__surface">
+			    <div class="mdc-select__label">Blank cards:</div>
+			    <div class="mdc-select__selected-text"></div>
+			    <div class="mdc-select__bottom-line"></div>
+			  </div>
+			  <div class="mdc-simple-menu mdc-select__menu">
+			    <ul id="blanksLimit" class="mdc-list mdc-simple-menu__items"></ul>
+			  </div>
+			</div></div>
+
+			<div class="mdc-layout-grid__cell"><div id="time" class="mdc-select" role="listbox" style="min-width:200px;">
+			  <div class="mdc-select__surface">
+			    <div class="mdc-select__label">Time Multiplier:</div>
+			    <div class="mdc-select__selected-text"></div>
+			    <div class="mdc-select__bottom-line"></div>
+			  </div>
+			  <div class="mdc-simple-menu mdc-select__menu">
+			    <ul id="timeMultiplier" class="mdc-list mdc-simple-menu__items"></ul>
+			  </div>
+			</div></div>
+		  </div>
+		</div>
                 </section>
             </div>
 
