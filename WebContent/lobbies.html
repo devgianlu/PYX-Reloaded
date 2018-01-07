@@ -77,64 +77,77 @@
                     <h5 class="mdc-card__title">General</h5>
                 </div>
                 <section class="mdc-card__supporting-text">
-		<div class="mdc-layout-grid">
-		  <div class="mdc-layout-grid__inner">
-			<div class="mdc-layout-grid__cell"><div id="goal" class="mdc-select" role="listbox" style="min-width:200px;">
-			  <div class="mdc-select__surface">
-			    <div class="mdc-select__label">Goal:</div>
-			    <div class="mdc-select__selected-text"></div>
-			    <div class="mdc-select__bottom-line"></div>
-			  </div>
-			  <div class="mdc-simple-menu mdc-select__menu">
-			    <ul id="scoreLimit" class="mdc-list mdc-simple-menu__items"></ul>
-			  </div>
-			</div></div>
-		      
-			<div class="mdc-layout-grid__cell"><div id="players" class="mdc-select" role="listbox" style="min-width:200px;">
-			  <div class="mdc-select__surface">
-			    <div class="mdc-select__label">Players Limit:</div>
-			    <div class="mdc-select__selected-text"></div>
-			    <div class="mdc-select__bottom-line"></div>
-			  </div>
-			  <div class="mdc-simple-menu mdc-select__menu">
-			    <ul id="playersLimit" class="mdc-list mdc-simple-menu__items"></ul>
-			  </div>
-			</div></div>
+                    <div class="mdc-layout-grid">
+                        <div class="mdc-layout-grid__inner">
+                            <div class="mdc-layout-grid__cell">
+                                <div id="scoreLimit" class="mdc-select" role="listbox" style="min-width:200px;">
+                                    <div class="mdc-select__surface">
+                                        <div class="mdc-select__label mdc-select__label--float-above">Goal</div>
+                                        <div class="mdc-select__selected-text"></div>
+                                        <div class="mdc-select__bottom-line"></div>
+                                    </div>
+                                    <div class="mdc-simple-menu mdc-select__menu">
+                                        <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                    </div>
+                                </div>
+                            </div>
 
-			<div class="mdc-layout-grid__cell"><div id="spectators" class="mdc-select" role="listbox" style="min-width:200px;">
-			  <div class="mdc-select__surface">
-			    <div class="mdc-select__label">Spectators Limit:</div>
-			    <div class="mdc-select__selected-text"></div>
-			    <div class="mdc-select__bottom-line"></div>
-			  </div>
-			  <div class="mdc-simple-menu mdc-select__menu">
-			    <ul id="spectatorsLimit" class="mdc-list mdc-simple-menu__items"></ul>
-			  </div>
-			</div></div>
+                            <div id="playersLimit" class="mdc-layout-grid__cell">
+                                <div class="mdc-select" role="listbox" style="min-width:200px;">
+                                    <div class="mdc-select__surface">
+                                        <div class="mdc-select__label mdc-select__label--float-above">Players Limit
+                                        </div>
+                                        <div class="mdc-select__selected-text"></div>
+                                        <div class="mdc-select__bottom-line"></div>
+                                    </div>
+                                    <div class="mdc-simple-menu mdc-select__menu">
+                                        <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                    </div>
+                                </div>
+                            </div>
 
-			<div class="mdc-layout-grid__cell"><div id="blanks" class="mdc-select" role="listbox" style="min-width:200px;">
-			  <div class="mdc-select__surface">
-			    <div class="mdc-select__label">Blank cards:</div>
-			    <div class="mdc-select__selected-text"></div>
-			    <div class="mdc-select__bottom-line"></div>
-			  </div>
-			  <div class="mdc-simple-menu mdc-select__menu">
-			    <ul id="blanksLimit" class="mdc-list mdc-simple-menu__items"></ul>
-			  </div>
-			</div></div>
+                            <div id="spectatorsLimit" class="mdc-layout-grid__cell">
+                                <div class="mdc-select" role="listbox" style="min-width:200px;">
+                                    <div class="mdc-select__surface">
+                                        <div class="mdc-select__label mdc-select__label--float-above">Spectators Limit
+                                        </div>
+                                        <div class="mdc-select__selected-text"></div>
+                                        <div class="mdc-select__bottom-line"></div>
+                                    </div>
+                                    <div class="mdc-simple-menu mdc-select__menu">
+                                        <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                    </div>
+                                </div>
+                            </div>
 
-			<div class="mdc-layout-grid__cell"><div id="time" class="mdc-select" role="listbox" style="min-width:200px;">
-			  <div class="mdc-select__surface">
-			    <div class="mdc-select__label">Time Multiplier:</div>
-			    <div class="mdc-select__selected-text"></div>
-			    <div class="mdc-select__bottom-line"></div>
-			  </div>
-			  <div class="mdc-simple-menu mdc-select__menu">
-			    <ul id="timeMultiplier" class="mdc-list mdc-simple-menu__items"></ul>
-			  </div>
-			</div></div>
-		  </div>
-		</div>
+                            <div id="blanksLimit" class="mdc-layout-grid__cell">
+                                <div class="mdc-select" role="listbox" style="min-width:200px;">
+                                    <div class="mdc-select__surface">
+                                        <div class="mdc-select__label mdc-select__label--float-above">Blank cards</div>
+                                        <div class="mdc-select__selected-text"></div>
+                                        <div class="mdc-select__bottom-line"></div>
+                                    </div>
+                                    <div class="mdc-simple-menu mdc-select__menu">
+                                        <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="timeMultiplier" class="mdc-layout-grid__cell">
+                                <div class="mdc-select" role="listbox" style="min-width:200px;">
+                                    <div class="mdc-select__surface">
+                                        <div class="mdc-select__label mdc-select__label--float-above">Time Multiplier
+                                        </div>
+                                        <div class="mdc-select__selected-text"></div>
+                                        <div class="mdc-select__bottom-line"></div>
+                                    </div>
+                                    <div class="mdc-simple-menu mdc-select__menu">
+                                        <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </div>
 

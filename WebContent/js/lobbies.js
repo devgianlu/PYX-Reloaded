@@ -1,10 +1,3 @@
-var MDCSelect = mdc.select.MDCSelect;
-var goalSelectComponent = new mdc.select.MDCSelect(document.getElementById('goal'));
-var playerSelectComponent = new mdc.select.MDCSelect(document.getElementById('players'));
-var spectatorSelectComponent = new mdc.select.MDCSelect(document.getElementById('spectators'));
-var blankSelectComponent = new mdc.select.MDCSelect(document.getElementById('blanks'));
-var timeSelectComponent = new mdc.select.MDCSelect(document.getElementById('time'));
-
 var games = new List('games-global-container', {
     item: 'game-info-template',
     valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
