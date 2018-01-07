@@ -7,6 +7,10 @@
     text-align: center;
 }
 
+.mdc-switch-label {
+    padding-left: 8px;
+}
+
 .mdc-dialog__body .mdc-card {
     margin-top: 24px;
 }
@@ -107,3 +111,16 @@ body {
     color: rgba(255, 255, 255, 0.3);
 }
 
+/* Hacks to get the select component to work inside the dialog */
+.mdc-dialog .mdc-select {
+    position: relative !important;
+}
+
+.mdc-dialog .mdc-select__menu {
+    top: inherit !important;
+    left: inherit !important;
+
+    /* max-height: calc(100vh - 64px) !important; */
+
+    margin-top: 44px;
+}

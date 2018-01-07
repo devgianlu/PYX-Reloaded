@@ -23,6 +23,8 @@ function populateDropdown(dropdown, dgo) {
         item.innerHTML = i;
         list.appendChild(item);
     }
+
+    new mdc.select.MDCSelect(dropdown);
 }
 
 function populateTimeMultiplier(dropdown, tm) {
@@ -38,6 +40,8 @@ function populateTimeMultiplier(dropdown, tm) {
         item.innerHTML = val;
         list.appendChild(item);
     }
+
+    new mdc.select.MDCSelect(dropdown);
 }
 
 function loadCardSets(container, css) {
@@ -87,7 +91,14 @@ function getSelectedCardSets(container) {
 }
 
 function getDropdownSelectedValue(dropdown) {
-    return dropdown.options[dropdown.selectedIndex].value;
+    var list = dropdown.querySelector('.mdc-simple-menu__items');
+    for (var i = 0; i < list.children.length; i++) {
+        var item = list.children[i];
+        if (item.hasAttribute("aria-selected"))
+            return item.innerHTML;
+    }
+
+    return list.children[0].innerHTML; // Shouldn't happen
 }
 
 function resetCreateGameDialog() {
@@ -97,7 +108,6 @@ function resetCreateGameDialog() {
     var blanksLimitElm = document.getElementById('blanksLimit');
     var timeMultiplierElm = document.getElementById('timeMultiplier');
 
-
     var dgo = JSON.parse(localStorage['dgo']);
     populateDropdown(scoreLimitElm, dgo.sl);
     populateDropdown(playersLimitElm, dgo.pL);
@@ -105,10 +115,4 @@ function resetCreateGameDialog() {
     populateDropdown(blanksLimitElm, dgo.bl);
     populateTimeMultiplier(timeMultiplierElm, dgo.tm);
     loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
-
-    var goalSelectComponent = new mdc.select.MDCSelect(scoreLimitElm);
-    var playerSelectComponent = new mdc.select.MDCSelect(playersLimitElm);
-    var spectatorSelectComponent = new mdc.select.MDCSelect(spectatorsLimitElm);
-    var blankSelectComponent = new mdc.select.MDCSelect(blanksLimitElm);
-    var timeSelectComponent = new mdc.select.MDCSelect(timeMultiplierElm);
 }
