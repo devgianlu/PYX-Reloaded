@@ -20,7 +20,7 @@ createGameDialog.listen('MDCDialog:accept', function () {
         "bl": blanksLimit,
         "tm": timeMultiplier,
         "wb": winBy,
-        "css": getSelectedCardSets(document.getElementById('deck_select'))
+        "css": getSelectedCardSets(document.getElementById('pyx_decks'))
     };
 
     console.log(go);

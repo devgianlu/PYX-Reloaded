@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="//unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
@@ -152,11 +151,40 @@
                 </section>
             </div>
 
-            <div id="deck_select" class="mdc-card">
+            <div id="pyx_decks" class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">Card Sets</h5>
+                    <h5 class="mdc-card__title">PYX Card Sets</h5>
                 </div>
                 <section class="mdc-card__supporting-text mdc-list list">
+                </section>
+            </div>
+
+            <div class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h5 class="mdc-card__title">Cardcast</h5>
+                </div>
+                <section class="mdc-card__supporting-text" style="display: inline-flex;">
+                    <div id="cc_decks" style="width: 50%; padding: 0 16px 0 16px">
+                        <h5>Decks</h5>
+                        <ul class="mdc-list mdc-list--two-line mdc-list--dense"></ul>
+                        <div class="message" style="margin-top: 48px">
+                            <div class="material-icons md-48 md-dark">info_outline</div>
+                            <h3 class="md-dark">No Cardcast decks.</h3>
+                        </div>
+                    </div>
+                    <div style="width: 50%; padding: 0 16px 0 16px">
+                        <h5>Add deck</h5>
+                        <div class="mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon"
+                             style="width: 100%;"
+                             data-mdc-auto-init="MDCTextField">
+                            <input maxlength="5" minlength="5" type="text" id="cc_deck_code"
+                                   class="mdc-text-field__input"
+                                   style="text-transform: uppercase">
+                            <label for="cc_deck_code" class="mdc-text-field__label">Deck code</label>
+                            <i class="material-icons mdc-text-field__icon" tabindex="0">add</i>
+                            <div class="mdc-text-field__bottom-line"></div>
+                        </div>
+                    </div>
                 </section>
             </div>
         </section>

@@ -1,10 +1,3 @@
-/**
- #1 - it will be better to have all user inputs in the modal done entirely in JS. Don't clutter
- lobbies.html more than it needs to be
- #2 - This is a work in progress. Most of the logic for the "New Game" dialog should go in here as well.
- #3 - Happy hacking!!
- **/
-
 function clearElement(elm) {
     while (elm.firstChild) {
         elm.removeChild(elm.firstChild);
@@ -42,6 +35,66 @@ function populateTimeMultiplier(dropdown, tm) {
     }
 
     new mdc.select.MDCSelect(dropdown);
+}
+
+function toggleCardcastNoDecksMessage(container, visible) {
+    container = $(container);
+    var message = container.find('.message');
+    var list = container.find('.list');
+    if (visible) {
+        message.show();
+        list.hide();
+    } else {
+        message.hide();
+        list.show();
+    }
+}
+
+function setupCardcastDecks(container) {
+    var list = container.querySelector('.mdc-list');
+    clearElement(list);
+
+    toggleCardcastNoDecksMessage(container, true);
+}
+
+function addCardcastDeck(container, deck) {
+    var li = document.createElement("li");
+    li.setAttribute("data-code", deck.code);
+    li.className = "mdc-list-item";
+    var text = document.createElement("span");
+    text.className = "mdc-list-item__text";
+    text.innerHTML = deck.name;
+    var code = document.createElement("span");
+    code.className = "mdc-list-item__secondary-text";
+    code.innerHTML = deck.code;
+    text.appendChild(code);
+    li.appendChild(text);
+
+    var remove = document.createElement("i");
+    remove.className = "mdc-list-item__end-detail material-icons";
+    remove.innerHTML = "delete";
+    remove.onclick = function (ev) {
+        removeCardcastDeck(container, deck.code);
+    };
+    li.appendChild(remove);
+
+    var list = container.querySelector('.mdc-list');
+    list.appendChild(li);
+
+    toggleCardcastNoDecksMessage(container, false);
+}
+
+function removeCardcastDeck(container, code) {
+    var list = container.querySelector('.mdc-list');
+    for (var i = 0; i < list.children.length; i++) {
+        var item = list.children[i];
+        if (item.getAttribute("data-code") === code) {
+            list.removeChild(item);
+            break;
+        }
+    }
+
+    toggleCardcastNoDecksMessage(container, list.children.length === 0);
 }
 
 function loadCardSets(container, css) {
@@ -116,5 +169,9 @@ function resetCreateGameDialog() {
     populateDropdown(blanksLimitElm, dgo.bl);
     populateTimeMultiplier(timeMultiplierElm, dgo.tm);
     populateDropdown(winByElm, dgo.wb);
-    loadCardSets(document.getElementById("deck_select"), JSON.parse(localStorage['css']));
+    loadCardSets(document.getElementById('pyx_decks'), JSON.parse(localStorage['css']));
+
+    var ccDecksElm = document.getElementById('cc_decks');
+    setupCardcastDecks(ccDecksElm);
+    addCardcastDeck(ccDecksElm, {"name": "Try this shit 123", "code": "ABC12"});
 }
