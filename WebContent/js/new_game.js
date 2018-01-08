@@ -173,5 +173,5 @@ function resetCreateGameDialog() {
 
     var ccDecksElm = document.getElementById('cc_decks');
     setupCardcastDecks(ccDecksElm);
-    addCardcastDeck(ccDecksElm, {"name": "Try this shit 123", "code": "ABC12"});
+    addCardcastDeck(ccDecksElm, {"name": "Try this text 123", "code": "ABC12"});
 }
