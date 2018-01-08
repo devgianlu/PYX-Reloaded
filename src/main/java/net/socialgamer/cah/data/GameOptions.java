@@ -9,10 +9,7 @@ import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GameOptions {
     public static final int DEFAULT_SCORE_MIN = 4;
@@ -32,8 +29,8 @@ public class GameOptions {
     public static final int DEFAULT_WIN_BY_MAX = 5;
     public static final TimeMultiplier DEFAULT_TIME_MULTIPLIER = TimeMultiplier.X1;
 
-    public final Set<Integer> cardSetIds = new HashSet<>();
-    public final Set<String> cardcastSetCodes = new HashSet<>();
+    public final Set<Integer> cardSetIds = Collections.synchronizedSet(new HashSet<>());
+    public final Set<String> cardcastSetCodes = Collections.synchronizedSet(new HashSet<>());
     public int winBy;
     public int blanksInDeck;
     public int playerLimit;
