@@ -97,7 +97,6 @@ public class Game {
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
     private final GameOptions options;
-    private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
     private final Object roundTimerLock = new Object();
     private final Object judgeLock = new Object();
     private final Object blackCardLock = new Object();
@@ -465,8 +464,8 @@ public class Game {
         notifyGameOptionsChanged();
     }
 
-    public Set<String> getCardcastDeckIds() {
-        return cardcastDeckIds;
+    public Set<String> getCardcastDeckCodes() {
+        return options.cardcastSetCodes;
     }
 
     /**
@@ -636,7 +635,7 @@ public class Game {
 
             logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
                             + "max players, %d max spectators, %d score limit, players %s.",
-                    id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
+                    id, options.cardSetIds, options.cardcastSetCodes, options.blanksInDeck, options.playerLimit,
                     options.spectatorLimit, options.scoreGoal, players));
 
             // do this stuff outside the players lock; they will lock players again later for much less
@@ -663,7 +662,7 @@ public class Game {
                 cardSets.addAll(PyxCardSet.loadCardSets(options.getPyxCardSetIds()));
 
             FailedLoadingSomeCardcastDecks cardcastException = null;
-            for (String cardcastId : cardcastDeckIds.toArray(new String[0])) {
+            for (String cardcastId : options.cardcastSetCodes.toArray(new String[0])) {
                 // Ideally, we can assume that anything in that set is going to load, but it is entirely
                 // possible that the cache has expired and we can't re-load it for some reason, so
                 // let's be safe.

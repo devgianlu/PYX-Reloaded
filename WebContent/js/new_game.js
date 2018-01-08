@@ -190,7 +190,6 @@ function addCardcastDeckToLayout(button) {
     };
     li.appendChild(remove);
 
-
     list.appendChild(li);
 
     toggleCardcastNoDecksMessage(container, false);
@@ -235,6 +234,16 @@ function loadCardcastDeckInfo(button) {
         loading.hide();
         input.valid = false;
     }
+}
+
+function getCardcastDeckCodes(container) {
+    const codes = [];
+    const list = container.querySelector('.mdc-list');
+    for (let i = 0; i < list.children.length; i++) {
+        codes.push(list.children[i].getAttribute("data-code"));
+    }
+
+    return codes;
 }
 
 /*

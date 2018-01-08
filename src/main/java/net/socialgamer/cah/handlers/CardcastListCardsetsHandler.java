@@ -32,7 +32,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
         JsonArray array = new JsonArray();
 
         FailedLoadingSomeCardcastDecks cardcastException = null;
-        for (String deckId : game.getCardcastDeckIds().toArray(new String[0])) {
+        for (String deckId : game.getCardcastDeckCodes().toArray(new String[0])) {
             CardcastDeck deck = cardcastService.loadSet(deckId);
             if (deck == null) {
                 if (cardcastException == null) cardcastException = new FailedLoadingSomeCardcastDecks();

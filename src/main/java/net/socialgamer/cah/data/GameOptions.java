@@ -33,6 +33,7 @@ public class GameOptions {
     public static final TimeMultiplier DEFAULT_TIME_MULTIPLIER = TimeMultiplier.X1;
 
     public final Set<Integer> cardSetIds = new HashSet<>();
+    public final Set<String> cardcastSetCodes = new HashSet<>();
     public int winBy;
     public int blanksInDeck;
     public int playerLimit;
@@ -96,6 +97,11 @@ public class GameOptions {
             for (JsonElement cardSetId : cardSetIds) options.cardSetIds.add(cardSetId.getAsInt());
         }
 
+        JsonArray cardcastSetCodes = json.getAsJsonArray(GameOptionData.CARDCAST_SETS.toString());
+        if (cardSetIds != null) {
+            for (JsonElement code : cardcastSetCodes) options.cardcastSetCodes.add(code.getAsString());
+        }
+
         Preferences.MinDefaultMax blankCards = getBlanksLimit(preferences);
         Preferences.MinDefaultMax score = getScoreLimit(preferences);
         Preferences.MinDefaultMax player = getPlayerLimit(preferences);
@@ -143,6 +149,7 @@ public class GameOptions {
     public Map<GameOptionData, Object> serialize(final boolean includePassword) {
         Map<GameOptionData, Object> info = new HashMap<>();
         info.put(GameOptionData.CARD_SETS, cardSetIds);
+        info.put(GameOptionData.CARDCAST_SETS, cardcastSetCodes);
         info.put(GameOptionData.BLANKS_LIMIT, blanksInDeck);
         info.put(GameOptionData.PLAYER_LIMIT, playerLimit);
         info.put(GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
@@ -156,6 +163,7 @@ public class GameOptions {
     public JsonObject toJson(boolean includePassword) {
         JsonObject obj = new JsonObject();
         obj.add(GameOptionData.CARD_SETS.toString(), Utils.toIntsJsonArray(cardSetIds));
+        obj.add(GameOptionData.CARDCAST_SETS.toString(), Utils.toStringsJsonArray(cardcastSetCodes));
         obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
         obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
         obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);

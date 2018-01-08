@@ -717,6 +717,7 @@ public class Constants {
         BLANKS_LIMIT("bl"),
         @DuplicationAllowed
         CARD_SETS(AjaxResponse.CARD_SETS),
+        CARDCAST_SETS("CCs"),
         @DuplicationAllowed
         PASSWORD(AjaxRequest.PASSWORD),
         PLAYER_LIMIT("pL"),

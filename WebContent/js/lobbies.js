@@ -1,25 +1,26 @@
-let games = new List('games-global-container', {
+const games = new List('games-global-container', {
     item: 'game-info-template',
     valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
         {'data': ['gid', 'hp', 'like', 'dislike']}]
 });
 
-let createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
+const createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
 createGameDialog.listen('MDCDialog:accept', function () {
-    let scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
-    let playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
-    let spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
-    let blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
-    let winBy = getDropdownSelectedValue(document.getElementById('winBy'));
-    let timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
+    const scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
+    const playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
+    const spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
+    const blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
+    const winBy = getDropdownSelectedValue(document.getElementById('winBy'));
+    const timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
 
-    let go = {
+    const go = {
         "vL": spectatorLimit,
         "pL": playerLimit,
         "sl": scoreLimit,
         "bl": blanksLimit,
         "tm": timeMultiplier,
         "wb": winBy,
+        "CCs": getCardcastDeckCodes(document.getElementById('cc_decks')),
         "css": getSelectedCardSets(document.getElementById('pyx_decks'))
     };
 
@@ -31,7 +32,7 @@ createGameDialog.listen('MDCDialog:cancel', function () {
     // Do nothing
 });
 
-let drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
+const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
     drawer.open = true
 });
@@ -77,8 +78,8 @@ function joinGame(element) {
 }
 
 function spectateGame(element) {
-    let gid = element.getAttribute('data-gid');
-    let hp = element.getAttribute('data-hp');
+    const gid = element.getAttribute('data-gid');
+    const hp = element.getAttribute('data-hp');
 
     let password = "";
     if (hp === true) password = askPassword();
@@ -110,9 +111,9 @@ function loadGamesList() {
 }
 
 function toggleNoGamesMessage(visible) {
-    let container = $('#games-global-container');
-    let list = container.find('.list');
-    let message = container.find('.message');
+    const container = $('#games-global-container');
+    const list = container.find('.list');
+    const message = container.find('.message');
     if (visible) {
         list.hide();
         message.show();
@@ -134,7 +135,7 @@ function filterGames(query) {
 }
 
 function populateGamesList(gamesList) {
-    let items = [];
+    const items = [];
     for (let i = 0; i < gamesList.length; i++) {
         let game = gamesList[i];
 
@@ -198,16 +199,17 @@ function populateGamesList(gamesList) {
 }
 
 function deckIdsToNames(ids) {
-    let names = [];
-    let css = localStorage["css"];
+    const names = [];
+    const css = localStorage["css"];
     if (css === undefined) return ids; // Shouldn't happen
-    let json = JSON.parse(css);
+    const json = JSON.parse(css);
 
     for (let i = 0; i < ids.length; i++) {
         for (let j = 0; j < json.length; j++) {
             if (ids[i] === json[j].cid) names[i] = json[j].csn;
         }
     }
+
     return names;
 }
 
@@ -247,7 +249,7 @@ function updateLikeDislike(likeButton, disLikeButton, data) {
 }
 
 function likeGame(button) {
-    let gid = button.parentElement.parentElement.getAttribute('data-gid');
+    const gid = button.parentElement.parentElement.getAttribute('data-gid');
 
     $.post("AjaxServlet?o=lk&gid=" + gid).done(function (data) {
         updateLikeDislike(button, undefined, data);
@@ -258,7 +260,7 @@ function likeGame(button) {
 }
 
 function dislikeGame(button) {
-    let gid = button.parentElement.parentElement.getAttribute('data-gid');
+    const gid = button.parentElement.parentElement.getAttribute('data-gid');
 
     $.post("AjaxServlet?o=dlk&gid=" + gid).done(function (data) {
         updateLikeDislike(undefined, button, data);
