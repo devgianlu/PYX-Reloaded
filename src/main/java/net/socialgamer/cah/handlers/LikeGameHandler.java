@@ -9,16 +9,16 @@ import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
 
-public class DislikeHandler extends GameHandler {
-    public static final String OP = Constants.AjaxOperation.DISLIKE.toString();
+public class LikeGameHandler extends GameHandler {
+    public static final String OP = Constants.AjaxOperation.LIKE.toString();
 
-    public DislikeHandler(@Annotations.GameManager GameManager gameManager) {
+    public LikeGameHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
     }
 
     @Override
     public JsonElement handle(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) {
-        game.toggleDislikeGame(user);
+        game.toggleLikeGame(user);
         return game.getLikesInfoJson(user);
     }
 }

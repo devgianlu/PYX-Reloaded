@@ -32,7 +32,7 @@ public class Handlers {
         LIST.put(SpectateGameHandler.OP, SpectateGameHandler.class);
         LIST.put(StartGameHandler.OP, StartGameHandler.class);
         LIST.put(StopGameHandler.OP, StopGameHandler.class);
-        LIST.put(LikeHandler.OP, LikeHandler.class);
-        LIST.put(DislikeHandler.OP, DislikeHandler.class);
+        LIST.put(LikeGameHandler.OP, LikeGameHandler.class);
+        LIST.put(DislikeGameHandler.OP, DislikeGameHandler.class);
     }
 }
