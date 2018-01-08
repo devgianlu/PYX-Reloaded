@@ -18,7 +18,7 @@ window.onload = function () {
 };
 
 function register() {
-    var nickname = $("input#nickname").val();
+    const nickname = $("input#nickname").val();
 
     $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
         alert("Error data: " + JSON.stringify(data));

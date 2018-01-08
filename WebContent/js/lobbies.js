@@ -1,19 +1,19 @@
-var games = new List('games-global-container', {
+let games = new List('games-global-container', {
     item: 'game-info-template',
     valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
         {'data': ['gid', 'hp', 'like', 'dislike']}]
 });
 
-var createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
+let createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
 createGameDialog.listen('MDCDialog:accept', function () {
-    var scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
-    var playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
-    var spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
-    var blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
-    var winBy = getDropdownSelectedValue(document.getElementById('winBy'));
-    var timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
+    let scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
+    let playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
+    let spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
+    let blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
+    let winBy = getDropdownSelectedValue(document.getElementById('winBy'));
+    let timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
 
-    var go = {
+    let go = {
         "vL": spectatorLimit,
         "pL": playerLimit,
         "sl": scoreLimit,
@@ -31,7 +31,7 @@ createGameDialog.listen('MDCDialog:cancel', function () {
     // Do nothing
 });
 
-var drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
+let drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
     drawer.open = true
 });
@@ -40,7 +40,7 @@ window.onload = function () {
     sendPollRequest(false);
     loadGamesList();
 
-    var gid = getURLParameter('gid');
+    let gid = getURLParameter('gid');
     if (gid !== undefined) {
         postJoinSpectate(gid) // No need to join or spectate, just move the UI there
     }
@@ -61,10 +61,10 @@ function askPassword() {
 }
 
 function joinGame(element) {
-    var gid = element.getAttribute('data-gid');
-    var hp = element.getAttribute('data-hp');
+    let gid = element.getAttribute('data-gid');
+    let hp = element.getAttribute('data-hp');
 
-    var password = "";
+    let password = "";
     if (hp === true) password = askPassword();
 
     $.post("AjaxServlet?o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
@@ -77,10 +77,10 @@ function joinGame(element) {
 }
 
 function spectateGame(element) {
-    var gid = element.getAttribute('data-gid');
-    var hp = element.getAttribute('data-hp');
+    let gid = element.getAttribute('data-gid');
+    let hp = element.getAttribute('data-hp');
 
-    var password = "";
+    let password = "";
     if (hp === true) password = askPassword();
 
     $.post("AjaxServlet?o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
@@ -110,9 +110,9 @@ function loadGamesList() {
 }
 
 function toggleNoGamesMessage(visible) {
-    var container = $('#games-global-container');
-    var list = container.find('.list');
-    var message = container.find('.message');
+    let container = $('#games-global-container');
+    let list = container.find('.list');
+    let message = container.find('.message');
     if (visible) {
         list.hide();
         message.show();
@@ -134,30 +134,30 @@ function filterGames(query) {
 }
 
 function populateGamesList(gamesList) {
-    var items = [];
-    for (var i = 0; i < gamesList.length; i++) {
-        var game = gamesList[i];
+    let items = [];
+    for (let i = 0; i < gamesList.length; i++) {
+        let game = gamesList[i];
 
-        var goal;
+        let goal;
         if (game.go.wb === 0) goal = game.go.sl;
         else goal = game.go.sl + " (win by " + game.go.wb + ")";
 
-        var status;
+        let status;
         if (game.S === "l") status = "lobby";
         else status = "started";
 
-        var decksNames = deckIdsToNames(game.go.css);
-        var decks;
+        let decksNames = deckIdsToNames(game.go.css);
+        let decks;
         if (decksNames.length === 0) decks = "none";
         else decks = decksNames.join(", ");
 
-        var players;
+        let players;
         if (game.P.length === 0) players = "none";
         else players = game.P.join(", ");
 
         players += " (" + game.P.length + "/" + game.go.pL + ")";
 
-        var spectators;
+        let spectators;
         if (game.V.length === 0) spectators = "none";
         else spectators = game.V.join(", ");
 
@@ -181,14 +181,14 @@ function populateGamesList(gamesList) {
 
     games.clear();
     games.add(items, function (items) {
-        for (var i = 0; i < items.length; i++) {
-            var card = $(items[i].elm);
+        for (let i = 0; i < items.length; i++) {
+            let card = $(items[i].elm);
 
-            var likeButton = card.find('._likes');
+            let likeButton = card.find('._likes');
             if (card.attr("data-like") === "true") likeButton.addClass('mdc-button--raised');
             else likeButton.removeClass('mdc-button--raised');
 
-            var dislikeButton = card.find('._dislikes');
+            let dislikeButton = card.find('._dislikes');
             if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
             else dislikeButton.removeClass('mdc-button--raised');
         }
@@ -198,13 +198,13 @@ function populateGamesList(gamesList) {
 }
 
 function deckIdsToNames(ids) {
-    var names = [];
-    var css = localStorage["css"];
+    let names = [];
+    let css = localStorage["css"];
     if (css === undefined) return ids; // Shouldn't happen
-    var json = JSON.parse(css);
+    let json = JSON.parse(css);
 
-    for (var i = 0; i < ids.length; i++) {
-        for (var j = 0; j < json.length; j++) {
+    for (let i = 0; i < ids.length; i++) {
+        for (let j = 0; j < json.length; j++) {
             if (ids[i] === json[j].cid) names[i] = json[j].csn;
         }
     }
@@ -247,7 +247,7 @@ function updateLikeDislike(likeButton, disLikeButton, data) {
 }
 
 function likeGame(button) {
-    var gid = button.parentElement.parentElement.getAttribute('data-gid');
+    let gid = button.parentElement.parentElement.getAttribute('data-gid');
 
     $.post("AjaxServlet?o=lk&gid=" + gid).done(function (data) {
         updateLikeDislike(button, undefined, data);
@@ -258,7 +258,7 @@ function likeGame(button) {
 }
 
 function dislikeGame(button) {
-    var gid = button.parentElement.parentElement.getAttribute('data-gid');
+    let gid = button.parentElement.parentElement.getAttribute('data-gid');
 
     $.post("AjaxServlet?o=dlk&gid=" + gid).done(function (data) {
         updateLikeDislike(undefined, button, data);

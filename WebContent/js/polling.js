@@ -1,4 +1,4 @@
-var shouldStop = false;
+let shouldStop = false;
 
 function stopPolling() {
     shouldStop = true;
