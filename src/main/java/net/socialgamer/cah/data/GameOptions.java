@@ -9,7 +9,10 @@ import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class GameOptions {
     public static final int DEFAULT_SCORE_MIN = 4;
@@ -27,8 +30,7 @@ public class GameOptions {
     public static final int DEFAULT_WIN_BY_MIN = 0;
     public static final int DEFAULT_WIN_BY_DEF = 0;
     public static final int DEFAULT_WIN_BY_MAX = 5;
-    public static final String DEFAULT_TIME_MULTIPLIER = "1x";
-    public static final Set<String> VALID_TIME_MULTIPLIERS = Collections.unmodifiableSet(new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x")));
+    public static final TimeMultiplier DEFAULT_TIME_MULTIPLIER = TimeMultiplier.X1;
 
     public final Set<Integer> cardSetIds = new HashSet<>();
     public int winBy;
@@ -37,7 +39,7 @@ public class GameOptions {
     public int spectatorLimit;
     public int scoreGoal;
     public String password = "";
-    public String timerMultiplier = "1x";
+    public TimeMultiplier timerMultiplier = DEFAULT_TIME_MULTIPLIER;
 
     private GameOptions(Preferences preferences) {
         blanksInDeck = getBlanksLimit(preferences).def;
@@ -56,15 +58,11 @@ public class GameOptions {
         obj.add(GameOptionData.WIN_BY.toString(), getWinBy(preferences).toJson());
 
         JsonObject tm = new JsonObject();
-        tm.add("values", getTimeMultiplierValidValues());
-        tm.addProperty("default", DEFAULT_TIME_MULTIPLIER);
+        tm.add("values", TimeMultiplier.validValuesJson());
+        tm.addProperty("default", DEFAULT_TIME_MULTIPLIER.val);
         obj.add(GameOptionData.TIMER_MULTIPLIER.toString(), tm);
 
         return obj;
-    }
-
-    public static JsonArray getTimeMultiplierValidValues() {
-        return Utils.toStringsJsonArray(VALID_TIME_MULTIPLIERS);
     }
 
     private static Preferences.MinDefaultMax getBlanksLimit(Preferences preferences) {
@@ -109,7 +107,7 @@ public class GameOptions {
         options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
         options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
         options.winBy = Math.max(winBy.min, Math.min(winBy.max, Utils.optInt(json, GameOptionData.WIN_BY.toString(), options.winBy)));
-        options.timerMultiplier = Utils.optString(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
+        options.timerMultiplier = TimeMultiplier.opt(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
         options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
 
         return options;
@@ -163,7 +161,7 @@ public class GameOptions {
         obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
         obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
         obj.addProperty(GameOptionData.WIN_BY.toString(), winBy);
-        obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier);
+        obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier.val);
         if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
         return obj;
     }
@@ -178,5 +176,43 @@ public class GameOptions {
         }
 
         return pyxCardSetIds;
+    }
+
+    public enum TimeMultiplier {
+        X0_25("0.25x"), X0_50("0.50x"), X0_75("0.75x"),
+        X1("1x"), X1_25("1.25x"), X1_50("1.50x"),
+        X1_75("1.75x"), X2("2x"), X2_5("2.50x"),
+        X3("3x"), X4("4x"), X5("5x"),
+        X10("10x"), UNLIMITED("Unlimited");
+
+        private final String val;
+
+        TimeMultiplier(String val) {
+            this.val = val;
+        }
+
+        public static TimeMultiplier opt(JsonObject obj, String key, TimeMultiplier fallback) {
+            if (obj.has(key)) return TimeMultiplier.parse(obj.get(key).getAsString(), fallback);
+            else return fallback;
+        }
+
+        public static JsonArray validValuesJson() {
+            JsonArray array = new JsonArray();
+            for (TimeMultiplier item : values()) array.add(item.val);
+            return array;
+        }
+
+        @NotNull
+        public static TimeMultiplier parse(String val, TimeMultiplier fallback) {
+            for (TimeMultiplier item : values())
+                if (item.val.equals(val)) return item;
+
+            return fallback;
+        }
+
+        public double factor() {
+            if (this == UNLIMITED) throw new IllegalArgumentException("Cannot get factor for unlimited");
+            return Double.valueOf(val.substring(0, val.length() - 1));
+        }
     }
 }

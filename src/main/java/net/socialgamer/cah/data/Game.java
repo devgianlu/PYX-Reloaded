@@ -794,13 +794,10 @@ public class Game {
     }
 
     private int calculateTime(int base) {
-        double factor = 1.0d;
-        String tm = options.timerMultiplier;
-        if (tm.equals("Unlimited")) return Integer.MAX_VALUE;
-        if (GameOptions.VALID_TIME_MULTIPLIERS.contains(tm)) factor = Double.valueOf(tm.substring(0, tm.length() - 1));
-        long retval = Math.round(base * factor);
-        if (retval > Integer.MAX_VALUE) return Integer.MAX_VALUE;
-        return (int) retval;
+        if (options.timerMultiplier == GameOptions.TimeMultiplier.UNLIMITED) return Integer.MAX_VALUE;
+        long val = Math.round(base * options.timerMultiplier.factor());
+        if (val > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        return (int) val;
     }
 
     /**
