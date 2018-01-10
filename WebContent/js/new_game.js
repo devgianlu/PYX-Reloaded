@@ -1,3 +1,53 @@
+class MDCMultiSelect extends mdc.select.MDCSelect {
+
+    constructor(root, foundation = undefined, ...args) {
+        super(root, foundation, ...args);
+
+        this.menu_.unlisten("MDCSimpleMenu:cancel", this.foundation_.cancelHandler_);
+        this.menu_.unlisten("MDCSimpleMenu:selected", this.foundation_.selectionHandler_);
+    }
+
+    get getSelectedItemNames() {
+        const names = [];
+
+        for (let i = 0; i < this.options.length; i++) {
+            let item = this.options[i];
+            if (item.querySelector('input').checked)
+                names.push(item.querySelector('label').innerText);
+        }
+
+        return names;
+    }
+
+    initialize(menuFactory) {
+        super.initialize(menuFactory);
+
+        this.menu_.listen("MDCSimpleMenu:selected", (evt) => {
+            this.updateUI();
+            this.foundation_.close_();
+            evt.preventDefault();
+        });
+        this.menu_.listen("MDCSimpleMenu:cancel", (evt) => {
+            this.updateUI();
+            this.foundation_.close_();
+            evt.preventDefault();
+        });
+    }
+
+    updateUI() {
+        const selected = this.getSelectedItemNames;
+        this.selectedText_.textContent = selected.join(", ");
+
+        if (selected.length === 0) this.label_.classList.remove("mdc-select__label--float-above");
+        else this.label_.classList.add("mdc-select__label--float-above");
+    }
+
+    clear() {
+        this.selectedText_.textContent = "";
+        this.label_.classList.remove("mdc-select__label--float-above")
+    }
+}
+
 function clearElement(elm) {
     while (elm.firstChild) {
         elm.removeChild(elm.firstChild);
@@ -69,7 +119,7 @@ function loadCardSets(container, css) {
     });
 }
 
-function getSelectedCardSets(container) {
+function getSelectedPyxDecks(container) {
     const list = container.querySelector('.list');
     let selected = [];
     for (let i = 0; i < list.children.length; i++) {
@@ -111,9 +161,17 @@ function resetCreateGameDialog() {
     populateDropdown(winByElm, dgo.wb);
     loadCardSets(document.getElementById('pyx_decks'), JSON.parse(localStorage['css']));
 
+    resetPyxDecks();
+
     const ccDecksElm = document.getElementById('cc_decks');
     setupCardcastDecks(ccDecksElm);
     resetLoadCardcast();
+}
+
+function resetPyxDecks() {
+    const element = document.querySelector('#pyx_decks');
+    const select = new MDCMultiSelect(element);
+    select.clear();
 }
 
 function resetLoadCardcast() {

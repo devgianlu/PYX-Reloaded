@@ -74,7 +74,7 @@
         <section class="mdc-dialog__body mdc-dialog__body--scrollable">
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">General</h5>
+                    <h5 class="mdc-card__title">Gameplay</h5>
                 </div>
                 <section class="mdc-card__supporting-text">
                     <div class="mdc-layout-grid">
@@ -154,74 +154,71 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">Cardcast</h5>
-                </div>
-                <section class="mdc-card__supporting-text mdc-layout-grid">
-                    <div class="mdc-layout-grid__inner">
-                        <div id="cc_decks" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                            <h5>Decks</h5>
-                            <ul class="mdc-list mdc-list--two-line mdc-list--dense"
-                                style="max-height: 256px; overflow-y: auto;"></ul>
-                            <div class="message" style="margin-top: 48px">
-                                <div class="material-icons md-48 md-dark">info_outline</div>
-                                <h3 class="md-dark">No Cardcast decks.</h3>
-                            </div>
-                        </div>
-                        <div id="cc_add" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                            <h5>Add deck</h5>
-                            <div class="mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon"
-                                 style="width: 100%;"
-                                 data-mdc-auto-init="MDCTextField">
-                                <input maxlength="5" minlength="5" type="text" id="cc_deck_code"
-                                       class="mdc-text-field__input"
-                                       style="text-transform: uppercase">
-                                <label for="cc_deck_code" class="mdc-text-field__label">Deck code</label>
-                                <i class="material-icons mdc-text-field__icon" tabindex="0"
-                                   onclick="loadCardcastDeckInfo(this);">add</i>
-                                <div class="mdc-text-field__bottom-line"></div>
-                            </div>
-                            <div id="deck_info">
-                                <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate"
-                                     style="display: none">
-                                    <div class="mdc-linear-progress__buffering-dots"></div>
-                                    <div class="mdc-linear-progress__buffer"></div>
-                                    <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
-                                        <span class="mdc-linear-progress__bar-inner"></span>
-                                    </div>
-                                    <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
-                                        <span class="mdc-linear-progress__bar-inner"></span>
-                                    </div>
-                                </div>
-
-                                <div id="deck_info_details" style="display: none">
-                                    <!-- TODO: Style this a bit better -->
-                                    <h3 class="_name">{{Deck name}}</h3>
-                                    <h3 class="_code">{{Deck code, XXXXX}}</h3>
-
-                                    <button class="mdc-button mdc-button--raised"
-                                            onclick="addCardcastDeckToLayout(this);">
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div id="pyx_decks" class="mdc-card">
-                <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">PYX Card Sets</h5>
+                    <h5 class="mdc-card__title">Cards</h5>
                 </div>
                 <section class="mdc-card__supporting-text">
-                    <div class="mdc-select" role="listbox" style="width: 100%">
+                    <h4>PYX</h4>
+                    <div class="mdc-select" id="pyx_decks" role="listbox" style="width: 100%; margin-bottom: 16px">
                         <div class="mdc-select__surface">
-                            <div class="mdc-select__label">TEST 123</div>
+                            <div class="mdc-select__label">PYX card sets</div>
                             <div class="mdc-select__selected-text"></div>
                             <div class="mdc-select__bottom-line"></div>
                         </div>
                         <div class="mdc-simple-menu mdc-select__menu">
                             <ul class="mdc-list mdc-list--non-interactive list mdc-simple-menu__items"></ul>
+                        </div>
+                    </div>
+                    <h4 style="margin-bottom: 0">Cardcast</h4>
+                    <div style="padding-top: 8px" class="mdc-layout-grid">
+                        <div class="mdc-layout-grid__inner">
+                            <div id="cc_decks" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                <h5>Decks</h5>
+                                <ul class="mdc-list mdc-list--two-line mdc-list--dense"
+                                    style="max-height: 256px; overflow-y: auto;"></ul>
+                                <div class="message" style="margin-top: 48px">
+                                    <div class="material-icons md-48 md-dark">info_outline</div>
+                                    <h3 class="md-dark">No Cardcast decks.</h3>
+                                </div>
+                            </div>
+                            <div id="cc_add" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                <h5>Add deck</h5>
+                                <div class="mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon"
+                                     style="width: 100%;"
+                                     data-mdc-auto-init="MDCTextField">
+                                    <input maxlength="5" minlength="5" type="text" id="cc_deck_code"
+                                           class="mdc-text-field__input"
+                                           style="text-transform: uppercase">
+                                    <label for="cc_deck_code" class="mdc-text-field__label">Deck code</label>
+                                    <i class="material-icons mdc-text-field__icon" tabindex="0"
+                                       onclick="loadCardcastDeckInfo(this);">add</i>
+                                    <div class="mdc-text-field__bottom-line"></div>
+                                </div>
+                                <div id="deck_info">
+                                    <div role="progressbar"
+                                         class="mdc-linear-progress mdc-linear-progress--indeterminate"
+                                         style="display: none">
+                                        <div class="mdc-linear-progress__buffering-dots"></div>
+                                        <div class="mdc-linear-progress__buffer"></div>
+                                        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                                            <span class="mdc-linear-progress__bar-inner"></span>
+                                        </div>
+                                        <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                                            <span class="mdc-linear-progress__bar-inner"></span>
+                                        </div>
+                                    </div>
+
+                                    <div id="deck_info_details" style="display: none">
+                                        <!-- TODO: Style this a bit better -->
+                                        <h3 class="_name">{{Deck name}}</h3>
+                                        <h3 class="_code">{{Deck code, XXXXX}}</h3>
+
+                                        <button class="mdc-button mdc-button--raised"
+                                                onclick="addCardcastDeckToLayout(this);">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -296,71 +293,7 @@
 <script src="js/polling.js"></script>
 <script src="js/new_game.js"></script>
 <script src="js/lobbies.js"></script>
-<script>
-    window.mdc.autoInit();
-
-    class MDCMultiSelect extends mdc.select.MDCSelect {
-
-        constructor(root, foundation = undefined, ...args) {
-            super(root, foundation, ...args);
-
-            this.menu_.unlisten("MDCSimpleMenu:cancel", this.foundation_.cancelHandler_);
-            this.menu_.unlisten("MDCSimpleMenu:selected", this.foundation_.selectionHandler_);
-        }
-
-        initialize(menuFactory) {
-            super.initialize(menuFactory);
-
-            this.menu_.listen("MDCSimpleMenu:selected", (evt) => {
-                this.updateUI();
-                this.foundation_.close_();
-                evt.preventDefault();
-            });
-            this.menu_.listen("MDCSimpleMenu:cancel", (evt) => {
-                this.updateUI();
-                this.foundation_.close_();
-                evt.preventDefault();
-            });
-        }
-
-        updateUI() {
-            const selected = this.getSelectedItemNames;
-            this.selectedText_.textContent = selected.join(", ");
-
-            if (selected.length === 0) this.label_.classList.remove("mdc-select__label--float-above");
-            else this.label_.classList.add("mdc-select__label--float-above");
-        }
-
-        get getSelectedItems() {
-            return this.selectedItems();
-        }
-
-        get getSelectedItemNames() {
-            const names = [];
-            const items = this.selectedItems();
-
-            for (let i = 0; i < items.length; i++) {
-                names.push(items[i].querySelector('label').innerText);
-            }
-
-            return names;
-        }
-
-        selectedItems() {
-            const selected = [];
-
-            for (let i = 0; i < this.options.length; i++) {
-                let item = this.options[i];
-                if (item.querySelector('input').checked)
-                    selected.push(item);
-            }
-
-            return selected;
-        }
-    }
-
-    new MDCMultiSelect(document.querySelector('#pyx_decks .mdc-select'));
-</script>
+<script>window.mdc.autoInit();</script>
 
 </body>
 </html>

@@ -21,7 +21,7 @@ createGameDialog.listen('MDCDialog:accept', function () {
         "tm": timeMultiplier,
         "wb": winBy,
         "CCs": getCardcastDeckCodes(document.getElementById('cc_decks')),
-        "css": getSelectedCardSets(document.getElementById('pyx_decks'))
+        "css": getSelectedPyxDecks(document.getElementById('pyx_decks'))
     };
 
     console.log(go);
