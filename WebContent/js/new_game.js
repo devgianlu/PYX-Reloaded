@@ -63,8 +63,8 @@ function loadCardSets(container, css) {
             let cid = items[i].values().cid;
             let item = $(items[i].elm);
 
-            item.find('input').attr("id", "deck_" + cid);
-            item.find('label').attr("for", "deck_" + cid);
+            item.find('input').attr("id", "pyx_deck_" + cid);
+            item.find('label').attr("for", "pyx_deck_" + cid);
         }
     });
 }
