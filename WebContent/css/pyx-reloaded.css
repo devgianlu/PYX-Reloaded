@@ -110,17 +110,3 @@ body {
 .md-light.md-inactive {
     color: rgba(255, 255, 255, 0.3);
 }
-
-/* Hacks to get the select component to work inside the dialog */
-.mdc-dialog .mdc-select {
-    position: relative !important;
-}
-
-.mdc-dialog .mdc-select__menu {
-    top: inherit !important;
-    left: inherit !important;
-
-    /* max-height: calc(100vh - 64px) !important; */
-
-    margin-top: 44px;
-}
