@@ -124,7 +124,6 @@ function toggleNoGamesMessage(visible) {
 }
 
 function filterGames(query) {
-    // TODO: Message when there are no search results
     if (query.length === 0) {
         games.filter(); // Remove all filters
     } else {

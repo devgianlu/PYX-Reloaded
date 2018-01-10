@@ -207,12 +207,16 @@
                                         </div>
                                     </div>
 
-                                    <div id="deck_info_details" style="display: none">
-                                        <!-- TODO: Style this a bit better -->
-                                        <h3 class="_name">{{Deck name}}</h3>
-                                        <h3 class="_code">{{Deck code, XXXXX}}</h3>
+                                    <div id="deck_info_details"
+                                         style="display: none; margin-top: 16px;">
+                                        <h1 class="mdc-typography--headline mdc-typography--adjust-margin _name">{{Deck
+                                            name}}</h1>
+
+                                        <h4 class="mdc-typography--caption mdc-typography--adjust-margin _author">{{Deck
+                                            author}}</h4>
 
                                         <button class="mdc-button mdc-button--raised"
+                                                style="float: right;"
                                                 onclick="addCardcastDeckToLayout(this);">
                                             Add
                                         </button>
