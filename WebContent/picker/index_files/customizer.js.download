@@ -282,7 +282,6 @@ MaterialCustomizer = function () {
             "\\$primary": this.urlsafeName(r20),
             "\\$accent": this.urlsafeName(rreturn)
         });
-        Prism.highlightElement(this.cdn);
     }, jQuery.prototype.highlightField = function (dataAndEvents) {
         var e = this.wheel.querySelector('[data-color="' + dataAndEvents + '"]');
         var list = getTarget(e);
