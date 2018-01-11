@@ -252,6 +252,7 @@ function addCardcastDeckToLayout(button) {
     list.appendChild(li);
 
     toggleCardcastNoDecksMessage(container, false);
+    resetLoadCardcast();
 }
 
 const _loadedCardcastDecks = {};
