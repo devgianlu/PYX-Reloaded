@@ -33,4 +33,13 @@ Screenshots
 ===========
 The following are screenshots of work that has been done already or is being worked on as of this writing:
 
+![][screen1]
+![][screen2]
+![][screen3]
+![][screen4]
 
+
+[screen1]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen1.png?raw=true
+[screen2]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen2.png?raw=true
+[screen3]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen3.png?raw=true
+[screen4]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen4.png?raw=true
