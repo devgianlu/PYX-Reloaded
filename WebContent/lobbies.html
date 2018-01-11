@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="css/pyx-reloaded.css">
+    <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="js/theming.js"></script>
+    <script>applyCustomTheme();</script>
 </head>
 
 <body class="mdc-typography">
@@ -19,7 +22,8 @@
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
-                <button class="material-icons align-icons mdc-toolbar__icon">settings</button>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">settings
+                </button>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="logout();">exit_to_app</button>
             </section>
         </div>
@@ -236,6 +240,13 @@
                 Cancel
             </button>
         </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>
+
+<aside class="mdc-dialog" id="themingDialog">
+    <div class="mdc-dialog__surface" style="transform: none">
+
     </div>
     <div class="mdc-dialog__backdrop"></div>
 </aside>
