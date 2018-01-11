@@ -27,4 +27,10 @@ After, run:
 ifconfig
 ```
 
-from your terminal. Find the one section that has ```<UP,BROADCAST,RUNNING,MULTICAST>``` and copy the IP address. Paste that IP address in your browser. If all is working smoothly, you should be taken to a page asking for you to enter a username.
+from your terminal. Find the one section that has ```<UP,BROADCAST,RUNNING,MULTICAST>``` and copy the IP address, which should be marked as *inet*. Paste that IP address in your browser. If all is working smoothly, you should be taken to a page asking for you to enter a username.
+
+Screenshots
+===========
+The following are screenshots of work that has been done already or is being worked on as of this writing:
+
+
