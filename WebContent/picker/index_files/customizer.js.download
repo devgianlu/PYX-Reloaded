@@ -4,9 +4,7 @@
 function init() {
     /** @type {(Element|null)} */
     var e = document.querySelector("#wheel > svg");
-    /** @type {(Element|null)} */
-    var element = document.querySelector(".mdl-gen__cdn .mdl-gen__cdn-link");
-    var self = new MaterialCustomizer(e, element);
+    var self = new MaterialCustomizer(e);
     /** @type {(Element|null)} */
     var li = document.querySelector("#download");
     li.addEventListener("click", function () {
@@ -21,32 +19,6 @@ function init() {
             eventAction: "download",
             eventLabel: self.getSelectedPrimary() + "-" + self.getSelectedSecondary()
         });
-    });
-    /** @type {number} */
-    var n = 0;
-    element.addEventListener("click", function () {
-        /** @type {(Selection|null)} */
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        /** @type {(Range|null)} */
-        var range2 = document.createRange();
-        if (0 === n) {
-            var testTextNode = element.querySelectorAll(".token.attr-value")[1];
-            range2.setStart(testTextNode, 2);
-            range2.setEnd(testTextNode, 3);
-        } else {
-            range2.setStart(element, 1);
-            range2.setEnd(element, 2);
-        }
-        selection.addRange(range2);
-        /** @type {number} */
-        n = (n + 1) % 2;
-    });
-    element.addEventListener("mouseup", function (types) {
-        types.preventDefault();
-    });
-    element.addEventListener("mousedown", function (types) {
-        types.preventDefault();
     });
     document.addEventListener("mouseup", function () {
         if (window.getSelection().toString().indexOf(".min.css") !== -1) {
@@ -68,7 +40,6 @@ function init() {
         self.highlightField("Indigo");
         self.highlightField("Pink");
         window.requestAnimationFrame(function () {
-            self.updateCDN();
             self.updateStylesheet();
         });
     };
@@ -247,7 +218,6 @@ MaterialCustomizer = function () {
                     this.highlightField(target.getAttribute("data-color"));
                     this.wheel.setAttribute("class", "");
                     window.requestAnimationFrame(function () {
-                        this.updateCDN();
                         this.updateStylesheet();
                     }.bind(this));
                     break;
@@ -275,13 +245,6 @@ MaterialCustomizer = function () {
         return this.wheel.querySelector(".selected--1").getAttribute("data-color");
     }, jQuery.prototype.getSelectedSecondary = function () {
         return this.wheel.querySelector(".selected--2").getAttribute("data-color");
-    }, jQuery.prototype.updateCDN = function () {
-        var r20 = this.getSelectedPrimary();
-        var rreturn = this.getSelectedSecondary();
-        this.cdn.textContent = this.replaceDict(this.cdnTpl, {
-            "\\$primary": this.urlsafeName(r20),
-            "\\$accent": this.urlsafeName(rreturn)
-        });
     }, jQuery.prototype.highlightField = function (dataAndEvents) {
         var e = this.wheel.querySelector('[data-color="' + dataAndEvents + '"]');
         var list = getTarget(e);
