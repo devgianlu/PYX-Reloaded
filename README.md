@@ -1,10 +1,30 @@
 Pretend You're Xyzzy
 ===================
 
-A  fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, and major changes in the backend. Finished product will have material design, work fairly decently on mobile devices, and have server that is self-contained instead of depending on Tomcat.
+A fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, and major changes in the backend. Finished product will have material design, work fairly decently on mobile devices, and have server that is self-contained instead of depending on Tomcat.
 
 
 Run
 ===
+While the server and current WebContent can be run, the game itself is unplayable. However, if you want to to test the work that IS done so far, you can do so via the following commands:
 
-The game cannot be run entirely at the moment, only the server part is executable.
+```sh
+git clone https://github.com/devgianlu/PYX-Reloaded.git
+cd PYX-Reloaded
+mvn clean package
+sudo java -jar $HOME/PYX-Reloaded/target/PYX-jar-with-dependencies.jar
+```
+
+**DO NOT** close the terminal after the server reports that it successfully loaded X number of cards. This will shut the server down.
+
+**NOTE**: These are instructions for Linux users. **IF** you happen to be on Windows, you can go to the Windows Store and get a CLI distribution that will allow you to run the above commands from Windows.
+
+**PREREQUISITES**: You need to have JDK8 (OpenJDK and the like) and Apache Maven installed and available in your path. Please look up which packages to install, as it will be heavily dependent upon which distro you run.
+
+After, run:
+
+```
+ifconfig
+```
+
+from your terminal. Find the one section that has ```<UP,BROADCAST,RUNNING,MULTICAST>``` and copy the IP address. Paste that IP address in your browser. If all is working smoothly, you should be taken to a page asking for you to enter a username.
