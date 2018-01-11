@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class App extends RouterNanoHTTPD {
     private static final List<String> INDEX_FILE_NAMES = new ArrayList<String>() {
         {
-            add("index_old.html");
+            add("index.html");
             add("index.htm");
         }
     };
