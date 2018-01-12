@@ -23,42 +23,6 @@ class MaterialCustomizer {
         return e.parentElement || e.parentNode;
     }
 
-    static calculateChannel(dataAndEvents) {
-        dataAndEvents /= 255;
-        return dataAndEvents < 0.03928 ? dataAndEvents / 12.92 : Math.pow((dataAndEvents + 0.055) / 1.055, 2.4);
-    }
-
-    static replaceDict(s, pairs) {
-        for (let r in pairs) {
-            if (pairs.hasOwnProperty(r)) {
-                s = s.replace(new RegExp(r, "g"), pairs[r]);
-            }
-        }
-
-        return s;
-    }
-
-    static calculateLuminance(deepDataAndEvents) {
-        const octalLiteral = deepDataAndEvents.split(",");
-        return 0.2126 * MaterialCustomizer.calculateChannel(parseInt(octalLiteral[0])) + 0.7152 * MaterialCustomizer.calculateChannel(parseInt(octalLiteral[1])) + 0.0722 * MaterialCustomizer.calculateChannel(parseInt(octalLiteral[2]));
-    }
-
-    static calculateContrast(deepDataAndEvents, dataAndEvents) {
-        const area = MaterialCustomizer.calculateLuminance(deepDataAndEvents) + 0.05;
-        const desired = MaterialCustomizer.calculateLuminance(dataAndEvents) + 0.05;
-        return Math.max(area, desired) / Math.min(area, desired);
-    }
-
-    static calculateTextColor(env) {
-        const dataAndEvents = "255,255,255";
-        const node = "66,66,66";
-        const b = MaterialCustomizer.calculateContrast(env, dataAndEvents);
-        if (b >= 3.1) {
-            return dataAndEvents;
-        }
-        return MaterialCustomizer.calculateContrast(env, node) > b ? node : dataAndEvents;
-    }
-
     init_() {
         this.config = {
             width: 650,
@@ -210,29 +174,9 @@ class MaterialCustomizer {
         return result ? result[this.lightnessIndices.indexOf(i)] : null;
     }
 
-    processTemplate(key, ast) { // FIXME
-        const paths = this.getColor(key, "500");
-        const environment = this.getColor(ast, "A200");
-        return MaterialCustomizer.replaceDict(this.template, {
-            "\\$color-primary-dark": this.getColor(key, "700"),
-            "\\$color-primary-contrast": MaterialCustomizer.calculateTextColor(paths),
-            "\\$color-accent-contrast": MaterialCustomizer.calculateTextColor(environment),
-            "\\$color-primary": paths,
-            "\\$color-accent": environment
-        });
-    }
-
     updateStylesheet() {
-        const tabPage = document.getElementById("main-stylesheet");
-        const st = document.createElement("style");
-        st.id = "main-stylesheet";
-        const udataCur = this.processTemplate(this.getSelectedPrimary(), this.getSelectedSecondary());
-        if (tabPage) {
-            if (tabPage.parentNode) {
-                tabPage.parentNode.removeChild(tabPage);
-            }
-        }
-        st.textContent = udataCur;
-        document.head.appendChild(st);
+        const example = document.getElementById('themingExample');
+        example.style.setProperty('--mdc-theme-primary', 'rgb(' + this.getColor(this.getSelectedPrimary(), "500") + ')');
+        example.style.setProperty('--mdc-theme-secondary', 'rgb(' + this.getColor(this.getSelectedSecondary(), "A200") + ')');
     }
 }

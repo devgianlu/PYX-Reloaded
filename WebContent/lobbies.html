@@ -249,27 +249,47 @@
         <header class="mdc-dialog__header">
             <h2 class="mdc-dialog__header__title">Customize appearance</h2>
         </header>
-        <section class="mdc-dialog__body">
-            <link rel="stylesheet" href="picker/customizer.css">
-            <div id="wheel">
-                <svg xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="drop-shadow">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
-                            <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
-                            <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
-                            <feComposite in2="offsetblur" operator="in"></feComposite>
-                            <feMerge>
-                                <feMergeNode></feMergeNode>
-                                <feMergeNode in="SourceGraphic"></feMergeNode>
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    <g class="wheel--maing"></g>
-                </svg>
+        <section class="mdc-dialog__body mdc-layout-grid">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                <link rel="stylesheet" href="picker/customizer.css">
+                <div id="wheel">
+                    <svg xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="drop-shadow">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
+                                <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
+                                <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
+                                <feComposite in2="offsetblur" operator="in"></feComposite>
+                                <feMerge>
+                                    <feMergeNode></feMergeNode>
+                                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <g class="wheel--maing"></g>
+                    </svg>
+                </div>
+                <script src="picker/customizer.js"></script>
+                <script>init();</script>
             </div>
-            <script src="picker/customizer.js"></script>
-            <script>init();</script>
+            <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                <header class="mdc-toolbar mdc-elevation--z4">
+                    <div class="mdc-toolbar__row">
+                        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                            <button class="material-icons mdc-toolbar__menu-icon">menu</button>
+                            <span class="mdc-toolbar__title">Toolbar</span>
+                        </section>
+                    </div>
+                </header>
+                <main>
+                    <h3>Try it out</h3>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                    <button class="mdc-button mdc-button--colored mdc-button--raised">BUTTON</button>
+                    <button class="mdc-fab material-icons">
+                        <span class="mdc-fab__icon">add</span>
+                    </button>
+                </main>
+            </div>
         </section>
         <footer class="mdc-dialog__footer">
             <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">
