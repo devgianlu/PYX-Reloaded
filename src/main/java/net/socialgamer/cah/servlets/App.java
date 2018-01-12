@@ -201,7 +201,7 @@ public class App extends RouterNanoHTTPD {
         }
 
         if (f.isDirectory()) {
-            // First look for index files (index_old.html, index.htm, etc) and if
+            // First look for index files (index.html, index.htm, etc) and if
             // none found, list the directory if readable.
             String indexFile = findIndexFileInDirectory(f);
             if (indexFile == null) {
