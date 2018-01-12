@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="css/pyx-reloaded.css">
+    <link rel="stylesheet" href="css/theming.css">
+    <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="js/theming.js"></script>
+    <script>applyCustomTheme();</script>
 </head>
 
 <body class="mdc-typography">
@@ -19,7 +23,8 @@
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
-                <button class="material-icons align-icons mdc-toolbar__icon">settings</button>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">settings
+                </button>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="logout();">exit_to_app</button>
             </section>
         </div>
@@ -231,6 +236,66 @@
         <footer class="mdc-dialog__footer">
             <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">
                 Start
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">
+                Cancel
+            </button>
+        </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>
+
+<aside class="mdc-dialog" id="themingDialog">
+    <div class="mdc-dialog__surface" style="transform: none">
+        <header class="mdc-dialog__header">
+            <h2 class="mdc-dialog__header__title">Customize appearance</h2>
+        </header>
+        <section class="mdc-dialog__body mdc-layout-grid">
+            <div class="mdc-layout-grid__inner">
+                <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                    <div id="themingWheel">
+                        <svg xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="drop-shadow">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
+                                    <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
+                                    <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
+                                    <feComposite in2="offsetblur" operator="in"></feComposite>
+                                    <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <g class="wheel--maing"></g>
+                        </svg>
+                    </div>
+                    <script>initWheel();</script>
+                </div>
+                <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                     style="display: flex; flex-flow: column">
+                    <header class="mdc-toolbar mdc-elevation--z4">
+                        <div class="mdc-toolbar__row">
+                            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                                <button class="material-icons mdc-toolbar__menu-icon">menu</button>
+                                <span class="mdc-toolbar__title">Toolbar</span>
+                            </section>
+                        </div>
+                    </header>
+                    <main style="padding: 16px; position: relative; flex-grow: 1; overflow-y: visible">
+                        <h3>Try it out</h3>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                        <button class="mdc-button mdc-button--colored mdc-button--raised">BUTTON</button>
+                        <button class="mdc-fab material-icons" style="position:absolute; bottom: 0; right: 0;">
+                            <span class="mdc-fab__icon">add</span>
+                        </button>
+                    </main>
+                </div>
+            </div>
+        </section>
+        <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">
+                Apply
             </button>
             <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">
                 Cancel

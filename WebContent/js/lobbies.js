@@ -28,9 +28,6 @@ createGameDialog.listen('MDCDialog:accept', function () {
 
     createGame(go);
 });
-createGameDialog.listen('MDCDialog:cancel', function () {
-    // Do nothing
-});
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
