@@ -246,7 +246,39 @@
 
 <aside class="mdc-dialog" id="themingDialog">
     <div class="mdc-dialog__surface" style="transform: none">
-
+        <header class="mdc-dialog__header">
+            <h2 class="mdc-dialog__header__title">Customize appearance</h2>
+        </header>
+        <section class="mdc-dialog__body">
+            <link rel="stylesheet" href="picker/customizer.css">
+            <div id="wheel">
+                <svg xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="drop-shadow">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
+                            <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
+                            <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
+                            <feComposite in2="offsetblur" operator="in"></feComposite>
+                            <feMerge>
+                                <feMergeNode></feMergeNode>
+                                <feMergeNode in="SourceGraphic"></feMergeNode>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g class="wheel--maing"></g>
+                </svg>
+            </div>
+            <script src="picker/customizer.js"></script>
+            <script>init();</script>
+        </section>
+        <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">
+                Apply
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">
+                Cancel
+            </button>
+        </footer>
     </div>
     <div class="mdc-dialog__backdrop"></div>
 </aside>

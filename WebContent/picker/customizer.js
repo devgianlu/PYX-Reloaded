@@ -94,7 +94,7 @@ class MaterialCustomizer {
     buildWheel_() {
         const opts = this.config;
         const r = this.wheel.querySelector("g.wheel--maing");
-        const parent = this.wheel.parentNode;
+        // const parent = this.wheel.parentNode;
         this.wheel.setAttribute("viewBox", "0 0 " + this.config.width + " " + this.config.height);
         this.wheel.setAttribute("preserveAspectRatio", "xMidYMid meet");
         this.wheel.setAttribute("width", this.config.width);
@@ -103,7 +103,6 @@ class MaterialCustomizer {
         const svgns = "http://www.w3.org/2000/svg";
         opts.colors.forEach(function (value, i) {
             const el = frag.cloneNode(true);
-            const elem = document.createElement("div");
             for (let x = 1; x <= 2; x++) {
                 const g = document.createElementNS(svgns, "g");
                 const text = document.createElementNS(svgns, "text");
@@ -122,10 +121,14 @@ class MaterialCustomizer {
             el.querySelector(".polygons").addEventListener("click", this.fieldClicked_.bind(this));
             el.setAttribute("transform", "rotate(" + opts.alphaDeg * i + ")");
             r.appendChild(el);
-            elem.setAttribute("for", value);
-            elem.className = "mdl-tooltip mdl-tooltip--large";
-            elem.innerHTML = value;
-            parent.appendChild(elem);
+
+            /* TODO: If tooltips will ever be implemented in MDC (https://github.com/material-components/material-components-web/pull/1701)
+            const tooltip = document.createElement("div");
+            tooltip.setAttribute("for", value);
+            tooltip.className = "mdl-tooltip mdl-tooltip--large";
+            tooltip.innerHTML = value;
+            parent.appendChild(tooltip);
+            */
         }.bind(this));
         r.setAttribute("transform", "translate(" + opts.width / 2 + "," + opts.height / 2 + ")");
     }
@@ -207,7 +210,7 @@ class MaterialCustomizer {
         return result ? result[this.lightnessIndices.indexOf(i)] : null;
     }
 
-    processTemplate(key, ast) {
+    processTemplate(key, ast) { // FIXME
         const paths = this.getColor(key, "500");
         const environment = this.getColor(ast, "A200");
         return MaterialCustomizer.replaceDict(this.template, {
