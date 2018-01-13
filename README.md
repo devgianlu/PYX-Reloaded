@@ -37,6 +37,9 @@ We cleaned up that ugly-ass screen the OG PYX had. It's been replaced with a nic
 Selecting the cards from the original PYX is also included, with Material checkboxes to make life complete!!
 
 ![][screen6]
+
+A view of the blank Cardcast screen. #dope
+
 ![][screen4]
 
 Before we add a Cardcast to your game, we want to make sure it's the exact one you want, by the author you chose.
