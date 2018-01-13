@@ -4,7 +4,7 @@ A fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, 
 
 Features
 --------
-We are nowhere near close to "done." It's been amazing to watch this thing climb. However, while we're working, we'll add new photos and explanations here so (eventually) we'll be able to convince you to use our fork. The main advantage to using this over the original or another fork are as follows:
+We are nowhere near close to "done." It's been amazing to watch this thing climb. However, while we're working, we'll add new photos and explanations here so (eventually) we'll be able to convince you to use our fork. The main advantages to using this over the original or another fork are as follows:
 
 * Improved back-end
   * Easier installation using a single jar file
