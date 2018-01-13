@@ -7,12 +7,12 @@ Features
 We are nowhere near close to "done." It's been amazing to watch this thing climb. However, while we're working, we'll add new photos and explanations here so (eventually) we'll be able to convince you to use our fork. The main advantage to using this over the original or another fork are as follows:
 
 * Improved back-end
- * Easier installation using a single jar file
- * No dependency on containers like Tomcat
+  * Easier installation using a single jar file
+  * No dependency on containers like Tomcat
 * Completely new frontend 
- * Full support for mobile device browsers (the current one simply doesn't work right in a browser on your phone)
- * Material Design through MDC-Web
- * See more below!
+  * Full support for mobile device browsers (the current one simply doesn't work right in a browser on your phone)
+  * Material Design through MDC-Web
+  * See more below!
 
 The following features have been implemented thusfar:
 
