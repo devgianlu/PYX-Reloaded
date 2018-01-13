@@ -4,9 +4,17 @@ A fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, 
 
 Features
 --------
-We are nowhere near close to "done." It's been amazing to watch this thing climb. However, while we're working, we'll add new photos and explanations here so (eventually) we'll be able to convince you to use our fork. The main advantage is easier installation, improved back-end, completely new frontend, and full support for mobile device browsers (the current one simply doesn't work right in a browser on your phone).
+We are nowhere near close to "done." It's been amazing to watch this thing climb. However, while we're working, we'll add new photos and explanations here so (eventually) we'll be able to convince you to use our fork. The main advantage to using this over the original or another fork are as follows:
 
-The following have been implemented thusfar:
+* Improved back-end
+-* Easier installation using a single jar file
+-* No dependency on containers like Tomcat
+* Completely new frontend 
+-* Full support for mobile device browsers (the current one simply doesn't work right in a browser on your phone)
+-* Material Design through MDC-Web
+-* See more below!
+
+The following features have been implemented thusfar:
 
 ### Removal of the BULLSHIT the original put you through to get to the games!
 This was a pain in the ass. The first screen the server takes you to is now the one with a place at the top to get a nick and start playing! 
