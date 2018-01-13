@@ -8,21 +8,25 @@ We are nowhere near close to "done." It's been amazing to watch this thing climb
 
 The following have been implemented thusfar:
 
-### Removal of the BULLSHIT needed to even sign into the game from the original
+### Removal of the BULLSHIT the original put you through to get to the games!
 This was a pain in the ass. The first screen the server takes you to is now the one with a place at the top to get a nick and start playing! 
+
 ![][screen1]
 
 ### No Games is absolutely fine
 The original PYX had issues: It would spit errors along the lines of "Game 0 not found", it appeared as if at least one game should be open at all times if the server is running. We fixed this, and added a beautiful placeholder to make sure everyone knows no games exist!
+
 ![][screen2]
 
 ### New Game!
 We cleaned up that ugly-ass screen the OG PYX had. It's been replaced with a nicer modal dialog (scrollable!) and - unlike its predecessor - has a built-in way of adding Cardcast decks via code straight from the UI. 
+
 ![][screen3]
 ![][screen4]
 
 ### Oooooooh Shiny!!!
 We've added custom colors from Google's Material palette. You may have noticed the ever-changing scheme in the photos above. The top-right "gear" icon opens this dialog. The screenshots were all taken within seconds of each other thanks to this screen. It also has a dynamic preview so you can see what your choices will look like when applied!!
+
 ![][screen5]
 
 Run
