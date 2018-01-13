@@ -9,7 +9,7 @@ We are nowhere near close to "done." It's been amazing to watch this thing climb
 * **Improved back-end**
   * Easier installation using a single jar file
   * No dependency on containers like Tomcat
-* **Completely new frontend**
+* **Completely new front-end**
   * Full support for mobile device browsers (the current one simply doesn't work right in a browser on your phone)
   * Material Design through MDC-Web
   * See more below!
