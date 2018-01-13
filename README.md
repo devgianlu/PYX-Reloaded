@@ -18,11 +18,23 @@ The original PYX had issues: It would spit errors along the lines of "Game 0 not
 
 ![][screen2]
 
+### ...but some may be necessary to have a good time!!
+![][screen9]
+
 ### New Game!
 We cleaned up that ugly-ass screen the OG PYX had. It's been replaced with a nicer modal dialog (scrollable!) and - unlike its predecessor - has a built-in way of adding Cardcast decks via code straight from the UI. 
 
 ![][screen3]
 ![][screen4]
+
+Selecting the cards from the original PYX is also included, with Material checkboxes to make life complete!!
+![][screen6]
+
+Before we add a Cardcast to your game, we want to make sure it's the exact one you want, by the author you chose.
+![][screen7]
+
+When this appears, the deck you selected and confirmed should now be an official part of your game!!
+![][screen8]
 
 ### Oooooooh Shiny!!!
 We've added custom colors from Google's Material palette. You may have noticed the ever-changing scheme in the photos above. The top-right "gear" icon opens this dialog. The screenshots were all taken within seconds of each other thanks to this screen. It also has a dynamic preview so you can see what your choices will look like when applied!!
@@ -59,3 +71,7 @@ from your terminal. Find the one section that has ```<UP,BROADCAST,RUNNING,MULTI
 [screen3]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen3.png?raw=true
 [screen4]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen4.png?raw=true
 [screen5]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen5.png?raw=true
+[screen6]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen6.png?raw=true
+[screen7]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen7.png?raw=true
+[screen8]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen8.png?raw=true
+[screen9]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen9.png?raw=true
