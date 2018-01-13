@@ -1,3 +1,5 @@
+**For development of the game itself only! Submit non-game design changes to mainline material-ui!!!**
+
 Pretend You're Xyzzy
 ===================
 A fork of the original Pretend You're Xyzzy. Complete re-write of the frontend, and major changes in the backend. Finished product will have material design, work fairly decently on mobile devices, and have a server that is self-contained instead of depending on Tomcat.
