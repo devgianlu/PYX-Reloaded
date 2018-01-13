@@ -1,4 +1,4 @@
-**For development of the game itself only! Submit non-game design changes to mainline material-ui!!!**
+**For development of the game itself only! Submit non-game design changes to mainline material-ui!!! When we complete the game development, we should merge this back into material-ui, then merge material-ui into master to get at least an operational game - at least it'll be the first thing people see. When done, work on other features should continue in material-ui and derivative branches of it.**
 
 Pretend You're Xyzzy
 ===================
