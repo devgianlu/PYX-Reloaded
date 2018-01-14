@@ -14,6 +14,24 @@
     max-height: 60vh;
 }
 
+.mdc-toolbar .mdc-text-field {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.mdc-toolbar .mdc-text-field__label {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input {
+    color: var(--mdc-theme-text-primary-on-dark);
+    border-color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input:hover {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
 main {
     overflow-y: auto;
 }
@@ -62,6 +80,19 @@ body {
     width: 100%;
 }
 
+.pyx-card {
+    display: block !important;
+}
+
+.pyx-card[data-black=true] {
+    background: black;
+}
+
+.pyx-card[data-black=true] h1 {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
 /* Stack toolbar and main on top of each other. */
 .page-content {
     display: inline-flex;
@@ -104,6 +135,24 @@ body {
 
 .md-light.md-inactive {
     color: rgba(255, 255, 255, 0.3);
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.pagination__inner {
+    display: inline-block;
+}
+
+.pagination__inner button {
+    min-width: auto;
+    padding: 0 8px;
+    height: 32px;
+    font-size: .8125rem;
+    line-height: 32px;
 }
 
 /* Media breakpoints for centred cards in homepage */
