@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
@@ -14,7 +14,7 @@
 
 <body>
 <div class="page-content">
-    <header class="mdc-toolbar mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <button class="material-icons mdc-toolbar__menu-icon">menu</button>
@@ -30,7 +30,7 @@
         </div>
     </header>
 
-    <main>
+    <main class="mdc-toolbar-fixed-adjust">
         <div class="mdc-layout-grid" id="games-global-container">
             <div class="mdc-layout-grid__inner list">
                 <!-- Games list  -->
@@ -250,7 +250,7 @@
         <header class="mdc-dialog__header">
             <h2 class="mdc-dialog__header__title">Customize Appearance</h2>
         </header>
-        <section class="mdc-dialog__body mdc-layout-grid">
+        <section class="mdc-dialog__body mdc-dialog__body--scrollable mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
                 <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
                     <div id="themingWheel">
