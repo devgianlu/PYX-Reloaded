@@ -223,7 +223,7 @@ function cardcastOptionsChanged() {
     _cardcastOffset = 0;
     loadDecks(getSearchQuery(),
         getCurrentCardcastCategories(menu.querySelector('.\_categories')),
-        true,
+        getNSFWSelected(),
         getCurrentCardcastSorting(menu.querySelector('.\_sort')));
 }
 
@@ -232,8 +232,12 @@ function changePage(page) {
     _cardcastOffset = DECKS_PER_PAGE * page;
     loadDecks(getSearchQuery(),
         getCurrentCardcastCategories(menu.querySelector('.\_categories')),
-        true,
+        getNSFWSelected(),
         getCurrentCardcastSorting(menu.querySelector('.\_sort')));
+}
+
+function getNSFWSelected() {
+    return document.getElementById('toggleNsfw').checked;
 }
 
 function getDefaultDirectionFor(sort) {
