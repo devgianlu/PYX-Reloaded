@@ -5,15 +5,17 @@
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/barrating.fontawesome-stars-o.css">
     <link rel="stylesheet" href="css/pyx-reloaded.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="js/theming.js"></script>
     <script>applyCustomTheme();</script>
 </head>
-<body>
+<body class="mdc-typography">
 
 <div class="page-content">
-    <header class="mdc-toolbar mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Cardcast - PYX Reloaded</span>
@@ -21,15 +23,45 @@
         </div>
     </header>
 
-    <main class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner"></div>
+    <main class="mdc-layout-grid mdc-toolbar-fixed-adjust" id="cardcast-container">
+        <div class="mdc-layout-grid__inner list"></div>
     </main>
 </div>
 
+<div style="display: none;">
+    <div class="mdc-card mdc-layout-grid__cell" id="cardcast-deck-template">
+        <section class="mdc-card__primary" style="display: inline-flex">
+            <div style="flex-grow: 1">
+                <h1 class="mdc-card__title mdc-card__title--large _name">{{Deck name}}</h1>
+                <h2 class="mdc-card__subtitle _author">{{Deck author}}</h2>
+            </div>
+            <span class="material-icons md-36 md-dark _category"></span>
+        </section>
+        <section class="mdc-card__supporting-text mdc-theme--dark">
+            <select class="_rating" title="">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <span class="_sample"></span>
+        </section>
+        <section class="mdc-card__actions">
+            <button class="mdc-button mdc-button--compact mdc-card__action">More</button>
+        </section>
+    </div>
+</div>
+
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.js"></script>
+<script src="js/barrating.min.js"></script>
 <script src="js/cardcast.js"></script>
-<script>window.mdc.autoInit();</script>
+<script>
+    window.mdc.autoInit();
+    loadDecks();
+</script>
 
 </body>
 </html>
