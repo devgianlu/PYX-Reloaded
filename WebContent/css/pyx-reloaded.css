@@ -11,11 +11,11 @@
     padding-left: 8px;
 }
 
-.mdc-dialog__body .mdc-card {
+.mdc-dialog__body > .mdc-card {
     margin-top: 24px;
 }
 
-#createGameDialog .mdc-dialog__body--scrollable {
+.mdc-dialog__body--scrollable {
     max-height: 60vh;
 }
 
@@ -65,6 +65,19 @@ body {
     box-sizing: border-box;
     height: 100%;
     width: 100%;
+}
+
+.pyx-card {
+    display: block !important;
+}
+
+.pyx-card[data-black=true] {
+    background: black;
+}
+
+.pyx-card[data-black=true] h1 {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
 }
 
 /* Stack toolbar and main on top of each other. */

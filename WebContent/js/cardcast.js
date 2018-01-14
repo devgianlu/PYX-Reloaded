@@ -1,63 +1,22 @@
 function loadDecks() {
     const list = new List('cardcast-container', {
-        valueNames: ['_name', '_code', '_category', '_author', '_sample'],
+        valueNames: ['_name', '_category', '_author', '_sample', {data: ['code']}],
         item: 'cardcast-deck-template'
     });
 
     Cardcast.decks("", "desc", 12, true, 0, "rating", function (data) {
         const results = data.results.data;
-        console.log(results);
-
         for (let i = 0; i < results.length; i++) {
             const item = results[i];
 
-            let category;
-            switch (item.category) {
-                case "books":
-                    category = "book";
-                    break;
-                case "community":
-                    category = "people";
-                    break;
-                case "gaming":
-                    category = "videogame_asset";
-                    break;
-                case "movies":
-                    category = "movie";
-                    break;
-                case "music":
-                    category = "music_note";
-                    break;
-                case "sports":
-                    category = "directions_run";
-                    break;
-                case "technology":
-                    category = "phonelink";
-                    break;
-                case "television":
-                    category = "tv";
-                    break;
-                case "translation":
-                    category = "translate";
-                    break;
-                case "other":
-                    category = "more";
-                    break;
-                case "random":
-                    category = "casino";
-                    break;
-            }
-
-
             const elm = list.add({
-                '_name': item.name,
-                '_code': item.code,
-                '_category': category,
-                '_author': "by " + item.author.username,
-                '_sample': createSamplePhrase(item.sample_calls, item.sample_responses.slice())
+                "_name": item.name,
+                "code": item.code,
+                "_category": getCategoryMaterialIconsName(item.category),
+                "_author": "by " + item.author.username,
+                "_sample": createSamplePhrase(item.sample_calls, item.sample_responses.slice())
             })[0];
 
-            console.log(elm);
             const rating = $(elm.elm.querySelector('.\_rating'));
             rating.barrating({
                 theme: 'fontawesome-stars-o',
@@ -66,6 +25,113 @@ function loadDecks() {
             });
         }
     })
+}
+
+function getCategoryMaterialIconsName(category) {
+    switch (category) {
+        case "books":
+            return "book";
+        case "community":
+            return "people";
+        case "gaming":
+            return "videogame_asset";
+        case "movies":
+            return "movie";
+        case "music":
+            return "music_note";
+        case "sports":
+            return "directions_run";
+        case "technology":
+            return "phonelink";
+        case "television":
+            return "tv";
+        case "translation":
+            return "translate";
+        default:
+        case "other":
+            return "more";
+        case "random":
+            return "casino";
+    }
+}
+
+function createCategoryAndAuthorString(category, author) {
+    let str = "";
+    if (category === "other") str += "An ";
+    else str += "A ";
+    return str + category + " deck created by " + author;
+}
+
+function showCardcastDetailsDialog(code) {
+    const elm = $(document.getElementById('cardcastDetailsDialog'));
+    const dialog = new mdc.dialog.MDCDialog(elm[0]);
+
+    elm.find('.mdc-dialog__body--scrollable')[0].scrollTop = 0;
+
+    const cc = new Cardcast(code);
+    cc.info(function (data) {
+        if (data === undefined) {
+            alert("ERROR!");
+        } else {
+            elm.find('.\_name').text(data.name);
+            elm.find('.\_author-category').text(createCategoryAndAuthorString(data.category, data.author.username));
+            elm.find('.\_desc').text(data.description);
+            elm.find('.\_code').text(data.code);
+            elm.find('.\_category').text(getCategoryMaterialIconsName(data.category));
+            elm.find('.\_calls').text("Calls (" + data.call_count + ")");
+            elm.find('.\_responses').text("Responses (" + data.response_count + ")");
+
+            const rating = elm.find('.\_rating');
+            rating.barrating('destroy');
+            rating.barrating({
+                theme: 'fontawesome-stars-o',
+                readonly: true,
+                initialRating: data.rating
+            });
+
+            rating.parent().css('margin-top', '6px');
+            rating.parent().css('margin-right', '16px');
+
+            dialog.show();
+        }
+    });
+
+    cc.calls(function (calls) {
+        if (calls === undefined) {
+            alert("ERROR!");
+        } else {
+            const list = _initCardsList(elm.find('#cardcastDetailsCalls')[0]);
+            for (let i = 0; i < calls.length; i++) {
+                list.add({
+                    "_text": calls[i].text.join("____"),
+                    "black": true
+                });
+            }
+        }
+    });
+
+    cc.responses(function (calls) {
+        if (calls === undefined) {
+            alert("ERROR!");
+        } else {
+            const list = _initCardsList(elm.find('#cardcastDetailsResponses')[0]);
+            for (let i = 0; i < calls.length; i++) {
+                list.add({
+                    "_text": calls[i].text[0],
+                    "black": false
+                });
+            }
+        }
+    });
+}
+
+function _initCardsList(container) {
+    const list = new List(container, {
+        item: 'card-template',
+        valueNames: ['_text', {data: ['black']}]
+    });
+    list.clear();
+    return list;
 }
 
 function createSamplePhrase(calls, responses) {
@@ -101,7 +167,7 @@ class Cardcast {
     }
 
     static decks(category, direction, limit, nsfw, offset, sort, listener) {
-        $.get(this.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort).fail(function (data) {
+        $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort).fail(function (data) {
             console.error(data);
             listener(undefined);
         }).done(function (data) {
@@ -110,7 +176,25 @@ class Cardcast {
     }
 
     info(listener) {
-        $.get(this.base_url + "decks/" + this.code).fail(function (data) {
+        $.get(Cardcast.base_url + "decks/" + this.code).fail(function (data) {
+            console.error(data);
+            listener(undefined);
+        }).done(function (data) {
+            listener(data);
+        });
+    }
+
+    calls(listener) {
+        $.get(Cardcast.base_url + "decks/" + this.code + "/calls").fail(function (data) {
+            console.error(data);
+            listener(undefined);
+        }).done(function (data) {
+            listener(data);
+        });
+    }
+
+    responses(listener) {
+        $.get(Cardcast.base_url + "decks/" + this.code + "/responses").fail(function (data) {
             console.error(data);
             listener(undefined);
         }).done(function (data) {
