@@ -2,7 +2,7 @@ const DECKS_PER_PAGE = 12;
 const PAGINATION_WINDOW = 4;
 let _cardcastOffset = 0;
 
-function loadDecks(category, nsfw, sort) {
+function loadDecks(query, category, nsfw, sort) {
     const container = document.getElementById('cardcast-container');
     const list = new List(container, {
         valueNames: ['_name', '_category', '_author', '_sample', {data: ['code']}],
@@ -10,7 +10,7 @@ function loadDecks(category, nsfw, sort) {
         paginationClass: 'not-pagination'
     });
 
-    Cardcast.decks(category.join(','), getDefaultDirectionFor(sort), DECKS_PER_PAGE, nsfw, _cardcastOffset, sort, function (data) {
+    Cardcast.decks(query, category.join(','), getDefaultDirectionFor(sort), DECKS_PER_PAGE, nsfw, _cardcastOffset, sort, function (data) {
         list.clear();
 
         const results = data.results.data;
@@ -218,14 +218,22 @@ function showCardcastMenu() {
     _cardcastMenu.open = !_cardcastMenu.open;
 }
 
-function cardcastOptionsChanged(menu) {
+function cardcastOptionsChanged() {
+    const menu = document.getElementById('cardcastMenu');
     _cardcastOffset = 0;
-    loadDecks(getCurrentCardcastCategories(menu.querySelector('.\_categories')), true, getCurrentCardcastSorting(menu.querySelector('.\_sort')));
+    loadDecks(getSearchQuery(),
+        getCurrentCardcastCategories(menu.querySelector('.\_categories')),
+        true,
+        getCurrentCardcastSorting(menu.querySelector('.\_sort')));
 }
 
 function changePage(page) {
+    const menu = document.getElementById('cardcastMenu');
     _cardcastOffset = DECKS_PER_PAGE * page;
-    loadDecks(getCurrentCardcastCategories(menu.querySelector('.\_categories')), true, getCurrentCardcastSorting(menu.querySelector('.\_sort')));
+    loadDecks(getSearchQuery(),
+        getCurrentCardcastCategories(menu.querySelector('.\_categories')),
+        true,
+        getCurrentCardcastSorting(menu.querySelector('.\_sort')));
 }
 
 function getDefaultDirectionFor(sort) {
@@ -256,7 +264,20 @@ function getCurrentCardcastSorting(sort) {
     return "rating";
 }
 
-function setupCardcastMenu(menuElm) {
+function getSearchQuery() {
+    const input = document.getElementById('cardcastSearch');
+    return input.value.length === 0 ? undefined : input.value;
+}
+
+function setupCardcastSearch() {
+    const input = document.getElementById('cardcastSearch');
+    input.addEventListener('keyup', function (ev) {
+        if (ev.keyCode === 13) cardcastOptionsChanged();
+    })
+}
+
+function setupCardcastMenu() {
+    const menuElm = document.getElementById('cardcastMenu');
     if (_cardcastMenu === undefined) {
         _cardcastMenu = new mdc.menu.MDCSimpleMenu(menuElm);
         _cardcastMenu.listen('MDCSimpleMenu:selected', () => cardcastOptionsChanged(menuElm));
@@ -317,8 +338,8 @@ class Cardcast {
         return "https://api.cardcastgame.com/v1/";
     }
 
-    static decks(category, direction, limit, nsfw, offset, sort, listener) {
-        $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort).fail(function (data) {
+    static decks(query, category, direction, limit, nsfw, offset, sort, listener) {
+        $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort + (query !== undefined ? "&search=" + query : "")).fail(function (data) {
             console.error(data);
             listener(undefined);
         }).done(function (data) {

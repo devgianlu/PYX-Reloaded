@@ -21,8 +21,18 @@
                 <span class="mdc-toolbar__title">Cardcast - PYX Reloaded</span>
             </section>
 
+            <section class="mdc-toolbar__section">
+                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                    <input type="text" id="cardcastSearch" class="mdc-text-field__input">
+                    <label class="mdc-text-field__label" for="cardcastSearch">Search</label>
+                    <div class="mdc-text-field__bottom-line"></div>
+                </div>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="cardcastOptionsChanged();"
+                        style="margin-top: 6px">search
+                </button>
+            </section>
+
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon">search</button>
                 <div class="mdc-menu-anchor">
                     <button class="material-icons align-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
                         filter_list
@@ -154,11 +164,11 @@
 <script src="js/barrating.min.js"></script>
 <script src="js/cardcast.js"></script>
 <script>
-    const menu = document.getElementById('cardcastMenu');
-    setupCardcastMenu(menu);
+    setupCardcastMenu();
+    setupCardcastSearch();
     window.mdc.autoInit();
 
-    cardcastOptionsChanged(menu);
+    cardcastOptionsChanged();
 </script>
 
 </body>

@@ -19,6 +19,24 @@
     max-height: 60vh;
 }
 
+.mdc-toolbar .mdc-text-field {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.mdc-toolbar .mdc-text-field__label {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input {
+    color: var(--mdc-theme-text-primary-on-dark);
+    border-color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input:hover {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
 main {
     overflow-y: auto;
 }
