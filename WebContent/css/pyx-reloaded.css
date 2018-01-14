@@ -123,3 +123,21 @@ body {
 .md-light.md-inactive {
     color: rgba(255, 255, 255, 0.3);
 }
+
+/* Pagination */
+.pagination {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.pagination__inner {
+    display: inline-block;
+}
+
+.pagination__inner button {
+    min-width: auto;
+    padding: 0 8px;
+    height: 32px;
+    font-size: .8125rem;
+    line-height: 32px;
+}

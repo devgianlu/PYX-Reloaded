@@ -45,7 +45,11 @@
 
     <main class="mdc-layout-grid mdc-toolbar-fixed-adjust" id="cardcast-container">
         <div class="mdc-layout-grid__inner list"></div>
+        <div class="pagination">
+            <div class="pagination__inner"></div>
+        </div>
     </main>
+
 </div>
 
 <div style="display: none;">
@@ -150,9 +154,10 @@
 <script src="js/barrating.min.js"></script>
 <script src="js/cardcast.js"></script>
 <script>
-    window.mdc.autoInit();
     const menu = document.getElementById('cardcastMenu');
     setupCardcastMenu(menu);
+    window.mdc.autoInit();
+
     cardcastOptionsChanged(menu);
 </script>
 

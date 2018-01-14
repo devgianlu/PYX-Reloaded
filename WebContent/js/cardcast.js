@@ -1,11 +1,18 @@
-function loadDecks(category, nsfw, sort) {
-    const list = new List('cardcast-container', {
-        valueNames: ['_name', '_category', '_author', '_sample', {data: ['code']}],
-        item: 'cardcast-deck-template'
-    });
-    list.clear();
+const DECKS_PER_PAGE = 12;
+const PAGINATION_WINDOW = 4;
+let _cardcastOffset = 0;
 
-    Cardcast.decks(category.join(','), getDefaultDirectionFor(sort), 12, nsfw, 0, sort, function (data) {
+function loadDecks(category, nsfw, sort) {
+    const container = document.getElementById('cardcast-container');
+    const list = new List(container, {
+        valueNames: ['_name', '_category', '_author', '_sample', {data: ['code']}],
+        item: 'cardcast-deck-template',
+        paginationClass: 'not-pagination'
+    });
+
+    Cardcast.decks(category.join(','), getDefaultDirectionFor(sort), DECKS_PER_PAGE, nsfw, _cardcastOffset, sort, function (data) {
+        list.clear();
+
         const results = data.results.data;
         for (let i = 0; i < results.length; i++) {
             const item = results[i];
@@ -25,7 +32,56 @@ function loadDecks(category, nsfw, sort) {
                 initialRating: item.rating
             });
         }
+
+        document.querySelector('main').scrollTop = 0;
+        generatePagination(container.querySelector('.pagination__inner'), data.results.count);
     })
+}
+
+function generatePagination(container, itemCount) {
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    let currPage = Math.floor(_cardcastOffset / DECKS_PER_PAGE);
+    if (currPage !== 0) {
+        const prev = document.createElement("button");
+        prev.className = "mdc-button";
+        prev.innerHTML = "&laquo;";
+        container.appendChild(prev);
+        prev.addEventListener('click', function () {
+            changePage(currPage - 1);
+        });
+    }
+
+    const maxPages = itemCount / DECKS_PER_PAGE;
+
+    let startPage = 0;
+    if (currPage > PAGINATION_WINDOW) startPage = currPage - PAGINATION_WINDOW;
+
+    let endPage = currPage + 1 + PAGINATION_WINDOW;
+    if (endPage > maxPages) endPage = maxPages;
+
+    for (let i = startPage; i < endPage; i++) {
+        const page = document.createElement("button");
+        page.className = "mdc-button";
+        if (i === currPage) page.className += " mdc-button--raised";
+        page.innerText = (i + 1).toString();
+        container.appendChild(page);
+        page.addEventListener('click', function () {
+            changePage(i);
+        });
+    }
+
+    if (currPage !== maxPages) {
+        const next = document.createElement("button");
+        next.className = "mdc-button";
+        next.innerHTML = "&raquo;";
+        container.appendChild(next);
+        next.addEventListener('click', function () {
+            changePage(currPage + 1);
+        });
+    }
 }
 
 function getCategoryMaterialIconsName(category) {
@@ -163,6 +219,12 @@ function showCardcastMenu() {
 }
 
 function cardcastOptionsChanged(menu) {
+    _cardcastOffset = 0;
+    loadDecks(getCurrentCardcastCategories(menu.querySelector('.\_categories')), true, getCurrentCardcastSorting(menu.querySelector('.\_sort')));
+}
+
+function changePage(page) {
+    _cardcastOffset = DECKS_PER_PAGE * page;
     loadDecks(getCurrentCardcastCategories(menu.querySelector('.\_categories')), true, getCurrentCardcastSorting(menu.querySelector('.\_sort')));
 }
 
