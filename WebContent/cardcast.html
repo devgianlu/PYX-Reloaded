@@ -20,6 +20,26 @@
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Cardcast - PYX Reloaded</span>
             </section>
+
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <button class="material-icons align-icons mdc-toolbar__icon">search</button>
+                <div class="mdc-menu-anchor">
+                    <button class="material-icons align-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
+                        filter_list
+                    </button>
+                    <div class="mdc-simple-menu" id="cardcastMenu" tabindex="-1">
+                        <div class="mdc-simple-menu__items mdc-list-group" role="menu" aria-hidden="true">
+                            <h3 class="mdc-list-group__subheader">Categories</h3>
+                            <ul class="mdc-list _categories"></ul>
+
+                            <hr class="mdc-list-divider">
+
+                            <h3 class="mdc-list-group__subheader">Order by</h3>
+                            <ul class="mdc-list _sort"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </header>
 
@@ -58,6 +78,32 @@
         <section class="mdc-card__supporting-text">
             <h1 class="mdc-typography mdc-typography--body1 _text"></h1>
         </section>
+    </div>
+
+    <div class="mdc-list-item" id="category-item-template">
+        <div class="mdc-checkbox" data-mdc-auto-init="MDCCheckbox">
+            <input type="checkbox" class="mdc-checkbox__native-control" id="category_"/>
+            <div class="mdc-checkbox__background">
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white"
+                          d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                </svg>
+                <div class="mdc-checkbox__mixedmark"></div>
+            </div>
+        </div>
+        <i class="material-icons mdc-list-item__graphic _icon">more</i>
+        <label for="category_" class="_name">{{Category name}}</label>
+    </div>
+
+    <div class="mdc-list-item" id="sort-item-template">
+        <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
+            <input class="mdc-radio__native-control" type="radio" id="sort_">
+            <div class="mdc-radio__background">
+                <div class="mdc-radio__outer-circle"></div>
+                <div class="mdc-radio__inner-circle"></div>
+            </div>
+        </div>
+        <label for="sort_" class="_name">{{Sort name}}</label>
     </div>
 </div>
 
@@ -105,7 +151,9 @@
 <script src="js/cardcast.js"></script>
 <script>
     window.mdc.autoInit();
-    loadDecks();
+    const menu = document.getElementById('cardcastMenu');
+    setupCardcastMenu(menu);
+    cardcastOptionsChanged(menu);
 </script>
 
 </body>
