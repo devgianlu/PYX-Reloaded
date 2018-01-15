@@ -39,14 +39,10 @@ window.onload = function () {
     loadGamesList();
 
     let gid = getURLParameter('gid');
-    if (gid !== undefined) {
+    if (gid !== null) {
         postJoinSpectate(gid) // No need to join or spectate, just move the UI there
     }
 };
-
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-}
 
 function logout() {
     $.post("AjaxServlet?o=lo").always(function (data) {
@@ -66,10 +62,9 @@ function joinGame(element) {
     if (hp === true) password = askPassword();
 
     $.post("AjaxServlet?o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
-        console.log(data);
         alert("Joined game: " + JSON.stringify(data));
+        postJoinSpectate(gid)
     }).fail(function (data) {
-        console.log(data);
         alert("Error data: " + JSON.stringify(data));
     })
 }
@@ -82,17 +77,15 @@ function spectateGame(element) {
     if (hp === true) password = askPassword();
 
     $.post("AjaxServlet?o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
-        console.log(data);
         alert("Spectating game: " + JSON.stringify(data));
         postJoinSpectate(gid)
     }).fail(function (data) {
-        console.log(data);
         alert("Error data: " + JSON.stringify(data));
     })
 }
 
 function postJoinSpectate(gid) {
-    // TODO: Show game UI
+    window.location = "game.html?gid=" + gid;
 }
 
 function loadGamesList() {

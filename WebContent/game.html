@@ -12,17 +12,24 @@
 </head>
 <body>
 <div class="page-content">
-    <header class="mdc-toolbar mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <span class="mdc-toolbar__title">{{Game name}} - PYX Reloaded</span>
+                <span class="mdc-toolbar__title _title">{{Game name}} - PYX Reloaded</span>
             </section>
         </div>
     </header>
+
+    <main class="mdc-toolbar-fixed-adjust">
+
+    </main>
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/polling.js"></script>
+<script src="js/game.js"></script>
 <script>window.mdc.autoInit();</script>
 
 </body>

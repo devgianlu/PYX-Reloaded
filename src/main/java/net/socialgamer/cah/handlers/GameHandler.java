@@ -25,7 +25,7 @@ public abstract class GameHandler extends BaseHandler {
         int gameId;
         try {
             gameId = Integer.parseInt(gameIdStr);
-        } catch (final NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             throw new CahResponder.CahException(ErrorCode.INVALID_GAME, ex);
         }
 
