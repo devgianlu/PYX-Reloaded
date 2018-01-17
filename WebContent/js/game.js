@@ -21,3 +21,9 @@ function loadUI(gid) {
         alert("Failed load: " + JSON.stringify(data));
     });
 }
+
+const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
+document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
+    drawer.open = true
+});
+

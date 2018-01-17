@@ -15,10 +15,22 @@
     <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                <button class="material-icons mdc-toolbar__menu-icon">menu</button>
                 <span class="mdc-toolbar__title _title">{{Game name}} - PYX Reloaded</span>
             </section>
         </div>
     </header>
+
+<aside class="mdc-drawer--temporary mdc-typography" id="drawer">
+    <nav class="mdc-drawer__drawer">
+        <center><div class="scoreboard">
+            <p class="_title">Scoreboard for game {{Game name}}</p>
+        </div></center>
+        <div class="chat">
+            <center><p>Chat</p></center>
+        </div>
+    </nav>
+</aside>
 
     <main class="mdc-toolbar-fixed-adjust">
 

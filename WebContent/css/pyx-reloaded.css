@@ -1,3 +1,15 @@
+.mdc-drawer--temporary {
+    min-width: 50vw;
+}
+
+.scoreboard {
+    height: 50vh;
+}
+
+.chat {
+    height: 50vh;
+}
+
 .message {
     text-align: center;
 }
