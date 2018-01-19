@@ -1,8 +1,8 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -17,7 +17,7 @@ public class LikeGameHandler extends GameHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Game game, Parameters params, HttpServerExchange exchange) {
+    public JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) {
         game.toggleLikeGame(user);
         return game.getLikesInfoJson(user);
     }

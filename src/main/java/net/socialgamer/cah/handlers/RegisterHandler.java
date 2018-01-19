@@ -52,6 +52,5 @@ public class RegisterHandler extends BaseHandler {
         return new JsonWrapper().add(AjaxResponse.NICKNAME, nickname)
                 .add(AjaxResponse.IS_ADMIN, admin)
                 .add(AjaxResponse.PERSISTENT_ID, pid);
-        ;
     }
 }

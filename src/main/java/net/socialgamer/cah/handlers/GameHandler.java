@@ -13,7 +13,7 @@ import net.socialgamer.cah.servlets.Parameters;
 public abstract class GameHandler extends BaseHandler {
     protected final GameManager gameManager;
 
-    public GameHandler(final GameManager gameManager) {
+    public GameHandler(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 

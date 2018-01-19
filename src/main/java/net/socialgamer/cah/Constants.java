@@ -203,7 +203,7 @@ public class Constants {
     /**
      * Parameters for client requests.
      */
-    public enum AjaxRequest {
+    public enum AjaxRequest implements ReturnableData {
         CARD_ID("cid"),
         CARDCAST_ID("cci"),
         EMOTE("me"),
@@ -233,7 +233,7 @@ public class Constants {
     /**
      * Keys for client request responses.
      */
-    public enum AjaxResponse {
+    public enum AjaxResponse implements ReturnableData {
         BLACK_CARD("bc"),
         @DuplicationAllowed
         CARD_ID(AjaxRequest.CARD_ID),
@@ -679,7 +679,7 @@ public class Constants {
     /**
      * Fields for information about a game.
      */
-    public enum GameInfo {
+    public enum GameInfo implements ReturnableData {
         HOST("H"),
         @DuplicationAllowed
         ID(AjaxRequest.GAME_ID),
@@ -795,11 +795,6 @@ public class Constants {
         public String getString() {
             return message;
         }
-
-        @Override
-        public String getString2() {
-            return message2;
-        }
     }
 
     /**
@@ -824,11 +819,6 @@ public class Constants {
          * @return The first user-visible string that is associated with this enum value.
          */
         String getString();
-
-        /**
-         * @return The second user-visible string that is associated with this enum value.
-         */
-        String getString2();
     }
 
     /**
@@ -838,5 +828,8 @@ public class Constants {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @interface DuplicationAllowed {
+    }
+
+    public interface ReturnableData {
     }
 }
