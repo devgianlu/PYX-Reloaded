@@ -3,7 +3,7 @@ package net.socialgamer.cah.handlers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ReconnectNextAction;
@@ -21,7 +21,7 @@ public class FirstLoadHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) {
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonObject obj = new JsonObject();
 
         if (user == null) {

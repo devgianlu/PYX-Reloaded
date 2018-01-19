@@ -3,7 +3,6 @@ package net.socialgamer.cah;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
 
 import java.util.Random;
 import java.util.Set;
@@ -40,10 +39,6 @@ public class Utils {
         JsonArray json = new JsonArray(1);
         json.add(element);
         return json;
-    }
-
-    public static NanoHTTPD.Response methodNotAllowed() {
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED, null, null);
     }
 
     public static String optString(JsonObject obj, String key, String fallback) {

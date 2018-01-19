@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -10,7 +10,7 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -22,22 +22,23 @@ public class PlayCardHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
+    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String cardIdStr = params.get(AjaxRequest.CARD_ID);
-        if (cardIdStr == null || cardIdStr.isEmpty()) throw new CahResponder.CahException(ErrorCode.NO_CARD_SPECIFIED);
+        if (cardIdStr == null || cardIdStr.isEmpty())
+            throw new BaseCahHandler.CahException(ErrorCode.NO_CARD_SPECIFIED);
 
         int cardId;
         try {
             cardId = Integer.parseInt(cardIdStr);
         } catch (NumberFormatException ex) {
-            throw new CahResponder.CahException(ErrorCode.INVALID_CARD, ex);
+            throw new BaseCahHandler.CahException(ErrorCode.INVALID_CARD, ex);
         }
 
         String text = params.get(AjaxRequest.MESSAGE);
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
         final ErrorCode errorCode = game.playCard(user, cardId, text);
-        if (errorCode != null) throw new CahResponder.CahException(errorCode);
+        if (errorCode != null) throw new BaseCahHandler.CahException(errorCode);
         else return new JsonObject();
     }
 }

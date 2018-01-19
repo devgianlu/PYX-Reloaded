@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -15,7 +15,7 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
@@ -28,7 +28,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
+    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         JsonArray array = new JsonArray();
 
         FailedLoadingSomeCardcastDecks cardcastException = null;
@@ -43,7 +43,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
         }
 
         if (cardcastException != null) {
-            throw new CahResponder.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
+            throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
                     Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
                             Utils.singletonJsonArray(cardcastException.getFailedJson())));
         } else {

@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Utils;
@@ -20,7 +20,7 @@ public class NamesHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) {
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonArray array = new JsonArray();
         for (User item : users.getUsers()) array.add(item.getNickname());
         return Utils.singletonJsonObject(AjaxResponse.NAMES.toString(), array);

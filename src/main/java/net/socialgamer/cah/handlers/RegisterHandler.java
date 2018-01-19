@@ -2,7 +2,8 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.CookieImpl;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
@@ -27,14 +28,15 @@ public class RegisterHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
-        if (BanList.contains(session.getRemoteIpAddress())) throw new CahResponder.CahException(ErrorCode.BANNED);
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+        if (BanList.contains(exchange.getHostName())) throw new BaseCahHandler.CahException(ErrorCode.BANNED);
 
         String nickname = params.get(AjaxRequest.NICKNAME);
-        if (nickname == null) throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
-        if (!Pattern.matches(VALID_NAME_PATTERN, nickname)) throw new CahResponder.CahException(ErrorCode.INVALID_NICK);
+        if (nickname == null) throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
+        if (!Pattern.matches(VALID_NAME_PATTERN, nickname))
+            throw new BaseCahHandler.CahException(ErrorCode.INVALID_NICK);
         if (nickname.equalsIgnoreCase("xyzzy"))
-            throw new CahResponder.CahException(ErrorCode.RESERVED_NICK);
+            throw new BaseCahHandler.CahException(ErrorCode.RESERVED_NICK);
 
         String pid = params.get(AjaxRequest.PERSISTENT_ID);
         if (pid == null || pid.isEmpty()) pid = UniqueIds.getNewRandomID();
@@ -43,11 +45,11 @@ public class RegisterHandler extends BaseHandler {
         String adminToken = params.get(Constants.AjaxRequest.ADMIN_TOKEN);
         admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.current().equals(adminToken);
 
-        user = userFactory.create(nickname, session.getRemoteIpAddress(), admin, pid);
+        user = userFactory.create(nickname, exchange.getHostName(), admin, pid);
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {
-            setHeader("Set-Cookie", "PYX-Session=" + Sessions.add(user));
+            exchange.setResponseCookie(new CookieImpl("Set-Cookie", "PYX-Session=" + Sessions.add(user)));
 
             JsonObject obj = new JsonObject();
             obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
@@ -55,7 +57,7 @@ public class RegisterHandler extends BaseHandler {
             obj.addProperty(AjaxResponse.PERSISTENT_ID.toString(), pid);
             return obj;
         } else {
-            throw new CahResponder.CahException(errorCode);
+            throw new BaseCahHandler.CahException(errorCode);
         }
     }
 }

@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
@@ -11,7 +11,7 @@ import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.BanList;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
 
@@ -25,12 +25,12 @@ public class BanHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
-        if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
 
         String nickname = params.get(AjaxRequest.NICKNAME);
         if (nickname == null || nickname.isEmpty())
-            throw new CahResponder.CahException(ErrorCode.NO_NICK_SPECIFIED);
+            throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
 
         String banIp;
         User kickUser = connectedUsers.getUser(nickname);

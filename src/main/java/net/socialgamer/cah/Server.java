@@ -1,21 +1,22 @@
 package net.socialgamer.cah;
 
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.server.handlers.ExceptionHandler;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.resource.PathResourceManager;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.db.LoadedCards;
-import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.App;
-import net.socialgamer.cah.servlets.Provider;
-import net.socialgamer.cah.servlets.Providers;
+import net.socialgamer.cah.servlets.*;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import net.socialgamer.cah.task.RefreshAdminTokenTask;
 import net.socialgamer.cah.task.UserPingTask;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +58,17 @@ public class Server {
         GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        new App(port, new File(preferences.getString("webContent", "./WebContent")), preferences.getString("cors", null)).start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        PathHandler handler = new PathHandler(Handlers.resource(new PathResourceManager(Paths.get("./WebContent").toAbsolutePath())));
+        handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
+                .addExactPath("/LongPollServlet", new BaseLongPollHandler());
+
+        Undertow server = Undertow.builder()
+                .addHttpListener(port, "0.0.0.0")
+                .setHandler(new ExceptionHandler(handler).addExceptionHandler(Exception.class, exchange -> {
+                    Throwable ex = exchange.getAttachment(ExceptionHandler.THROWABLE);
+                    ex.printStackTrace();
+                })).build();
+
+        server.start();
     }
 }
