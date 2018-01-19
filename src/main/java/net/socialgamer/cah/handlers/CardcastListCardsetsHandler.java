@@ -1,12 +1,12 @@
 package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
@@ -28,7 +28,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         JsonArray array = new JsonArray();
 
         FailedLoadingSomeCardcastDecks cardcastException = null;
@@ -47,7 +47,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
                     Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
                             Utils.singletonJsonArray(cardcastException.getFailedJson())));
         } else {
-            return Utils.singletonJsonObject(AjaxResponse.CARD_SETS.toString(), array);
+            return new JsonWrapper(AjaxResponse.CARD_SETS, array);
         }
     }
 }

@@ -1,10 +1,9 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.DisconnectReason;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
@@ -20,10 +19,10 @@ public class LogoutHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         user.noLongerValid();
         users.removeUser(user, DisconnectReason.MANUAL);
         Sessions.invalidate(user.getSessionId());
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

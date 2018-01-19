@@ -1,7 +1,5 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import net.socialgamer.cah.Constants;
@@ -9,6 +7,7 @@ import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.UniqueIds;
 import net.socialgamer.cah.data.User;
@@ -28,7 +27,7 @@ public class RegisterHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (BanList.contains(exchange.getHostName())) throw new BaseCahHandler.CahException(ErrorCode.BANNED);
 
         String nickname = params.get(AjaxRequest.NICKNAME);
@@ -51,10 +50,10 @@ public class RegisterHandler extends BaseHandler {
         if (errorCode == null) {
             exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 
-            JsonObject obj = new JsonObject();
-            obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
-            obj.addProperty(AjaxResponse.IS_ADMIN.toString(), admin);
-            obj.addProperty(AjaxResponse.PERSISTENT_ID.toString(), pid);
+            JsonWrapper obj = new JsonWrapper();
+            obj.add(AjaxResponse.NICKNAME, nickname);
+            obj.add(AjaxResponse.IS_ADMIN, admin);
+            obj.add(AjaxResponse.PERSISTENT_ID, pid);
             return obj;
         } else {
             throw new BaseCahHandler.CahException(errorCode);

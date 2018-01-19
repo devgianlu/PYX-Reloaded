@@ -38,6 +38,6 @@ public class BaseAjaxHandler extends BaseCahHandler {
             throw new CahException(Constants.ErrorCode.BAD_OP);
         }
 
-        return handler.handle(user, params, exchange);
+        return handler.handle(user, params, exchange).obj();
     }
 }

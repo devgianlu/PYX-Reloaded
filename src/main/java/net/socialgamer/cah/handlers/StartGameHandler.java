@@ -1,6 +1,5 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
@@ -8,6 +7,7 @@ import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Constants.ErrorInformation;
 import net.socialgamer.cah.Constants.GameState;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.CardSet;
@@ -28,7 +28,7 @@ public class StartGameHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getHost() != user) throw new BaseCahHandler.CahException(ErrorCode.NOT_GAME_HOST);
         if (game.getState() != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
 
@@ -44,7 +44,7 @@ public class StartGameHandler extends GameWithPlayerHandler {
             } else {
                 ErrorCode error = game.start();
                 if (error != null) throw new BaseCahHandler.CahException(error);
-                else return new JsonObject();
+                else return JsonWrapper.EMPTY;
             }
         } catch (FailedLoadingSomeCardcastDecks ex) {
             throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND,

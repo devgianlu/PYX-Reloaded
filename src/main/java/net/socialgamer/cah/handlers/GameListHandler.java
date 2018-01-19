@@ -1,11 +1,11 @@
 package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -23,8 +23,8 @@ public class GameListHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) {
-        JsonObject json = new JsonObject();
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
+        JsonWrapper json = new JsonWrapper();
 
         JsonArray infoArray = new JsonArray();
         for (Game game : gameManager.getGameList()) {
@@ -32,8 +32,8 @@ public class GameListHandler extends BaseHandler {
             if (info != null) infoArray.add(info);
         }
 
-        json.add(AjaxResponse.GAMES.toString(), infoArray);
-        json.addProperty(AjaxResponse.MAX_GAMES.toString(), maxGames);
+        json.add(AjaxResponse.GAMES, infoArray);
+        json.add(AjaxResponse.MAX_GAMES, maxGames);
         return json;
     }
 }
