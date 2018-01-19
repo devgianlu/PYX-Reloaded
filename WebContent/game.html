@@ -21,21 +21,24 @@
         </div>
     </header>
 
-<aside class="mdc-drawer--temporary mdc-typography" id="drawer">
-    <nav class="mdc-drawer__drawer">
-        <center><div class="scoreboard">
-            <p class="_title">Scoreboard for game {{Game name}}</p>
-        </div></center>
-        <div class="chat">
-            <center><p>Chat</p></center>
+    <main class="mdc-toolbar-fixed-adjust">
+    </main>
+</div>
+
+<aside class="mdc-drawer--temporary" id="drawer">
+    <nav class="mdc-drawer__drawer mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+            <div class="mdc-layout-grid__cell--span-12">
+                <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
+            </div>
+        </div>
+        <div class="mdc-layout-grid__inner">
+            <div class="mdc-layout-grid__cell--span-12">
+                <h3 class="mdc-typography mdc-typography--title">Chat</h3>
+            </div>
         </div>
     </nav>
 </aside>
-
-    <main class="mdc-toolbar-fixed-adjust">
-
-    </main>
-</div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.js"></script>
