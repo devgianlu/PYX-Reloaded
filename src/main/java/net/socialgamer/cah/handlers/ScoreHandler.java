@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -12,8 +12,8 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Player;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.BaseUriResponder;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
+import net.socialgamer.cah.servlets.BaseJsonHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class ScoreHandler extends BaseHandler {
@@ -25,28 +25,28 @@ public class ScoreHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
-        if (!user.isAdmin()) throw new CahResponder.CahException(ErrorCode.NOT_ADMIN);
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
 
         String argsStr = params.get(AjaxRequest.MESSAGE);
         String[] args = (argsStr == null || argsStr.isEmpty()) ? new String[0] : argsStr.trim().split(" ");
-        if (args.length != 2) throw new CahResponder.CahException(ErrorCode.BAD_REQUEST);
+        if (args.length != 2) throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST);
 
         User target = connectedUsers.getUser(args[0]);
-        if (target == null) throw new CahResponder.CahException(ErrorCode.NO_SUCH_USER);
+        if (target == null) throw new BaseCahHandler.CahException(ErrorCode.NO_SUCH_USER);
 
         Game game = target.getGame();
-        if (game == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
+        if (game == null) throw new BaseCahHandler.CahException(ErrorCode.INVALID_GAME);
 
         Player player = game.getPlayerForUser(target);
-        if (player == null) throw new CahResponder.CahException(ErrorCode.INVALID_GAME);
+        if (player == null) throw new BaseCahHandler.CahException(ErrorCode.INVALID_GAME);
 
         try {
             int offset = Integer.parseInt(args[1]);
             player.increaseScore(offset);
             game.notifyPlayerInfoChange(player);
         } catch (final NumberFormatException ex) {
-            throw new CahResponder.CahException(ErrorCode.BAD_REQUEST, ex);
+            throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST, ex);
         }
 
         JsonObject obj = new JsonObject();
