@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
@@ -13,8 +13,8 @@ import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.GameOptions;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.BaseUriResponder;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
+import net.socialgamer.cah.servlets.BaseJsonHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class CreateGameHandler extends BaseHandler {
@@ -28,7 +28,7 @@ public class CreateGameHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) throws BaseUriResponder.StatusException {
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         String value = params.get(Constants.AjaxRequest.GAME_OPTIONS);
         GameOptions options = GameOptions.deserialize(preferences, value);
 
@@ -36,10 +36,10 @@ public class CreateGameHandler extends BaseHandler {
         try {
             game = gameManager.createGameWithPlayer(user, options);
         } catch (IllegalStateException ex) {
-            throw new CahResponder.CahException(ErrorCode.CANNOT_JOIN_ANOTHER_GAME, ex);
+            throw new BaseCahHandler.CahException(ErrorCode.CANNOT_JOIN_ANOTHER_GAME, ex);
         }
 
-        if (game == null) throw new CahResponder.CahException(ErrorCode.TOO_MANY_GAMES);
+        if (game == null) throw new BaseCahHandler.CahException(ErrorCode.TOO_MANY_GAMES);
 
         JsonObject obj = new JsonObject();
         obj.addProperty(AjaxResponse.GAME_ID.toString(), game.getId());

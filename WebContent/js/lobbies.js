@@ -45,7 +45,7 @@ window.onload = function () {
 };
 
 function logout() {
-    $.post("AjaxServlet?o=lo").always(function (data) {
+    $.post("AjaxServlet", "o=lo").always(function (data) {
         window.location = "/";
     });
 }
@@ -61,8 +61,8 @@ function joinGame(element) {
     let password = "";
     if (hp === true) password = askPassword();
 
-    $.post("AjaxServlet?o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
-        alert("Joined game: " + JSON.stringify(data));
+    $.post("AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
+        console.log(data);
         postJoinSpectate(gid)
     }).fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
@@ -76,8 +76,8 @@ function spectateGame(element) {
     let password = "";
     if (hp === true) password = askPassword();
 
-    $.post("AjaxServlet?o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
-        alert("Spectating game: " + JSON.stringify(data));
+    $.post("AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
+        console.log(data);
         postJoinSpectate(gid)
     }).fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
@@ -91,7 +91,7 @@ function postJoinSpectate(gid) {
 function loadGamesList() {
     games.clear();
 
-    $.post("AjaxServlet?o=ggl").done(function (data) {
+    $.post("AjaxServlet", "o=ggl").done(function (data) {
         console.log(data);
         populateGamesList(data.gl);
     }).fail(function (data) {
@@ -208,7 +208,7 @@ function showCreateGameDialog() {
 }
 
 function createGame(go) {
-    $.post("AjaxServlet?o=cg&go=" + JSON.stringify(go)).done(function (data) {
+    $.post("AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
         postJoinSpectate(data.gid);
         loadGamesList();
     }).fail(function (data) {
@@ -240,7 +240,7 @@ function updateLikeDislike(likeButton, disLikeButton, data) {
 function likeGame(button) {
     const gid = button.parentElement.parentElement.getAttribute('data-gid');
 
-    $.post("AjaxServlet?o=lk&gid=" + gid).done(function (data) {
+    $.post("AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
         updateLikeDislike(button, undefined, data);
         console.log(data);
     }).fail(function (data) {
@@ -251,7 +251,7 @@ function likeGame(button) {
 function dislikeGame(button) {
     const gid = button.parentElement.parentElement.getAttribute('data-gid');
 
-    $.post("AjaxServlet?o=dlk&gid=" + gid).done(function (data) {
+    $.post("AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
         updateLikeDislike(undefined, button, data);
         console.log(data);
     }).fail(function (data) {

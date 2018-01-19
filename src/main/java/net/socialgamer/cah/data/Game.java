@@ -10,7 +10,7 @@ import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.db.PyxCardSet;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.task.SafeTimerTask;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -624,9 +624,9 @@ public class Game {
      * <br/>
      * Synchronizes on {@link #players}.
      */
-    public void start() throws FailedLoadingSomeCardcastDecks, CahResponder.CahException {
-        if (state != GameState.LOBBY) throw new CahResponder.CahException(ErrorCode.ALREADY_STARTED);
-        if (!hasEnoughCards()) throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_CARDS);
+    public void start() throws FailedLoadingSomeCardcastDecks, BaseCahHandler.CahException {
+        if (state != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
+        if (!hasEnoughCards()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_CARDS);
 
         int numPlayers = players.size();
         if (numPlayers >= 3) {
@@ -650,7 +650,7 @@ public class Game {
             startNextRound();
             gameManager.broadcastGameListRefresh();
         } else {
-            throw new CahResponder.CahException(ErrorCode.NOT_ENOUGH_PLAYERS);
+            throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_PLAYERS);
         }
     }
 
@@ -1233,12 +1233,12 @@ public class Game {
      * @param cardId   ID of the card to play.
      * @param cardText User text for a blank card.  Ignored for normal cards.
      */
-    public void playCard(User user, int cardId, String cardText) throws CahResponder.CahException {
+    public void playCard(User user, int cardId, String cardText) throws BaseCahHandler.CahException {
         Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
             if (getJudge() == player || state != GameState.PLAYING)
-                throw new CahResponder.CahException(ErrorCode.NOT_YOUR_TURN);
+                throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
             WhiteCard playCard = null;
             synchronized (player.hand) {
@@ -1262,7 +1262,7 @@ public class Game {
                 notifyPlayerInfoChange(player);
                 if (shouldStartJudging()) judgingState();
             } else {
-                throw new CahResponder.CahException(ErrorCode.DO_NOT_HAVE_CARD);
+                throw new BaseCahHandler.CahException(ErrorCode.DO_NOT_HAVE_CARD);
             }
         }
     }
@@ -1275,18 +1275,18 @@ public class Game {
      * @param judge  Judge user.
      * @param cardId Selected card ID.
      */
-    public void judgeCard(User judge, int cardId) throws CahResponder.CahException {
+    public void judgeCard(User judge, int cardId) throws BaseCahHandler.CahException {
         Player winner;
         synchronized (judgeLock) {
             final Player judgePlayer = getPlayerForUser(judge);
-            if (getJudge() != judgePlayer) throw new CahResponder.CahException(ErrorCode.NOT_JUDGE);
-            else if (state != GameState.JUDGING) throw new CahResponder.CahException(ErrorCode.NOT_YOUR_TURN);
+            if (getJudge() != judgePlayer) throw new BaseCahHandler.CahException(ErrorCode.NOT_JUDGE);
+            else if (state != GameState.JUDGING) throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
             // shouldn't ever happen, but just in case...
             if (judgePlayer != null) judgePlayer.resetSkipCount();
 
             winner = playedCards.getPlayerForId(cardId);
-            if (winner == null) throw new CahResponder.CahException(ErrorCode.INVALID_CARD);
+            if (winner == null) throw new BaseCahHandler.CahException(ErrorCode.INVALID_CARD);
 
             winner.increaseScore();
             state = GameState.ROUND_OVER;

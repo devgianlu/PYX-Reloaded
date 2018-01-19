@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.DisconnectReason;
 import net.socialgamer.cah.data.ConnectedUsers;
@@ -20,7 +20,7 @@ public class LogoutHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, NanoHTTPD.IHTTPSession session) {
+    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) {
         user.noLongerValid();
         users.removeUser(user, DisconnectReason.MANUAL);
         Sessions.invalidate(user.getSessionId());

@@ -2,7 +2,7 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -13,7 +13,7 @@ import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.GameOptions;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.CahResponder;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
@@ -26,9 +26,9 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) throws CahResponder.CahException {
-        if (game.getHost() != user) throw new CahResponder.CahException(ErrorCode.NOT_GAME_HOST);
-        if (game.getState() != GameState.LOBBY) throw new CahResponder.CahException(ErrorCode.ALREADY_STARTED);
+    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+        if (game.getHost() != user) throw new BaseCahHandler.CahException(ErrorCode.NOT_GAME_HOST);
+        if (game.getState() != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
 
         try {
             String value = params.get(AjaxRequest.GAME_OPTIONS);
@@ -40,7 +40,7 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
             // the text on the join button and the sort order
             if (!game.getPassword().equals(oldPassword)) gameManager.broadcastGameListRefresh();
         } catch (Exception ex) {
-            throw new CahResponder.CahException(ErrorCode.BAD_REQUEST, ex);
+            throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST, ex);
         }
 
         return new JsonObject();
