@@ -1,5 +1,5 @@
 window.onload = function () {
-    $.post("AjaxServlet?o=fl").fail(function (data) {
+    $.post("AjaxServlet", "o=fl").fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
     }).done(function (data) {
         console.log(data);
@@ -20,7 +20,7 @@ window.onload = function () {
 function register() {
     const nickname = $("input#nickname").val();
 
-    $.post("AjaxServlet?o=r&n=" + nickname).fail(function (data) {
+    $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
     }).done(function (data) {
         console.log(data);

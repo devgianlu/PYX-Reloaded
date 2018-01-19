@@ -48,7 +48,7 @@ public class RegisterHandler extends BaseHandler {
         user = userFactory.create(nickname, exchange.getHostName(), admin, pid);
 
         users.checkAndAdd(user);
-        exchange.setResponseCookie(new CookieImpl("Set-Cookie", "PYX-Session=" + Sessions.add(user)));
+        exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 
         JsonObject obj = new JsonObject();
         obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);

@@ -1,7 +1,7 @@
 package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonElement;
-import fi.iki.elonen.NanoHTTPD;
+import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
@@ -17,7 +17,7 @@ public class DislikeGameHandler extends GameHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Game game, Parameters params, NanoHTTPD.IHTTPSession session) {
+    public JsonElement handle(User user, Game game, Parameters params, HttpServerExchange exchange) {
         game.toggleDislikeGame(user);
         return game.getLikesInfoJson(user);
     }
