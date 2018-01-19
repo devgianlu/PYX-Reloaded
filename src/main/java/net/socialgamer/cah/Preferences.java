@@ -70,5 +70,13 @@ public class Preferences extends HashMap<String, JsonElement> {
             def = obj.get("default").getAsInt();
             max = obj.get("max").getAsInt();
         }
+
+        public JsonObject toJson() {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("min", min);
+            obj.addProperty("default", def);
+            obj.addProperty("max", max);
+            return obj;
+        }
     }
 }

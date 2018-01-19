@@ -10,6 +10,7 @@ import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.db.PyxCardSet;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.task.SafeTimerTask;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -41,18 +42,12 @@ import java.util.concurrent.TimeUnit;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class Game {
-    private final static Set<String> FINITE_PLAYTIMES;
     private static final Logger logger = Logger.getLogger(Game.class);
-
-    static {
-        final Set<String> finitePlaytimes = new TreeSet<>(Arrays.asList("0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "2.5x", "3x", "4x", "5x", "10x"));
-        FINITE_PLAYTIMES = Collections.unmodifiableSet(finitePlaytimes);
-    }
 
     /**
      * The minimum number of black cards that must be added to a game for it to be able to start.
      */
-    public final int MINIMUM_BLACK_CARDS;
+    private final int MINIMUM_BLACK_CARDS;
 
     /**
      * The minimum number of white cards per player limit slots that must be added to a game for it to
@@ -60,7 +55,7 @@ public class Game {
      * <p>
      * We need 20 * maxPlayers cards. This allows black cards up to "draw 9" to work correctly.
      */
-    public final int MINIMUM_WHITE_CARDS_PER_PLAYER;
+    private final int MINIMUM_WHITE_CARDS_PER_PLAYER;
 
     /**
      * Time, in milliseconds, to delay before starting a new round.
@@ -93,32 +88,22 @@ public class Game {
      */
     private final int JUDGE_TIMEOUT_PER_CARD;
     private final int MAX_SKIPS_BEFORE_KICK;
+
     private final int id;
-    /**
-     * All players present in the game.
-     */
     private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>(10));
-    /**
-     * Players participating in the current round.
-     */
     private final List<Player> roundPlayers = Collections.synchronizedList(new ArrayList<Player>(9));
     private final PlayerPlayedCardsTracker playedCards = new PlayerPlayedCardsTracker();
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
     private final GameManager gameManager;
-    private final Object blackCardLock = new Object();
     private final GameOptions options;
-    private final Set<String> cardcastDeckIds = Collections.synchronizedSet(new HashSet<String>());
-    /**
-     * Lock object to prevent judging during idle judge detection and vice-versa.
-     */
-    private final Object judgeLock = new Object();
-    /**
-     * Lock to prevent missing timer updates.
-     */
     private final Object roundTimerLock = new Object();
+    private final Object judgeLock = new Object();
+    private final Object blackCardLock = new Object();
     private final ScheduledThreadPoolExecutor globalTimer;
     private final CardcastService cardcastService;
+    private final Set<User> likes = Collections.synchronizedSet(new HashSet<>());
+    private final Set<User> dislikes = Collections.synchronizedSet(new HashSet<>());
     private Player host;
     private BlackDeck blackDeck;
     private BlackCard blackCard;
@@ -126,7 +111,6 @@ public class Game {
     private GameState state;
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
-    private String currentUniqueId;
 
     /**
      * Create a new game.
@@ -137,12 +121,12 @@ public class Game {
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(int id, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
+    public Game(int id, GameOptions options, ConnectedUsers connectedUsers, GameManager gameManager, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
         this.id = id;
         this.connectedUsers = connectedUsers;
         this.gameManager = gameManager;
         this.globalTimer = globalTimer;
-        this.options = new GameOptions(preferences);
+        this.options = options;
         this.cardcastService = cardcastService;
         this.state = GameState.LOBBY;
 
@@ -163,6 +147,31 @@ public class Game {
     }
 
     /**
+     * Count valid users and also remove invalid ones
+     *
+     * @param users the users to count
+     * @return number of valid users
+     */
+    private static int countValidUsers(Iterable<User> users) {
+        int count = 0;
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().isValid()) count++;
+            else iterator.remove();
+        }
+        return count;
+    }
+
+    private static void toggleLikeDislike(Set<User> one, Set<User> other, User user) {
+        if (!one.contains(user)) {
+            if (other.contains(user)) other.remove(user);
+            one.add(user);
+        } else {
+            one.remove(user);
+        }
+    }
+
+    /**
      * Add a player to the game.
      * <p>
      * Synchronizes on {@link #players}.
@@ -171,8 +180,9 @@ public class Game {
      * @throws TooManyPlayersException Thrown if this game is at its maximum player capacity.
      * @throws IllegalStateException   Thrown if {@code user} is already in a game.
      */
-    public void addPlayer(final User user) throws TooManyPlayersException, IllegalStateException {
+    public void addPlayer(User user) throws TooManyPlayersException, IllegalStateException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
+
         synchronized (players) {
             if (options.playerLimit >= 3 && players.size() >= options.playerLimit) throw new TooManyPlayersException();
 
@@ -188,6 +198,43 @@ public class Game {
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, obj);
     }
 
+    public int getLikes() {
+        synchronized (likes) {
+            return countValidUsers(likes);
+        }
+    }
+
+    public int getDislikes() {
+        synchronized (dislikes) {
+            return countValidUsers(dislikes);
+        }
+    }
+
+    public JsonObject getLikesInfoJson(User user) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+        obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
+        return obj;
+    }
+
+    private boolean userDislikes(User user) {
+        return dislikes.contains(user);
+    }
+
+    private boolean userLikes(User user) {
+        return likes.contains(user);
+    }
+
+    public void toggleLikeGame(User user) {
+        toggleLikeDislike(likes, dislikes, user);
+    }
+
+    public void toggleDislikeGame(User user) {
+        toggleLikeDislike(dislikes, likes, user);
+    }
+
     public boolean isPasswordCorrect(String userPassword) {
         return getPassword() == null || getPassword().isEmpty() || Objects.equals(userPassword, getPassword());
     }
@@ -201,7 +248,7 @@ public class Game {
      * @param user Player to remove from the game.
      * @return True if {@code user} was the last player in the game.
      */
-    public boolean removePlayer(final User user) {
+    public boolean removePlayer(User user) {
         logger.info(String.format("Removing %s from game %d.", user.toString(), id));
 
         boolean wasJudge = false;
@@ -313,7 +360,7 @@ public class Game {
      *
      * @param user Spectator to remove from the game.
      */
-    public void removeSpectator(final User user) {
+    public void removeSpectator(User user) {
         logger.info(String.format("Removing spectator %s from game %d.", user.toString(), id));
         synchronized (spectators) {
             if (!spectators.remove(user)) return;
@@ -375,7 +422,7 @@ public class Game {
      */
     private void notifyGameOptionsChanged() {
         JsonObject obj = getEventJson(LongPollEvent.GAME_OPTIONS_CHANGED);
-        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(true));
+        obj.add(LongPollResponse.GAME_INFO.toString(), getInfoJson(null, true));
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
     }
 
@@ -417,8 +464,8 @@ public class Game {
         notifyGameOptionsChanged();
     }
 
-    public Set<String> getCardcastDeckIds() {
-        return cardcastDeckIds;
+    public Set<String> getCardcastDeckCodes() {
+        return options.cardcastSetCodes;
     }
 
     /**
@@ -434,17 +481,24 @@ public class Game {
     }
 
     @Nullable
-    public JsonObject getInfoJson(boolean includePassword) {
+    public JsonObject getInfoJson(@Nullable User user, boolean includePassword) {
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
         if (host == null) return null;
 
         JsonObject obj = new JsonObject();
         obj.addProperty(GameInfo.ID.toString(), id);
+        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
+        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
         obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
         obj.addProperty(GameInfo.STATE.toString(), state.toString());
         obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
         obj.addProperty(GameInfo.HAS_PASSWORD.toString(), options.password != null && !options.password.equals(""));
+
+        if (user != null) {
+            obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
+            obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+        }
 
         JsonArray playerNames = new JsonArray();
         for (Player player : players.toArray(new Player[players.size()]))
@@ -524,7 +578,7 @@ public class Game {
      * {@code PLAYING}, {@code JUDGING}, or {@code WINNER}, depending on the game's state and
      * what the player has done.
      */
-    private GamePlayerStatus getPlayerStatus(final Player player) {
+    private GamePlayerStatus getPlayerStatus(Player player) {
         final GamePlayerStatus playerStatus;
 
         switch (state) {
@@ -555,8 +609,7 @@ public class Game {
                 break;
             case ROUND_OVER:
                 if (getJudge() == player) playerStatus = GamePlayerStatus.JUDGE;
-                else if (player.getScore() >= options.scoreGoal)
-                    playerStatus = GamePlayerStatus.WINNER;     // TODO win-by-x
+                else if (didPlayerWonGame(player)) playerStatus = GamePlayerStatus.WINNER;
                 else playerStatus = GamePlayerStatus.IDLE;
                 break;
             default:
@@ -570,26 +623,20 @@ public class Game {
      * Start the game, if there are at least 3 players present. This does not do any access checking!
      * <br/>
      * Synchronizes on {@link #players}.
-     *
-     * @return True if the game is started. Would only be false if there aren't enough players, or the
-     * game is already started, or doesn't have enough cards, but hopefully callers and
-     * clients would prevent that from happening!
      */
-    @Nullable
-    public ErrorCode start() throws FailedLoadingSomeCardcastDecks {
-        if (state != GameState.LOBBY) return ErrorCode.ALREADY_STARTED;
-        if (!hasEnoughCards()) return ErrorCode.NOT_ENOUGH_CARDS;
+    public void start() throws FailedLoadingSomeCardcastDecks, BaseCahHandler.CahException {
+        if (state != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
+        if (!hasEnoughCards()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_CARDS);
 
         int numPlayers = players.size();
         if (numPlayers >= 3) {
             // Pick a random start judge, though the "next" judge will actually go first.
             judgeIndex = (int) (Math.random() * numPlayers);
 
-            currentUniqueId = UniqueIds.getNewRandomID();
             logger.info(String.format("Starting game %d with card sets %s, Cardcast %s, %d blanks, %d "
-                            + "max players, %d max spectators, %d score limit, players %s, unique %s.",
-                    id, options.cardSetIds, cardcastDeckIds, options.blanksInDeck, options.playerLimit,
-                    options.spectatorLimit, options.scoreGoal, players, currentUniqueId));
+                            + "max players, %d max spectators, %d score limit, players %s.",
+                    id, options.cardSetIds, options.cardcastSetCodes, options.blanksInDeck, options.playerLimit,
+                    options.spectatorLimit, options.scoreGoal, players));
 
             // do this stuff outside the players lock; they will lock players again later for much less
             // time, and not at the same time as trying to lock users, which has caused deadlocks
@@ -602,10 +649,8 @@ public class Game {
 
             startNextRound();
             gameManager.broadcastGameListRefresh();
-
-            return null;
         } else {
-            return ErrorCode.NOT_ENOUGH_PLAYERS;
+            throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_PLAYERS);
         }
     }
 
@@ -617,7 +662,7 @@ public class Game {
                 cardSets.addAll(PyxCardSet.loadCardSets(options.getPyxCardSetIds()));
 
             FailedLoadingSomeCardcastDecks cardcastException = null;
-            for (String cardcastId : cardcastDeckIds.toArray(new String[0])) {
+            for (String cardcastId : options.cardcastSetCodes.toArray(new String[0])) {
                 // Ideally, we can assume that anything in that set is going to load, but it is entirely
                 // possible that the cache has expired and we can't re-load it for some reason, so
                 // let's be safe.
@@ -748,13 +793,10 @@ public class Game {
     }
 
     private int calculateTime(int base) {
-        double factor = 1.0d;
-        String tm = options.timerMultiplier;
-        if (tm.equals("Unlimited")) return Integer.MAX_VALUE;
-        if (FINITE_PLAYTIMES.contains(tm)) factor = Double.valueOf(tm.substring(0, tm.length() - 1));
-        long retval = Math.round(base * factor);
-        if (retval > Integer.MAX_VALUE) return Integer.MAX_VALUE;
-        return (int) retval;
+        if (options.timerMultiplier == GameOptions.TimeMultiplier.UNLIMITED) return Integer.MAX_VALUE;
+        long val = Math.round(base * options.timerMultiplier.factor());
+        if (val > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        return (int) val;
     }
 
     /**
@@ -1190,16 +1232,13 @@ public class Game {
      * @param user     User playing the card.
      * @param cardId   ID of the card to play.
      * @param cardText User text for a blank card.  Ignored for normal cards.
-     * @return An {@code ErrorCode} if the play was unsuccessful ({@code user} doesn't have the card,
-     * {@code user} is the judge, etc.), or {@code null} if there was no error and the play
-     * was successful.
      */
-    @Nullable
-    public ErrorCode playCard(final User user, final int cardId, final String cardText) {
-        final Player player = getPlayerForUser(user);
+    public void playCard(User user, int cardId, String cardText) throws BaseCahHandler.CahException {
+        Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
-            if (getJudge() == player || state != GameState.PLAYING) return ErrorCode.NOT_YOUR_TURN;
+            if (getJudge() == player || state != GameState.PLAYING)
+                throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
             WhiteCard playCard = null;
             synchronized (player.hand) {
@@ -1222,12 +1261,9 @@ public class Game {
                 playedCards.addCard(player, playCard);
                 notifyPlayerInfoChange(player);
                 if (shouldStartJudging()) judgingState();
-                return null;
             } else {
-                return ErrorCode.DO_NOT_HAVE_CARD;
+                throw new BaseCahHandler.CahException(ErrorCode.DO_NOT_HAVE_CARD);
             }
-        } else {
-            return null;
         }
     }
 
@@ -1238,40 +1274,37 @@ public class Game {
      *
      * @param judge  Judge user.
      * @param cardId Selected card ID.
-     * @return Error code if there is an error, or null if success.
      */
-    @Nullable
-    public ErrorCode judgeCard(final User judge, final int cardId) {
-        final Player cardPlayer;
+    public void judgeCard(User judge, int cardId) throws BaseCahHandler.CahException {
+        Player winner;
         synchronized (judgeLock) {
             final Player judgePlayer = getPlayerForUser(judge);
-            if (getJudge() != judgePlayer) return ErrorCode.NOT_JUDGE;
-            else if (state != GameState.JUDGING) return ErrorCode.NOT_YOUR_TURN;
+            if (getJudge() != judgePlayer) throw new BaseCahHandler.CahException(ErrorCode.NOT_JUDGE);
+            else if (state != GameState.JUDGING) throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
             // shouldn't ever happen, but just in case...
             if (judgePlayer != null) judgePlayer.resetSkipCount();
 
-            cardPlayer = playedCards.getPlayerForId(cardId);
-            if (cardPlayer == null) return ErrorCode.INVALID_CARD;
+            winner = playedCards.getPlayerForId(cardId);
+            if (winner == null) throw new BaseCahHandler.CahException(ErrorCode.INVALID_CARD);
 
-            cardPlayer.increaseScore();
+            winner.increaseScore();
             state = GameState.ROUND_OVER;
         }
 
-        int clientCardId = playedCards.getCards(cardPlayer).get(0).getId();
+        int clientCardId = playedCards.getCards(winner).get(0).getId();
 
         JsonObject obj = getEventJson(LongPollEvent.GAME_ROUND_COMPLETE);
-        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), cardPlayer.getUser().getNickname());
+        obj.addProperty(LongPollResponse.ROUND_WINNER.toString(), winner.getUser().getNickname());
         obj.addProperty(LongPollResponse.WINNING_CARD.toString(), clientCardId);
         obj.addProperty(LongPollResponse.INTERMISSION.toString(), ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, obj);
 
         notifyPlayerInfoChange(getJudge());
-        notifyPlayerInfoChange(cardPlayer);
+        notifyPlayerInfoChange(winner);
 
-        // TODO win-by-x option
         synchronized (roundTimerLock) {
-            if (cardPlayer.getScore() >= options.scoreGoal) {
+            if (didPlayerWonGame(winner)) {
                 rescheduleTimer(new SafeTimerTask() {
                     @Override
                     public void process() {
@@ -1290,11 +1323,29 @@ public class Game {
 
         Map<String, List<WhiteCard>> cardsBySessionId = new HashMap<>();
         playedCards.cardsByUser().forEach((key, value) -> cardsBySessionId.put(key.getSessionId(), value));
-        return null;
     }
 
     public int getRequiredBlackCardCount() {
         return MINIMUM_BLACK_CARDS;
+    }
+
+    private boolean didPlayerWonGame(Player player) {
+        if (player.getScore() >= options.scoreGoal) {
+            if (options.winBy == 0) return true;
+
+            Player highestScore = null;
+            synchronized (players) {
+                for (Player p : players) {
+                    if (player.equals(p)) continue;
+                    if (highestScore == null) highestScore = p;
+                    if (p.getScore() > highestScore.getScore()) highestScore = p;
+                }
+            }
+
+            return highestScore == null || player.getScore() + options.winBy >= highestScore.getScore();
+        } else {
+            return false;
+        }
     }
 
     /**

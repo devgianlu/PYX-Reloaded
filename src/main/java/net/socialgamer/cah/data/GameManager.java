@@ -1,6 +1,8 @@
 package net.socialgamer.cah.data;
 
+import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.data.Game.TooManyPlayersException;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -47,11 +49,11 @@ public class GameManager {
      *
      * @return Newly created game, or {@code null} if the maximum number of games are in progress.
      */
-    private Game createGame() {
+    private Game createGame(GameOptions options) throws BaseCahHandler.CahException {
         synchronized (games) {
-            if (games.size() >= getMaxGames()) return null;
-            Game game = gameProvider.create(this);
-            if (game.getId() < 0) return null;
+            if (games.size() >= getMaxGames())
+                throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_MANY_GAMES);
+            Game game = gameProvider.create(this, options);
             games.put(game.getId(), game);
             return game;
         }
@@ -69,11 +71,9 @@ public class GameManager {
      * @return Newly created game, or {@code null} if the maximum number of games are in progress.
      * @throws IllegalStateException If the user is already in a game and cannot join another.
      */
-    @Nullable
-    public Game createGameWithPlayer(User user) throws IllegalStateException {
+    public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws IllegalStateException, BaseCahHandler.CahException {
         synchronized (games) {
-            Game game = createGame();
-            if (game == null) return null;
+            Game game = createGame(options);
 
             try {
                 game.addPlayer(user);
@@ -150,6 +150,6 @@ public class GameManager {
     }
 
     public interface GameProvider {
-        Game create(GameManager manager);
+        Game create(GameManager manager, GameOptions options);
     }
 }

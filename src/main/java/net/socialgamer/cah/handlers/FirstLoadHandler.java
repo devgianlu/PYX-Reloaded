@@ -5,18 +5,23 @@ import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ReconnectNextAction;
+import net.socialgamer.cah.Preferences;
+import net.socialgamer.cah.data.GameOptions;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.db.LoadedCards;
 import net.socialgamer.cah.db.PyxCardSet;
+import net.socialgamer.cah.servlets.Annotations;
 import net.socialgamer.cah.servlets.Parameters;
 
 import java.util.Set;
 
 public class FirstLoadHandler extends BaseHandler {
     public static final String OP = AjaxOperation.FIRST_LOAD.toString();
+    private final Preferences preferences;
 
-    public FirstLoadHandler() {
+    public FirstLoadHandler(@Annotations.Preferences Preferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
@@ -43,7 +48,8 @@ public class FirstLoadHandler extends BaseHandler {
         Set<PyxCardSet> cardSets = LoadedCards.getLoadedSets();
         JsonArray json = new JsonArray(cardSets.size());
         for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson());
-        obj.add(AjaxResponse.CARD_SETS, json);
+        obj.add(AjaxResponse.CARD_SETS, json)
+                .add(AjaxResponse.DEFAULT_GAME_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
 
         return obj;
     }

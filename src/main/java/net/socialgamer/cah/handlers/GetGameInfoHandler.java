@@ -20,7 +20,7 @@ public class GetGameInfoHandler extends GameWithPlayerHandler {
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();
-        obj.add(AjaxResponse.GAME_INFO, game.getInfoJson(true));
+        obj.add(AjaxResponse.GAME_INFO, game.getInfoJson(user, true));
         obj.add(AjaxResponse.PLAYER_INFO, game.getAllPlayersInfoJson());
         return obj;
     }

@@ -4,16 +4,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    public static JsonArray toJsonArray(Set<Integer> set) {
-        JsonArray jsonArray = new JsonArray(set.size());
-        for (int item : set) jsonArray.add(item);
+    public static JsonArray toIntsJsonArray(Collection<Integer> items) {
+        JsonArray jsonArray = new JsonArray(items.size());
+        for (int item : items) jsonArray.add(item);
+        return jsonArray;
+    }
+
+    public static JsonArray toStringsJsonArray(Collection<String> items) {
+        JsonArray jsonArray = new JsonArray(items.size());
+        for (String item : items) jsonArray.add(item);
         return jsonArray;
     }
 

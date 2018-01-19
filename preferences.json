@@ -31,5 +31,10 @@
     "min": 0,
     "default": 0,
     "max": 30
+  },
+  "winBy": {
+    "min": 0,
+    "default": 0,
+    "max": 5
   }
 }

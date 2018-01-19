@@ -47,7 +47,7 @@ public class Constants {
 
     /**
      * The next thing the client should do during reconnect phase.
-     *
+     * <p>
      * Leaving these as longer strings as they are only used once per client.
      */
     public enum ReconnectNextAction {
@@ -141,7 +141,7 @@ public class Constants {
         JUDGE_SELECT("js"),
         /**
          * Kick a user from the server
-         *
+         * <p>
          * Admin only
          */
         KICK("K"),
@@ -167,7 +167,7 @@ public class Constants {
         REGISTER("r"),
         /**
          * Change a player score
-         *
+         * <p>
          * Admin only
          */
         SCORE("SC"),
@@ -178,7 +178,15 @@ public class Constants {
         /**
          * Stop the game
          */
-        STOP_GAME("Sg");
+        STOP_GAME("Sg"),
+        /**
+         * Like a game
+         */
+        LIKE("lk"),
+        /**
+         * Dislike a game
+         */
+        DISLIKE("dlk");
 
         private final String op;
 
@@ -225,7 +233,7 @@ public class Constants {
     /**
      * Keys for client request responses.
      */
-    public enum AjaxResponse implements ReturnableData {
+    public enum AjaxResponse {
         BLACK_CARD("bc"),
         @DuplicationAllowed
         CARD_ID(AjaxRequest.CARD_ID),
@@ -239,6 +247,7 @@ public class Constants {
         GAME_INFO("gi"),
         @DuplicationAllowed
         GAME_OPTIONS(AjaxRequest.GAME_OPTIONS),
+        DEFAULT_GAME_OPTIONS("dgo"),
         GAMES("gl"),
         HAND("h"),
         /**
@@ -280,7 +289,7 @@ public class Constants {
         }
     }
 
-    public enum ErrorInformation implements ReturnableData {
+    public enum ErrorInformation {
         BLACK_CARDS_PRESENT("bcp"),
         BLACK_CARDS_REQUIRED("bcr"),
         WHITE_CARDS_PRESENT("wcp"),
@@ -489,7 +498,7 @@ public class Constants {
     /**
      * Data keys that can be in a long poll response.
      */
-    public enum LongPollResponse implements ReturnableData {
+    public enum LongPollResponse {
         @DuplicationAllowed
         BLACK_CARD(AjaxResponse.BLACK_CARD),
         CARDCAST_DECK_INFO("cdi"),
@@ -679,6 +688,10 @@ public class Constants {
         HAS_PASSWORD("hp"),
         PLAYERS("P"),
         SPECTATORS("V"),
+        LIKES("LK"),
+        I_LIKE("iLK"),
+        I_DISLIKE("iDLK"),
+        DISLIKES("DLK"),
         STATE("S");
 
         private final String key;
@@ -704,11 +717,13 @@ public class Constants {
         BLANKS_LIMIT("bl"),
         @DuplicationAllowed
         CARD_SETS(AjaxResponse.CARD_SETS),
+        CARDCAST_SETS("CCs"),
         @DuplicationAllowed
         PASSWORD(AjaxRequest.PASSWORD),
         PLAYER_LIMIT("pL"),
         SPECTATOR_LIMIT("vL"),
         SCORE_LIMIT("sl"),
+        WIN_BY("wb"),
         TIMER_MULTIPLIER("tm");
 
         private final String key;
@@ -785,12 +800,6 @@ public class Constants {
         public String getString2() {
             return message2;
         }
-    }
-
-    /**
-     * Enums that implement this interface are valid keys for data returned to clients.
-     */
-    interface ReturnableData {
     }
 
     /**

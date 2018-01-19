@@ -42,9 +42,8 @@ public class StartGameHandler extends GameWithPlayerHandler {
                 obj.addProperty(ErrorInformation.WHITE_CARDS_REQUIRED.toString(), game.getRequiredWhiteCardCount());
                 throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_CARDS, obj);
             } else {
-                ErrorCode error = game.start();
-                if (error != null) throw new BaseCahHandler.CahException(error);
-                else return JsonWrapper.EMPTY;
+                game.start();
+                return JsonWrapper.EMPTY;
             }
         } catch (FailedLoadingSomeCardcastDecks ex) {
             throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND,

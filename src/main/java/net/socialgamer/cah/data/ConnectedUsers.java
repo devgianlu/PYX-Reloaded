@@ -7,6 +7,7 @@ import net.socialgamer.cah.Constants.LongPollEvent;
 import net.socialgamer.cah.Constants.LongPollResponse;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,18 +51,15 @@ public class ConnectedUsers {
      * as an atomic operation.
      *
      * @param user User to add. {@code getNickname()} is used to determine the nickname.
-     * @return {@code null} if the user was added, or an {@link ErrorCode} explaining why the user was
-     * rejected.
      */
-    @Nullable
-    public ErrorCode checkAndAdd(User user) {
+    public void checkAndAdd(User user) throws BaseCahHandler.CahException {
         synchronized (users) {
             if (this.hasUser(user.getNickname())) {
                 logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
-                return ErrorCode.NICK_IN_USE;
+                throw new BaseCahHandler.CahException(ErrorCode.NICK_IN_USE);
             } else if (users.size() >= maxUsers && !user.isAdmin()) {
                 logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)", user.toString(), users.size(), maxUsers));
-                return ErrorCode.TOO_MANY_USERS;
+                throw new BaseCahHandler.CahException(ErrorCode.TOO_MANY_USERS);
             } else {
                 logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
@@ -71,8 +69,6 @@ public class ConnectedUsers {
                     obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
                     broadcastToAll(MessageType.PLAYER_EVENT, obj);
                 }
-
-                return null;
             }
         }
     }

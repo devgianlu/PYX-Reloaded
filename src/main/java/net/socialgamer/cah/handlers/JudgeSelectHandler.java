@@ -32,8 +32,7 @@ public class JudgeSelectHandler extends GameWithPlayerHandler {
             throw new BaseCahHandler.CahException(ErrorCode.INVALID_CARD, ex);
         }
 
-        final ErrorCode errorCode = game.judgeCard(user, cardId);
-        if (errorCode != null) throw new BaseCahHandler.CahException(errorCode);
+        game.judgeCard(user, cardId);
         return JsonWrapper.EMPTY;
     }
 }

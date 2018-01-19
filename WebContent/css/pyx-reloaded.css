@@ -1,0 +1,182 @@
+.message {
+    text-align: center;
+}
+
+.mdc-switch-label {
+    padding-left: 8px;
+}
+
+.mdc-dialog__body--scrollable > .mdc-card {
+    margin-top: 24px;
+}
+
+.mdc-dialog__body--scrollable {
+    max-height: 60vh;
+}
+
+.mdc-toolbar .mdc-text-field {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.mdc-toolbar .mdc-text-field__label {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input {
+    color: var(--mdc-theme-text-primary-on-dark);
+    border-color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-toolbar .mdc-text-field__input:hover {
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+main {
+    overflow-y: auto;
+}
+
+.fab-bottom-right {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .fab-bottom-right {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+}
+
+.mdc-toolbar-demo {
+    margin: 0;
+}
+
+.demo-paragraph {
+    margin: 0;
+    padding: 20px 28px;
+}
+
+@media (max-width: 599px) {
+    .demo-paragraph {
+        padding: 16px;
+    }
+}
+
+/* Ensure layout covers the entire screen. */
+html {
+    height: 100%;
+}
+
+/* Place drawer and content side by side. */
+body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+
+.pyx-card {
+    display: block !important;
+}
+
+.pyx-card[data-black=true] {
+    background: black;
+}
+
+.pyx-card[data-black=true] h1 {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+/* Stack toolbar and main on top of each other. */
+.page-content {
+    display: inline-flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 {
+    font-size: 18px;
+}
+
+.material-icons.md-24 {
+    font-size: 24px;
+}
+
+.material-icons.md-36 {
+    font-size: 36px;
+}
+
+.material-icons.md-48 {
+    font-size: 48px;
+}
+
+/* Rules for using icons as black on a light background. */
+.md-dark {
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.md-dark.md-inactive {
+    color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.md-light {
+    color: rgba(255, 255, 255, 1);
+}
+
+.md-light.md-inactive {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.pagination__inner {
+    display: inline-block;
+}
+
+.pagination__inner button {
+    min-width: auto;
+    padding: 0 8px;
+    height: 32px;
+    font-size: .8125rem;
+    line-height: 32px;
+}
+
+/* Media breakpoints for centred cards in homepage */
+.centered_cards {
+    width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+    .centered_cards {
+        width: 75%;
+        margin: auto;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .centered_cards {
+        width: 60%;
+        margin: auto;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .centered_cards {
+        width: 50%;
+        margin: auto;
+    }
+}

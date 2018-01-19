@@ -46,17 +46,12 @@ public class RegisterHandler extends BaseHandler {
 
         user = userFactory.create(nickname, exchange.getHostName(), admin, pid);
 
-        ErrorCode errorCode = users.checkAndAdd(user);
-        if (errorCode == null) {
-            exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
+        users.checkAndAdd(user);
+        exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 
-            JsonWrapper obj = new JsonWrapper();
-            obj.add(AjaxResponse.NICKNAME, nickname);
-            obj.add(AjaxResponse.IS_ADMIN, admin);
-            obj.add(AjaxResponse.PERSISTENT_ID, pid);
-            return obj;
-        } else {
-            throw new BaseCahHandler.CahException(errorCode);
-        }
+        return new JsonWrapper().add(AjaxResponse.NICKNAME, nickname)
+                .add(AjaxResponse.IS_ADMIN, admin)
+                .add(AjaxResponse.PERSISTENT_ID, pid);
+        ;
     }
 }

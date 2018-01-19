@@ -34,7 +34,7 @@ public class CardcastRemoveCardsetHandler extends GameWithPlayerHandler {
         deckId = deckId.toUpperCase();
 
         // Remove it from the set regardless if it loads or not.
-        game.getCardcastDeckIds().remove(deckId);
+        game.getCardcastDeckCodes().remove(deckId);
         final CardcastDeck deck = cardcastService.loadSet(deckId);
         if (deck == null) throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND);
 

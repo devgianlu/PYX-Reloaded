@@ -39,7 +39,7 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         JsonObject obj = game.getEventJson(LongPollEvent.CARDCAST_ADD_CARDSET);
         obj.add(LongPollResponse.CARDCAST_DECK_INFO.toString(), deck.getClientMetadataJson());
         game.broadcastToPlayers(MessageType.GAME_EVENT, obj);
-        game.getCardcastDeckIds().add(deckId);
+        game.getCardcastDeckCodes().add(deckId);
 
         return JsonWrapper.EMPTY;
     }

@@ -28,7 +28,7 @@ public class GameListHandler extends BaseHandler {
 
         JsonArray infoArray = new JsonArray();
         for (Game game : gameManager.getGameList()) {
-            JsonObject info = game.getInfoJson(false);
+            JsonObject info = game.getInfoJson(user, false);
             if (info != null) infoArray.add(info);
         }
 
