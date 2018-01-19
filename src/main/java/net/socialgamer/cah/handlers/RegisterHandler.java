@@ -49,7 +49,7 @@ public class RegisterHandler extends BaseHandler {
 
         ErrorCode errorCode = users.checkAndAdd(user);
         if (errorCode == null) {
-            exchange.setResponseCookie(new CookieImpl("Set-Cookie", "PYX-Session=" + Sessions.add(user)));
+            exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 
             JsonObject obj = new JsonObject();
             obj.addProperty(AjaxResponse.NICKNAME.toString(), nickname);
