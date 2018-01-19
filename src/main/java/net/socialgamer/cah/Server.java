@@ -58,7 +58,7 @@ public class Server {
         GameManager gameManager = new GameManager(manager -> new Game(GameManager.generateGameId(), connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        PathHandler handler = new PathHandler(Handlers.resource(new PathResourceManager(Paths.get("./WebContent").toAbsolutePath())));
+        PathHandler handler = new PathHandler(Handlers.resource(new PathResourceManager(Paths.get(preferences.getString("webContent", "./WebContent")).toAbsolutePath())));
         handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
                 .addExactPath("/LongPollServlet", new BaseLongPollHandler());
 
