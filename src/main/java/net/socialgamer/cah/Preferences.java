@@ -26,7 +26,7 @@ public class Preferences extends HashMap<String, JsonElement> {
     }
 
     public static Preferences load(String[] args) throws IOException {
-        String prefs = "preferences.json";
+        String prefs = "preferences.json.default";
         if (args.length >= 2) {
             for (int i = 0; i < args.length / 2; i++) {
                 if (args[i * 2].equals("--prefs")) prefs = args[i * 2 + 1];
