@@ -1,6 +1,8 @@
 package net.socialgamer.cah.data;
 
 
+import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.servlets.BaseCahHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -48,6 +50,16 @@ public class User {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public void checkChatFlood() throws BaseCahHandler.CahException {
+        if (getLastMessageTimes().size() >= Constants.CHAT_FLOOD_MESSAGE_COUNT) {
+            long head = getLastMessageTimes().get(0);
+            if (System.currentTimeMillis() - head < Constants.CHAT_FLOOD_TIME)
+                throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_FAST);
+
+            getLastMessageTimes().remove(0);
+        }
     }
 
     /**

@@ -24,8 +24,6 @@ createGameDialog.listen('MDCDialog:accept', function () {
         "css": getSelectedPyxDecks(document.getElementById('pyx_decks'))
     };
 
-    console.log(go);
-
     createGame(go);
 });
 

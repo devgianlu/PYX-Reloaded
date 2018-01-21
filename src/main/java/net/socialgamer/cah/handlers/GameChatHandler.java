@@ -22,13 +22,7 @@ public class GameChatHandler extends GameWithPlayerHandler {
 
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (user.getLastMessageTimes().size() >= Constants.CHAT_FLOOD_MESSAGE_COUNT) {
-            final Long head = user.getLastMessageTimes().get(0);
-            if (System.currentTimeMillis() - head < Constants.CHAT_FLOOD_TIME)
-                throw new BaseCahHandler.CahException(ErrorCode.TOO_FAST);
-
-            user.getLastMessageTimes().remove(0);
-        }
+        user.checkChatFlood();
 
         String msg = params.get(AjaxRequest.MESSAGE);
         if (msg == null || msg.isEmpty()) throw new BaseCahHandler.CahException(ErrorCode.NO_MSG_SPECIFIED);

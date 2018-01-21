@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.User;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-public class BaseLongPollHandler extends BaseCahHandler {
+public class BaseLongPollHandler extends BaseCahHandler { // FIXME: Missing some events
     /**
      * Minimum amount of time before timing out and returning a no-op, in nanoseconds.
      */
@@ -61,7 +62,7 @@ public class BaseLongPollHandler extends BaseCahHandler {
                 // This will certainly happen in some game states. We want to deliver as much to the client
                 // in as few round-trips as possible while not waiting too long.
                 Thread.sleep(WAIT_FOR_MORE_DELAY);
-            } catch (final InterruptedException ie) {
+            } catch (InterruptedException ie) {
                 // pass
             }
 
@@ -70,14 +71,13 @@ public class BaseLongPollHandler extends BaseCahHandler {
             if (msgs.size() > 0) {
                 JsonArray array = new JsonArray(msgs.size());
                 for (QueuedMessage qm : msgs) array.add(qm.getData());
-                return array;
+                return Utils.singletonJsonObject(Constants.LongPollResponse.EVENT.toString(), array);
             }
         }
 
-        // otherwise, return that there is no new data
         JsonObject obj = new JsonObject();
-        obj.addProperty(Constants.LongPollResponse.EVENT.toString(), Constants.LongPollEvent.NOOP.toString());
         obj.addProperty(Constants.LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
+        obj.addProperty(Constants.LongPollResponse.EVENT.toString(), Constants.LongPollEvent.NOOP.toString());
         return obj;
     }
 }

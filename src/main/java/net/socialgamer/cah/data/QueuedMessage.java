@@ -20,16 +20,9 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
      *                    to the client.
      * @param data        The data of the message to be queued.
      */
-    public QueuedMessage(final MessageType messageType, final JsonObject data) {
+    public QueuedMessage(MessageType messageType, JsonObject data) {
         this.messageType = messageType;
         this.data = data;
-    }
-
-    /**
-     * @return The type of the message.
-     */
-    public MessageType getMessageType() {
-        return messageType;
     }
 
     /**
@@ -44,7 +37,7 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
      * ordering.
      */
     @Override
-    public int compareTo(@NotNull final QueuedMessage qm) {
+    public int compareTo(@NotNull QueuedMessage qm) {
         return this.messageType.getWeight() - qm.messageType.getWeight();
     }
 
@@ -58,11 +51,11 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
      * should be delivered (lower = more important) compared to other queued messages.
      */
     public enum MessageType {
-        KICKED(1), PLAYER_EVENT(3), GAME_EVENT(3), GAME_PLAYER_EVENT(4), CHAT(5);
+        KICKED(1), PLAYER_EVENT(2), GAME_EVENT(3), GAME_PLAYER_EVENT(4), CHAT(5);
 
         private final int weight;
 
-        MessageType(final int weight) {
+        MessageType(int weight) {
             this.weight = weight;
         }
 

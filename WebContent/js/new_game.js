@@ -48,12 +48,6 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     }
 }
 
-function clearElement(elm) {
-    while (elm.firstChild) {
-        elm.removeChild(elm.firstChild);
-    }
-}
-
 function populateDropdown(dropdown, dgo) {
     const list = dropdown.querySelector('.mdc-simple-menu__items');
     clearElement(list);
