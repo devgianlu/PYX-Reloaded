@@ -1,11 +1,10 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Game.TooManySpectatorsException;
 import net.socialgamer.cah.data.GameManager;
@@ -22,7 +21,7 @@ public class SpectateGameHandler extends GameHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!game.isPasswordCorrect(params.get(AjaxRequest.PASSWORD)))
             throw new BaseCahHandler.CahException(ErrorCode.WRONG_PASSWORD);
 
@@ -34,6 +33,6 @@ public class SpectateGameHandler extends GameHandler {
             throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL, ex);
         }
 
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

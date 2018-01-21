@@ -1,9 +1,9 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.Game;
@@ -24,7 +24,7 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getHost() != user) throw new BaseCahHandler.CahException(ErrorCode.NOT_GAME_HOST);
         if (game.getState() != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
 
@@ -41,6 +41,6 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         game.broadcastToPlayers(MessageType.GAME_EVENT, obj);
         game.getCardcastDeckCodes().add(deckId);
 
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

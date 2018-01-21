@@ -1,11 +1,10 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -22,7 +21,7 @@ public class PlayCardHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String cardIdStr = params.get(AjaxRequest.CARD_ID);
         if (cardIdStr == null || cardIdStr.isEmpty())
             throw new BaseCahHandler.CahException(ErrorCode.NO_CARD_SPECIFIED);
@@ -38,6 +37,6 @@ public class PlayCardHandler extends GameWithPlayerHandler {
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
         game.playCard(user, cardId, text);
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

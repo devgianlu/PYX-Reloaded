@@ -1,12 +1,11 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.Player;
@@ -25,7 +24,7 @@ public class ScoreHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
 
         String argsStr = params.get(AjaxRequest.MESSAGE);
@@ -49,8 +48,8 @@ public class ScoreHandler extends BaseHandler {
             throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST, ex);
         }
 
-        JsonObject obj = new JsonObject();
-        obj.add(AjaxResponse.PLAYER_INFO.toString(), game.getPlayerInfoJson(player));
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(AjaxResponse.PLAYER_INFO, game.getPlayerInfoJson(player));
         return obj;
     }
 }

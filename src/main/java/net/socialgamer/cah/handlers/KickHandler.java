@@ -1,9 +1,8 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
@@ -24,7 +23,7 @@ public class KickHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
 
         String nickname = params.get(AjaxRequest.NICKNAME);
@@ -38,6 +37,6 @@ public class KickHandler extends BaseHandler {
         connectedUsers.removeUser(kickUser, DisconnectReason.KICKED);
         logger.warn(String.format("Kicking %s by request of %s", kickUser.getNickname(), user.getNickname()));
 
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

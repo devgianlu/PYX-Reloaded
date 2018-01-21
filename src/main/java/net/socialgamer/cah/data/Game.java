@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
@@ -210,12 +211,12 @@ public class Game {
         }
     }
 
-    public JsonObject getLikesInfoJson(User user) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
-        obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
-        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
-        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
+    public JsonWrapper getLikesInfoJson(User user) {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(GameInfo.I_LIKE, userLikes(user));
+        obj.add(GameInfo.I_DISLIKE, userDislikes(user));
+        obj.add(GameInfo.LIKES, getLikes());
+        obj.add(GameInfo.DISLIKES, getDislikes());
         return obj;
     }
 

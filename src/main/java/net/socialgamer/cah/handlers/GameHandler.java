@@ -1,9 +1,9 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -13,12 +13,12 @@ import net.socialgamer.cah.servlets.Parameters;
 public abstract class GameHandler extends BaseHandler {
     protected final GameManager gameManager;
 
-    public GameHandler(final GameManager gameManager) {
+    public GameHandler(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String gameIdStr = params.get(AjaxRequest.GAME_ID);
         if (gameIdStr == null || gameIdStr.isEmpty())
             throw new BaseCahHandler.CahException(ErrorCode.NO_GAME_SPECIFIED);
@@ -36,5 +36,5 @@ public abstract class GameHandler extends BaseHandler {
         return handle(user, game, params, exchange);
     }
 
-    public abstract JsonElement handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException;
+    public abstract JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException;
 }

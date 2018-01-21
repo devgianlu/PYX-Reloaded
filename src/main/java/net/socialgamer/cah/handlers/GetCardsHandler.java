@@ -1,10 +1,9 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
@@ -19,12 +18,12 @@ public class GetCardsHandler extends GameWithPlayerHandler {
     }
 
     @Override
-    public JsonElement handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
-        JsonObject obj = new JsonObject();
-        obj.add(AjaxResponse.HAND.toString(), game.getHandJson(user));
-        obj.add(AjaxResponse.BLACK_CARD.toString(), game.getBlackCardJson());
-        obj.add(AjaxResponse.WHITE_CARDS.toString(), game.getWhiteCardsJson(user));
-        obj.addProperty(AjaxResponse.GAME_ID.toString(), game.getId());
+    public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(AjaxResponse.HAND, game.getHandJson(user));
+        obj.add(AjaxResponse.BLACK_CARD, game.getBlackCardJson());
+        obj.add(AjaxResponse.WHITE_CARDS, game.getWhiteCardsJson(user));
+        obj.add(AjaxResponse.GAME_ID, game.getId());
 
         return obj;
     }

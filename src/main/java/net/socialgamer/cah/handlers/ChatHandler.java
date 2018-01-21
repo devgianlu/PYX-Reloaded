@@ -1,10 +1,10 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.data.User;
@@ -22,7 +22,7 @@ public class ChatHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (user.getLastMessageTimes().size() >= Constants.CHAT_FLOOD_MESSAGE_COUNT) {
             final Long head = user.getLastMessageTimes().get(0);
             if (System.currentTimeMillis() - head < Constants.CHAT_FLOOD_TIME)
@@ -52,6 +52,6 @@ public class ChatHandler extends BaseHandler {
             users.broadcastToAll(MessageType.CHAT, obj);
         }
 
-        return new JsonObject();
+        return JsonWrapper.EMPTY;
     }
 }

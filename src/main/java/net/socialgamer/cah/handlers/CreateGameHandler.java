@@ -1,12 +1,11 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
@@ -28,7 +27,7 @@ public class CreateGameHandler extends BaseHandler {
     }
 
     @Override
-    public JsonElement handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         String value = params.get(Constants.AjaxRequest.GAME_OPTIONS);
         GameOptions options = GameOptions.deserialize(preferences, value);
 
@@ -41,8 +40,6 @@ public class CreateGameHandler extends BaseHandler {
 
         if (game == null) throw new BaseCahHandler.CahException(ErrorCode.TOO_MANY_GAMES);
 
-        JsonObject obj = new JsonObject();
-        obj.addProperty(AjaxResponse.GAME_ID.toString(), game.getId());
-        return obj;
+        return new JsonWrapper(AjaxResponse.GAME_ID, game.getId());
     }
 }

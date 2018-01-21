@@ -29,7 +29,7 @@ public class Server {
     private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     public static void main(String[] args) throws IOException, SQLException {
-        Preferences preferences = Preferences.load();
+        Preferences preferences = Preferences.load(args);
         int maxGames = preferences.getInt("maxGames", 100);
         int maxUsers = preferences.getInt("maxUsers", 400);
         int port = preferences.getInt("port", 80);
