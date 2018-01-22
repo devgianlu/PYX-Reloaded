@@ -116,6 +116,13 @@ function getStatusFromCode(st) {
     }
 }
 
+function leaveGame() {
+    stopPolling();
+    $.post("AjaxServlet", "o=lg&gid=" + game_id).always(function (data) {
+        window.location = "lobbies.html";
+    });
+}
+
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
     drawer.open = true

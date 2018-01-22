@@ -1,23 +1,29 @@
 const _pollingListeners = {};
+let shouldStop = false;
+
+function stopPolling() {
+    shouldStop = true;
+}
 
 // Will automatically start polling
 function sendPollRequest(retry) {
-    $.post("LongPollServlet").always(function (data) {
+    $.post("LongPollServlet").done(function (data) {
         processPollData(data);
-        if (!retry) sendPollRequest(status === "error");
+        if (!shouldStop) sendPollRequest(false);
+    }).fail(function () {
+        if (!retry && !shouldStop) sendPollRequest(true);
     })
 }
 
 function _fakePollData(obj) {
-    processPollData({"E": [obj]})
+    processPollData({"Es": [obj]})
 }
 
 function processPollData(data) {
     console.log(data);
 
-    const events = data["E"];
-    // noinspection JSValidateTypes
-    if (events === "_") return;
+    const events = data["Es"];
+    if (events.length === 0) return;
 
     for (const key in _pollingListeners) {
         if (_pollingListeners.hasOwnProperty(key)) {

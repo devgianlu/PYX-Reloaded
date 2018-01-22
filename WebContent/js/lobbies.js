@@ -43,6 +43,7 @@ window.onload = function () {
 };
 
 function logout() {
+    stopPolling();
     $.post("AjaxServlet", "o=lo").always(function (data) {
         window.location = "/";
     });

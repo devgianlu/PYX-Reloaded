@@ -60,13 +60,10 @@ public class BaseLongPollHandler extends BaseCahHandler {
             if (msgs.size() > 0) {
                 JsonArray array = new JsonArray(msgs.size());
                 for (QueuedMessage qm : msgs) array.add(qm.getData());
-                return Utils.singletonJsonObject(Constants.LongPollResponse.EVENT.toString(), array);
+                return Utils.singletonJsonObject(Constants.LongPollResponse.EVENTS.toString(), array);
             }
         }
 
-        JsonObject obj = new JsonObject();
-        obj.addProperty(Constants.LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
-        obj.addProperty(Constants.LongPollResponse.EVENT.toString(), Constants.LongPollEvent.NOOP.toString());
-        return obj;
+        return Utils.singletonJsonObject(Constants.LongPollResponse.EVENTS.toString(), new JsonArray());
     }
 }

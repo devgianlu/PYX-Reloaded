@@ -467,11 +467,6 @@ public class Constants {
          */
         NEW_PLAYER("np"),
         /**
-         * There has been no other action to inform the client about in a certain time frame, so inform
-         * the client that we have nothing to inform them so the client doesn't think we went away.
-         */
-        NOOP("_"),
-        /**
          * A player has left the server
          */
         PLAYER_LEAVE("pl");
@@ -506,13 +501,8 @@ public class Constants {
         @DuplicationAllowed
         ERROR_CODE(AjaxResponse.ERROR_CODE),
         EVENT("E"),
-        /**
-         * Player a chat message is from.
-         */
+        EVENTS("Es"),
         FROM("f"),
-        /**
-         * A chat message is from an admin. This is going to be done with IP addresses for now.
-         */
         FROM_ADMIN("fa"),
         @DuplicationAllowed
         GAME_ID(AjaxResponse.GAME_ID),
@@ -521,9 +511,6 @@ public class Constants {
         GAME_STATE("gs"),
         @DuplicationAllowed
         HAND(AjaxResponse.HAND),
-        /**
-         * The delay until the next game round begins.
-         */
         INTERMISSION("i"),
         @DuplicationAllowed
         MESSAGE(AjaxRequest.MESSAGE),
