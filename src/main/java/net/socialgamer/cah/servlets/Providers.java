@@ -20,8 +20,8 @@ public final class Providers {
     static {
         add(Annotations.UserFactory.class, (Provider<User.Factory>) () -> new User.Factory() {
             @Override
-            public User create(String nickname, String hostname, boolean admin, String persistentId) {
-                return new User(nickname, hostname, persistentId, Sessions.generateNewId(), admin);
+            public User create(String nickname, String hostname, boolean admin) {
+                return new User(nickname, hostname, Sessions.generateNewId(), admin);
             }
         });
     }

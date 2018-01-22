@@ -17,20 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ConnectedUsers {
-    /**
-     * Duration of a ping timeout, in nanoseconds.
-     */
-    public static final long PING_TIMEOUT = TimeUnit.SECONDS.toNanos(90);
-    /**
-     * Duration of an idle timeout, in nanoseconds.
-     */
-    public static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toNanos(60);
+    private static final long PING_TIMEOUT = TimeUnit.SECONDS.toMillis(90);
+    private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(60);
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
     private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
-    /**
-     * Key (username) must be stored in lower-case to facilitate case-insensitivity in nicks.
-     */
     private final Map<String, User> users = new HashMap<>();
 
     public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers) {
@@ -94,7 +85,7 @@ public class ConnectedUsers {
     /**
      * Get the User for the specified nickname, or null if no such user exists.
      *
-     * @param nickname
+     * @param nickname user's nickname
      * @return User, or null.
      */
     @Nullable
@@ -132,9 +123,9 @@ public class ConnectedUsers {
                 User user = iterator.next();
 
                 DisconnectReason reason = null;
-                if (System.nanoTime() - user.getLastHeardFrom() > PING_TIMEOUT) {
+                if (System.currentTimeMillis() - user.getLastHeardFrom() > PING_TIMEOUT) {
                     reason = DisconnectReason.PING_TIMEOUT;
-                } else if (!user.isAdmin() && System.nanoTime() - user.getLastUserAction() > IDLE_TIMEOUT) {
+                } else if (!user.isAdmin() && System.currentTimeMillis() - user.getLastUserAction() > IDLE_TIMEOUT) {
                     reason = DisconnectReason.IDLE_TIMEOUT;
                 }
 

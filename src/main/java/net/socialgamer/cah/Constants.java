@@ -213,7 +213,6 @@ public class Constants {
         NICKNAME("n"),
         OP("o"),
         PASSWORD("pw"),
-        PERSISTENT_ID("pid"),
         SERIAL("s"),
         WALL("wall"),
         ADMIN_TOKEN("at");
@@ -262,8 +261,6 @@ public class Constants {
         NEXT("next"),
         @DuplicationAllowed
         NICKNAME(AjaxRequest.NICKNAME),
-        @DuplicationAllowed
-        PERSISTENT_ID(AjaxRequest.PERSISTENT_ID),
         PLAYER_INFO("pi"),
         @DuplicationAllowed
         SERIAL(AjaxRequest.SERIAL),

@@ -9,7 +9,6 @@ import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
-import net.socialgamer.cah.data.UniqueIds;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.*;
 
@@ -37,20 +36,17 @@ public class RegisterHandler extends BaseHandler {
         if (nickname.equalsIgnoreCase("xyzzy"))
             throw new BaseCahHandler.CahException(ErrorCode.RESERVED_NICK);
 
-        String pid = params.get(AjaxRequest.PERSISTENT_ID);
-        if (pid == null || pid.isEmpty()) pid = UniqueIds.getNewRandomID();
-
         boolean admin;
         String adminToken = params.get(Constants.AjaxRequest.ADMIN_TOKEN);
         admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.current().equals(adminToken);
 
-        user = userFactory.create(nickname, exchange.getHostName(), admin, pid);
+        user = userFactory.create(nickname, exchange.getHostName(), admin);
 
         users.checkAndAdd(user);
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 
-        return new JsonWrapper().add(AjaxResponse.NICKNAME, nickname)
-                .add(AjaxResponse.IS_ADMIN, admin)
-                .add(AjaxResponse.PERSISTENT_ID, pid);
+        return new JsonWrapper()
+                .add(AjaxResponse.NICKNAME, nickname)
+                .add(AjaxResponse.IS_ADMIN, admin);
     }
 }

@@ -3,7 +3,6 @@ package net.socialgamer.cah.data;
 
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.servlets.BaseCahHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -17,32 +16,26 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class User {
     private final String nickname;
     private final PriorityBlockingQueue<QueuedMessage> queuedMessages;
-    private final Object queuedMessageSynchronization = new Object();
+    private final Object queuedMessageLock = new Object();
     private final String hostname;
-    private final String persistentId;
     private final String sessionId;
     private final boolean admin;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
     private long lastHeardFrom = 0;
     private long lastUserAction = 0;
     private Game currentGame;
-    /**
-     * Reset when this user object is no longer valid, most likely because it pinged out.
-     */
     private boolean valid = true;
 
     /**
      * Create a new user.
      *
-     * @param nickname     The user's nickname.
-     * @param hostname     The user's Internet hostname (which will likely just be their IP address).
-     * @param persistentId This user's persistent (cross-session) ID.
-     * @param sessionId    The unique ID of this session for this server instance.
+     * @param nickname  The user's nickname.
+     * @param hostname  The user's Internet hostname (which will likely just be their IP address).
+     * @param sessionId The unique ID of this session for this server instance.
      */
-    public User(String nickname, String hostname, String persistentId, String sessionId, boolean admin) {
+    public User(String nickname, String hostname, String sessionId, boolean admin) {
         this.nickname = nickname;
         this.hostname = hostname;
-        this.persistentId = persistentId;
         this.sessionId = sessionId;
         this.admin = admin;
         this.queuedMessages = new PriorityBlockingQueue<>();
@@ -67,10 +60,10 @@ public class User {
      *
      * @param message Message to enqueue.
      */
-    public void enqueueMessage(final QueuedMessage message) {
-        synchronized (queuedMessageSynchronization) {
+    public void enqueueMessage(QueuedMessage message) {
+        synchronized (queuedMessageLock) {
             queuedMessages.add(message);
-            queuedMessageSynchronization.notifyAll();
+            queuedMessageLock.notifyAll();
         }
     }
 
@@ -88,26 +81,11 @@ public class User {
      * @throws InterruptedException should do that
      * @see java.lang.Object#wait(long timeout)
      */
-    public void waitForNewMessageNotification(final long timeout) throws InterruptedException {
+    public void waitForNewMessageNotification(long timeout) throws InterruptedException {
         if (timeout > 0) {
-            synchronized (queuedMessageSynchronization) {
-                queuedMessageSynchronization.wait(timeout);
+            synchronized (queuedMessageLock) {
+                queuedMessageLock.wait(timeout);
             }
-        }
-    }
-
-    /**
-     * This method blocks if there are no messages to return, or perhaps if the queue is being
-     * modified by another thread.
-     *
-     * @return The next message in the queue, or null if interrupted.
-     */
-    @Nullable
-    public QueuedMessage getNextQueuedMessage() {
-        try {
-            return queuedMessages.take();
-        } catch (final InterruptedException ie) {
-            return null;
         }
     }
 
@@ -115,21 +93,18 @@ public class User {
      * @param maxElements Maximum number of messages to return.
      * @return The next {@code maxElements} messages queued for this user.
      */
-    public Collection<QueuedMessage> getNextQueuedMessages(final int maxElements) {
-        final ArrayList<QueuedMessage> c = new ArrayList<>(maxElements);
-        synchronized (queuedMessageSynchronization) {
+    public Collection<QueuedMessage> getNextQueuedMessages(int maxElements) {
+        ArrayList<QueuedMessage> c = new ArrayList<>(maxElements);
+        synchronized (queuedMessageLock) {
             queuedMessages.drainTo(c, maxElements);
         }
+
         c.trimToSize();
         return c;
     }
 
     public String getSessionId() {
         return sessionId;
-    }
-
-    public String getPersistentId() {
-        return persistentId;
     }
 
     /**
@@ -155,7 +130,7 @@ public class User {
      * Update the timestamp that we have last heard from this user to the current time.
      */
     public void contactedServer() {
-        lastHeardFrom = System.nanoTime();
+        lastHeardFrom = System.currentTimeMillis();
     }
 
     /**
@@ -166,7 +141,7 @@ public class User {
     }
 
     public void userDidSomething() {
-        lastUserAction = System.nanoTime();
+        lastUserAction = System.currentTimeMillis();
     }
 
     public long getLastUserAction() {
@@ -224,6 +199,6 @@ public class User {
     }
 
     public abstract static class Factory {
-        public abstract User create(String nickname, String hostname, boolean admin, String persistentId);
+        public abstract User create(String nickname, String hostname, boolean admin);
     }
 }
