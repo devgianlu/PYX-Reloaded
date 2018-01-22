@@ -3,15 +3,32 @@
     color: var(--mdc-theme-text-primary-on-dark);
 }
 
+.mdc-card.pyx-card[data-black=true] .mdc-typography {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
 /* Extra small phones ---- */
-.mdc-card.pyx-card {
-    width: 50vw;
+@media only screen and (max-width: 320px) {
+    .mdc-card.pyx-card {
+        width: 50vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 0.6rem;
+        line-height: 0.7rem;
+    }
 }
 
 /* Small phones ---------- */
 @media only screen and (min-width: 320px) {
     .mdc-card.pyx-card {
         width: 40vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 0.6rem;
+        line-height: 0.9rem;
     }
 }
 
@@ -20,12 +37,22 @@
     .mdc-card.pyx-card {
         width: 35vw;
     }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 0.7rem;
+        line-height: 1rem;
+    }
 }
 
 /* Large phones ---------- */
 @media only screen and (min-width: 425px) {
     .mdc-card.pyx-card {
         width: 30vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 0.85rem;
+        line-height: 1.1rem;
     }
 }
 
@@ -34,12 +61,34 @@
     .mdc-card.pyx-card {
         width: 30vw;
     }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1rem;
+        line-height: 1.1rem;
+    }
 }
 
-/* Laptops --------------- */
+/* Small laptops --------------- */
 @media only screen and (min-width: 1024px) {
     .mdc-card.pyx-card {
         width: 25vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+}
+
+/* Medium Laptops --------------- */
+@media only screen and (min-width: 1280px) {
+    .mdc-card.pyx-card {
+        width: 20vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1rem;
+        line-height: 1.2rem;
     }
 }
 
@@ -48,11 +97,33 @@
     .mdc-card.pyx-card {
         width: 20vw;
     }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+}
+
+/* Desktop --------- */
+@media only screen and (min-width: 1600px) {
+    .mdc-card.pyx-card {
+        width: 16vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
 }
 
 /* 4K -------------------- */
 @media only screen and (min-width: 2560px) {
     .mdc-card.pyx-card {
         width: 12vw;
+    }
+
+    .mdc-card.pyx-card .mdc-typography {
+        font-size: 1.5rem;
+        line-height: 1.75rem;
     }
 }
