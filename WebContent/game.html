@@ -27,11 +27,6 @@
     </header>
 
     <main class="mdc-toolbar-fixed-adjust">
-        <div class="mdc-card pyx-card" data-black="true" style="margin: 8px">
-            <section class="mdc-card__supporting-text mdc-typography mdc-typography--body1">
-                Fool me once, I'm mad. Fool me twice? How could you. Fool me three times, you're officially ____.
-            </section>
-        </div>
     </main>
 </div>
 
@@ -66,6 +61,20 @@
     <h5 id="chat-msg-template" class=" mdc-typography mdc-typography--adjust-margin mdc-typography--body1">
         <b class="_sender">{{Sender}}</b><span class="_msg">{{Message}}</span>
     </h5>
+
+    <div id="card-template" class="mdc-card pyx-card" data-black style="margin: 8px">
+        <section class="mdc-card__supporting-text mdc-typography mdc-typography--body1 _text">
+            Fool me once, I'm mad. Fool me twice? How could you. Fool me three times, you're officially ____.
+        </section>
+        <section class="mdc-card__supporting-text">
+            <h4 class="mdc-typography mdc-typography--subheading1">Pick
+                <div class="circled _pick">?</div>
+            </h4>
+            <h4 class="mdc-typography mdc-typography--subheading1" style="margin-top: 8px">Draw
+                <div class="circled _draw">?</div>
+            </h4>
+        </section>
+    </div>
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>

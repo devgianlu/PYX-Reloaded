@@ -1,28 +1,61 @@
+.mdc-card.pyx-card[data-black=false] .circled {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 1px;
+    width: var(--adapted-line-height);
+    text-align: center;
+    display: inline-block;
+}
+
+.mdc-card.pyx-card[data-black=true] .circled {
+    background: white;
+    color: var(--mdc-theme-text-primary-on-light);
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 1px;
+    width: var(--adapted-line-height);
+    text-align: center;
+    display: inline-block;
+}
+
 .mdc-card.pyx-card[data-black=true] {
     background: black;
     color: var(--mdc-theme-text-primary-on-dark);
 }
 
-.mdc-card.pyx-card[data-black=true] .mdc-typography {
+.mdc-card.pyx-card[data-black=true] .mdc-card__supporting-text {
     background: black;
     color: var(--mdc-theme-text-primary-on-dark);
 }
 
 .mdc-card.pyx-card > .mdc-card__supporting-text {
     max-height: 30vh;
+    min-height: 10vh;
     overflow-y: auto;
     padding: 8px;
 }
 
-/* Extra small phones ---- */
+.mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
+    margin: 0;
+    text-align: right;
+}
+
+.mdc-card.pyx-card .mdc-typography {
+    font-size: var(--adapted-font-size);
+    line-height: var(--adapted-line-height);
+}
+
+/* Default --------------- */
 @media only screen and (max-width: 320px) {
     .mdc-card.pyx-card {
         width: 50vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 0.6rem;
-        line-height: 0.7rem;
+        --adapted-font-size: 0.6rem;
+        --adapted-line-height: 0.7rem;
     }
 }
 
@@ -33,8 +66,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 0.6rem;
-        line-height: 0.9rem;
+        --adapted-font-size: 0.6rem;
+        --adapted-line-height: 0.9rem;
     }
 }
 
@@ -45,8 +78,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 0.7rem;
-        line-height: 1rem;
+        --adapted-font-size: 0.7rem;
+        --adapted-line-height: 1rem;
     }
 }
 
@@ -57,8 +90,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 0.85rem;
-        line-height: 1.1rem;
+        --adapted-font-size: 0.85rem;
+        --adapted-line-height: 1.1rem;
     }
 }
 
@@ -69,8 +102,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1rem;
-        line-height: 1.1rem;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.1rem;
     }
 
     .mdc-card.pyx-card > .mdc-card__supporting-text {
@@ -85,8 +118,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1rem;
-        line-height: 1.2rem;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
     }
 }
 
@@ -97,8 +130,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1rem;
-        line-height: 1.2rem;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
     }
 }
 
@@ -109,8 +142,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1rem;
-        line-height: 1.2rem;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
     }
 }
 
@@ -121,8 +154,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1rem;
-        line-height: 1.3rem;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.3rem;
     }
 
     .mdc-card.pyx-card > .mdc-card__supporting-text {
@@ -137,8 +170,8 @@
     }
 
     .mdc-card.pyx-card .mdc-typography {
-        font-size: 1.5rem;
-        line-height: 1.75rem;
+        --adapted-font-size: 1.5rem;
+        --adapted-line-height: 1.75rem;
     }
 
     .mdc-card.pyx-card > .mdc-card__supporting-text {
