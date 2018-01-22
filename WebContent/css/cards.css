@@ -1,0 +1,58 @@
+.mdc-card.pyx-card[data-black=true] {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+/* Extra small phones ---- */
+.mdc-card.pyx-card {
+    width: 50vw;
+}
+
+/* Small phones ---------- */
+@media only screen and (min-width: 320px) {
+    .mdc-card.pyx-card {
+        width: 40vw;
+    }
+}
+
+/* Medium phones --------- */
+@media only screen and (min-width: 375px) {
+    .mdc-card.pyx-card {
+        width: 35vw;
+    }
+}
+
+/* Large phones ---------- */
+@media only screen and (min-width: 425px) {
+    .mdc-card.pyx-card {
+        width: 30vw;
+    }
+}
+
+/* Tablets --------------- */
+@media only screen and (min-width: 768px) {
+    .mdc-card.pyx-card {
+        width: 30vw;
+    }
+}
+
+/* Laptops --------------- */
+@media only screen and (min-width: 1024px) {
+    .mdc-card.pyx-card {
+        width: 25vw;
+    }
+}
+
+/* Large laptops --------- */
+@media only screen and (min-width: 1440px) {
+    .mdc-card.pyx-card {
+        width: 20vw;
+    }
+}
+
+/* 4K -------------------- */
+@media only screen and (min-width: 2560px) {
+    .mdc-card.pyx-card {
+        width: 12vw;
+    }
+}

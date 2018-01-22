@@ -49,21 +49,6 @@ main {
     }
 }
 
-.mdc-toolbar-demo {
-    margin: 0;
-}
-
-.demo-paragraph {
-    margin: 0;
-    padding: 20px 28px;
-}
-
-@media (max-width: 599px) {
-    .demo-paragraph {
-        padding: 16px;
-    }
-}
-
 /* Ensure layout covers the entire screen. */
 html {
     height: 100%;
@@ -80,15 +65,15 @@ body {
     width: 100%;
 }
 
-.pyx-card {
+.mdc-card.cc-card {
     display: block !important;
 }
 
-.pyx-card[data-black=true] {
+.mdc-card.cc-card[data-black=true] {
     background: black;
 }
 
-.pyx-card[data-black=true] h1 {
+.mdc-card.cc-card[data-black=true] h1 {
     background: black;
     color: var(--mdc-theme-text-primary-on-dark);
 }
