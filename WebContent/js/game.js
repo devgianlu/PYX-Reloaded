@@ -18,6 +18,8 @@ function loadUI(gid) {
         setTitle(data.gi.H);
         loadPlayers(data.pi);
 
+        _loadDummyData();
+
         console.log(data);
     }).fail(function (data) {
         alert("Failed load: " + JSON.stringify(data));
@@ -120,6 +122,73 @@ function leaveGame() {
     stopPolling();
     $.post("AjaxServlet", "o=lg&gid=" + game_id).always(function (data) {
         window.location = "lobbies.html";
+    });
+}
+
+function addWhiteCard(list, card) {
+    const elm = $(list.add({"_text": card.T, "_watermark": card.W, "black": false})[0].elm);
+    if (card.W === undefined || card.W.length === 0) elm.find('._watermark').remove();
+    elm.find('._pick').parent().remove();
+    elm.find('._draw').parent().remove();
+}
+
+function setBlackCard(card) {
+    const template = $('#card-template').clone();
+    template.removeAttr("id");
+    template.attr("data-black", "true");
+
+    template.find('._text').text(card.T);
+
+    const watermark = template.find('._watermark');
+    if (card.W !== undefined && card.W.length > 0) watermark.text(card.W);
+    else watermark.remove();
+
+    const pick = template.find('._pick');
+    if (card.PK > 0) pick.innerText = card.PK.toString();
+    else pick.parent().remove();
+
+    const draw = template.find('._draw');
+    if (card.D > 0) draw.innerText = card.D.toString();
+    else draw.parent().remove();
+
+    const blackCard = $('#blackCard');
+    blackCard.empty();
+    blackCard.append(template);
+}
+
+function _loadDummyData() {
+    setBlackCard({
+        "T": "Fool me once, I'm mad. Fool me twice? How could you. Fool me three times, you're officially ____.",
+        "PK": 1, "D": 0,
+        "W": "Cards!!?"
+    });
+
+
+    const whiteCards = new List('whiteCards', {
+        valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black']}],
+        item: 'card-template'
+    });
+
+    addWhiteCard(whiteCards, {
+        "T": "Some text here: ____",
+        "W": "Oh GOSH!"
+    });
+
+    addWhiteCard(whiteCards, {
+        "T": "Oh look another card!!"
+    });
+
+    addWhiteCard(whiteCards, {
+        "T": "This card will have more text than the others because I need to see how that looks."
+    });
+
+    addWhiteCard(whiteCards, {
+        "T": "4 cards should be enough to fill the screen. Right?",
+        "W": "PYX!!"
+    });
+
+    addWhiteCard(whiteCards, {
+        "T": "Apparently 4 cards wasn't enough so here it goes another card."
     });
 }
 

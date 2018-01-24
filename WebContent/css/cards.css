@@ -1,17 +1,6 @@
-.mdc-card.pyx-card[data-black=false] .circled {
-    background: black;
-    color: var(--mdc-theme-text-primary-on-dark);
-    font-weight: bold;
-    border-radius: 50%;
-    padding: 1px;
-    width: var(--adapted-line-height);
-    text-align: center;
-    display: inline-block;
-}
-
 .mdc-card.pyx-card[data-black=true] .circled {
-    background: white;
-    color: var(--mdc-theme-text-primary-on-light);
+    background: var(--mdc-theme-text-secondary-on-dark);
+    color: black;
     font-weight: bold;
     border-radius: 50%;
     padding: 1px;
@@ -22,10 +11,9 @@
 
 .mdc-card.pyx-card[data-black=true] {
     background: black;
-    color: var(--mdc-theme-text-primary-on-dark);
 }
 
-.mdc-card.pyx-card[data-black=true] .mdc-card__supporting-text {
+.mdc-card.pyx-card[data-black=true] .card-text {
     background: black;
     color: var(--mdc-theme-text-primary-on-dark);
 }
@@ -35,6 +23,32 @@
     min-height: 10vh;
     overflow-y: auto;
     padding: 8px;
+}
+
+#whiteCards > .list > .mdc-card.pyx-card {
+    float: left;
+    margin: 8px;
+}
+
+.mdc-card.pyx-card .card-details {
+    min-height: 0;
+}
+
+.mdc-card.pyx-card[data-black=true] .card-details {
+    color: var(--mdc-theme-text-secondary-on-dark);
+}
+
+.mdc-card.pyx-card[data-black=false] .card-details {
+    color: var(--mdc-theme-text-secondary-on-light);
+}
+
+.mdc-card.pyx-card {
+    width: var(--adapted-card-width);
+}
+
+.mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
+    margin: 0;
+    text-align: right;
 }
 
 .mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
@@ -50,7 +64,7 @@
 /* Default --------------- */
 @media only screen and (max-width: 320px) {
     .mdc-card.pyx-card {
-        width: 50vw;
+        --adapted-card-width: 50vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -62,7 +76,7 @@
 /* Small phones ---------- */
 @media only screen and (min-width: 320px) {
     .mdc-card.pyx-card {
-        width: 40vw;
+        --adapted-card-width: 40vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -74,7 +88,7 @@
 /* Medium phones --------- */
 @media only screen and (min-width: 375px) {
     .mdc-card.pyx-card {
-        width: 35vw;
+        --adapted-card-width: 35vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -86,7 +100,7 @@
 /* Large phones ---------- */
 @media only screen and (min-width: 425px) {
     .mdc-card.pyx-card {
-        width: 30vw;
+        --adapted-card-width: 30vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -98,7 +112,7 @@
 /* Tablets --------------- */
 @media only screen and (min-width: 768px) {
     .mdc-card.pyx-card {
-        width: 30vw;
+        --adapted-card-width: 30vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -114,7 +128,7 @@
 /* Small laptops --------------- */
 @media only screen and (min-width: 1024px) {
     .mdc-card.pyx-card {
-        width: 25vw;
+        --adapted-card-width: 25vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -126,7 +140,7 @@
 /* Medium Laptops --------------- */
 @media only screen and (min-width: 1280px) {
     .mdc-card.pyx-card {
-        width: 20vw;
+        --adapted-card-width: 20vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -138,7 +152,7 @@
 /* Large laptops --------- */
 @media only screen and (min-width: 1440px) {
     .mdc-card.pyx-card {
-        width: 20vw;
+        --adapted-card-width: 20vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -150,7 +164,7 @@
 /* Desktop --------- */
 @media only screen and (min-width: 1600px) {
     .mdc-card.pyx-card {
-        width: 16vw;
+        --adapted-card-width: 16vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {
@@ -166,7 +180,7 @@
 /* 4K -------------------- */
 @media only screen and (min-width: 2560px) {
     .mdc-card.pyx-card {
-        width: 12vw;
+        --adapted-card-width: 12vw;
     }
 
     .mdc-card.pyx-card .mdc-typography {

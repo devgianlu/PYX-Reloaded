@@ -26,7 +26,11 @@
         </div>
     </header>
 
-    <main class="mdc-toolbar-fixed-adjust">
+    <main class="mdc-toolbar-fixed-adjust" style="display: flex; flex-flow: row">
+        <div id="blackCard" style="padding: 8px"></div>
+        <div id="whiteCards">
+            <div class="list" style="display: inline-block"></div>
+        </div>
     </main>
 </div>
 
@@ -62,16 +66,20 @@
         <b class="_sender">{{Sender}}</b><span class="_msg">{{Message}}</span>
     </h5>
 
-    <div id="card-template" class="mdc-card pyx-card" data-black style="margin: 8px">
-        <section class="mdc-card__supporting-text mdc-typography mdc-typography--body1 _text">
-            Fool me once, I'm mad. Fool me twice? How could you. Fool me three times, you're officially ____.
+    <div id="card-template" class="mdc-card pyx-card">
+        <section class="mdc-card__supporting-text mdc-typography mdc-typography--body1 _text card-text">
+            {{Text}}
         </section>
-        <section class="mdc-card__supporting-text">
+        <section class="mdc-card__supporting-text card-details">
             <h4 class="mdc-typography mdc-typography--subheading1">Pick
                 <div class="circled _pick">?</div>
             </h4>
             <h4 class="mdc-typography mdc-typography--subheading1" style="margin-top: 8px">Draw
                 <div class="circled _draw">?</div>
+            </h4>
+            <h4 class="mdc-typography mdc-typography--subheading1 _watermark"
+                style="margin-top: 8px; font-weight: 300;">
+                {{Watermark}}
             </h4>
         </section>
     </div>
