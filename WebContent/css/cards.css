@@ -25,8 +25,19 @@
     padding: 8px;
 }
 
+#blackCard {
+    padding: 8px;
+}
+
+#whiteCards {
+    width: 100%;
+}
+
+#whiteCards > .list {
+    margin: 0 auto;
+}
+
 #whiteCards > .list > .mdc-card.pyx-card {
-    float: left;
     margin: 8px;
 }
 

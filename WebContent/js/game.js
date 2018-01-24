@@ -163,8 +163,8 @@ function _loadDummyData() {
         "W": "Cards!!?"
     });
 
-
-    const whiteCards = new List('whiteCards', {
+    const whiteCardsContainer = document.getElementById('whiteCards');
+    const whiteCards = new List(whiteCardsContainer, {
         valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black']}],
         item: 'card-template'
     });
@@ -189,6 +189,11 @@ function _loadDummyData() {
 
     addWhiteCard(whiteCards, {
         "T": "Apparently 4 cards wasn't enough so here it goes another card."
+    });
+
+    $(whiteCardsContainer).find('.list').masonry({
+        itemSelector: '.pyx-card',
+        fitWidth: true
     });
 }
 
