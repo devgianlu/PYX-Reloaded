@@ -31,14 +31,19 @@ function loadUI(gid) {
                 handleChatMessage(data);
                 break;
             case "gpj":
-                addPlayer(document.getElementById('scoreboard'), {"N": data.n, "sc": 0, "st": "si"});
+                scoreboard.add({"_name": data.n, "_score": 0, "_status": getStatusFromCode("si")});
                 break;
             case "gpl":
-                removePlayer(document.getElementById('scoreboard'), data.n);
+                scoreboard.remove("_name", data.n);
                 break;
         }
     });
 }
+
+const scoreboard = new List('scoreboard', {
+    item: 'player-item-template',
+    valueNames: ['_name', '_score', '_status']
+});
 
 const chat = new List('chat', {
     item: 'chat-msg-template',
@@ -65,37 +70,16 @@ function sendChatMessage(field) {
     });
 }
 
-function removePlayer(container, nick) {
-    $(container).find('span.mdc-list-item__text:contains(' + nick + ')').filter(function () {
-        return $(this).contents().get(0).textContent === nick;
-    }).parent().remove();
-}
-
-function addPlayer(container, player) {
-    const li = document.createElement("li");
-    li.className = "mdc-list-item";
-    const graphic = document.createElement("span");
-    graphic.className = "mdc-list-item__graphic mdc-typography mdc-typography--display1";
-    graphic.innerText = player.sc.toString();
-    li.appendChild(graphic);
-    const primary = document.createElement("span");
-    primary.className = "mdc-list-item__text";
-    primary.innerText = player.N;
-    const secondary = document.createElement("span");
-    secondary.className = "mdc-list-item__secondary-text";
-    secondary.innerText = getStatusFromCode(player.st);
-    primary.appendChild(secondary);
-    li.appendChild(primary);
-
-    container.appendChild(li);
-}
-
 function loadPlayers(players) {
-    const scoreboard = document.getElementById('scoreboard');
-    clearElement(scoreboard);
+    scoreboard.clear();
 
     for (let i = 0; i < players.length; i++) {
-        addPlayer(scoreboard, players[i]);
+        const player = players[i];
+        scoreboard.add({
+            "_name": player.N,
+            "_score": player.sc,
+            "_status": getStatusFromCode(player.st)
+        });
     }
 }
 
