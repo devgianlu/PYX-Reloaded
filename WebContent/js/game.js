@@ -184,6 +184,34 @@ function _loadDummyData() {
         itemSelector: '.pyx-card',
         fitWidth: true
     });
+
+
+    const hand = new List('hand', {
+        valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black']}],
+        item: 'card-template'
+    });
+
+    addWhiteCard(hand, {
+        "T": "Some text here: ____",
+        "W": "Oh GOSH!"
+    });
+
+    addWhiteCard(hand, {
+        "T": "Oh look another card!!"
+    });
+
+    addWhiteCard(hand, {
+        "T": "This card will have more text than the others because I need to see how that looks."
+    });
+
+    addWhiteCard(hand, {
+        "T": "4 cards should be enough to fill the screen. Right?",
+        "W": "PYX!!"
+    });
+
+    addWhiteCard(hand, {
+        "T": "Apparently 4 cards wasn't enough so here it goes another card."
+    });
 }
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));

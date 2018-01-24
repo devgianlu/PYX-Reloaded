@@ -41,6 +41,10 @@
     margin: 8px;
 }
 
+#hand > .list > .mdc-card.pyx-card {
+    margin: 8px;
+}
+
 .mdc-card.pyx-card .card-details {
     min-height: 0;
 }

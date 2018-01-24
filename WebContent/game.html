@@ -34,6 +34,24 @@
     </main>
 </div>
 
+<aside class="bottom-sheet" id="hand">
+    <div style="flex-grow: 1"></div>
+    <div class="mdc-elevation--z16 mdc-toolbar">
+        <div class="mdc-toolbar__row">
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                <span class="mdc-toolbar__title">Hand cards</span>
+            </section>
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="toggleHand(this)">
+                    keyboard_arrow_up
+                </button>
+            </section>
+        </div>
+    </div>
+    <div class="list mdc-theme--background bottom-sheet__content">
+    </div>
+</aside>
+
 <aside class="mdc-drawer--temporary" id="drawer">
     <nav class="mdc-drawer__drawer" style="padding: 16px;">
         <div style="height: 50%;" id="scoreboard">
@@ -98,9 +116,24 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/bottom_sheet.js"></script>
 <script src="js/polling.js"></script>
 <script src="js/game.js"></script>
-<script>window.mdc.autoInit();</script>
+<script>
+    window.mdc.autoInit();
+
+    const hand = new BottomSheet(document.getElementById('hand'));
+
+    function toggleHand(button) {
+        if (hand.open) {
+            button.innerHTML = "keyboard_arrow_up";
+            hand.open = false;
+        } else {
+            button.innerHTML = "keyboard_arrow_down";
+            hand.open = true;
+        }
+    }
+</script>
 
 </body>
 </html>
