@@ -36,6 +36,11 @@ function loadUI(gid) {
             case "gpl":
                 scoreboard.remove("_name", data.n);
                 break;
+            case "gpic":
+                const pi = data.pi;
+                const item = scoreboard.get("_name", pi.N);
+                // TODO: Handle player info changed
+                break;
         }
     });
 }
@@ -128,11 +133,11 @@ function setBlackCard(card) {
     else watermark.remove();
 
     const pick = template.find('._pick');
-    if (card.PK > 0) pick.innerText = card.PK.toString();
+    if (card.PK > 0) pick.text(card.PK.toString());
     else pick.parent().remove();
 
     const draw = template.find('._draw');
-    if (card.D > 0) draw.innerText = card.D.toString();
+    if (card.D > 0) draw.text(card.D.toString());
     else draw.parent().remove();
 
     const blackCard = $('#blackCard');
