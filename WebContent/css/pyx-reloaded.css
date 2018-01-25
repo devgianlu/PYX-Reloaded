@@ -198,6 +198,6 @@ body {
 }
 
 .bottom-sheet--open .bottom-sheet__content {
-    height: auto;
     padding: 16px;
+    height: auto;
 }

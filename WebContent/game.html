@@ -35,15 +35,14 @@
 </div>
 
 <aside class="bottom-sheet" id="hand">
-    <div style="flex-grow: 1"></div>
-    <!-- TODO: Clicking this should close everything -->
+    <div style="flex-grow: 1" onclick="toggleHand(undefined);"></div>
     <div class="mdc-elevation--z16 mdc-toolbar">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Hand cards</span>
             </section>
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="toggleHand(this)">
+                <button class="material-icons align-icons mdc-toolbar__icon" id="toggleHand" onclick="toggleHand(this)">
                     keyboard_arrow_up
                 </button>
             </section>
@@ -120,21 +119,7 @@
 <script src="js/bottom_sheet.js"></script>
 <script src="js/polling.js"></script>
 <script src="js/game.js"></script>
-<script>
-    window.mdc.autoInit();
-
-    const hand = new BottomSheet(document.getElementById('hand'));
-
-    function toggleHand(button) {
-        if (hand.open) {
-            button.innerHTML = "keyboard_arrow_up";
-            hand.open = false;
-        } else {
-            button.innerHTML = "keyboard_arrow_down";
-            hand.open = true;
-        }
-    }
-</script>
+<script>window.mdc.autoInit();</script>
 
 </body>
 </html>
