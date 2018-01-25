@@ -193,7 +193,7 @@ body {
 }
 
 .bottom-sheet--open {
-    background-color: rgba(0, 0, 0, .87);
+    background-color: rgba(0, 0, 0, .6);
     pointer-events: auto;
 }
 
