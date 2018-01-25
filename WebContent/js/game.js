@@ -154,7 +154,17 @@ class GameManager {
                 const item = this.scoreboard.get("_name", pi.N);
                 // TODO: Handle player info changed
                 break;
+            case "hd":
+                this.addHandCards(data.h, data.h.length === 10);
+                break;
+            case "gsc":
+                this._handleGameStatusChange(data);
+                break;
         }
+    }
+
+    _handleGameStatusChange(data) {
+        // TODO: Handle gsc
     }
 
     setup() {
@@ -175,6 +185,15 @@ class GameManager {
         $.post("AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
             window.location = "lobbies.html";
         });
+    }
+
+    start() {
+        $.post("AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
+            console.log(data);
+        }).fail(function (data) {
+            alert("Failed starting game: " + JSON.stringify(data));
+            // TODO: Show nice dialog
+        })
     }
 }
 
@@ -226,6 +245,10 @@ function sendChatMessage(field) {
 function leaveGame() {
     stopPolling();
     gameManager.leave();
+}
+
+function startGame() {
+    gameManager.start();
 }
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
