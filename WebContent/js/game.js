@@ -38,6 +38,11 @@ class GameManager {
     }
 
     set blackCard(card) {
+        if (card === null) {
+            this._blackCardContainer.empty();
+            return;
+        }
+
         const template = this._cardTemplate.clone();
         template.removeAttr("id");
         template.attr("data-black", "true");
@@ -102,16 +107,20 @@ class GameManager {
         })
     }
 
-    addHandCards(cards) {
+    addHandCards(cards, clear = false) {
         if (!Array.isArray(cards)) cards = [cards];
+
+        if (clear) this.hand.clear();
 
         for (let i = 0; i < cards.length; i++) {
             GameManager._addWhiteCard(this.hand, cards[i]);
         }
     }
 
-    addTableCards(cards) {
+    addTableCards(cards, clear = false) {
         if (!Array.isArray(cards)) cards = [cards];
+
+        if (clear) this.hand.clear();
 
         for (let i = 0; i < cards.length; i++) {
             GameManager._addWhiteCard(this.table, cards[i]);
@@ -184,7 +193,14 @@ function loadUI() {
     $.post("AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
         gameManager.gameInfo = data;
 
-        _loadDummyData();
+        $.post("AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
+            gameManager.blackCard = data.bc;
+            gameManager.addHandCards(data.h, true);
+            gameManager.addTableCards(data.wc, true);
+            console.log(data);
+        }).fail(function (data) {
+            alert("Failed load: " + JSON.stringify(data));
+        });
 
         console.log(data);
     }).fail(function (data) {
@@ -210,44 +226,6 @@ function sendChatMessage(field) {
 function leaveGame() {
     stopPolling();
     gameManager.leave();
-}
-
-function _loadDummyData() {
-    gameManager.blackCard = {
-        "T": "Fool me once, I'm mad. Fool me twice? How could you. Fool me three times, you're officially ____.",
-        "PK": 1, "D": 0,
-        "W": "Cards!!?"
-    };
-
-
-    gameManager.addHandCards([{
-        "T": "Some text here: ____",
-        "W": "Oh GOSH!"
-    }, {
-        "T": "Oh look another card!!"
-    }, {
-        "T": "This card will have more text than the others because I need to see how that looks."
-    }, {
-        "T": "4 cards should be enough to fill the screen. Right?",
-        "W": "PYX!!"
-    }, {
-        "T": "Apparently 4 cards wasn't enough so here it goes another card."
-    }]);
-
-
-    gameManager.addTableCards([{
-        "T": "Some text here: ____",
-        "W": "Oh GOSH!"
-    }, {
-        "T": "Oh look another card!!"
-    }, {
-        "T": "This card will have more text than the others because I need to see how that looks."
-    }, {
-        "T": "4 cards should be enough to fill the screen. Right?",
-        "W": "PYX!!"
-    }, {
-        "T": "Apparently 4 cards wasn't enough so here it goes another card."
-    }]);
 }
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
