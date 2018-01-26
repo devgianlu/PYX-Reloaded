@@ -7,7 +7,6 @@ public class JsonWrapper {
     public static final JsonWrapper EMPTY = new JsonWrapper();
     private final JsonObject obj;
 
-
     public JsonWrapper() {
         obj = new JsonObject();
     }
@@ -20,6 +19,11 @@ public class JsonWrapper {
     public JsonWrapper(Constants.ReturnableData data, int i) {
         this();
         add(data, i);
+    }
+
+    public JsonWrapper(Constants.ReturnableData data, String str) {
+        this();
+        add(data, str);
     }
 
     public JsonObject obj() {

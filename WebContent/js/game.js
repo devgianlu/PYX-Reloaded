@@ -35,6 +35,11 @@ class GameManager {
         this._cardTemplate = this.root.find('#card-template');
         this._blackCardContainer = this.root.find('#blackCard');
         this._title = this.root.find('header ._title');
+        this._startGame = this.root.find('#startGame');
+    }
+
+    set me(user) {
+        this.user = user;
     }
 
     set blackCard(card) {
@@ -93,11 +98,8 @@ class GameManager {
         }
     }
 
-    static _addWhiteCard(list, card) {
-        const elm = $(list.add({"_text": card.T, "_watermark": card.W, "black": false})[0].elm);
-        if (card.W === undefined || card.W.length === 0) elm.find('._watermark').remove();
-        elm.find('._pick').parent().remove();
-        elm.find('._draw').parent().remove();
+    get amHost() {
+        return this.info.gi.H === this.user.n;
     }
 
     _receivedGameChatMessage(data) {
@@ -163,12 +165,48 @@ class GameManager {
         }
     }
 
+    static _addWhiteCard(list, card) {
+        if (Array.isArray(card)) {
+            for (let i = 0; i < card.length; i++)
+                this._addWhiteCard(list, card);
+
+            return;
+        }
+
+        const elm = $(list.add({"_text": card.T, "_watermark": card.W, "black": false})[0].elm);
+        if (card.W === undefined || card.W.length === 0) elm.find('._watermark').remove();
+        elm.find('._pick').parent().remove();
+        elm.find('._draw').parent().remove();
+    }
+
     _handleGameStatusChange(data) {
-        // TODO: Handle gsc
+        switch (data.gs) {
+            case "l":
+                this.blackCard = null;
+                this.addHandCards([], true);
+                this.addTableCards([], true);
+
+                this.toggleStartButton(this.amHost);
+                break;
+            case "p":
+                this.blackCard = data.bc;
+                this.toggleStartButton(false);
+                break;
+            case "j":
+                this.addTableCards(data.wc, true);
+                this.toggleStartButton(false);
+                break;
+        }
+    }
+
+    toggleStartButton(visible) {
+        if (visible) this._startGame.show();
+        else this._startGame.hide();
     }
 
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
+        this.toggleStartButton(this.amHost);
 
         this.scoreboard.clear();
         for (let i = 0; i < this.info.pi.length; i++) {
@@ -209,24 +247,31 @@ window.onload = function () {
 };
 
 function loadUI() {
-    $.post("AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
-        gameManager.gameInfo = data;
+    $.post("AjaxServlet", "o=gme").done(function (data) {
+        gameManager.me = data;
 
-        $.post("AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
-            gameManager.blackCard = data.bc;
-            gameManager.addHandCards(data.h, true);
-            gameManager.addTableCards(data.wc, true);
+        $.post("AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
+            gameManager.gameInfo = data;
+
+            $.post("AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
+                gameManager.blackCard = data.bc;
+                gameManager.addHandCards(data.h, true);
+                gameManager.addTableCards(data.wc, true);
+                console.log(data);
+            }).fail(function (data) {
+                alert("Failed load: " + JSON.stringify(data));
+            });
+
             console.log(data);
         }).fail(function (data) {
             alert("Failed load: " + JSON.stringify(data));
         });
-
-        console.log(data);
     }).fail(function (data) {
         alert("Failed load: " + JSON.stringify(data));
     });
 
     registerPollListener("GAME", function (data) {
+        console.log(data);
         gameManager.handlePollEvent(data);
     });
 }

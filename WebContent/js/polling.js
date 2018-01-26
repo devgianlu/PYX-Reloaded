@@ -15,13 +15,7 @@ function sendPollRequest(retry) {
     })
 }
 
-function _fakePollData(obj) {
-    processPollData({"Es": [obj]})
-}
-
 function processPollData(data) {
-    console.log(data);
-
     const events = data["Es"];
     if (events.length === 0) return;
 

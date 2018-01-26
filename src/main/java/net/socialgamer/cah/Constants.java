@@ -186,7 +186,11 @@ public class Constants {
         /**
          * Dislike a game
          */
-        DISLIKE("dlk");
+        DISLIKE("dlk"),
+        /**
+         * Get logged user info
+         */
+        ME("gme");
 
         private final String op;
 
@@ -644,7 +648,7 @@ public class Constants {
         private final String state;
         private final String message;
 
-        GameState(final String state, final String message) {
+        GameState(String state, String message) {
             this.state = state;
             this.message = message;
         }
