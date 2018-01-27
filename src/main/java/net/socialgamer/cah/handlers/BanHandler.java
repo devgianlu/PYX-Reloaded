@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 public class BanHandler extends BaseHandler {
     public static final String OP = AjaxOperation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
-    private final ConnectedUsers connectedUsers;
+    private final ConnectedUsers connectedUsers; // Presumably between here to line 28, we get the list of users currently connected.
 
     public BanHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
@@ -31,6 +31,7 @@ public class BanHandler extends BaseHandler {
         // Detect that user doesn't have permission to kick/ban etc
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
 
+        // Set a variable "nickname" to the one entered through the command.
         String nickname = params.get(AjaxRequest.NICKNAME);
         
         // Assuming this is for when the command wasn't properly typed
@@ -59,7 +60,7 @@ public class BanHandler extends BaseHandler {
             logger.info(String.format("Banning %s by request of %s", banIp, user.getNickname()));
         }
 
-        BanList.add(banIp);
+        BanList.add(banIp); // Whatever banIp was determined to be, it was documented server-side right here.
         return JsonWrapper.EMPTY; //Doesn't return any JSON
     }
 }
