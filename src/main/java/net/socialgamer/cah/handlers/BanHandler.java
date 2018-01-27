@@ -1,3 +1,6 @@
+/*
+ * Handler to ban users via either nick or IP.
+ */
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
