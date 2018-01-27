@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 public class BanHandler extends BaseHandler {
     public static final String OP = AjaxOperation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
-    private final ConnectedUsers connectedUsers; // Presumably between here to line 28, we get the list of users currently connected.
+    private final ConnectedUsers connectedUsers; //Presumably between here to line 28, we get the list of users currently connected.
 
     public BanHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.connectedUsers = connectedUsers;
@@ -28,19 +28,16 @@ public class BanHandler extends BaseHandler {
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        // Detect that user doesn't have permission to kick/ban etc
-        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
+        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
 
-        // Set a variable "nickname" to the one entered through the command.
-        String nickname = params.get(AjaxRequest.NICKNAME);
+        String nickname = params.get(AjaxRequest.NICKNAME); //Set a variable "nickname" to the one entered through the command.
         
-        // Assuming this is for when the command wasn't properly typed
+        //Assuming this is for when the command wasn't properly typed
         if (nickname == null || nickname.isEmpty())
             throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
 
         String banIp;
-        // Single out the user we want to ban, give it its own object
-        User kickUser = connectedUsers.getUser(nickname);
+        User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
         
         /*
          * Assuming singled out user exists, set banIP to the IP(?) of the user in question.
@@ -60,7 +57,7 @@ public class BanHandler extends BaseHandler {
             logger.info(String.format("Banning %s by request of %s", banIp, user.getNickname()));
         }
 
-        BanList.add(banIp); // Whatever banIp was determined to be, it was documented server-side right here.
+        BanList.add(banIp); //Whatever banIp was determined to be, it was documented server-side right here.
         return JsonWrapper.EMPTY; //Doesn't return any JSON
     }
 }
