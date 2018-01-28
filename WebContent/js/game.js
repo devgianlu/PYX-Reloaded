@@ -48,13 +48,14 @@ class GameManager {
     }
 
     /**
+     * @param {object} card - Card
      * @param {int} card.PK - Num pick
      * @param {int} card.D - Num draw
      * @param {string} card.W - Watermark
      * @param {string} card.T - Card text
      */
     set blackCard(card) {
-        if (card === undefined) {
+        if (card === null) {
             this._blackCardContainer.empty();
             return;
         }
@@ -139,7 +140,7 @@ class GameManager {
     static _addWhiteCard(list, card, listener = undefined) {
         if (Array.isArray(card)) {
             for (let i = 0; i < card.length; i++)
-                this._addWhiteCard(list, card[i]); // TODO: Group cards
+                this._addWhiteCard(list, card[i], listener); // TODO: Group cards
 
             return;
         }
@@ -191,9 +192,19 @@ class GameManager {
         });
     }
 
+    _updatePlayerStatus(info) {
+        for (let i = 0; i < this.info.pi.length; i++) {
+            if (this.info.pi[i].N === info.N) {
+                this.info.pi[i] = info;
+                break;
+            }
+        }
+    }
+
     /**
      * @param {object[]} data.h - Hand cards
      * @param {object} data.pi - Player's info
+     * @param {string} data.rw - Round winner
      * @param {string} data.n - Player's nickname
      * @param {object} data.pi.st - Player's status
      * @param {int} data.pi.sc - Player's score
@@ -212,6 +223,8 @@ class GameManager {
                 break;
             case "gpic":
                 const pi = data.pi;
+                this._updatePlayerStatus(pi);
+
                 if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
 
                 const item = this.scoreboard.get("_name", pi.N);
@@ -222,6 +235,10 @@ class GameManager {
                 break;
             case "gsc":
                 this._handleGameStatusChange(data);
+                break;
+            case "grc":
+
+                console.log("Winner is " + data.rw);
                 break;
         }
     }
@@ -265,13 +282,21 @@ class GameManager {
         });
     }
 
+    _handleTableCardSelect(card) {
+        $.post("AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+            alert("Judged!")
+        }).fail(function (data) {
+            alert("Failed play card: " + JSON.stringify(data));
+        });
+    }
+
     addTableCards(cards, clear = false) {
         if (!Array.isArray(cards)) cards = [cards];
 
         if (clear) this.table.clear();
 
         for (let i = 0; i < cards.length; i++) {
-            GameManager._addWhiteCard(this.table, cards[i], undefined);
+            GameManager._addWhiteCard(this.table, cards[i], (card) => this._handleTableCardSelect(card));
         }
 
         this._recreateMasonry();
@@ -285,7 +310,7 @@ class GameManager {
     _handleGameStatusChange(data) {
         switch (data.gs) {
             case "l":
-                this.blackCard = undefined;
+                this.blackCard = null;
                 this.addHandCards([], true);
                 this.addTableCards([], true);
 
@@ -295,6 +320,7 @@ class GameManager {
             case "p":
                 this.blackCard = data.bc;
                 this.toggleStartButton(false);
+                this.addTableCards([], true);
                 this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
                 break;
             case "j":

@@ -731,7 +731,7 @@ public class Game {
 
     /**
      * Move the game into the {@code PLAYING} state, drawing a new Black Card and dispatching a
-     * message to all players.
+     * message to all players along with the new judge.
      * <br/>
      * Synchronizes on {@link #players}, {@link #blackCardLock}, and {@link #roundTimerLock}.
      */
@@ -758,6 +758,8 @@ public class Game {
                 }
             }
         }
+
+        notifyPlayerInfoChange(getJudge());
 
         // Perhaps figure out a better way to do this...
         int playTimer = calculateTime(PLAY_TIMEOUT_BASE + (PLAY_TIMEOUT_PER_CARD * blackCard.getPick()));
