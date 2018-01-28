@@ -311,6 +311,8 @@ const hand = new BottomSheet(document.getElementById('hand'));
 
 function toggleHand(button) {
     if (button === undefined) button = document.getElementById('toggleHand');
+    const list = document.querySelector("#hand .list");
+    list.scrollLeft = 0;
 
     if (hand.open) {
         button.innerHTML = "keyboard_arrow_up";
