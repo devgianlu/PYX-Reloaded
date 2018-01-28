@@ -215,14 +215,17 @@ class GameManager {
                 this.addTableCards([], true);
 
                 this.toggleStartButton(this.amHost);
+                toggleHandVisibility(false);
                 break;
             case "p":
                 this.blackCard = data.bc;
                 this.toggleStartButton(false);
+                toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
                 this.toggleStartButton(false);
+                toggleHandVisibility(false);
                 break;
         }
     }
@@ -232,9 +235,18 @@ class GameManager {
         else this._startGame.hide();
     }
 
+    _getPlayer(nick) {
+        for (let i = 0; i < this.info.pi.length; i++) {
+            const player = this.info.pi[i];
+            if (player.N === nick)
+                return player;
+        }
+    }
+
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
         this.toggleStartButton(this.amHost);
+        toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
 
         this.scoreboard.clear();
         for (let i = 0; i < this.info.pi.length; i++) {
@@ -345,5 +357,11 @@ function toggleHand(button, open = undefined) {
         button.innerHTML = "keyboard_arrow_up";
         hand.open = false;
     }
+}
+
+function toggleHandVisibility(visible) {
+    const toolbar = $("#hand").find(".mdc-toolbar");
+    if (visible) toolbar.show();
+    else toolbar.hide();
 }
 
