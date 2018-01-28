@@ -1,6 +1,7 @@
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
+import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
@@ -36,7 +37,6 @@ public class PlayCardHandler extends GameWithPlayerHandler {
         String text = params.get(AjaxRequest.MESSAGE);
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
-        game.playCard(user, cardId, text);
-        return JsonWrapper.EMPTY;
+        return new JsonWrapper(Constants.AjaxResponse.LEFT_TO_PLAY, game.playCard(user, cardId, text));
     }
 }

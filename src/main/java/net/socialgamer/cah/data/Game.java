@@ -1187,15 +1187,17 @@ public class Game {
      * @param user     User playing the card.
      * @param cardId   ID of the card to play.
      * @param cardText User text for a blank card. Ignored for normal cards.
+     * @return The number of cards left to play
      */
-    public void playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
+    public int playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
         Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
             if (getJudge() == player || state != GameState.PLAYING)
                 throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
-            if (playedCards.playedCardsCount(player) == blackCard.getPick())
+            int playedCardsCount = playedCards.playedCardsCount(player);
+            if (playedCardsCount == blackCard.getPick())
                 throw new BaseCahHandler.CahException(ErrorCode.ALREADY_PLAYED);
 
             WhiteCard playCard = null;
@@ -1221,8 +1223,11 @@ public class Game {
 
             if (playCard != null) {
                 playedCards.addCard(player, playCard);
+                playedCardsCount++;
+
                 notifyPlayerInfoChange(player);
                 if (shouldStartJudging()) judgingState();
+                return blackCard.getPick() + blackCard.getDraw() - playedCardsCount;
             } else {
                 throw new BaseCahHandler.CahException(ErrorCode.DO_NOT_HAVE_CARD);
             }

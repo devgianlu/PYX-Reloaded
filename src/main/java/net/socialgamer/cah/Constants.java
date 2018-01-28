@@ -272,7 +272,11 @@ public class Constants {
         /**
          * Whether the user successfully registered as an admin
          */
-        IS_ADMIN("ia");
+        IS_ADMIN("ia"),
+        /**
+         * Number of cards left to play to complete the round
+         */
+        LEFT_TO_PLAY("ltp");
 
         private final String field;
 

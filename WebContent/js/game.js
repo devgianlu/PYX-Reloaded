@@ -281,9 +281,13 @@ class GameManager {
     _handleHandCardSelect(card) {
         // TODO: Support for write-in cards
         const self = this;
-        $.post("AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
-            toggleHand(undefined, false);
+        $.post("AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
+            /**
+             * @param {int} data.ltp - Number of cards left to play
+             */
+
             self.removeHandCard(card);
+            if (data.ltp === 0) toggleHand(undefined, false);
         }).fail(function (data) {
             alert("Failed play card: " + JSON.stringify(data));
         });
@@ -291,7 +295,7 @@ class GameManager {
 
     _handleTableCardSelect(card) {
         $.post("AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
-            alert("Judged!")
+            // Do nothing
         }).fail(function (data) {
             alert("Failed play card: " + JSON.stringify(data));
         });
