@@ -1,4 +1,4 @@
-# Introduction
+# About the PYX-Reloaded Project
 Welcome to the new documentation site for the PYX-Reloaded project! This project aims to revitalize the original Cards Against Humanity clone, and has come a long way since its inception in late December 2017. 
 
 ## Topics Covered
