@@ -68,6 +68,8 @@ class GameManager {
 
         this._blackCardContainer.empty();
         this._blackCardContainer.append(template);
+
+        this._recreateMasonry(); // Width changed
     }
 
     get id() {
@@ -122,14 +124,13 @@ class GameManager {
     addTableCards(cards, clear = false) {
         if (!Array.isArray(cards)) cards = [cards];
 
-        if (clear) this.hand.clear();
+        if (clear) this.table.clear();
 
         for (let i = 0; i < cards.length; i++) {
             GameManager._addWhiteCard(this.table, cards[i]);
         }
 
-        this._tableCards_masonry.masonry('destroy');
-        this._tableCards_masonry.masonry(this.masonryOptions)
+        this._recreateMasonry();
     }
 
     sendGameChatMessage(msg, clear) {
@@ -163,6 +164,11 @@ class GameManager {
                 this._handleGameStatusChange(data);
                 break;
         }
+    }
+
+    _recreateMasonry() {
+        this._tableCards_masonry.masonry('destroy');
+        this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
     static _addWhiteCard(list, card) {

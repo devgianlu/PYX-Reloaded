@@ -23,6 +23,8 @@
     min-height: 10vh;
     overflow-y: auto;
     padding: 8px;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
 }
 
 #blackCard {
@@ -43,6 +45,7 @@
 
 #hand > .list > .mdc-card.pyx-card {
     margin: 8px;
+    flex-shrink: 0;
 }
 
 .mdc-card.pyx-card .card-details {
