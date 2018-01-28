@@ -580,44 +580,30 @@ public class Game {
      * what the player has done.
      */
     private GamePlayerStatus getPlayerStatus(Player player) {
-        final GamePlayerStatus playerStatus;
-
         switch (state) {
             case LOBBY:
-                if (host == player) playerStatus = GamePlayerStatus.HOST;
-                else playerStatus = GamePlayerStatus.IDLE;
-                break;
+                if (host == player) return GamePlayerStatus.HOST;
+                else return GamePlayerStatus.IDLE;
             case PLAYING:
-                if (getJudge() == player) {
-                    playerStatus = GamePlayerStatus.JUDGE;
-                } else {
-                    if (!roundPlayers.contains(player)) {
-                        playerStatus = GamePlayerStatus.IDLE;
-                        break;
-                    }
+                if (getJudge() == player) return GamePlayerStatus.JUDGE;
 
-                    List<WhiteCard> playerCards = playedCards.getCards(player);
-                    if (playerCards != null && blackCard != null && playerCards.size() == blackCard.getPick()) {
-                        playerStatus = GamePlayerStatus.IDLE;
-                    } else {
-                        playerStatus = GamePlayerStatus.PLAYING;
-                    }
-                }
-                break;
+                if (!roundPlayers.contains(player)) return GamePlayerStatus.IDLE;
+
+                List<WhiteCard> playerCards = playedCards.getCards(player);
+                if (playerCards != null && blackCard != null && playerCards.size() >= blackCard.getPick())
+                    return GamePlayerStatus.IDLE;
+                else
+                    return GamePlayerStatus.PLAYING;
             case JUDGING:
-                if (getJudge() == player) playerStatus = GamePlayerStatus.JUDGING;
-                else playerStatus = GamePlayerStatus.IDLE;
-                break;
+                if (getJudge() == player) return GamePlayerStatus.JUDGING;
+                else return GamePlayerStatus.IDLE;
             case ROUND_OVER:
-                if (getJudge() == player) playerStatus = GamePlayerStatus.JUDGE;
-                else if (didPlayerWonGame(player)) playerStatus = GamePlayerStatus.WINNER;
-                else playerStatus = GamePlayerStatus.IDLE;
-                break;
+                if (getJudge() == player) return GamePlayerStatus.JUDGE;
+                else if (didPlayerWonGame(player)) return GamePlayerStatus.WINNER;
+                else return GamePlayerStatus.IDLE;
             default:
                 throw new IllegalStateException("Unknown GameState " + state.toString());
         }
-
-        return playerStatus;
     }
 
     /**
@@ -1234,12 +1220,15 @@ public class Game {
      * @param cardId   ID of the card to play.
      * @param cardText User text for a blank card.  Ignored for normal cards.
      */
-    public void playCard(User user, int cardId, String cardText) throws BaseCahHandler.CahException {
+    public void playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
         Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
             if (getJudge() == player || state != GameState.PLAYING)
                 throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
+
+            if (playedCards.getCards(player).size() == blackCard.getPick())
+                throw new BaseCahHandler.CahException(ErrorCode.ALREADY_PLAYED);
 
             WhiteCard playCard = null;
             synchronized (player.hand) {
@@ -1248,7 +1237,11 @@ public class Game {
                     WhiteCard card = iter.next();
                     if (card.getId() == cardId) {
                         playCard = card;
-                        if (WhiteDeck.isBlankCard(card)) ((BlankWhiteCard) playCard).setText(cardText);
+                        if (WhiteDeck.isBlankCard(card)) {
+                            if (cardText == null || cardText.isEmpty())
+                                throw new BaseCahHandler.CahException(ErrorCode.NO_MSG_SPECIFIED);
+                            ((BlankWhiteCard) playCard).setText(cardText);
+                        }
 
                         // remove the card from their hand. the client will also do so when we return
                         // success, so no need to tell it to do so here.

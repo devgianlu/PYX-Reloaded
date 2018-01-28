@@ -15,7 +15,7 @@ class GameManager {
 
         this.hand = new List(this.root.find('#hand')[0], {
             item: 'card-template',
-            valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black']}]
+            valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}]
         });
 
         this.masonryOptions = {
@@ -28,7 +28,7 @@ class GameManager {
         this._tableCards_masonry.masonry(this.masonryOptions);
 
         this.table = new List(this._tableCards[0], {
-            valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black']}],
+            valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}],
             item: 'card-template'
         });
 
@@ -111,26 +111,39 @@ class GameManager {
         })
     }
 
+    static _addWhiteCard(list, card, listener = undefined) {
+        if (Array.isArray(card)) {
+            for (let i = 0; i < card.length; i++)
+                this._addWhiteCard(list, card);
+
+            return;
+        }
+
+        const elm = $(list.add({"cid": card.cid, "_text": card.T, "_watermark": card.W, "black": false})[0].elm);
+        if (card.W === undefined || card.W.length === 0) elm.find('._watermark').remove();
+        elm.find('._pick').parent().remove();
+        elm.find('._draw').parent().remove();
+
+        if (listener === undefined) elm.removeClass("mdc-ripple-surface");
+        else elm.on("click", () => listener(card));
+    }
+
+    static _removeWhiteCard(list, card) {
+        list.remove("cid", card.cid);
+    }
+
     addHandCards(cards, clear = false) {
         if (!Array.isArray(cards)) cards = [cards];
 
         if (clear) this.hand.clear();
 
         for (let i = 0; i < cards.length; i++) {
-            GameManager._addWhiteCard(this.hand, cards[i]);
+            GameManager._addWhiteCard(this.hand, cards[i], (card) => this._handleHandCardSelect(card));
         }
     }
 
-    addTableCards(cards, clear = false) {
-        if (!Array.isArray(cards)) cards = [cards];
-
-        if (clear) this.table.clear();
-
-        for (let i = 0; i < cards.length; i++) {
-            GameManager._addWhiteCard(this.table, cards[i]);
-        }
-
-        this._recreateMasonry();
+    removeHandCard(card) {
+        GameManager._removeWhiteCard(this.hand, card);
     }
 
     sendGameChatMessage(msg, clear) {
@@ -171,18 +184,27 @@ class GameManager {
         this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
-    static _addWhiteCard(list, card) {
-        if (Array.isArray(card)) {
-            for (let i = 0; i < card.length; i++)
-                this._addWhiteCard(list, card);
+    _handleHandCardSelect(card) {
+        // TODO: Support for write-in cards
+        const self = this;
+        $.post("AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+            toggleHand(undefined, false);
+            self.removeHandCard(card);
+        }).fail(function (data) {
+            alert("Failed play card: " + JSON.stringify(data));
+        });
+    }
 
-            return;
+    addTableCards(cards, clear = false) {
+        if (!Array.isArray(cards)) cards = [cards];
+
+        if (clear) this.table.clear();
+
+        for (let i = 0; i < cards.length; i++) {
+            GameManager._addWhiteCard(this.table, cards[i], undefined);
         }
 
-        const elm = $(list.add({"_text": card.T, "_watermark": card.W, "black": false})[0].elm);
-        if (card.W === undefined || card.W.length === 0) elm.find('._watermark').remove();
-        elm.find('._pick').parent().remove();
-        elm.find('._draw').parent().remove();
+        this._recreateMasonry();
     }
 
     _handleGameStatusChange(data) {
@@ -309,17 +331,19 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
 
 const hand = new BottomSheet(document.getElementById('hand'));
 
-function toggleHand(button) {
+function toggleHand(button, open = undefined) {
     if (button === undefined) button = document.getElementById('toggleHand');
     const list = document.querySelector("#hand .list");
     list.scrollLeft = 0;
 
-    if (hand.open) {
-        button.innerHTML = "keyboard_arrow_up";
-        hand.open = false;
-    } else {
+    if (open === undefined) open = !hand.open;
+
+    if (open) {
         button.innerHTML = "keyboard_arrow_down";
         hand.open = true;
+    } else {
+        button.innerHTML = "keyboard_arrow_up";
+        hand.open = false;
     }
 }
 
