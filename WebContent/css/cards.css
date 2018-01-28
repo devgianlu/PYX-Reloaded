@@ -64,6 +64,10 @@
     width: var(--adapted-card-width);
 }
 
+.mdc-card.pyx-card[data-black=false].highlighted {
+    background: var(--mdc-theme-secondary);
+}
+
 .mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
     margin: 0;
     text-align: right;

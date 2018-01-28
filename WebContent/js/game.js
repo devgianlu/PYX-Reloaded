@@ -337,6 +337,7 @@ class GameManager {
      * @param {string} data.gs - Game status
      * @param {object} data.bc - Black card
      * @param {object[]} data.wc - Table cards
+     * @param {int} data.WC - Winning card
      */
     _handleGameStatusChange(data) {
         switch (data.gs) {
@@ -361,9 +362,17 @@ class GameManager {
                 this.toggleHandVisibility(false);
                 break;
             case "ro":
-
+                this._highlightWinningCard(data.WC);
                 break;
         }
+    }
+
+    _highlightWinningCard(cid) {
+        this._tableCards_masonry.children().each(function () {
+            const self = $(this);
+            if (self.attr("data-cid") === cid.toString()) self.addClass("highlighted");
+            else self.removeClass("highlighted");
+        })
     }
 
     toggleStartButton(visible) {
