@@ -1,6 +1,6 @@
 # Summary
 
-[Introduction](index.md)
-- [Handlers](/handlers/Handlers.md)
-    - [Ban](/handlers/Ban.md)
-    - [GetMe](/handlers/GetMe.md)
+- [Introduction](index.md)
+- [Handlers](Handlers.md)
+    - [Ban](Ban.md)
+    - [GetMe](GetMe.md)
