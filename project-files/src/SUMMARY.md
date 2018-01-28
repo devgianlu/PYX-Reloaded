@@ -5,5 +5,5 @@
     - [Screenshots](screenshots.md)
 - [Server Internals](server.md)
     - [Handlers](Handlers.md) 
-        - [Ban](Ban.md)
+        - [Ban](Ban.md) 
         - [GetMe](GetMe.md)
