@@ -13,7 +13,8 @@ class GameManager {
             valueNames: ['_msg', '_sender']
         });
 
-        this.hand = new List(this.root.find('#hand')[0], {
+        this._hand = this.root.find('#hand');
+        this.hand = new List(this._hand[0], {
             item: 'card-template',
             valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}]
         });
@@ -36,6 +37,7 @@ class GameManager {
         this._blackCardContainer = this.root.find('#blackCard');
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
+        this._hand_toolbar = this._hand.find(".mdc-toolbar");
     }
 
     set me(user) {
@@ -167,6 +169,8 @@ class GameManager {
                 break;
             case "gpic":
                 const pi = data.pi;
+                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
+
                 const item = this.scoreboard.get("_name", pi.N);
                 // TODO: Handle player info changed
                 break;
@@ -175,6 +179,26 @@ class GameManager {
                 break;
             case "gsc":
                 this._handleGameStatusChange(data);
+                break;
+        }
+    }
+
+    handleMyInfoChanged(info) {
+        switch (info.st) {
+            case "sj":
+                break;
+            case "sjj":
+                break;
+            case "sp":
+                break;
+            case "sh":
+                break;
+            case "si":
+                this.toggleHandVisibility(false);
+                break;
+            case "sw":
+                break;
+            case "sv":
                 break;
         }
     }
@@ -215,17 +239,17 @@ class GameManager {
                 this.addTableCards([], true);
 
                 this.toggleStartButton(this.amHost);
-                toggleHandVisibility(false);
+                this.toggleHandVisibility(false);
                 break;
             case "p":
                 this.blackCard = data.bc;
                 this.toggleStartButton(false);
-                toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+                this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
                 this.toggleStartButton(false);
-                toggleHandVisibility(false);
+                this.toggleHandVisibility(false);
                 break;
         }
     }
@@ -233,6 +257,11 @@ class GameManager {
     toggleStartButton(visible) {
         if (visible) this._startGame.show();
         else this._startGame.hide();
+    }
+
+    toggleHandVisibility(visible) {
+        if (visible) this._hand_toolbar.show();
+        else this._hand_toolbar.hide();
     }
 
     _getPlayer(nick) {
@@ -245,8 +274,8 @@ class GameManager {
 
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
-        this.toggleStartButton(this.amHost);
-        toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+        this.toggleStartButton(this.amHost && this.info.gi.S === "l");
+        this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
 
         this.scoreboard.clear();
         for (let i = 0; i < this.info.pi.length; i++) {
@@ -357,11 +386,5 @@ function toggleHand(button, open = undefined) {
         button.innerHTML = "keyboard_arrow_up";
         hand.open = false;
     }
-}
-
-function toggleHandVisibility(visible) {
-    const toolbar = $("#hand").find(".mdc-toolbar");
-    if (visible) toolbar.show();
-    else toolbar.hide();
 }
 
