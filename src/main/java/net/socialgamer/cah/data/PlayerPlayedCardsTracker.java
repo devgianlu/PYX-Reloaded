@@ -1,12 +1,14 @@
 package net.socialgamer.cah.data;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 
 /**
  * Class to track which card(s) have been played by players. Can get the card(s) for a player, and
  * also which player played a given card.
- *
+ * <p>
  * All methods in this class are synchronized.
  *
  * @author Andy Janata (ajanata@socialgamer.net)
@@ -58,6 +60,7 @@ public class PlayerPlayedCardsTracker {
      * @return The list of cards {@code player} has played this round, or {@code null} if they have
      * not played any cards.
      */
+    @Nullable
     public synchronized List<WhiteCard> getCards(Player player) {
         return playerCardMap.get(player);
     }
@@ -79,6 +82,14 @@ public class PlayerPlayedCardsTracker {
      */
     public synchronized int size() {
         return playerCardMap.size();
+    }
+
+    /**
+     * @return The number of played cards per player
+     */
+    public synchronized int playedCardsCount(Player player) {
+        List<WhiteCard> cards = getCards(player);
+        return cards == null ? 0 : cards.size();
     }
 
     /**

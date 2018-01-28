@@ -114,7 +114,7 @@ class GameManager {
     static _addWhiteCard(list, card, listener = undefined) {
         if (Array.isArray(card)) {
             for (let i = 0; i < card.length; i++)
-                this._addWhiteCard(list, card);
+                this._addWhiteCard(list, card[i]);
 
             return;
         }

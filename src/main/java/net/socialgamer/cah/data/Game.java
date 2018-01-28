@@ -1218,7 +1218,7 @@ public class Game {
      *
      * @param user     User playing the card.
      * @param cardId   ID of the card to play.
-     * @param cardText User text for a blank card.  Ignored for normal cards.
+     * @param cardText User text for a blank card. Ignored for normal cards.
      */
     public void playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
         Player player = getPlayerForUser(user);
@@ -1227,7 +1227,7 @@ public class Game {
             if (getJudge() == player || state != GameState.PLAYING)
                 throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
 
-            if (playedCards.getCards(player).size() == blackCard.getPick())
+            if (playedCards.playedCardsCount(player) == blackCard.getPick())
                 throw new BaseCahHandler.CahException(ErrorCode.ALREADY_PLAYED);
 
             WhiteCard playCard = null;
@@ -1258,6 +1258,8 @@ public class Game {
             } else {
                 throw new BaseCahHandler.CahException(ErrorCode.DO_NOT_HAVE_CARD);
             }
+        } else {
+            throw new BaseCahHandler.CahException(ErrorCode.NOT_IN_THAT_GAME);
         }
     }
 
