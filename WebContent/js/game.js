@@ -216,19 +216,25 @@ class GameManager {
                 this._receivedGameChatMessage(data);
                 break;
             case "gpj":
-                this.scoreboard.add({"_name": data.n, "_score": 0, "_status": GameManager.getStatusFromCode("si")});
+                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
+                this._reloadScoreboard();
                 break;
             case "gpl":
-                this.scoreboard.remove("_name", data.n);
+                for (let i = 0; i < this.info.pi.length; i++) {
+                    if (this.info.pi[i].N === data.n) {
+                        this.info.pi = this.info.pi.splice(i, 1);
+                        break;
+                    }
+                }
+
+                this._reloadScoreboard();
                 break;
             case "gpic":
                 const pi = data.pi;
                 this._updatePlayerStatus(pi);
+                this._reloadScoreboard();
 
                 if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
-
-                const item = this.scoreboard.get("_name", pi.N);
-                // TODO: Handle player info changed
                 break;
             case "hd":
                 this.addHandCards(data.h, data.h.length === 10);
@@ -243,21 +249,26 @@ class GameManager {
      * @param {string} info.st - Player's (my) status
      */
     handleMyInfoChanged(info) {
+        console.log("MY STATUS IS NOW: " + info.st);
+
         switch (info.st) {
             case "sj":
+                this.toggleHandVisibility(false);
                 break;
             case "sjj":
+                this.toggleHandVisibility(false);
                 break;
             case "sp":
+                this.toggleHandVisibility(true);
                 break;
             case "sh":
+                this.toggleHandVisibility(false);
                 break;
             case "si":
                 this.toggleHandVisibility(false);
                 break;
             case "sw":
-                break;
-            case "sv":
+                this.toggleHandVisibility(false);
                 break;
         }
     }
@@ -298,6 +309,30 @@ class GameManager {
         this._recreateMasonry();
     }
 
+    _resetPlayerStatuesToPlaying() {
+        let me;
+        for (let i = 0; i < this.info.pi.length; i++) {
+            const player = this.info.pi[i];
+            player.st = "sp";
+            if (player.N === this.user.n) me = player;
+        }
+
+        this.handleMyInfoChanged(me);
+        this._reloadScoreboard();
+    }
+
+    _reloadScoreboard() {
+        this.scoreboard.clear();
+        for (let i = 0; i < this.info.pi.length; i++) {
+            const player = this.info.pi[i];
+            this.scoreboard.add({
+                "_name": player.N,
+                "_score": player.sc,
+                "_status": GameManager.getStatusFromCode(player.st)
+            });
+        }
+    }
+
     /**
      * @param {string} data.gs - Game status
      * @param {object} data.bc - Black card
@@ -318,6 +353,7 @@ class GameManager {
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
                 this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+                this._resetPlayerStatuesToPlaying();
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
@@ -353,15 +389,7 @@ class GameManager {
         this.toggleStartButton(this.amHost && this.info.gi.S === "l");
         this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
 
-        this.scoreboard.clear();
-        for (let i = 0; i < this.info.pi.length; i++) {
-            const player = this.info.pi[i];
-            this.scoreboard.add({
-                "_name": player.N,
-                "_score": player.sc,
-                "_status": GameManager.getStatusFromCode(player.st)
-            });
-        }
+        this._reloadScoreboard();
     }
 
     leave() {

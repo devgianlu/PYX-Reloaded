@@ -4,7 +4,6 @@ import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
-import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.data.Game;
@@ -31,15 +30,10 @@ public class CreateGameHandler extends BaseHandler {
         String value = params.get(Constants.AjaxRequest.GAME_OPTIONS);
         GameOptions options = GameOptions.deserialize(preferences, value);
 
-        Game game;
         try {
-            game = gameManager.createGameWithPlayer(user, options);
-        } catch (IllegalStateException ex) {
-            throw new BaseCahHandler.CahException(ErrorCode.CANNOT_JOIN_ANOTHER_GAME, ex);
+            return new JsonWrapper(AjaxResponse.GAME_ID, gameManager.createGameWithPlayer(user, options).getId());
+        } catch (Game.TooManyPlayersException ex) {
+            throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_MANY_USERS, ex);
         }
-
-        if (game == null) throw new BaseCahHandler.CahException(ErrorCode.TOO_MANY_GAMES);
-
-        return new JsonWrapper(AjaxResponse.GAME_ID, game.getId());
     }
 }

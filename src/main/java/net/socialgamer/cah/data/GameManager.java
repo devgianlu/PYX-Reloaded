@@ -1,21 +1,15 @@
 package net.socialgamer.cah.data;
 
 import net.socialgamer.cah.Constants;
-import net.socialgamer.cah.data.Game.TooManyPlayersException;
 import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-
-/**
- * Manage games for the server.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
 public class GameManager {
     private static final Logger logger = Logger.getLogger(GameManager.class);
     private final int maxGames;
@@ -44,10 +38,9 @@ public class GameManager {
     }
 
     /**
-     * Creates a new game, if there are free game slots. Returns {@code null} if there are already the
-     * maximum number of games in progress.
+     * Creates a new game, if there are free game slots.
      *
-     * @return Newly created game, or {@code null} if the maximum number of games are in progress.
+     * @return Newly created game
      */
     private Game createGame(GameOptions options) throws BaseCahHandler.CahException {
         synchronized (games) {
@@ -61,30 +54,22 @@ public class GameManager {
 
     /**
      * Creates a new game and puts the specified user into the game, if there are free game slots.
-     * Returns {@code null} if there are already the maximum number of games in progress.
      * <p>
      * Creating the game and adding the user are done atomically with respect to another game getting
      * created, or even getting the list of active games. It is impossible for another user to join
      * the game before the requesting user.
      *
      * @param user User to place into the game.
-     * @return Newly created game, or {@code null} if the maximum number of games are in progress.
-     * @throws IllegalStateException If the user is already in a game and cannot join another.
+     * @return Newly created game
+     * @throws BaseCahHandler.CahException If the user is already in a game and cannot join another.
      */
-    public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws IllegalStateException, BaseCahHandler.CahException {
+    @NotNull
+    public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws BaseCahHandler.CahException, Game.TooManyPlayersException {
         synchronized (games) {
             Game game = createGame(options);
 
-            try {
-                game.addPlayer(user);
-                logger.info(String.format("Created new game %d by user %s.", game.getId(), user.toString()));
-            } catch (IllegalStateException ise) {
-                destroyGame(game.getId());
-                throw ise;
-            } catch (TooManyPlayersException tmpe) {
-                // this should never happen -- we just made the game
-                throw new Error("Impossible exception: Too many players in new game.", tmpe);
-            }
+            game.addPlayer(user);
+            logger.info(String.format("Created new game %d by user %s.", game.getId(), user.toString()));
 
             broadcastGameListRefresh();
             return game;
@@ -105,7 +90,7 @@ public class GameManager {
             final Game game = games.remove(gameId);
             if (game == null) return;
 
-            // remove the players from the game
+            // Remove the players from the game
             List<User> usersToRemove = game.getUsers();
             for (User user : usersToRemove) {
                 game.removePlayer(user);
@@ -139,7 +124,7 @@ public class GameManager {
      * @param id Id of game to retrieve.
      * @return The Game, or {@code null} if there is no game with that id.
      */
-    public Game getGame(final int id) {
+    public Game getGame(int id) {
         synchronized (games) {
             return games.get(id);
         }

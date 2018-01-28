@@ -176,10 +176,10 @@ public class User {
      * This should only be called from Game itself.
      *
      * @param game Game in which this user is playing.
-     * @throws IllegalStateException Thrown if this user is already in another game.
+     * @throws BaseCahHandler.CahException Thrown if this user is already in another game.
      */
-    void joinGame(Game game) throws IllegalStateException {
-        if (currentGame != null) throw new IllegalStateException("User is already in a game.");
+    void joinGame(Game game) throws BaseCahHandler.CahException {
+        if (currentGame != null) throw new BaseCahHandler.CahException(Constants.ErrorCode.CANNOT_JOIN_ANOTHER_GAME);
         currentGame = game;
     }
 

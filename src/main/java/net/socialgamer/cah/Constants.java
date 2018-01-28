@@ -520,8 +520,7 @@ public class Constants {
         WALL(AjaxRequest.WALL),
         @DuplicationAllowed
         WHITE_CARDS(AjaxResponse.WHITE_CARDS),
-        WINNING_CARD("WC"),
-        NEW_JUDGE("nj");
+        WINNING_CARD("WC");
 
         private final String field;
 
