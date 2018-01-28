@@ -96,7 +96,13 @@ function loadGamesList() {
     }).fail(function (data) {
         console.log(data);
         alert("Error data: " + JSON.stringify(data));
-    })
+    });
+
+    registerPollListener("LOBBIES", function (data) {
+        if (data["E"] === "glr") {
+            loadGamesList();
+        }
+    });
 }
 
 function toggleNoGamesMessage(visible) {
