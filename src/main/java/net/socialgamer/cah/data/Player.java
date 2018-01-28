@@ -20,7 +20,7 @@ public class Player {
      *
      * @param user The {@code User} associated with this player.
      */
-    public Player(final User user) {
+    public Player(User user) {
         this.user = user;
     }
 
@@ -48,7 +48,7 @@ public class Player {
     /**
      * Increase the player's score by the specified amount.
      */
-    public void increaseScore(final int offset) {
+    public void increaseScore(int offset) {
         score += offset;
     }
 

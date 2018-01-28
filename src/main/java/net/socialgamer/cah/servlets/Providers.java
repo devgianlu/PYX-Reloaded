@@ -1,7 +1,5 @@
 package net.socialgamer.cah.servlets;
 
-import net.socialgamer.cah.data.User;
-
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,15 +14,6 @@ public final class Providers {
             return super.put(key, value);
         }
     };
-
-    static {
-        add(Annotations.UserFactory.class, (Provider<User.Factory>) () -> new User.Factory() {
-            @Override
-            public User create(String nickname, String hostname, boolean admin) {
-                return new User(nickname, hostname, Sessions.generateNewId(), admin);
-            }
-        });
-    }
 
     @SuppressWarnings("unchecked")
     public static <P> Provider<P> get(Class<? extends Annotation> cls) {

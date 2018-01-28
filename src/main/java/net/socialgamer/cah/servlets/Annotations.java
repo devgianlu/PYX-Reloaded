@@ -28,11 +28,6 @@ public final class Annotations {
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface UserFactory {
-    }
-
-    @Target(ElementType.PARAMETER)
-    @Retention(RetentionPolicy.RUNTIME)
     public @interface MaxGames {
     }
 }

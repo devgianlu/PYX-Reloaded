@@ -18,11 +18,9 @@ public class RegisterHandler extends BaseHandler {
     public static final String OP = AjaxOperation.REGISTER.toString();
     private static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
     private final ConnectedUsers users;
-    private final User.Factory userFactory;
 
-    public RegisterHandler(@Annotations.ConnectedUsers ConnectedUsers users, @Annotations.UserFactory User.Factory userFactory) {
+    public RegisterHandler(@Annotations.ConnectedUsers ConnectedUsers users) {
         this.users = users;
-        this.userFactory = userFactory;
     }
 
     @Override
@@ -40,8 +38,7 @@ public class RegisterHandler extends BaseHandler {
         String adminToken = params.get(Constants.AjaxRequest.ADMIN_TOKEN);
         admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.current().equals(adminToken);
 
-        user = userFactory.create(nickname, exchange.getHostName(), admin);
-
+        user = new User(nickname, exchange.getHostName(), Sessions.generateNewId(), admin);
         users.checkAndAdd(user);
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.add(user)));
 

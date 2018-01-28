@@ -197,8 +197,4 @@ public class User {
     public List<Long> getLastMessageTimes() {
         return lastMessageTimes;
     }
-
-    public abstract static class Factory {
-        public abstract User create(String nickname, String hostname, boolean admin);
-    }
 }

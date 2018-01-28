@@ -236,10 +236,6 @@ class GameManager {
             case "gsc":
                 this._handleGameStatusChange(data);
                 break;
-            case "grc":
-
-                console.log("Winner is " + data.rw);
-                break;
         }
     }
 
@@ -327,6 +323,9 @@ class GameManager {
                 this.addTableCards(data.wc, true);
                 this.toggleStartButton(false);
                 this.toggleHandVisibility(false);
+                break;
+            case "ro":
+
                 break;
         }
     }
