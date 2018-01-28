@@ -2,9 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Ban - Pretned You're Xyzzy: Reloaded</title>
+        <title>Ban - </title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <meta name="description" content="The example book covers examples.">
+        <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
@@ -99,7 +99,7 @@
                             </ul>
                         </div>
 
-                        <h1 class="menu-title">Pretned You're Xyzzy: Reloaded</h1>
+                        <h1 class="menu-title"></h1>
 
                         <div class="right-buttons">
                             <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -121,6 +121,47 @@
                 <div id="content" class="content">
                     <main>
                         <a class="header" href="Ban.html#ban" id="ban"><h1>Ban</h1></a>
+<p>This handler provides the basic algo that processes the request to ban a user, usually from the in-game console as an admin user who typed in <code>/ban user</code> or some similar command. The way the server handles this is as follows:</p>
+<ol>
+<li>Get the list of users currently connected to the server.</li>
+<li>Begin processing the <code>/ban</code> command and its parameters:
+<ul>
+<li>Check to make sure the user has admin rights on the server.
+<ul>
+<li>If they don't, give an error that states the user is not an admin.</li>
+</ul>
+</li>
+<li>Start concatenation process - inputs here get translated to a JSON response that is read/interpreted by the client.
+<ul>
+<li>Set a variable (in this case, <code>nickname</code>) to the one entered as the parameter of <code>/ban</code></li>
+<li>If the nickname parameter is <code>null</code> or otherwise unspecified, exit with <code>No nick specified</code></li>
+<li>Declasre an empty string, <code>banIp</code>.</li>
+<li>Create a variable of custom <code>User</code> type, <code>kickUser</code>
+<ul>
+<li>Of the currently connected users we want to ban, match this up with the parameter of the <code>/ban</code> command.</li>
+<li>Basically, by this point, we have a name for the user we want to kick!</li>
+</ul>
+</li>
+<li>Check <code>kickUser</code> for validity, and decide which route to take to rid that scum from the server:
+<ul>
+<li>If the returned value of <code>kickUser</code> is valid, do the following:
+<ul>
+<li>Set <code>banIP</code> to the IP of the user in question</li>
+<li>Send a message via the <code>LongPoll</code> servlet to the client with a notif they've been kicked.</li>
+<li>Remove the user in question from the list of connected users on the server.</li>
+<li>To everyone else: Send a message of who banned who.</li>
+</ul>
+</li>
+<li>If <code>kickUser</code> doesn't come back with anything proper, be a savage and directly ban the nick itself, even if it doesn't exist.</li>
+</ul>
+</li>
+<li>After determining <code>banIP</code>, the nick or IP address gets added to the internal list of banned users.</li>
+</ul>
+</li>
+<li>End concatenation process. This handler doesn't return any JSON by itself, however it may return an error to the client if one happens to arise.</li>
+</ul>
+</li>
+</ol>
 
                     </main>
 
