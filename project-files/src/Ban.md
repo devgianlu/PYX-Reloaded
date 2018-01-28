@@ -1,6 +1,7 @@
 # Ban
 This handler provides the basic algo that processes the request to ban a user, usually from the in-game console as an admin user who typed in ```/ban user``` or some similar command. The way the server handles this is as follows:
 
+## Steps to Ban a User From the Server
 1. Get the list of users currently connected to the server.
 2. Begin processing the ```/ban``` command and its parameters:
     - Check to make sure the user has admin rights on the server.
