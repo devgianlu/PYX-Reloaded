@@ -59,7 +59,7 @@ public class BaseLongPollHandler extends BaseCahHandler {
             Collection<QueuedMessage> msgs = user.getNextQueuedMessages(MAX_MESSAGES_PER_POLL);
             if (msgs.size() > 0) {
                 JsonArray array = new JsonArray(msgs.size());
-                for (QueuedMessage qm : msgs) array.add(qm.getData());
+                for (QueuedMessage qm : msgs) array.add(qm.getData().obj());
                 return Utils.singletonJsonObject(Constants.LongPollResponse.EVENTS.toString(), array);
             }
         }

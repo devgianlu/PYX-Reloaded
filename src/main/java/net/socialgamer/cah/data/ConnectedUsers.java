@@ -1,11 +1,10 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.JsonObject;
 import net.socialgamer.cah.Constants.DisconnectReason;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.Constants.LongPollEvent;
 import net.socialgamer.cah.Constants.LongPollResponse;
-import net.socialgamer.cah.Utils;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.servlets.BaseCahHandler;
 import org.apache.log4j.Logger;
@@ -55,10 +54,9 @@ public class ConnectedUsers {
                 logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
                 if (broadcastConnectsAndDisconnects) {
-                    JsonObject obj = new JsonObject();
-                    obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.NEW_PLAYER.toString());
-                    obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
-                    broadcastToAll(MessageType.PLAYER_EVENT, obj);
+                    EventWrapper ev = new EventWrapper(LongPollEvent.NEW_PLAYER);
+                    ev.add(LongPollResponse.NICKNAME, user.getNickname());
+                    broadcastToAll(MessageType.PLAYER_EVENT, ev);
                 }
             }
         }
@@ -102,11 +100,10 @@ public class ConnectedUsers {
     private void notifyRemoveUser(User user, DisconnectReason reason) {
         // Games are informed about the user leaving when the user object is marked invalid.
         if (broadcastConnectsAndDisconnects) {
-            JsonObject obj = new JsonObject();
-            obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.PLAYER_LEAVE.toString());
-            obj.addProperty(LongPollResponse.NICKNAME.toString(), user.getNickname());
-            obj.addProperty(LongPollResponse.REASON.toString(), reason.toString());
-            broadcastToAll(MessageType.PLAYER_EVENT, obj);
+            EventWrapper ev = new EventWrapper(LongPollEvent.PLAYER_LEAVE);
+            ev.add(LongPollResponse.NICKNAME, user.getNickname());
+            ev.add(LongPollResponse.REASON, reason.toString());
+            broadcastToAll(MessageType.PLAYER_EVENT, ev);
         }
     }
 
@@ -151,12 +148,12 @@ public class ConnectedUsers {
     /**
      * Broadcast a message to all connected players.
      *
-     * @param type       Type of message to broadcast. This determines the order the messages are returned by
-     *                   priority.
-     * @param masterData Message data to broadcast.
+     * @param type Type of message to broadcast. This determines the order the messages are returned by
+     *             priority.
+     * @param ev   Message data to broadcast.
      */
-    public void broadcastToAll(MessageType type, JsonObject masterData) {
-        broadcastToList(users.values(), type, masterData);
+    public void broadcastToAll(MessageType type, EventWrapper ev) {
+        broadcastToList(users.values(), type, ev);
     }
 
     /**
@@ -165,14 +162,10 @@ public class ConnectedUsers {
      * @param broadcastTo List of users to broadcast the message to.
      * @param type        Type of message to broadcast. This determines the order the messages are returned by
      *                    priority.
-     * @param masterData  Message data to broadcast.
+     * @param ev          Message data to broadcast.
      */
-    public void broadcastToList(Collection<User> broadcastTo, MessageType type, JsonObject masterData) {
-        for (User user : broadcastTo) {
-            JsonObject obj = Utils.singletonJsonObject(LongPollResponse.TIMESTAMP.toString(), System.currentTimeMillis());
-            for (String key : masterData.keySet()) obj.add(key, masterData.get(key));
-            user.enqueueMessage(new QueuedMessage(type, obj));
-        }
+    public void broadcastToList(Collection<User> broadcastTo, MessageType type, EventWrapper ev) {
+        for (User user : broadcastTo) user.enqueueMessage(new QueuedMessage(type, ev));
     }
 
     /**

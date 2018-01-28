@@ -5,8 +5,8 @@ package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
-import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
@@ -28,17 +28,18 @@ public class BanHandler extends BaseHandler {
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
+        if (!user.isAdmin())
+            throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
 
         String nickname = params.get(AjaxRequest.NICKNAME); //Set a variable "nickname" to the one entered through the command.
-        
+
         //Assuming this is for when the command wasn't properly typed
         if (nickname == null || nickname.isEmpty())
             throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
 
         String banIp;
         User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
-        
+
         /*
          * Assuming singled out user exists, set banIP to the IP(?) of the user in question.
          * Then, send a message via the LongPoll servlet to the client with a notif they've been kicked.
@@ -48,7 +49,7 @@ public class BanHandler extends BaseHandler {
         if (kickUser != null) {
             banIp = kickUser.getHostname();
 
-            kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, Utils.singletonJsonObject(LongPollResponse.EVENT.toString(), LongPollEvent.BANNED.toString())));
+            kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(LongPollEvent.BANNED)));
 
             connectedUsers.removeUser(kickUser, DisconnectReason.BANNED);
             logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), banIp, user.getNickname()));

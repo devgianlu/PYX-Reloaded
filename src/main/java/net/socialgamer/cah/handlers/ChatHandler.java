@@ -1,9 +1,9 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
@@ -36,14 +36,13 @@ public class ChatHandler extends BaseHandler {
             throw new BaseCahHandler.CahException(ErrorCode.MESSAGE_TOO_LONG);
         } else {
             user.getLastMessageTimes().add(System.currentTimeMillis());
-            JsonObject obj = new JsonObject();
-            obj.addProperty(LongPollResponse.EVENT.toString(), LongPollEvent.CHAT.toString());
-            obj.addProperty(LongPollResponse.FROM.toString(), user.getNickname());
-            obj.addProperty(LongPollResponse.MESSAGE.toString(), msg);
-            if (user.isAdmin()) obj.addProperty(LongPollResponse.FROM_ADMIN.toString(), true);
-            if (wall) obj.addProperty(LongPollResponse.WALL.toString(), true);
-            if (emote) obj.addProperty(LongPollResponse.EMOTE.toString(), true);
-            users.broadcastToAll(MessageType.CHAT, obj);
+            EventWrapper ev = new EventWrapper(LongPollEvent.CHAT);
+            ev.add(LongPollResponse.FROM, user.getNickname());
+            ev.add(LongPollResponse.MESSAGE, msg);
+            if (user.isAdmin()) ev.add(LongPollResponse.FROM_ADMIN, true);
+            if (wall) ev.add(LongPollResponse.WALL, true);
+            if (emote) ev.add(LongPollResponse.EMOTE, true);
+            users.broadcastToAll(MessageType.CHAT, ev);
         }
 
         return JsonWrapper.EMPTY;

@@ -1,8 +1,8 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
@@ -36,9 +36,9 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         CardcastDeck deck = cardcastService.loadSet(deckId);
         if (deck == null) throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND);
 
-        JsonObject obj = game.getEventJson(LongPollEvent.CARDCAST_ADD_CARDSET);
-        obj.add(LongPollResponse.CARDCAST_DECK_INFO.toString(), deck.getClientMetadataJson());
-        game.broadcastToPlayers(MessageType.GAME_EVENT, obj);
+        EventWrapper ev = new EventWrapper(game, LongPollEvent.CARDCAST_ADD_CARDSET);
+        ev.add(LongPollResponse.CARDCAST_DECK_INFO, deck.getClientMetadataJson());
+        game.broadcastToPlayers(MessageType.GAME_EVENT, ev);
         game.getCardcastDeckCodes().add(deckId);
 
         return JsonWrapper.EMPTY;

@@ -1,6 +1,6 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.JsonObject;
+import net.socialgamer.cah.EventWrapper;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -11,25 +11,25 @@ import org.jetbrains.annotations.NotNull;
  */
 public class QueuedMessage implements Comparable<QueuedMessage> {
     private final MessageType messageType;
-    private final JsonObject data;
+    private final EventWrapper ev;
 
     /**
      * Create a new queued message.
      *
      * @param messageType Type of message to be queued. The type influences the priority in returning messages
      *                    to the client.
-     * @param data        The data of the message to be queued.
+     * @param ev          The data of the message to be queued.
      */
-    public QueuedMessage(MessageType messageType, JsonObject data) {
+    public QueuedMessage(MessageType messageType, EventWrapper ev) {
         this.messageType = messageType;
-        this.data = data;
+        this.ev = ev;
     }
 
     /**
      * @return The data in the message.
      */
-    public JsonObject getData() {
-        return data;
+    public EventWrapper getData() {
+        return ev;
     }
 
     /**
@@ -43,7 +43,7 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
 
     @Override
     public String toString() {
-        return messageType.toString() + "_" + data.toString();
+        return messageType.toString() + "_" + ev.toString();
     }
 
     /**

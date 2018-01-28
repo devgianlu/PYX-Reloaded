@@ -2,8 +2,8 @@ package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
 import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
-import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
@@ -32,7 +32,7 @@ public class KickHandler extends BaseHandler {
         final User kickUser = connectedUsers.getUser(nickname);
         if (kickUser == null) throw new BaseCahHandler.CahException(ErrorCode.NO_SUCH_USER);
 
-        kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, Utils.singletonJsonObject(LongPollResponse.EVENT.toString(), LongPollEvent.KICKED.toString())));
+        kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(LongPollEvent.KICKED)));
 
         connectedUsers.removeUser(kickUser, DisconnectReason.KICKED);
         logger.warn(String.format("Kicking %s by request of %s", kickUser.getNickname(), user.getNickname()));

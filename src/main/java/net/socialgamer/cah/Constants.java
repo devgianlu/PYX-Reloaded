@@ -35,7 +35,7 @@ public class Constants {
 
         private final String reason;
 
-        DisconnectReason(final String reason) {
+        DisconnectReason(String reason) {
             this.reason = reason;
         }
 
@@ -63,7 +63,7 @@ public class Constants {
 
         private final String action;
 
-        ReconnectNextAction(final String action) {
+        ReconnectNextAction(String action) {
             this.action = action;
         }
 
@@ -194,7 +194,7 @@ public class Constants {
 
         private final String op;
 
-        AjaxOperation(final String op) {
+        AjaxOperation(String op) {
             this.op = op;
         }
 
@@ -223,7 +223,7 @@ public class Constants {
 
         private final String field;
 
-        AjaxRequest(final String field) {
+        AjaxRequest(String field) {
             this.field = field;
         }
 
@@ -276,11 +276,11 @@ public class Constants {
 
         private final String field;
 
-        AjaxResponse(final String field) {
+        AjaxResponse(String field) {
             this.field = field;
         }
 
-        AjaxResponse(final Enum<?> field) {
+        AjaxResponse(Enum<?> field) {
             this.field = field.toString();
         }
 
@@ -298,7 +298,7 @@ public class Constants {
 
         private final String code;
 
-        ErrorInformation(final String code) {
+        ErrorInformation(String code) {
             this.code = code;
         }
 
@@ -311,7 +311,7 @@ public class Constants {
     /**
      * Client request and long poll response errors.
      */
-    public enum ErrorCode implements Localizable {
+    public enum ErrorCode {
         ACCESS_DENIED("ad", "Access denied."),
         ALREADY_STARTED("as", "The game has already started."),
         ALREADY_STOPPED("aS", "The game has already stopped."),
@@ -353,30 +353,22 @@ public class Constants {
         WRONG_PASSWORD("wp", "That password is incorrect."), ALREADY_PLAYED("ap", "You have already played all the necessary cards.");
 
         private final String code;
-        private final String message;
 
         /**
          * @param code    Error code to send over the wire to the client.
          * @param message Message the client should display for the error code.
          */
-        ErrorCode(final String code, final String message) {
+        ErrorCode(String code, String message) {
             this.code = code;
-            this.message = message;
         }
 
-        ErrorCode(final Enum<?> code, final String message) {
+        ErrorCode(Enum<?> code, String message) {
             this.code = code.toString();
-            this.message = message;
         }
 
         @Override
         public String toString() {
             return code;
-        }
-
-        @Override
-        public String getString() {
-            return message;
         }
     }
 
@@ -441,10 +433,6 @@ public class Constants {
          */
         GAME_SPECTATOR_LEAVE("gvl"),
         /**
-         * Round completed
-         */
-        GAME_ROUND_COMPLETE("grc"),
-        /**
          * The game state changed
          */
         GAME_STATE_CHANGE("gsc"),
@@ -477,11 +465,11 @@ public class Constants {
 
         private final String event;
 
-        LongPollEvent(final String event) {
+        LongPollEvent(String event) {
             this.event = event;
         }
 
-        LongPollEvent(final Enum<?> event) {
+        LongPollEvent(Enum<?> event) {
             this.event = event.toString();
         }
 
@@ -494,7 +482,7 @@ public class Constants {
     /**
      * Data keys that can be in a long poll response.
      */
-    public enum LongPollResponse {
+    public enum LongPollResponse implements ReturnableData {
         @DuplicationAllowed
         BLACK_CARD(AjaxResponse.BLACK_CARD),
         CARDCAST_DECK_INFO("cdi"),
@@ -528,20 +516,20 @@ public class Constants {
          */
         REASON("qr"),
         ROUND_WINNER("rw"),
-        TIMESTAMP("ts"),
         @DuplicationAllowed
         WALL(AjaxRequest.WALL),
         @DuplicationAllowed
         WHITE_CARDS(AjaxResponse.WHITE_CARDS),
-        WINNING_CARD("WC");
+        WINNING_CARD("WC"),
+        NEW_JUDGE("nj");
 
         private final String field;
 
-        LongPollResponse(final String field) {
+        LongPollResponse(String field) {
             this.field = field;
         }
 
-        LongPollResponse(final Enum<?> field) {
+        LongPollResponse(Enum<?> field) {
             this.field = field.toString();
         }
 
@@ -563,11 +551,11 @@ public class Constants {
 
         private final String key;
 
-        WhiteCardData(final String key) {
+        WhiteCardData(String key) {
             this.key = key;
         }
 
-        WhiteCardData(final Enum<?> key) {
+        WhiteCardData(Enum<?> key) {
             this.key = key.toString();
         }
 
@@ -592,11 +580,11 @@ public class Constants {
 
         private final String key;
 
-        BlackCardData(final String key) {
+        BlackCardData(String key) {
             this.key = key;
         }
 
-        BlackCardData(final Enum<?> key) {
+        BlackCardData(Enum<?> key) {
             this.key = key.toString();
         }
 
@@ -621,11 +609,11 @@ public class Constants {
 
         private final String key;
 
-        CardSetData(final String key) {
+        CardSetData(String key) {
             this.key = key;
         }
 
-        CardSetData(final Enum<?> key) {
+        CardSetData(Enum<?> key) {
             this.key = key.toString();
         }
 
@@ -635,32 +623,18 @@ public class Constants {
         }
     }
 
-    /**
-     * A game's current state.
-     */
-    public enum GameState implements Localizable {
-        DEALING("d", "In Progress"),
-        JUDGING("j", "In Progress"),
-        LOBBY("l", "Not Started"),
-        PLAYING("p", "In Progress"),
-        ROUND_OVER("ro", "In Progress");
+    public enum GameState {
+        JUDGING("j"), LOBBY("l"), PLAYING("p"), ROUND_OVER("ro");
 
         private final String state;
-        private final String message;
 
-        GameState(String state, String message) {
+        GameState(String state) {
             this.state = state;
-            this.message = message;
         }
 
         @Override
         public String toString() {
             return state;
-        }
-
-        @Override
-        public String getString() {
-            return message;
         }
     }
 
@@ -684,11 +658,11 @@ public class Constants {
 
         private final String key;
 
-        GameInfo(final String key) {
+        GameInfo(String key) {
             this.key = key;
         }
 
-        GameInfo(final Enum<?> key) {
+        GameInfo(Enum<?> key) {
             this.key = key.toString();
         }
 
@@ -716,11 +690,11 @@ public class Constants {
 
         private final String key;
 
-        GameOptionData(final String key) {
+        GameOptionData(String key) {
             this.key = key;
         }
 
-        GameOptionData(final Enum<?> key) {
+        GameOptionData(Enum<?> key) {
             this.key = key.toString();
         }
 
@@ -734,13 +708,11 @@ public class Constants {
      * Keys for the information about players in a game.
      */
     public enum GamePlayerInfo {
-        NAME("N"),
-        SCORE("sc"),
-        STATUS("st");
+        NAME("N"), SCORE("sc"), STATUS("st");
 
         private final String key;
 
-        GamePlayerInfo(final String key) {
+        GamePlayerInfo(String key) {
             this.key = key;
         }
 
@@ -750,63 +722,19 @@ public class Constants {
         }
     }
 
-    /**
-     * States that a player in a game can be in. The first client string is displayed in the
-     * scoreboard, and the second one is displayed in a banner at the top, telling the user what to
-     * do.
-     */
-    public enum GamePlayerStatus implements DoubleLocalizable {
-        HOST("sh", "Host", "Wait for players then click Start Game."),
-        IDLE("si", "", "Waiting for players..."),
-        JUDGE("sj", "Card Czar", "You are the Card Czar."),
-        JUDGING("sjj", "Selecting", "Select a winning card."),
-        PLAYING("sp", "Playing", "Select a card to play."),
-        WINNER("sw", "Winner!", "You have won!"),
-        SPECTATOR("sv", "Spectator", "You are just spectating.");
+    public enum GamePlayerStatus {
+        HOST("sh"), IDLE("si"), JUDGE("sj"), JUDGING("sjj"), WINNER("sw"), PLAYING("sp");
 
         private final String status;
-        private final String message;
-        private final String message2;
 
-        GamePlayerStatus(final String status, final String message, final String message2) {
+        GamePlayerStatus(String status) {
             this.status = status;
-            this.message = message;
-            this.message2 = message2;
         }
 
         @Override
         public String toString() {
             return status;
         }
-
-        @Override
-        public String getString() {
-            return message;
-        }
-    }
-
-    /**
-     * Enums that implement this interface have a user-visible string associated with them.
-     * <p>
-     * There presently is not support for localization, but the name fits.
-     */
-    public interface Localizable {
-        /**
-         * @return The user-visible string that is associated with this enum value.
-         */
-        String getString();
-    }
-
-    /**
-     * Enums that implement this interface have two user-visible strings associated with them.
-     * <p>
-     * There presently is not support for localization, but the name fits.
-     */
-    public interface DoubleLocalizable {
-        /**
-         * @return The first user-visible string that is associated with this enum value.
-         */
-        String getString();
     }
 
     /**
@@ -818,6 +746,6 @@ public class Constants {
     @interface DuplicationAllowed {
     }
 
-    public interface ReturnableData {
+    interface ReturnableData {
     }
 }

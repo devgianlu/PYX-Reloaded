@@ -49,4 +49,9 @@ public class JsonWrapper {
         obj.addProperty(data.toString(), str);
         return this;
     }
+
+    @Override
+    public String toString() {
+        return obj.toString();
+    }
 }
