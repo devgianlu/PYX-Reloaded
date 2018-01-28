@@ -40,12 +40,21 @@ class GameManager {
         this._hand_toolbar = this._hand.find(".mdc-toolbar");
     }
 
+    /**
+     * @param {string} user.n - Nickname
+     */
     set me(user) {
         this.user = user;
     }
 
+    /**
+     * @param {int} card.PK - Num pick
+     * @param {int} card.D - Num draw
+     * @param {string} card.W - Watermark
+     * @param {string} card.T - Card text
+     */
     set blackCard(card) {
-        if (card === null) {
+        if (card === undefined) {
             this._blackCardContainer.empty();
             return;
         }
@@ -78,11 +87,27 @@ class GameManager {
         return this.gid;
     }
 
+    /**
+     * @param {array} info.pi - Players info
+     * @param {string} info.gi.H - Host's nickname
+     * @param {string} info.gi.S - Game status
+     */
     set gameInfo(info) {
         this.info = info;
         this.setup();
     }
 
+    /**
+     * @returns {boolean} - Wheteter I am the host or not
+     */
+    get amHost() {
+        return this.info.gi.H === this.user.n;
+    }
+
+    /**
+     * @param st - Status code
+     * @returns {string} - Status string
+     */
     static getStatusFromCode(st) {
         switch (st) {
             case "sh":
@@ -102,21 +127,19 @@ class GameManager {
         }
     }
 
-    get amHost() {
-        return this.info.gi.H === this.user.n;
-    }
-
-    _receivedGameChatMessage(data) {
-        this.chat.add({
-            "_msg": data.m,
-            "_sender": data.f + ": "
-        })
-    }
-
+    /**
+     * @param list - The List.JS object
+     * @param {object|object[]} card - A card or a list of cards
+     * @param {string} card.W - Card watermark
+     * @param {string} card.T - Card text
+     * @param {int} card.cid - Card ID
+     * @param listener - A click listener
+     * @private
+     */
     static _addWhiteCard(list, card, listener = undefined) {
         if (Array.isArray(card)) {
             for (let i = 0; i < card.length; i++)
-                this._addWhiteCard(list, card[i]);
+                this._addWhiteCard(list, card[i]); // TODO: Group cards
 
             return;
         }
@@ -128,6 +151,18 @@ class GameManager {
 
         if (listener === undefined) elm.removeClass("mdc-ripple-surface");
         else elm.on("click", () => listener(card));
+    }
+
+    /**
+     * @param {string} data.m - Message
+     * @param {string} data.f - Sender
+     * @private
+     */
+    _receivedGameChatMessage(data) {
+        this.chat.add({
+            "_msg": data.m,
+            "_sender": data.f + ": "
+        })
     }
 
     static _removeWhiteCard(list, card) {
@@ -156,6 +191,14 @@ class GameManager {
         });
     }
 
+    /**
+     * @param {object[]} data.h - Hand cards
+     * @param {object} data.pi - Player's info
+     * @param {string} data.n - Player's nickname
+     * @param {object} data.pi.st - Player's status
+     * @param {int} data.pi.sc - Player's score
+     * @param {string} data.pi.N - Player's name
+     */
     handlePollEvent(data) {
         switch (data["E"]) {
             case "c":
@@ -183,6 +226,9 @@ class GameManager {
         }
     }
 
+    /**
+     * @param {string} info.st - Player's (my) status
+     */
     handleMyInfoChanged(info) {
         switch (info.st) {
             case "sj":
@@ -231,10 +277,15 @@ class GameManager {
         this._recreateMasonry();
     }
 
+    /**
+     * @param {string} data.gs - Game status
+     * @param {object} data.bc - Black card
+     * @param {object[]} data.wc - Table cards
+     */
     _handleGameStatusChange(data) {
         switch (data.gs) {
             case "l":
-                this.blackCard = null;
+                this.blackCard = undefined;
                 this.addHandCards([], true);
                 this.addTableCards([], true);
 

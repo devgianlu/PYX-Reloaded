@@ -81,6 +81,11 @@ function populateTimeMultiplier(dropdown, tm) {
     new mdc.select.MDCSelect(dropdown);
 }
 
+/**
+ * @param container - Cards container in layout
+ * @param {object[]} css - Card sets
+ * @param {string} css.csn - Card set name
+ */
 function loadCardSets(container, css) {
     const setsList = [];
     for (let i = 0; i < css.length; i++) {

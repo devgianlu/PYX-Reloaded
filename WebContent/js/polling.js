@@ -15,8 +15,11 @@ function sendPollRequest(retry) {
     })
 }
 
+/**
+ * @param {object[]} data.Es - Events
+ */
 function processPollData(data) {
-    const events = data["Es"];
+    const events = data.Es;
     if (events.length === 0) return;
 
     for (const key in _pollingListeners) {

@@ -20,7 +20,7 @@ function register() {
 
     $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
-    }).done(function (data) {
+    }).done(function () {
         window.location = "lobbies.html";
     });
 }

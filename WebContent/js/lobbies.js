@@ -44,7 +44,7 @@ window.onload = function () {
 
 function logout() {
     stopPolling();
-    $.post("AjaxServlet", "o=lo").always(function (data) {
+    $.post("AjaxServlet", "o=lo").always(function () {
         window.location = "/";
     });
 }
@@ -91,6 +91,10 @@ function loadGamesList() {
     games.clear();
 
     $.post("AjaxServlet", "o=ggl").done(function (data) {
+        /**
+         * @param {object[]} data.gl - Games list
+         */
+
         console.log(data);
         populateGamesList(data.gl);
     }).fail(function (data) {
@@ -128,6 +132,20 @@ function filterGames(query) {
     }
 }
 
+/**
+ *
+ * @param {object[]} gamesList - Games list
+ * @param {object} gamesList[].go - Game options
+ * @param {int[]} gamesList[].go.css - Card set IDs
+ * @param {int} gamesList[].go.wb - Win by X
+ * @param {int} gamesList[].go.sl - Score limit (goal)
+ * @param {string[]} gamesList[].P - Player names
+ * @param {string[]} gamesList[].V - Spectator names
+ * @param {int} gamesList[].LK - Like count
+ * @param {int} gamesList[].DLK - Dislike count
+ * @param {boolean} gamesList[].iLK - Do I like this game?
+ * @param {boolean} gamesList[].iDLK - Do I dislike this game?
+ */
 function populateGamesList(gamesList) {
     const items = [];
     for (let i = 0; i < gamesList.length; i++) {
