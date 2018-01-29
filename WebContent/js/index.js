@@ -15,7 +15,9 @@ window.onload = function () {
     });
 };
 
-function register() {
+function register(ev) {
+    if (ev !== undefined && ev.keyCode !== 13) return;
+
     const nickname = $("input#nickname").val();
 
     $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {

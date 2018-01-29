@@ -462,8 +462,13 @@ function loadUI() {
     });
 }
 
-function sendChatMessage(field) {
-    const input = field.querySelector('input');
+function sendChatMessage(field, ev = undefined) {
+    if (ev !== undefined && ev.keyCode !== 13) return;
+
+    let input;
+    if (field.tagName === "INPUT") input = field;
+    else input = field.querySelector('input');
+
     const msg = input.value;
     if (msg.length === 0) return;
 

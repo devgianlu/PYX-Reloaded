@@ -68,7 +68,8 @@
                  style="flex-grow: 1; overflow-y: auto; overflow-wrap: break-word; padding-top: 0.25rem"></div>
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
                  data-mdc-auto-init="MDCTextField" style="width: 100%">
-                <input type="text" id="chat-message" class="mdc-text-field__input">
+                <input type="text" id="chat-message" class="mdc-text-field__input"
+                       onkeydown="sendChatMessage(this, event);">
                 <label for="chat-message" class="mdc-text-field__label">Message</label>
                 <i class="material-icons mdc-text-field__icon" tabindex="0"
                    onclick="sendChatMessage(this.parentElement);">send</i>
