@@ -10,6 +10,10 @@ ws.onmessage = function (event) {
     processPollData(events);
 };
 
+function closeWebSocket() {
+    ws.close(1000);
+}
+
 /**
  * @param {string} events[].E - Event code
  */

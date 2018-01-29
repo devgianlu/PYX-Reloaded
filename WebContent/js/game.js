@@ -478,7 +478,7 @@ function sendChatMessage(field, ev = undefined) {
 }
 
 function leaveGame() {
-    stopPolling();
+    closeWebSocket();
     gameManager.leave();
 }
 

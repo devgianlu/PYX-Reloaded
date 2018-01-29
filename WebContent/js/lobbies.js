@@ -42,7 +42,7 @@ window.onload = function () {
 };
 
 function logout() {
-    stopPolling();
+    closeWebSocket();
     $.post("AjaxServlet", "o=lo").always(function () {
         window.location = "/";
     });
