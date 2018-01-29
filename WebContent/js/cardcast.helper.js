@@ -59,6 +59,8 @@ class Cardcast {
             console.error(data);
             listener(undefined);
         }).done(function (data) {
+            data.call_count = parseInt(data.call_count);
+            data.response_count = parseInt(data.response_count);
             listener(data);
         });
     }

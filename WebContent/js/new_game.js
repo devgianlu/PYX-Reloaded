@@ -40,6 +40,8 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
 
         if (selected.length === 0) this.label_.classList.remove("mdc-select__label--float-above");
         else this.label_.classList.add("mdc-select__label--float-above");
+
+        updateTitles();
     }
 
     clear() {
@@ -214,6 +216,7 @@ function removeCardcastDeckFromLayout(container, code) {
     }
 
     toggleCardcastNoDecksMessage(container, list.children.length === 0);
+    updateTitles();
 }
 
 function addCardcastDeckToLayout(button) {
@@ -252,6 +255,7 @@ function addCardcastDeckToLayout(button) {
 
     toggleCardcastNoDecksMessage(container, false);
     resetLoadCardcast();
+    updateTitles();
 }
 
 const _loadedCardcastDecks = {};
@@ -301,4 +305,62 @@ function getCardcastDeckCodes(container) {
     }
 
     return codes;
+}
+
+function updateTitles() {
+    const pyxCardsTitle = document.getElementById('pyxCardsTitle');
+    const pyxDetails = getPyxDecksDetails();
+    pyxCardsTitle.innerText = "PYX (" + createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")";
+
+    const ccCardsTitle = document.getElementById('ccCardsTitle');
+    const ccDetails = getCardcastDecksDetails();
+    ccCardsTitle.innerText = "Cardcast (" + createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")";
+
+    const cardsTitle = document.getElementById('cardsTitle');
+    cardsTitle.innerText = "Cards (" + createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")";
+}
+
+function getPyxDecksDetails() {
+    const pyxIds = getSelectedPyxDecks(document.getElementById('pyx_decks'));
+    const css = JSON.parse(localStorage['css']);
+
+    let whites = 0;
+    let blacks = 0;
+
+    for (let i = 0; i < css.length; i++) {
+        const cardSet = css[i];
+        for (let j = 0; j < pyxIds.length; j++) {
+            if (cardSet.cid.toString() === pyxIds[j]) {
+                whites += cardSet.wcid;
+                blacks += cardSet.bcid;
+            }
+        }
+    }
+
+    return {"decks": pyxIds.length, "whites": whites, "blacks": blacks}
+}
+
+function getCardcastDecksDetails() {
+    const deckCodes = getCardcastDeckCodes(document.getElementById('cc_decks'));
+
+    let whites = 0;
+    let blacks = 0;
+
+    for (let i = 0; i < deckCodes.length; i++) {
+        const deck = _loadedCardcastDecks[deckCodes[i]];
+        whites += deck.response_count;
+        blacks += deck.call_count;
+    }
+
+    return {"decks": deckCodes.length, "whites": whites, "blacks": blacks}
+}
+
+function createDetailsString(decks, whites, blacks) {
+    if (decks === 0) {
+        return "0 decks";
+    } else {
+        return decks + (decks === 1 ? " deck, " : " decks, ")
+            + whites + (whites === 1 ? " white card, " : " white cards, ")
+            + blacks + (blacks === 1 ? " black card" : " black cards");
+    }
 }

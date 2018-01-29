@@ -59,7 +59,7 @@
         <nav class="mdc-drawer__content mdc-list">
             <a class="mdc-list-item mdc-drawer--selected" href="cardcast.html" target="_blank">
                 <i class="material-icons mdc-list-item__start-detail">cast</i>
-		Cardcast
+                Cardcast
             </a>
         </nav>
     </nav>
@@ -153,10 +153,10 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">Cards</h5>
+                    <h5 class="mdc-card__title" id="cardsTitle">Cards (0 decks, 0 white cards, 0 black cards)</h5>
                 </div>
                 <section class="mdc-card__supporting-text">
-                    <h4>PYX</h4>
+                    <h4 id="pyxCardsTitle">PYX (0 decks, 0 white cards, 0 black cards)</h4>
                     <div class="mdc-select" id="pyx_decks" role="listbox" style="width: 100%; margin-bottom: 16px">
                         <div class="mdc-select__surface">
                             <div class="mdc-select__label">PYX card sets</div>
@@ -167,7 +167,7 @@
                             <ul class="mdc-list mdc-list--non-interactive list mdc-simple-menu__items"></ul>
                         </div>
                     </div>
-                    <h4 style="margin-bottom: 0">Cardcast</h4>
+                    <h4 style="margin-bottom: 0" id="ccCardsTitle">Cardcast (0 decks, 0 white cards, 0 black cards)</h4>
                     <div style="padding-top: 8px" class="mdc-layout-grid">
                         <div class="mdc-layout-grid__inner">
                             <div id="cc_decks" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
