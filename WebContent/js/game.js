@@ -21,7 +21,8 @@ class GameManager {
 
         this.masonryOptions = {
             itemSelector: '.pyx-card',
-            fitWidth: true
+            percentPosition: true,
+            fitWidth: false
         };
 
         this._tableCards = this.root.find('#whiteCards');
