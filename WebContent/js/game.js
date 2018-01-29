@@ -475,6 +475,7 @@ function sendChatMessage(field, ev = undefined) {
     gameManager.sendGameChatMessage(msg, () => {
         $(input.nextElementSibling).removeClass("mdc-text-field__label--float-above");
         input.value = "";
+        $(input).blur();
     });
 }
 

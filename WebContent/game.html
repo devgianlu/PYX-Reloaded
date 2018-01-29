@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="css/pyx-reloaded.css">
     <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/game.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="js/theming.js"></script>
     <script>applyCustomTheme();</script>
@@ -57,17 +58,16 @@
 </aside>
 
 <aside class="mdc-drawer--temporary" id="drawer">
-    <nav class="mdc-drawer__drawer" style="padding: 16px;">
-        <div style="height: 50%;" id="scoreboard">
+    <nav class="mdc-drawer__drawer">
+        <div id="scoreboard" style="">
             <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
-            <ul class="mdc-list mdc-list--two-line list" style="overflow-y: auto"></ul>
+            <ul class="mdc-list mdc-list--two-line list"></ul>
         </div>
-        <div id="chat" style="display: flex; flex-flow:column; height: 50%">
+        <div id="chat">
             <h3 class="mdc-typography mdc-typography--title">Chat</h3>
-            <div class="list"
-                 style="flex-grow: 1; overflow-y: auto; overflow-wrap: break-word; padding-top: 0.25rem"></div>
+            <div class="list"></div>
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
-                 data-mdc-auto-init="MDCTextField" style="width: 100%">
+                 data-mdc-auto-init="MDCTextField">
                 <input type="text" id="chat-message" class="mdc-text-field__input"
                        onkeydown="sendChatMessage(this, event);">
                 <label for="chat-message" class="mdc-text-field__label">Message</label>
