@@ -43,7 +43,7 @@ class Cardcast {
      * @param {decksCallback} listener
      */
     static decks(query, category, direction, limit, nsfw, offset, sort, listener) {
-        $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort + (query !== undefined ? "&search=" + query : "")).fail(function (data) {
+        $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort + (query !== null ? "&search=" + query : "")).fail(function (data) {
             console.error(data);
             listener(undefined);
         }).done(function (data) {
