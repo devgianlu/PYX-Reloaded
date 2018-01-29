@@ -5,11 +5,6 @@ import net.socialgamer.cah.data.ConnectedUsers;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
-/**
- * Timer task to check for disconnected and idle clients.
- *
- * @author Andy Janata (ajanata@gmail.com)
- */
 public class UserPingTask extends SafeTimerTask {
     private final ConnectedUsers users;
     private final ScheduledThreadPoolExecutor globalTimer;

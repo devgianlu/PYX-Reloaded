@@ -190,7 +190,11 @@ public class Constants {
         /**
          * Get logged user info
          */
-        ME("gme");
+        ME("gme"),
+        /**
+         * Response to a ping
+         */
+        PONG("PP");
 
         private final String op;
 
@@ -465,7 +469,11 @@ public class Constants {
         /**
          * A player has left the server
          */
-        PLAYER_LEAVE("pl");
+        PLAYER_LEAVE("pl"),
+        /**
+         * Ping request, should respond with pong
+         */
+        PING("pp");
 
         private final String event;
 

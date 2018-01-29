@@ -35,5 +35,6 @@ public class Handlers {
         LIST.put(LikeGameHandler.OP, LikeGameHandler.class);
         LIST.put(DislikeGameHandler.OP, DislikeGameHandler.class);
         LIST.put(GetMeHandler.OP, GetMeHandler.class);
+        LIST.put(PongHandler.OP, PongHandler.class);
     }
 }

@@ -3,12 +3,6 @@ package net.socialgamer.cah.data;
 import net.socialgamer.cah.EventWrapper;
 import org.jetbrains.annotations.NotNull;
 
-
-/**
- * A message to be queued for delivery to a client.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
 public class QueuedMessage implements Comparable<QueuedMessage> {
     private final MessageType messageType;
     private final EventWrapper ev;
@@ -51,7 +45,7 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
      * should be delivered (lower = more important) compared to other queued messages.
      */
     public enum MessageType {
-        KICKED(1), PLAYER_EVENT(2), GAME_EVENT(3), GAME_PLAYER_EVENT(4), CHAT(5);
+        PING(1), KICKED(2), PLAYER_EVENT(3), GAME_EVENT(4), GAME_PLAYER_EVENT(5), CHAT(6);
 
         private final int weight;
 

@@ -33,7 +33,6 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
 });
 
 window.onload = function () {
-    sendPollRequest(false);
     loadGamesList();
 
     let gid = getURLParameter('gid');

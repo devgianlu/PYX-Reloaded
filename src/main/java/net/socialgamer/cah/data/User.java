@@ -2,29 +2,27 @@ package net.socialgamer.cah.data;
 
 
 import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.servlets.BaseCahHandler;
+import net.socialgamer.cah.servlets.EventsHandler;
 
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 
-/**
- * A user connected to the server.
- *
- * @author Andy Janata (ajanata@socialgamer.net)
- */
 public class User {
     private final String nickname;
-    private final PriorityBlockingQueue<QueuedMessage> queuedMessages;
-    private final Object queuedMessageLock = new Object();
     private final String hostname;
     private final String sessionId;
     private final boolean admin;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
-    private long lastHeardFrom = 0;
+    private long lastReceivedEvents = 0;
     private long lastUserAction = 0;
     private Game currentGame;
     private boolean valid = true;
+    private EventsHandler.EventsSender eventsSender = null;
+    private boolean waitingPong = false;
 
     /**
      * Create a new user.
@@ -38,7 +36,6 @@ public class User {
         this.hostname = hostname;
         this.sessionId = sessionId;
         this.admin = admin;
-        this.queuedMessages = new PriorityBlockingQueue<>();
     }
 
     public boolean isAdmin() {
@@ -61,48 +58,12 @@ public class User {
      * @param message Message to enqueue.
      */
     public void enqueueMessage(QueuedMessage message) {
-        synchronized (queuedMessageLock) {
-            queuedMessages.add(message);
-            queuedMessageLock.notifyAll();
-        }
+        if (eventsSender != null) eventsSender.enqueue(message);
     }
 
     /**
-     * @return True if the user has any messages queued to be delivered.
+     * @return The user's session ID.
      */
-    public boolean hasQueuedMessages() {
-        return !queuedMessages.isEmpty();
-    }
-
-    /**
-     * Wait for a new message to be queued.
-     *
-     * @param timeout Maximum time to wait in milliseconds.
-     * @throws InterruptedException should do that
-     * @see java.lang.Object#wait(long timeout)
-     */
-    public void waitForNewMessageNotification(long timeout) throws InterruptedException {
-        if (timeout > 0) {
-            synchronized (queuedMessageLock) {
-                queuedMessageLock.wait(timeout);
-            }
-        }
-    }
-
-    /**
-     * @param maxElements Maximum number of messages to return.
-     * @return The next {@code maxElements} messages queued for this user.
-     */
-    public Collection<QueuedMessage> getNextQueuedMessages(int maxElements) {
-        ArrayList<QueuedMessage> c = new ArrayList<>(maxElements);
-        synchronized (queuedMessageLock) {
-            queuedMessages.drainTo(c, maxElements);
-        }
-
-        c.trimToSize();
-        return c;
-    }
-
     public String getSessionId() {
         return sessionId;
     }
@@ -126,26 +87,41 @@ public class User {
         return getNickname();
     }
 
-    /**
-     * Update the timestamp that we have last heard from this user to the current time.
-     */
-    public void contactedServer() {
-        lastHeardFrom = System.currentTimeMillis();
-    }
-
-    /**
-     * @return The time the user was last heard from, in nanoseconds.
-     */
-    public long getLastHeardFrom() {
-        return lastHeardFrom;
+    public void establishedEventsConnection(EventsHandler.EventsSender sender) {
+        this.eventsSender = sender;
     }
 
     public void userDidSomething() {
         lastUserAction = System.currentTimeMillis();
+        waitingPong = false;
+    }
+
+    /**
+     * User received some events or responded to a ping
+     */
+    public void userReceivedEvents() {
+        lastReceivedEvents = System.currentTimeMillis();
+        waitingPong = false;
     }
 
     public long getLastUserAction() {
         return lastUserAction;
+    }
+
+    public long getLastReceivedEvents() {
+        return lastReceivedEvents;
+    }
+
+    /**
+     * Send a ping to the client
+     */
+    public void sendPing() {
+        waitingPong = true;
+        enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.PING, new EventWrapper(Constants.LongPollEvent.PING)));
+    }
+
+    public boolean isWaitingPong() {
+        return waitingPong;
     }
 
     /**

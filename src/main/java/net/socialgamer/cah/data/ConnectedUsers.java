@@ -120,14 +120,15 @@ public class ConnectedUsers {
                 User user = iterator.next();
 
                 DisconnectReason reason = null;
-                if (System.currentTimeMillis() - user.getLastHeardFrom() > PING_TIMEOUT) {
-                    reason = DisconnectReason.PING_TIMEOUT;
+                if (System.currentTimeMillis() - user.getLastReceivedEvents() > PING_TIMEOUT) {
+                    if (user.isWaitingPong()) reason = DisconnectReason.PING_TIMEOUT;
+                    else user.sendPing();
                 } else if (!user.isAdmin() && System.currentTimeMillis() - user.getLastUserAction() > IDLE_TIMEOUT) {
                     reason = DisconnectReason.IDLE_TIMEOUT;
                 }
 
                 if (reason != null) {
-                    removedUsers.put(user, reason);
+                    removedUsers.put(user, reason); // Changes are reflected to the map
                     iterator.remove();
                 }
             }

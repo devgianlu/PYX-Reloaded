@@ -1,34 +1,33 @@
 const _pollingListeners = {};
-let shouldStop = false;
 
-function stopPolling() {
-    shouldStop = true;
-}
-
-// Will automatically start polling
-function sendPollRequest(retry) {
-    $.post("LongPollServlet").done(function (data) {
-        processPollData(data);
-        if (!shouldStop) sendPollRequest(false);
-    }).fail(function () {
-        if (!retry && !shouldStop) sendPollRequest(true);
-    })
-}
-
-/**
- * @param {object[]} data.Es - Events
- */
-function processPollData(data) {
+const ws = new WebSocket((location.protocol === "https:" ? "wss" : "ws") + "://" + location.hostname + (location.port ? ":" + location.port : "") + "/Events");
+ws.onmessage = function (event) {
+    /** @param {object[]} data.Es - Events **/
+    const data = JSON.parse(event.data);
     const events = data.Es;
     if (events.length === 0) return;
 
-    for (const key in _pollingListeners) {
-        if (_pollingListeners.hasOwnProperty(key)) {
-            for (let i = 0; i < events.length; i++) {
-                _pollingListeners[key](events[i]);
+    processPollData(events);
+};
+
+/**
+ * @param {string} events[].E - Event code
+ */
+function processPollData(events) {
+    for (let i = 0; i < events.length; i++) {
+        const event = events[i];
+        if (event.E === "pp") {
+            $.post("AjaxServlet", "o=PP");
+            continue;
+        }
+
+        for (const key in _pollingListeners) {
+            if (_pollingListeners.hasOwnProperty(key)) {
+                _pollingListeners[key](event);
             }
         }
     }
+
 }
 
 function registerPollListener(key, listener) {

@@ -29,18 +29,6 @@ public class Utils {
         return json;
     }
 
-    public static JsonObject singletonJsonObject(String key, String str) {
-        JsonObject json = new JsonObject();
-        json.addProperty(key, str);
-        return json;
-    }
-
-    public static JsonObject singletonJsonObject(String key, Number num) {
-        JsonObject json = new JsonObject();
-        json.addProperty(key, num);
-        return json;
-    }
-
     public static JsonArray singletonJsonArray(JsonElement element) {
         JsonArray json = new JsonArray(1);
         json.add(element);

@@ -427,7 +427,6 @@ window.onload = function () {
     if (gameManager.id === null) {
         window.location = "lobbies.html";
     } else {
-        sendPollRequest(false);
         loadUI();
     }
 };

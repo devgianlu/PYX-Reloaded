@@ -26,6 +26,12 @@ public class JsonWrapper {
         add(data, str);
     }
 
+    public JsonWrapper(Constants.ReturnableData data, Constants.ErrorCode code) {
+        this();
+        add(Constants.AjaxResponse.ERROR, true);
+        add(data, code.toString());
+    }
+
     public JsonObject obj() {
         return obj;
     }

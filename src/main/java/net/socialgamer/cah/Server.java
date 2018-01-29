@@ -60,7 +60,7 @@ public class Server {
 
         PathHandler handler = new PathHandler(Handlers.resource(new PathResourceManager(Paths.get(preferences.getString("webContent", "./WebContent")).toAbsolutePath())));
         handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
-                .addExactPath("/LongPollServlet", new BaseLongPollHandler());
+                .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 
         Undertow server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
