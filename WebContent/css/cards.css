@@ -35,10 +35,6 @@
     width: 100%;
 }
 
-#whiteCards > .list {
-    margin: 0 auto;
-}
-
 #whiteCards > .list > .mdc-card.pyx-card {
     margin: 8px;
 }
@@ -62,6 +58,7 @@
 
 .mdc-card.pyx-card {
     width: var(--adapted-card-width);
+    justify-content: flex-start;
 }
 
 .mdc-card.pyx-card[data-black=false].highlighted {
