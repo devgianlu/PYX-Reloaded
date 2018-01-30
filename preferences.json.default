@@ -2,6 +2,7 @@
   "port": 80,
   "maxGames": 400,
   "maxUsers": 100,
+  "cacheEnabled": true,
   "webContent": "./WebContent",
   "pyxDb": "pyx.sqlite",
   "maxSkipsBeforeKick": 2,

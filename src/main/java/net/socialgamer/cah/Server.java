@@ -5,6 +5,7 @@ import io.undertow.Undertow;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.PathResourceManager;
+import io.undertow.server.handlers.resource.ResourceHandler;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.Game;
@@ -58,7 +59,14 @@ public class Server {
         GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        PathHandler handler = new PathHandler(Handlers.resource(new PathResourceManager(Paths.get(preferences.getString("webContent", "./WebContent")).toAbsolutePath())));
+        ResourceHandler webContentHandler = Handlers.resource(new PathResourceManager(Paths.get(preferences.getString("webContent", "./WebContent")).toAbsolutePath()));
+        CacheControlHandler resourceManager;
+        if (preferences.getBoolean("cacheEnabled", true))
+            resourceManager = CacheControlHandler.browserManagedCache(webContentHandler);
+        else
+            resourceManager = CacheControlHandler.disableCache(webContentHandler);
+
+        PathHandler handler = new PathHandler(resourceManager);
         handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
                 .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 

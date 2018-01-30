@@ -71,6 +71,12 @@ public class Preferences extends HashMap<String, JsonElement> {
         else return obj.getAsInt();
     }
 
+    public boolean getBoolean(String key, boolean fallback) {
+        JsonElement obj = get(key);
+        if (obj == null) return fallback;
+        else return obj.getAsBoolean();
+    }
+
     public static class MinDefaultMax {
         public final int min;
         public final int def;
