@@ -15,7 +15,6 @@ import net.socialgamer.cah.servlets.Provider;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import net.socialgamer.cah.task.RefreshAdminTokenTask;
 import net.socialgamer.cah.task.UserPingTask;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.net.ssl.*;
 import java.io.File;
@@ -34,10 +33,6 @@ public class Server {
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
