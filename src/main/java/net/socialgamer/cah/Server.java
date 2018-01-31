@@ -77,12 +77,15 @@ public class Server {
         Undertow.Builder server = Undertow.builder()
                 .setHandler(handler);
 
+        int port = preferences.getInt("port", 80);
+
         if (preferences.getBoolean("secure", false)) {
-            server.addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
+            server.addHttpListener(port, "0.0.0.0", new HttpsRedirect())
+                    .addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
                     new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
                     new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
         } else {
-            server.addHttpListener(preferences.getInt("port", 80), "0.0.0.0");
+            server.addHttpListener(port, "0.0.0.0");
         }
 
         server.build().start();
