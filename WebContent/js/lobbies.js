@@ -1,31 +1,172 @@
-const games = new List('games-global-container', {
-    item: 'game-info-template',
-    valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
-        {'data': ['gid', 'hp', 'like', 'dislike']}]
-});
+class Games {
+    constructor() {
+        this._games = $('#games');
+        this._games_list = this._games.find('.list');
+        this._games_message = this._games.find('.message');
 
-const createGameDialog = new mdc.dialog.MDCDialog(document.getElementById('createGameDialog'));
-createGameDialog.listen('MDCDialog:accept', function () {
-    const scoreLimit = getDropdownSelectedValue(document.getElementById('scoreLimit'));
-    const playerLimit = getDropdownSelectedValue(document.getElementById('playersLimit'));
-    const spectatorLimit = getDropdownSelectedValue(document.getElementById('spectatorsLimit'));
-    const blanksLimit = getDropdownSelectedValue(document.getElementById('blanksLimit'));
-    const winBy = getDropdownSelectedValue(document.getElementById('winBy'));
-    const timeMultiplier = getDropdownSelectedValue(document.getElementById('timeMultiplier'));
+        this.games = new List(this._games[0], {
+            item: 'game-info-template',
+            valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
+                {'data': ['gid', 'hp', 'like', 'dislike']}]
+        });
+    }
 
-    const go = {
-        "vL": spectatorLimit,
-        "pL": playerLimit,
-        "sl": scoreLimit,
-        "bl": blanksLimit,
-        "tm": timeMultiplier,
-        "wb": winBy,
-        "CCs": getCardcastDeckCodes(document.getElementById('cc_decks')),
-        "css": getSelectedPyxDecks(document.getElementById('pyx_decks'))
-    };
+    static deckIdsToNames(ids) {
+        const names = [];
+        const css = localStorage["css"];
+        if (css === undefined) return ids; // Shouldn't happen
+        const json = JSON.parse(css);
 
-    createGame(go);
-});
+        for (let i = 0; i < ids.length; i++) {
+            for (let j = 0; j < json.length; j++) {
+                if (ids[i] === json[j].cid) names[i] = json[j].csn;
+            }
+        }
+
+        return names;
+    }
+
+    static askPassword() {
+        return prompt("Enter the game password:", "");
+    }
+
+    static postJoinSpectate(gid) {
+        window.location = "game.html?gid=" + gid;
+    }
+
+    /**
+     *
+     * @param {object[]} list - Games list
+     * @param {object} list[].go - Game options
+     * @param {int[]} list[].go.css - Card set IDs
+     * @param {int} list[].go.wb - Win by X
+     * @param {int} list[].go.sl - Score limit (goal)
+     * @param {string[]} list[].P - Player names
+     * @param {string[]} list[].V - Spectator names
+     * @param {int} list[].LK - Like count
+     * @param {int} list[].DLK - Dislike count
+     * @param {boolean} list[].iLK - Do I like this game?
+     * @param {boolean} list[].iDLK - Do I dislike this game?
+     */
+    setup(list) {
+        this.games.clear();
+
+        for (let i = 0; i < list.length; i++) {
+            const game = list[i];
+
+            let goal;
+            if (game.go.wb === 0) goal = game.go.sl;
+            else goal = game.go.sl + " (win by " + game.go.wb + ")";
+
+            let status;
+            if (game.S === "l") status = "lobby";
+            else status = "started";
+
+            let decksNames = Games.deckIdsToNames(game.go.css);
+            let decks;
+            if (decksNames.length === 0) decks = "none";
+            else decks = decksNames.join(", ");
+
+            let players;
+            if (game.P.length === 0) players = "none";
+            else players = game.P.join(", ");
+
+            players += " (" + game.P.length + "/" + game.go.pL + ")";
+
+            let spectators;
+            if (game.V.length === 0) spectators = "none";
+            else spectators = game.V.join(", ");
+
+            spectators += " (" + game.V.length + "/" + game.go.vL + ")";
+
+            const elm = $(this.games.add({
+                "gid": game.gid,
+                "hp": game.hp,
+                "_likes": game.LK + (game.LK === 1 ? " LIKE" : " LIKES"),
+                "_dislikes": game.DLK + (game.DLK === 1 ? " DISLIKE" : " DISLIKES"),
+                "like": game.iLK,
+                "dislike": game.iDLK,
+                "_host": game.H,
+                "_decks": decks,
+                "_players": players,
+                "_spectators": spectators,
+                "_goal": goal,
+                "_status": status
+            })[0].elm);
+
+            let likeButton = elm.find('._likes');
+            if (elm.attr("data-like") === "true") likeButton.addClass('mdc-button--raised');
+            else likeButton.removeClass('mdc-button--raised');
+
+            let dislikeButton = elm.find('._dislikes');
+            if (elm.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
+            else dislikeButton.removeClass('mdc-button--raised');
+        }
+
+        this.toggleNoGamesMessage(this.games.size() === 0);
+    }
+
+    filterGames(query) {
+        if (query.length === 0) {
+            this.games.filter(); // Remove all filters
+        } else {
+            this.games.filter(function (item) {
+                return item.values()._host.indexOf(query) !== -1;
+            })
+        }
+    }
+
+    toggleNoGamesMessage(visible) {
+        if (visible) {
+            this._games_list.hide();
+            this._games_message.show();
+        } else {
+            this._games_list.show();
+            this._games_message.hide();
+        }
+    }
+
+    createGame(go) {
+        $.post("AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
+            Games.postJoinSpectate(data.gid);
+            loadGamesList();
+        }).fail(function (data) {
+            console.log(data);
+            alert("Error create game: " + JSON.stringify(data));
+        });
+    }
+
+    joinGame(element) {
+        let gid = element.getAttribute('data-gid');
+        let hp = element.getAttribute('data-hp');
+
+        let password = "";
+        if (hp === true) password = Games.askPassword();
+
+        $.post("AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function () {
+            Games.postJoinSpectate(gid)
+        }).fail(function (data) {
+            alert("Error data: " + JSON.stringify(data));
+        })
+    }
+
+    spectateGame(element) {
+        const gid = element.getAttribute('data-gid');
+        const hp = element.getAttribute('data-hp');
+
+        let password = "";
+        if (hp === true) password = Games.askPassword();
+
+        $.post("AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function () {
+            Games.postJoinSpectate(gid)
+        }).fail(function (data) {
+            alert("Error data: " + JSON.stringify(data));
+        })
+    }
+}
+
+const games = new Games();
+
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
@@ -37,7 +178,7 @@ window.onload = function () {
 
     let gid = getURLParameter('gid');
     if (gid !== null) {
-        postJoinSpectate(gid) // No need to join or spectate, just move the UI there
+        Games.postJoinSpectate(gid) // No need to join or spectate, just move the UI there
     }
 };
 
@@ -48,54 +189,13 @@ function logout() {
     });
 }
 
-function askPassword() {
-    return prompt("Enter the game password:", "");
-}
-
-function joinGame(element) {
-    let gid = element.getAttribute('data-gid');
-    let hp = element.getAttribute('data-hp');
-
-    let password = "";
-    if (hp === true) password = askPassword();
-
-    $.post("AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function (data) {
-        console.log(data);
-        postJoinSpectate(gid)
-    }).fail(function (data) {
-        alert("Error data: " + JSON.stringify(data));
-    })
-}
-
-function spectateGame(element) {
-    const gid = element.getAttribute('data-gid');
-    const hp = element.getAttribute('data-hp');
-
-    let password = "";
-    if (hp === true) password = askPassword();
-
-    $.post("AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function (data) {
-        console.log(data);
-        postJoinSpectate(gid)
-    }).fail(function (data) {
-        alert("Error data: " + JSON.stringify(data));
-    })
-}
-
-function postJoinSpectate(gid) {
-    window.location = "game.html?gid=" + gid;
-}
-
 function loadGamesList() {
-    games.clear();
-
     $.post("AjaxServlet", "o=ggl").done(function (data) {
         /**
          * @param {object[]} data.gl - Games list
          */
 
-        console.log(data);
-        populateGamesList(data.gl);
+        games.setup(data.gl);
     }).fail(function (data) {
         console.log(data);
         alert("Error data: " + JSON.stringify(data));
@@ -108,135 +208,8 @@ function loadGamesList() {
     });
 }
 
-function toggleNoGamesMessage(visible) {
-    const container = $('#games-global-container');
-    const list = container.find('.list');
-    const message = container.find('.message');
-    if (visible) {
-        list.hide();
-        message.show();
-    } else {
-        list.show();
-        message.hide();
-    }
-}
-
 function filterGames(query) {
-    if (query.length === 0) {
-        games.filter(); // Remove all filters
-    } else {
-        games.filter(function (item) {
-            return item.values()._host.indexOf(query) !== -1;
-        })
-    }
-}
-
-/**
- *
- * @param {object[]} gamesList - Games list
- * @param {object} gamesList[].go - Game options
- * @param {int[]} gamesList[].go.css - Card set IDs
- * @param {int} gamesList[].go.wb - Win by X
- * @param {int} gamesList[].go.sl - Score limit (goal)
- * @param {string[]} gamesList[].P - Player names
- * @param {string[]} gamesList[].V - Spectator names
- * @param {int} gamesList[].LK - Like count
- * @param {int} gamesList[].DLK - Dislike count
- * @param {boolean} gamesList[].iLK - Do I like this game?
- * @param {boolean} gamesList[].iDLK - Do I dislike this game?
- */
-function populateGamesList(gamesList) {
-    const items = [];
-    for (let i = 0; i < gamesList.length; i++) {
-        let game = gamesList[i];
-
-        let goal;
-        if (game.go.wb === 0) goal = game.go.sl;
-        else goal = game.go.sl + " (win by " + game.go.wb + ")";
-
-        let status;
-        if (game.S === "l") status = "lobby";
-        else status = "started";
-
-        let decksNames = deckIdsToNames(game.go.css);
-        let decks;
-        if (decksNames.length === 0) decks = "none";
-        else decks = decksNames.join(", ");
-
-        let players;
-        if (game.P.length === 0) players = "none";
-        else players = game.P.join(", ");
-
-        players += " (" + game.P.length + "/" + game.go.pL + ")";
-
-        let spectators;
-        if (game.V.length === 0) spectators = "none";
-        else spectators = game.V.join(", ");
-
-        spectators += " (" + game.V.length + "/" + game.go.vL + ")";
-
-        items.push({
-            "gid": game.gid,
-            "hp": game.hp,
-            "_likes": game.LK + (game.LK === 1 ? " LIKE" : " LIKES"),
-            "_dislikes": game.DLK + (game.DLK === 1 ? " DISLIKE" : " DISLIKES"),
-            "like": game.iLK,
-            "dislike": game.iDLK,
-            "_host": game.H,
-            "_decks": decks,
-            "_players": players,
-            "_spectators": spectators,
-            "_goal": goal,
-            "_status": status
-        });
-    }
-
-    games.clear();
-    games.add(items, function (items) {
-        for (let i = 0; i < items.length; i++) {
-            let card = $(items[i].elm);
-
-            let likeButton = card.find('._likes');
-            if (card.attr("data-like") === "true") likeButton.addClass('mdc-button--raised');
-            else likeButton.removeClass('mdc-button--raised');
-
-            let dislikeButton = card.find('._dislikes');
-            if (card.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
-            else dislikeButton.removeClass('mdc-button--raised');
-        }
-    });
-
-    toggleNoGamesMessage(games.size() === 0);
-}
-
-function deckIdsToNames(ids) {
-    const names = [];
-    const css = localStorage["css"];
-    if (css === undefined) return ids; // Shouldn't happen
-    const json = JSON.parse(css);
-
-    for (let i = 0; i < ids.length; i++) {
-        for (let j = 0; j < json.length; j++) {
-            if (ids[i] === json[j].cid) names[i] = json[j].csn;
-        }
-    }
-
-    return names;
-}
-
-function showCreateGameDialog() {
-    resetCreateGameDialog();
-    createGameDialog.show();
-}
-
-function createGame(go) {
-    $.post("AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
-        postJoinSpectate(data.gid);
-        loadGamesList();
-    }).fail(function (data) {
-        console.log(data);
-        alert("Error create game: " + JSON.stringify(data));
-    });
+    games.filterGames(query);
 }
 
 function updateLikeDislike(likeButton, disLikeButton, data) {

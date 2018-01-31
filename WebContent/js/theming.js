@@ -1,39 +1,42 @@
 const DEFAULT_PRIMARY = "rgb(103,58,183)";
 const DEFAULT_SECONDARY = "rgb(0,150,136)";
 
-function applyCustomTheme() {
-    const primary = Cookies.getJSON("PYX-Theme-Primary");
-    const secondary = Cookies.getJSON("PYX-Theme-Secondary");
+class Theming {
 
-    if (primary === undefined || secondary === undefined) {
-        setPrimaryColor(DEFAULT_PRIMARY);
-        setSecondaryColor(DEFAULT_SECONDARY);
-    } else {
-        setPrimaryColor(primary);
-        setSecondaryColor(secondary);
+    static setPrimaryColor(color) {
+        document.documentElement.style.setProperty('--mdc-theme-primary', color);
+        Cookies.set("PYX-Theme-Primary", color);
     }
-}
 
-function setPrimaryColor(color) {
-    document.documentElement.style.setProperty('--mdc-theme-primary', color);
-    Cookies.set("PYX-Theme-Primary", color);
-}
+    static setSecondaryColor(color) {
+        document.documentElement.style.setProperty('--mdc-theme-secondary', color);
+        Cookies.set("PYX-Theme-Secondary", color);
+    }
 
-function setSecondaryColor(color) {
-    document.documentElement.style.setProperty('--mdc-theme-secondary', color);
-    Cookies.set("PYX-Theme-Secondary", color);
-}
+    static apply() {
+        const primary = Cookies.getJSON("PYX-Theme-Primary");
+        const secondary = Cookies.getJSON("PYX-Theme-Secondary");
 
-function clearColors() {
-    Cookies.remove("PYX-Theme-Primary");
-    Cookies.remove("PYX-Theme-Secondary");
+        if (primary === undefined || secondary === undefined) {
+            Theming.setPrimaryColor(DEFAULT_PRIMARY);
+            Theming.setSecondaryColor(DEFAULT_SECONDARY);
+        } else {
+            Theming.setPrimaryColor(primary);
+            Theming.setSecondaryColor(secondary);
+        }
+    }
+
+    static clear() {
+        Cookies.remove("PYX-Theme-Primary");
+        Cookies.remove("PYX-Theme-Secondary");
+    }
 }
 
 function showThemingDialog() {
     const themingDialog = new mdc.dialog.MDCDialog(document.getElementById('themingDialog'));
     themingDialog.listen('MDCDialog:accept', function () {
-        setPrimaryColor(wheel_.getColorPrimary());
-        setSecondaryColor(wheel_.getColorSecondary());
+        Theming.setPrimaryColor(wheel_.getColorPrimary());
+        Theming.setSecondaryColor(wheel_.getColorSecondary());
     });
 
     themingDialog.show();

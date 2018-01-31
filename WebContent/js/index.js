@@ -2,6 +2,10 @@ window.onload = function () {
     $.post("AjaxServlet", "o=fl").fail(function (data) {
         alert("Error data: " + JSON.stringify(data));
     }).done(function (data) {
+        data.css.sort(function (a, b) {
+            return a.w - b.w;
+        });
+
         localStorage['css'] = JSON.stringify(data.css);
         localStorage['dgo'] = JSON.stringify(data.dgo);
 
