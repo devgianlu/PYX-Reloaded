@@ -9,6 +9,7 @@ import io.undertow.util.StatusCodes;
 import net.socialgamer.cah.Constants;
 
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class BaseJsonHandler implements HttpHandler {
@@ -44,6 +45,8 @@ public abstract class BaseJsonHandler implements HttpHandler {
 
                     exchange.getResponseSender().send(obj.toString());
                 }
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
             }
         } else {
             exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);

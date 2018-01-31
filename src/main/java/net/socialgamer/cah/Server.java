@@ -2,7 +2,6 @@ package net.socialgamer.cah;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
-import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
@@ -12,12 +11,19 @@ import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.db.LoadedCards;
 import net.socialgamer.cah.servlets.*;
+import net.socialgamer.cah.servlets.Provider;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import net.socialgamer.cah.task.RefreshAdminTokenTask;
 import net.socialgamer.cah.task.UserPingTask;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.net.ssl.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +35,14 @@ public class Server {
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
 
-    public static void main(String[] args) throws IOException, SQLException {
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
         int maxGames = preferences.getInt("maxGames", 100);
         int maxUsers = preferences.getInt("maxUsers", 400);
-        int port = preferences.getInt("port", 80);
 
         ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
         globalTimer.scheduleAtFixedRate(new RefreshAdminTokenTask(), 0, REFRESH_ADMIN_TOKEN_DELAY, TimeUnit.MILLISECONDS);
@@ -70,13 +79,37 @@ public class Server {
         handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
                 .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 
-        Undertow server = Undertow.builder()
-                .addHttpListener(port, "0.0.0.0")
-                .setHandler(new ExceptionHandler(handler).addExceptionHandler(Exception.class, exchange -> {
-                    Throwable ex = exchange.getAttachment(ExceptionHandler.THROWABLE);
-                    ex.printStackTrace();
-                })).build();
+        Undertow.Builder server = Undertow.builder()
+                .addHttpListener(preferences.getInt("port", 80), "0.0.0.0")
+                .setHandler(handler);
 
-        server.start();
+        if (preferences.getBoolean("secure", false)) {
+            server.addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
+                    new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
+                    new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
+        }
+
+        server.build().start();
+    }
+
+    private static SSLContext getSSLContext(File keyStorePath, String keyStorePassword, File trustStorePath, String trustStorePassword) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, KeyManagementException {
+        KeyStore clientStore = KeyStore.getInstance("PKCS12");
+        clientStore.load(new FileInputStream(keyStorePath), keyStorePassword.toCharArray());
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(clientStore, keyStorePassword.toCharArray());
+        KeyManager[] kms = kmf.getKeyManagers();
+
+        KeyStore trustStore = KeyStore.getInstance("JKS");
+        trustStore.load(new FileInputStream(trustStorePath), trustStorePassword.toCharArray());
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(trustStore);
+        TrustManager[] tms = tmf.getTrustManagers();
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kms, tms, new SecureRandom());
+
+        return sslContext;
     }
 }
