@@ -75,13 +75,14 @@ public class Server {
                 .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 
         Undertow.Builder server = Undertow.builder()
-                .addHttpListener(preferences.getInt("port", 80), "0.0.0.0")
                 .setHandler(handler);
 
         if (preferences.getBoolean("secure", false)) {
             server.addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
                     new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
                     new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
+        } else {
+            server.addHttpListener(preferences.getInt("port", 80), "0.0.0.0");
         }
 
         server.build().start();
