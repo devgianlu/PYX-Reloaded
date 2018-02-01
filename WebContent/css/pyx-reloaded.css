@@ -221,31 +221,31 @@ body {
 }
 
 .noty_theme__mdc.noty_type__info {
-    background-color: #fff;
-    border-bottom: 1px solid #d1d1d1;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #757575; /* Grey 600 */
     color: rgba(0, 0, 0, 0.87);
 }
 
 .noty_theme__mdc.noty_type__alert {
     background-color: var(--mdc-theme-primary);
-    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid #BDBDBD; /* Grey 400 */
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
 .noty_theme__mdc.noty_type__success {
     background-color: #4CAF50;
-    border-bottom: 1px solid #d1d1d1;
-    color: #fff;
+    border-bottom: 1px solid #2E7D32; /* Green 800 */
+    color: #FFFFFF;
 }
 
 .noty_theme__mdc.noty_type__warning {
     background-color: #FF9800;
-    border-bottom: 1px solid #d1d1d1;
-    color: #fff;
+    border-bottom: 1px solid #EF6C00; /* Orange 800 */
+    color: #FFFFFF;
 }
 
 .noty_theme__mdc.noty_type__error {
     background-color: #F44336;
-    border-bottom: 1px solid #d1d1d1;
-    color: #fff;
+    border-bottom: 1px solid #C62828; /* Red 800 */
+    color: #FFFFFF;
 }
