@@ -44,10 +44,9 @@ class Cardcast {
      */
     static decks(query, category, direction, limit, nsfw, offset, sort, listener) {
         $.get(Cardcast.base_url + "decks?category=" + category + "&direction=" + direction + "&limit=" + limit + "&nsfw=" + nsfw + "&offset=" + offset + "&sort=" + sort + (query !== null ? "&search=" + query : "")).fail(function (data) {
-            console.error(data);
-            listener(undefined);
+            listener(null, data);
         }).done(function (data) {
-            listener(data);
+            listener(data, null);
         });
     }
 
@@ -56,30 +55,27 @@ class Cardcast {
      */
     info(listener) {
         $.get(Cardcast.base_url + "decks/" + this.code).fail(function (data) {
-            console.error(data);
-            listener(undefined);
+            listener(null, data);
         }).done(function (data) {
             data.call_count = parseInt(data.call_count);
             data.response_count = parseInt(data.response_count);
-            listener(data);
+            listener(data, null);
         });
     }
 
     calls(listener) {
         $.get(Cardcast.base_url + "decks/" + this.code + "/calls").fail(function (data) {
-            console.error(data);
-            listener(undefined);
+            listener(null, data);
         }).done(function (data) {
-            listener(data);
+            listener(data, null);
         });
     }
 
     responses(listener) {
         $.get(Cardcast.base_url + "decks/" + this.code + "/responses").fail(function (data) {
-            console.error(data);
-            listener(undefined);
+            listener(null, data);
         }).done(function (data) {
-            listener(data);
+            listener(data, null);
         });
     }
 }

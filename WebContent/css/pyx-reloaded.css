@@ -207,6 +207,10 @@ body {
     top: 84px !important; /* 20px (default) + 64px (toolbar) */
 }
 
+#noty_layout__bottom, #noty_layout__bottomCenter, #noty_layout__bottomLeft, #noty_layout__bottomRight, #noty_layout__center, #noty_layout__centerLeft, #noty_layout__centerRight, #noty_layout__top, #noty_layout__topCenter, #noty_layout__topLeft, #noty_layout__topRight, .noty_layout_mixin {
+    z-index: 4; /* Below drawer */
+}
+
 /* Noty custom theme */
 .noty_theme__mdc.noty_bar {
     margin: 4px 0;

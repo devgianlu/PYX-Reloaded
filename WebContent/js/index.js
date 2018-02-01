@@ -1,6 +1,6 @@
 window.onload = function () {
     $.post("AjaxServlet", "o=fl").fail(function (data) {
-        alert("Error data: " + JSON.stringify(data));
+        Notifier.error("Failed contacting the server!", data);
     }).done(function (data) {
         data.css.sort(function (a, b) {
             return a.w - b.w;
@@ -25,7 +25,7 @@ function register(ev) {
     const nickname = $("input#nickname").val();
 
     $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
-        alert("Error data: " + JSON.stringify(data));
+        Notifier.error("Failed registering to the server!", data);
     }).done(function () {
         window.location = "lobbies.html";
     });

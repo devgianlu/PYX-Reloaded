@@ -5,7 +5,7 @@ class Games {
         this._games_message = this._games.find('.message');
 
         this.games = new List(this._games[0], {
-            item: 'game-info-template',
+            item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
                 {'data': ['gid', 'hp', 'like', 'dislike']}]
         });
@@ -131,36 +131,29 @@ class Games {
             Games.postJoinSpectate(data.gid);
             loadGamesList();
         }).fail(function (data) {
-            console.log(data);
-            alert("Error create game: " + JSON.stringify(data));
+            Notifier.error("Failed creating the game!", data);
         });
     }
 
-    joinGame(element) {
-        let gid = element.getAttribute('data-gid');
-        let hp = element.getAttribute('data-hp');
-
+    joinGame(gid, hp) {
         let password = "";
         if (hp === true) password = Games.askPassword();
 
         $.post("AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)
         }).fail(function (data) {
-            alert("Error data: " + JSON.stringify(data));
+            Notifier.error("Failed joining the game!", data);
         })
     }
 
-    spectateGame(element) {
-        const gid = element.getAttribute('data-gid');
-        const hp = element.getAttribute('data-hp');
-
+    spectateGame(gid, hp) {
         let password = "";
         if (hp === true) password = Games.askPassword();
 
         $.post("AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)
         }).fail(function (data) {
-            alert("Error data: " + JSON.stringify(data));
+            Notifier.error("Failed spectating the game!", data);
         })
     }
 }
@@ -197,8 +190,7 @@ function loadGamesList() {
 
         games.setup(data.gl);
     }).fail(function (data) {
-        console.log(data);
-        alert("Error data: " + JSON.stringify(data));
+        Notifier.error("Failed loading the games!", data);
     });
 
     registerPollListener("LOBBIES", function (data) {
@@ -237,9 +229,8 @@ function likeGame(button) {
 
     $.post("AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
         updateLikeDislike(button, undefined, data);
-        console.log(data);
     }).fail(function (data) {
-        console.log(data);
+        Notifier.error("Failed liking the game!", data);
     });
 }
 
@@ -248,8 +239,15 @@ function dislikeGame(button) {
 
     $.post("AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
         updateLikeDislike(undefined, button, data);
-        console.log(data);
     }).fail(function (data) {
-        console.log(data);
+        Notifier.error("Failed disliking the game!", data);
     });
+}
+
+function joinGame(element) {
+    games.joinGame(element.getAttribute('data-gid'), element.getAttribute('data-hp'));
+}
+
+function spectateGame(element) {
+    games.spectateGame(element.getAttribute('data-gid'), element.getAttribute('data-hp'))
 }

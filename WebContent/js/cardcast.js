@@ -168,9 +168,9 @@ class CardcastDialog {
         this._responsesList = this.dialog.find('#responsesList');
 
         const self = this;
-        this.cardcast.info(function (data) {
-            if (data === undefined) {
-                alert("ERROR!");
+        this.cardcast.info(function (data, error) {
+            if (data === null) {
+                Notifier.error("Failed loading deck info!", error);
             } else {
                 self._name.text(data.name);
                 self._author_category.text(CardcastDialog._createCategoryAndAuthorString(data.category, data.author.username));
@@ -192,9 +192,9 @@ class CardcastDialog {
             }
         });
 
-        this.cardcast.calls(function (calls) {
-            if (calls === undefined) {
-                alert("ERROR!");
+        this.cardcast.calls(function (calls, error) {
+            if (calls === null) {
+                Notifier.error("Failed loading deck calls!", error);
             } else {
                 const list = CardcastDialog._initCardsList(self._callsList[0]);
                 for (let i = 0; i < calls.length; i++) {
@@ -206,9 +206,9 @@ class CardcastDialog {
             }
         });
 
-        this.cardcast.responses(function (calls) {
-            if (calls === undefined) {
-                alert("ERROR!");
+        this.cardcast.responses(function (calls, error) {
+            if (calls === null) {
+                Notifier.error("Failed loading deck responses!", error);
             } else {
                 const list = CardcastDialog._initCardsList(self._responsesList[0]);
                 for (let i = 0; i < calls.length; i++) {
@@ -223,7 +223,7 @@ class CardcastDialog {
 
     static _initCardsList(container) {
         const list = new List(container, {
-            item: 'card-template',
+            item: 'cardTemplate',
             valueNames: ['_text', {data: ['black']}]
         });
         list.clear();
@@ -252,7 +252,12 @@ function loadDecks(query = null, category, nsfw, sort) {
         paginationClass: 'not-pagination'
     });
 
-    Cardcast.decks(query, category.join(','), CardcastMenu.getDefaultDirectionFor(sort), DECKS_PER_PAGE, nsfw, _cardcastOffset, sort, function (data) {
+    Cardcast.decks(query, category.join(','), CardcastMenu.getDefaultDirectionFor(sort), DECKS_PER_PAGE, nsfw, _cardcastOffset, sort, function (data, error) {
+        if (data === null) {
+            Notifier.error("Failed loading the decks!", error);
+            return;
+        }
+
         list.clear();
 
         const results = data.results.data;

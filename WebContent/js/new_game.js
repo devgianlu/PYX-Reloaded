@@ -320,11 +320,11 @@ class CreateGameDialog {
         this._cardcastAddDeckInfo_details.hide();
 
         if (code.match(/[A-Z0-9]{5}/) !== null) {
-            const cc = new Cardcast(code);
             const self = this;
-            cc.info(function (info) {
+            new Cardcast(code).info(function (info, error) {
                 self._cardcastAddDeckInfo_loading.hide();
-                if (info === undefined) {
+                if (info === null) {
+                    Notifier.debug(error);
                     self._cardcastAddDeckInfo_details.hide();
                     self.cardcastAddDeckCode.valid = false;
                     return;

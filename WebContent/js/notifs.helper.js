@@ -1,5 +1,9 @@
 class Notifier {
 
+    static get _debug() {
+        return true;
+    }
+
     static get INFO() {
         return "info";
     }
@@ -20,16 +24,29 @@ class Notifier {
         return "warning";
     }
 
+    static get DEFAULT_TIMEOUT() {
+        return 3;
+    }
+
     static _notyDefault() {
         return {
             theme: 'mdc'
         }
     }
 
-    static show(type, msg) {
-        const noty = new Noty(Object.assign({type: type, text: msg}, Notifier._notyDefault()));
+    static show(type, msg, timeout = false, progressBar = false) {
+        const noty = new Noty(Object.assign({
+            type: type,
+            text: msg,
+            timeout: timeout * 1000,
+            progressBar: progressBar
+        }, Notifier._notyDefault()));
         noty.show();
         return noty;
+    }
+
+    static timeout(type, msg, progressBar = false) {
+        return Notifier.show(type, msg, this.DEFAULT_TIMEOUT, progressBar);
     }
 
     static countdown(type, msg_before, interval, msg_after) {
@@ -53,10 +70,17 @@ class Notifier {
         noty.show();
         return noty;
     }
-}
 
-Notifier.show(Notifier.INFO, "Some notification text");
-Notifier.show(Notifier.ALERT, "Some notification text");
-Notifier.show(Notifier.SUCCESS, "Some notification text");
-Notifier.show(Notifier.WARN, "Some notification text");
-Notifier.countdown(Notifier.ERROR, "A new round will begin in ", 8, " seconds.");
+    static error(msg, data = undefined, progressBar = false) {
+        if (Notifier._debug) {
+            console.log(msg);
+            if (data !== undefined) console.log(data);
+        }
+
+        return Notifier.show(Notifier.ERROR, msg, this.DEFAULT_TIMEOUT * 1.5, progressBar);
+    }
+
+    static debug(data) {
+        if (Notifier._debug) console.log(data);
+    }
+}

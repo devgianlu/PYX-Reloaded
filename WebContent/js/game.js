@@ -4,18 +4,18 @@ class GameManager {
         this.gid = gid;
 
         this.scoreboard = new List(this.root.find('#scoreboard')[0], {
-            item: 'player-item-template',
+            item: 'playerItemTemplate',
             valueNames: ['_name', '_score', '_status']
         });
 
         this.chat = new List(this.root.find('#chat')[0], {
-            item: 'chat-msg-template',
+            item: 'chatMessageTemplate',
             valueNames: ['_msg', '_sender']
         });
 
         this._hand = this.root.find('#hand');
         this.hand = new List(this._hand[0], {
-            item: 'card-template',
+            item: 'cardTemplate',
             valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}]
         });
 
@@ -31,10 +31,10 @@ class GameManager {
 
         this.table = new List(this._tableCards[0], {
             valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}],
-            item: 'card-template'
+            item: 'cardTemplate'
         });
 
-        this._cardTemplate = this.root.find('#card-template');
+        this._cardTemplate = this.root.find('#cardTemplate');
         this._blackCardContainer = this.root.find('#blackCard');
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
@@ -56,6 +56,8 @@ class GameManager {
      * @param {string} card.T - Card text
      */
     set blackCard(card) {
+        this.bc = card;
+
         if (card === null) {
             this._blackCardContainer.empty();
             return;
@@ -189,7 +191,7 @@ class GameManager {
         $.post("AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
             clear();
         }).fail(function (data) {
-            alert("Failed send message: " + JSON.stringify(data));
+            Notifier.error("Failed to send the message!", data);
         });
     }
 
@@ -210,6 +212,7 @@ class GameManager {
      * @param {object} data.pi.st - Player's status
      * @param {int} data.pi.sc - Player's score
      * @param {string} data.pi.N - Player's name
+     * @param {string} data.gs - Game status
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -219,16 +222,18 @@ class GameManager {
             case "gpj":
                 this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
                 this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!")
                 break;
             case "gpl":
                 for (let i = 0; i < this.info.pi.length; i++) {
                     if (this.info.pi[i].N === data.n) {
-                        this.info.pi = this.info.pi.splice(i, 1);
+                        this.info.pi.splice(i, 1);
                         break;
                     }
                 }
 
                 this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!")
                 break;
             case "gpic":
                 const pi = data.pi;
@@ -241,6 +246,7 @@ class GameManager {
                 this.addHandCards(data.h, data.h.length === 10);
                 break;
             case "gsc":
+                this.info.gi.S = data.gs;
                 this._handleGameStatusChange(data);
                 break;
         }
@@ -250,26 +256,31 @@ class GameManager {
      * @param {string} info.st - Player's (my) status
      */
     handleMyInfoChanged(info) {
-        console.log("MY STATUS IS NOW: " + info.st);
+        Notifier.debug("My status is now: " + info.st);
 
         switch (info.st) {
             case "sj":
                 this.toggleHandVisibility(false);
+                Notifier.timeout(Notifier.ALERT, "You are the Card Czar.");
                 break;
             case "sjj":
                 this.toggleHandVisibility(false);
+                Notifier.timeout(Notifier.ALERT, "Select the winning card.");
                 break;
             case "sp":
                 this.toggleHandVisibility(true);
+                Notifier.timeout(Notifier.ALERT, "Select " + this.bc.PK + (this.bc.PK === 1 ? " card" : " cards") + " to play.");
                 break;
             case "sh":
                 this.toggleHandVisibility(false);
+                Notifier.timeout(Notifier.ALERT, "You are the game host. Start when you're ready.");
                 break;
             case "si":
                 this.toggleHandVisibility(false);
                 break;
             case "sw":
                 this.toggleHandVisibility(false);
+                Notifier.timeout(Notifier.ALERT, "You won this round!");
                 break;
         }
     }
@@ -290,7 +301,7 @@ class GameManager {
             self.removeHandCard(card);
             if (data.ltp === 0) toggleHand(undefined, false);
         }).fail(function (data) {
-            alert("Failed play card: " + JSON.stringify(data));
+            Notifier.error("Failed to play the card!", data);
         });
     }
 
@@ -298,7 +309,7 @@ class GameManager {
         $.post("AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
             // Do nothing
         }).fail(function (data) {
-            alert("Failed play card: " + JSON.stringify(data));
+            Notifier.error("Failed to select the card!", data);
         });
     }
 
@@ -343,6 +354,8 @@ class GameManager {
      * @param {object} data.bc - Black card
      * @param {object[]} data.wc - Table cards
      * @param {int} data.WC - Winning card
+     * @param {string} data.rw - Round winner nickname
+     * @param {int} data.i - Round intermission
      */
     _handleGameStatusChange(data) {
         switch (data.gs) {
@@ -368,6 +381,8 @@ class GameManager {
                 break;
             case "ro":
                 this._highlightWinningCard(data.WC);
+                if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, data.rw + " won this round!");
+                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
                 break;
         }
     }
@@ -414,9 +429,9 @@ class GameManager {
 
     start() {
         $.post("AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
-            console.log(data);
+            Notifier.debug(data);
         }).fail(function (data) {
-            alert("Failed starting game: " + JSON.stringify(data));
+            Notifier.error("Failed starting the game!", data);
             // TODO: Show nice dialog
         })
     }
@@ -443,21 +458,21 @@ function loadUI() {
                 gameManager.blackCard = data.bc;
                 gameManager.addHandCards(data.h, true);
                 gameManager.addTableCards(data.wc, true);
-                console.log(data);
+                Notifier.debug(data);
             }).fail(function (data) {
-                alert("Failed load: " + JSON.stringify(data));
+                Notifier.error("Failed loading the game!", data);
             });
 
-            console.log(data);
+            Notifier.debug(data);
         }).fail(function (data) {
-            alert("Failed load: " + JSON.stringify(data));
+            Notifier.error("Failed loading the game!", data);
         });
     }).fail(function (data) {
-        alert("Failed load: " + JSON.stringify(data));
+        Notifier.error("Failed loading the game!", data);
     });
 
     registerPollListener("GAME", function (data) {
-        console.log(data);
+        Notifier.debug(data);
         gameManager.handlePollEvent(data);
     });
 }
