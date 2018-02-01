@@ -201,3 +201,51 @@ body {
     padding: 16px;
     height: auto;
 }
+
+/* Noty fixes */
+#noty_layout__topRight {
+    top: 84px !important; /* 20px (default) + 64px (toolbar) */
+}
+
+/* Noty custom theme */
+.noty_theme__mdc.noty_bar {
+    margin: 4px 0;
+    overflow: hidden;
+    border-radius: 2px;
+    position: relative;
+}
+
+.noty_theme__mdc.noty_bar > .noty_body {
+    padding: 10px;
+    font-size: 14px;
+}
+
+.noty_theme__mdc.noty_type__info {
+    background-color: #fff;
+    border-bottom: 1px solid #d1d1d1;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.noty_theme__mdc.noty_type__alert {
+    background-color: var(--mdc-theme-primary);
+    border-bottom: 1px solid #d1d1d1;
+    color: var(--mdc-theme-text-primary-on-primary);
+}
+
+.noty_theme__mdc.noty_type__success {
+    background-color: #4CAF50;
+    border-bottom: 1px solid #d1d1d1;
+    color: #fff;
+}
+
+.noty_theme__mdc.noty_type__warning {
+    background-color: #FF9800;
+    border-bottom: 1px solid #d1d1d1;
+    color: #fff;
+}
+
+.noty_theme__mdc.noty_type__error {
+    background-color: #F44336;
+    border-bottom: 1px solid #d1d1d1;
+    color: #fff;
+}
