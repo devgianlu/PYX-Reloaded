@@ -6,12 +6,10 @@ import net.socialgamer.cah.Constants.AjaxOperation;
 import net.socialgamer.cah.Constants.AjaxResponse;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
-import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.GameOptions;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
-import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.BaseJsonHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
@@ -29,11 +27,6 @@ public class CreateGameHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         String value = params.get(Constants.AjaxRequest.GAME_OPTIONS);
         GameOptions options = GameOptions.deserialize(preferences, value);
-
-        try {
-            return new JsonWrapper(AjaxResponse.GAME_ID, gameManager.createGameWithPlayer(user, options).getId());
-        } catch (Game.TooManyPlayersException ex) {
-            throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_MANY_USERS, ex);
-        }
+        return new JsonWrapper(AjaxResponse.GAME_ID, gameManager.createGameWithPlayer(user, options).getId());
     }
 }

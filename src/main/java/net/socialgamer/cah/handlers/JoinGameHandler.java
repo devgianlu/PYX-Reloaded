@@ -6,7 +6,6 @@ import net.socialgamer.cah.Constants.AjaxRequest;
 import net.socialgamer.cah.Constants.ErrorCode;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
-import net.socialgamer.cah.data.Game.TooManyPlayersException;
 import net.socialgamer.cah.data.GameManager;
 import net.socialgamer.cah.data.User;
 import net.socialgamer.cah.servlets.Annotations;
@@ -25,14 +24,7 @@ public class JoinGameHandler extends GameHandler {
         if (!game.isPasswordCorrect(params.get(AjaxRequest.PASSWORD)))
             throw new BaseCahHandler.CahException(ErrorCode.WRONG_PASSWORD);
 
-        try {
-            game.addPlayer(user);
-        } catch (IllegalStateException ex) {
-            throw new BaseCahHandler.CahException(ErrorCode.CANNOT_JOIN_ANOTHER_GAME, ex);
-        } catch (TooManyPlayersException ex) {
-            throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL, ex);
-        }
-
+        game.addPlayer(user);
         return JsonWrapper.EMPTY;
     }
 }

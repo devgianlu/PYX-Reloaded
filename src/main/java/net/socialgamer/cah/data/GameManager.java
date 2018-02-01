@@ -64,7 +64,7 @@ public class GameManager {
      * @throws BaseCahHandler.CahException If the user is already in a game and cannot join another.
      */
     @NotNull
-    public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws BaseCahHandler.CahException, Game.TooManyPlayersException {
+    public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws BaseCahHandler.CahException {
         synchronized (games) {
             Game game = createGame(options);
 

@@ -164,14 +164,12 @@ public class Game {
      * Add a player to the game.
      *
      * @param user Player to add to this game.
-     * @throws TooManyPlayersException     Thrown if this game is at its maximum player capacity.
-     * @throws BaseCahHandler.CahException Thrown if {@param user} is already in a game.
      */
-    public void addPlayer(User user) throws TooManyPlayersException, BaseCahHandler.CahException {
+    public void addPlayer(User user) throws BaseCahHandler.CahException {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
 
         synchronized (players) {
-            if (players.size() >= options.playerLimit) throw new TooManyPlayersException();
+            if (players.size() >= options.playerLimit) throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL);
 
             user.joinGame(this);
             Player player = new Player(user);
@@ -347,13 +345,11 @@ public class Game {
      * Add a spectator to the game.
      *
      * @param user Spectator to add to this game.
-     * @throws TooManySpectatorsException  Thrown if this game is at its maximum spectator capacity.
-     * @throws BaseCahHandler.CahException Thrown if {@param user} is already in a game.
      */
-    public void addSpectator(User user) throws TooManySpectatorsException, BaseCahHandler.CahException {
+    public void addSpectator(User user) throws BaseCahHandler.CahException {
         logger.info(String.format("%s joined game %d as a spectator.", user.toString(), id));
         synchronized (spectators) {
-            if (spectators.size() >= options.spectatorLimit) throw new TooManySpectatorsException();
+            if (spectators.size() >= options.spectatorLimit) throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL);
 
             user.joinGame(this);
             spectators.add(user);
@@ -1264,7 +1260,7 @@ public class Game {
         EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_STATE_CHANGE);
         ev.add(LongPollResponse.GAME_STATE, GameState.ROUND_OVER.toString());
         ev.add(LongPollResponse.ROUND_WINNER, winner.getUser().getNickname());
-        ev.add(LongPollResponse.WINNING_CARD, playedCards.getCards(winner).get(0).getId());
+        ev.add(LongPollResponse.WINNING_CARD, cardId); // TODO: Return all ids
         ev.add(LongPollResponse.INTERMISSION, ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
@@ -1320,19 +1316,5 @@ public class Game {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Exception to be thrown when there are too many players in a game.
-     */
-    public class TooManyPlayersException extends Exception {
-        private static final long serialVersionUID = -6603422097641992017L;
-    }
-
-    /**
-     * Exception to be thrown when there are too many spectators in a game.
-     */
-    public class TooManySpectatorsException extends Exception {
-        private static final long serialVersionUID = -6603422097641992018L;
     }
 }

@@ -56,7 +56,7 @@ public class PlayerPlayedCardsTracker {
     }
 
     /**
-     * @param player
+     * @param player The given player
      * @return The list of cards {@code player} has played this round, or {@code null} if they have
      * not played any cards.
      */

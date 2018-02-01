@@ -213,8 +213,9 @@ class GameManager {
      * @param {int} data.pi.sc - Player's score
      * @param {string} data.pi.N - Player's name
      * @param {string} data.gs - Game status
+     * @param {object} data.gi - Game info
      */
-    handlePollEvent(data) {
+    handlePollEvent(data) { // TODO: Handle all events
         switch (data["E"]) {
             case "c":
                 this._receivedGameChatMessage(data);
@@ -248,6 +249,22 @@ class GameManager {
             case "gsc":
                 this.info.gi.S = data.gs;
                 this._handleGameStatusChange(data);
+                break;
+            case "gjl":
+                break;
+            case "gjs":
+                break;
+            case "goc":
+                this.info.gi.go = data.gi;
+                break;
+            case "gpki":
+                break;
+            case "gps":
+                break;
+            case "kfgi":
+                break;
+            case "hu":
+                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!")
                 break;
         }
     }

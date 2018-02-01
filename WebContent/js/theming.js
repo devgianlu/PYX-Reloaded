@@ -179,6 +179,7 @@ class MaterialCustomizer {
         const target = MaterialCustomizer.getTarget(MaterialCustomizer.getTarget(e.target));
         const getNumSelected = this.getNumSelected();
         if ((target.getAttribute("class") || "").indexOf("selected--1") === -1 || 1 !== getNumSelected) {
+            // noinspection FallThroughInSwitchStatementJS
             switch (getNumSelected) {
                 case 1:
                     if (this.forbiddenAccents.indexOf(target.getAttribute("data-color")) !== -1) {
