@@ -2,7 +2,7 @@ package net.socialgamer.cah.servlets;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.QueryParameterUtils;
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Consts;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -35,11 +35,11 @@ public final class Parameters extends HashMap<String, String> {
     }
 
     @Nullable
-    public String get(Constants.AjaxRequest key) {
+    public String get(Consts.ReceivableKey key) {
         return get(key.toString());
     }
 
-    public boolean getBoolean(Constants.AjaxRequest key, boolean fallback) {
+    public boolean getBoolean(Consts.ReceivableKey key, boolean fallback) {
         return getBoolean(key.toString(), fallback);
     }
 

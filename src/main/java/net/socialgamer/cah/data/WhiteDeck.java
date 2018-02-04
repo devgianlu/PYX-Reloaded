@@ -80,8 +80,4 @@ public class WhiteDeck {
     private WhiteCard createBlankCard() {
         return new BlankWhiteCard(--lastBlankCardId);
     }
-
-    public synchronized int totalCount() {
-        return deck.size() + discard.size();
-    }
 }

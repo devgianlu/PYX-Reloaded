@@ -5,7 +5,8 @@ import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.util.StatusCodes;
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Consts;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.User;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,13 +29,13 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
             throw new StatusException(StatusCodes.INTERNAL_SERVER_ERROR, ex);
         }
 
-        String op = params.get(Constants.AjaxRequest.OP.toString());
-        boolean skipUserCheck = Objects.equals(op, Constants.AjaxOperation.REGISTER.toString()) || Objects.equals(op, Constants.AjaxOperation.FIRST_LOAD.toString());
+        String op = params.get(Consts.GeneralKeys.OP);
+        boolean skipUserCheck = Objects.equals(op, Consts.Operation.REGISTER.toString()) || Objects.equals(op, Consts.Operation.FIRST_LOAD.toString());
         if (!skipUserCheck && user == null) {
-            throw new CahException(Constants.ErrorCode.NOT_REGISTERED);
+            throw new CahException(Consts.ErrorCode.NOT_REGISTERED);
         } else if (user != null && !user.isValid()) {
             Sessions.invalidate(sid.getValue());
-            throw new CahException(Constants.ErrorCode.SESSION_EXPIRED);
+            throw new CahException(Consts.ErrorCode.SESSION_EXPIRED);
         } else {
             return handleRequest(op, user, params, exchange);
         }
@@ -43,25 +44,25 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
     protected abstract JsonElement handleRequest(@Nullable String op, @Nullable User user, Parameters params, HttpServerExchange exchange) throws StatusException;
 
     public static class CahException extends StatusException {
-        public final Constants.ErrorCode code;
+        public final Consts.ErrorCode code;
         public final JsonObject data;
 
-        public CahException(Constants.ErrorCode code) {
+        public CahException(Consts.ErrorCode code) {
             super(StatusCodes.INTERNAL_SERVER_ERROR);
             this.code = code;
             this.data = null;
         }
 
-        public CahException(Constants.ErrorCode code, Throwable cause) {
+        public CahException(Consts.ErrorCode code, Throwable cause) {
             super(StatusCodes.INTERNAL_SERVER_ERROR, cause);
             this.code = code;
             this.data = null;
         }
 
-        public CahException(Constants.ErrorCode code, JsonObject data) {
+        public CahException(Consts.ErrorCode code, JsonWrapper data) {
             super(StatusCodes.INTERNAL_SERVER_ERROR);
             this.code = code;
-            this.data = data;
+            this.data = data.obj();
         }
     }
 }

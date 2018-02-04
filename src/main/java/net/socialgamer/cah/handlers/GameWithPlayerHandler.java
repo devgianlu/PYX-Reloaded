@@ -1,7 +1,7 @@
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
@@ -17,7 +17,7 @@ public abstract class GameWithPlayerHandler extends GameHandler {
 
     @Override
     public final JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (user.getGame() != game) throw new BaseCahHandler.CahException(ErrorCode.NOT_IN_THAT_GAME);
+        if (user.getGame() != game) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_IN_THAT_GAME);
         else return handleWithUserInGame(user, game, params, exchange);
     }
 

@@ -2,12 +2,8 @@ package net.socialgamer.cah.handlers;
 
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants;
-import net.socialgamer.cah.Constants.AjaxOperation;
-import net.socialgamer.cah.Constants.AjaxResponse;
-import net.socialgamer.cah.Constants.ErrorCode;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.JsonWrapper;
-import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
@@ -19,7 +15,7 @@ import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.Parameters;
 
 public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
-    public static final String OP = AjaxOperation.CARDCAST_LIST_CARDSETS.toString();
+    public static final String OP = Consts.Operation.CARDCAST_LIST_CARDSETS.toString();
     private final CardcastService cardcastService;
 
     public CardcastListCardsetsHandler(@Annotations.GameManager GameManager gameManager, @Annotations.CardcastService CardcastService cardcastService) {
@@ -39,15 +35,14 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
                 cardcastException.failedDecks.add(deckId);
             }
 
-            if (deck != null) array.add(deck.getClientMetadataJson());
+            if (deck != null) array.add(deck.getClientMetadataJson().obj());
         }
 
         if (cardcastException != null) {
-            throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
-                    Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
-                            Utils.singletonJsonArray(cardcastException.getFailedJson())));
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND,
+                    new JsonWrapper(Consts.GeneralKeys.CARDCAST_ID, cardcastException.getFailedJson()));
         } else {
-            return new JsonWrapper(AjaxResponse.CARD_SETS, array);
+            return new JsonWrapper(Consts.GameOptionData.CARD_SETS, array);
         }
     }
 }

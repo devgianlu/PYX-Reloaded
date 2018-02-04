@@ -54,8 +54,4 @@ public class BlackDeck {
         deck.addAll(0, discard);
         discard.clear();
     }
-
-    public synchronized int totalCount() {
-        return deck.size() + discard.size();
-    }
 }

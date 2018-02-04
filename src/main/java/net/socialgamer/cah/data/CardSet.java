@@ -1,7 +1,7 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.JsonObject;
-import net.socialgamer.cah.Constants.CardSetData;
+import net.socialgamer.cah.Consts;
+import net.socialgamer.cah.JsonWrapper;
 
 import java.util.Set;
 
@@ -24,20 +24,20 @@ public abstract class CardSet {
 
     public abstract Set<? extends WhiteCard> getWhiteCards();
 
-    public final JsonObject getClientMetadataJson() {
-        JsonObject obj = getCommonClientMetadataJson();
-        obj.addProperty(CardSetData.BLACK_CARDS_IN_DECK.toString(), getBlackCards().size());
-        obj.addProperty(CardSetData.WHITE_CARDS_IN_DECK.toString(), getWhiteCards().size());
+    public final JsonWrapper getClientMetadataJson() {
+        JsonWrapper obj = getCommonClientMetadataJson();
+        obj.add(Consts.CardSetData.BLACK_CARDS_IN_DECK, getBlackCards().size());
+        obj.add(Consts.CardSetData.WHITE_CARDS_IN_DECK, getWhiteCards().size());
         return obj;
     }
 
-    private JsonObject getCommonClientMetadataJson() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(CardSetData.ID.toString(), getId());
-        obj.addProperty(CardSetData.CARD_SET_NAME.toString(), getName());
-        obj.addProperty(CardSetData.CARD_SET_DESCRIPTION.toString(), getDescription());
-        obj.addProperty(CardSetData.WEIGHT.toString(), getWeight());
-        obj.addProperty(CardSetData.BASE_DECK.toString(), isBaseDeck());
+    private JsonWrapper getCommonClientMetadataJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.CardSetData.ID, getId());
+        obj.add(Consts.CardSetData.CARD_SET_NAME, getName());
+        obj.add(Consts.CardSetData.CARD_SET_DESCRIPTION, getDescription());
+        obj.add(Consts.CardSetData.WEIGHT, getWeight());
+        obj.add(Consts.CardSetData.BASE_DECK, isBaseDeck());
         return obj;
     }
 

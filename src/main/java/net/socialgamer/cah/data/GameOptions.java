@@ -4,12 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.socialgamer.cah.Constants.GameOptionData;
+import net.socialgamer.cah.Consts;
+import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
 import net.socialgamer.cah.Utils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameOptions {
     public static final int DEFAULT_SCORE_MIN = 4;
@@ -47,18 +50,18 @@ public class GameOptions {
         winBy = getWinBy(preferences).def;
     }
 
-    public static JsonObject getOptionsDefaultsJson(Preferences preferences) {
-        JsonObject obj = new JsonObject();
-        obj.add(GameOptionData.BLANKS_LIMIT.toString(), getBlanksLimit(preferences).toJson());
-        obj.add(GameOptionData.PLAYER_LIMIT.toString(), getPlayerLimit(preferences).toJson());
-        obj.add(GameOptionData.SPECTATOR_LIMIT.toString(), getSpectatorLimit(preferences).toJson());
-        obj.add(GameOptionData.SCORE_LIMIT.toString(), getScoreLimit(preferences).toJson());
-        obj.add(GameOptionData.WIN_BY.toString(), getWinBy(preferences).toJson());
+    public static JsonWrapper getOptionsDefaultsJson(Preferences preferences) {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GameOptionData.BLANKS_LIMIT, getBlanksLimit(preferences).toJson());
+        obj.add(Consts.GameOptionData.PLAYER_LIMIT, getPlayerLimit(preferences).toJson());
+        obj.add(Consts.GameOptionData.SPECTATOR_LIMIT, getSpectatorLimit(preferences).toJson());
+        obj.add(Consts.GameOptionData.SCORE_LIMIT, getScoreLimit(preferences).toJson());
+        obj.add(Consts.GameOptionData.WIN_BY, getWinBy(preferences).toJson());
 
-        JsonObject tm = new JsonObject();
-        tm.add("values", TimeMultiplier.validValuesJson());
-        tm.addProperty("default", DEFAULT_TIME_MULTIPLIER.val);
-        obj.add(GameOptionData.TIMER_MULTIPLIER.toString(), tm);
+        JsonWrapper tm = new JsonWrapper();
+        tm.add(Consts.TimeMultiplierData.VALUES, TimeMultiplier.validValuesJson());
+        tm.add(Consts.TimeMultiplierData.DEFAULT, DEFAULT_TIME_MULTIPLIER.val);
+        obj.add(Consts.GameOptionData.TIMER_MULTIPLIER, tm);
 
         return obj;
     }
@@ -89,12 +92,12 @@ public class GameOptions {
         if (text == null || text.isEmpty()) return options;
 
         JsonObject json = new JsonParser().parse(text).getAsJsonObject();
-        JsonArray cardSetIds = json.getAsJsonArray(GameOptionData.CARD_SETS.toString());
+        JsonArray cardSetIds = json.getAsJsonArray(Consts.GameOptionData.CARD_SETS.toString());
         if (cardSetIds != null) {
             for (JsonElement cardSetId : cardSetIds) options.cardSetIds.add(cardSetId.getAsInt());
         }
 
-        JsonArray cardcastSetCodes = json.getAsJsonArray(GameOptionData.CARDCAST_SETS.toString());
+        JsonArray cardcastSetCodes = json.getAsJsonArray(Consts.GameOptionData.CARDCAST_SETS.toString());
         if (cardSetIds != null) {
             for (JsonElement code : cardcastSetCodes) options.cardcastSetCodes.add(code.getAsString());
         }
@@ -105,15 +108,30 @@ public class GameOptions {
         Preferences.MinDefaultMax spectator = getSpectatorLimit(preferences);
         Preferences.MinDefaultMax winBy = getWinBy(preferences);
 
-        options.blanksInDeck = Math.max(blankCards.min, Math.min(blankCards.max, Utils.optInt(json, GameOptionData.BLANKS_LIMIT.toString(), options.blanksInDeck)));
-        options.playerLimit = Math.max(player.min, Math.min(player.max, Utils.optInt(json, GameOptionData.PLAYER_LIMIT.toString(), options.playerLimit)));
-        options.spectatorLimit = Math.max(spectator.min, Math.min(spectator.max, Utils.optInt(json, GameOptionData.SPECTATOR_LIMIT.toString(), options.spectatorLimit)));
-        options.scoreGoal = Math.max(score.min, Math.min(score.max, Utils.optInt(json, GameOptionData.SCORE_LIMIT.toString(), options.scoreGoal)));
-        options.winBy = Math.max(winBy.min, Math.min(winBy.max, Utils.optInt(json, GameOptionData.WIN_BY.toString(), options.winBy)));
-        options.timerMultiplier = TimeMultiplier.opt(json, GameOptionData.TIMER_MULTIPLIER.toString(), options.timerMultiplier);
-        options.password = Utils.optString(json, GameOptionData.PASSWORD.toString(), options.password);
+        options.blanksInDeck = assign(blankCards, options.blanksInDeck, json, Consts.GameOptionData.BLANKS_LIMIT);
+        options.playerLimit = assign(player, options.playerLimit, json, Consts.GameOptionData.PLAYER_LIMIT);
+        options.spectatorLimit = assign(spectator, options.spectatorLimit, json, Consts.GameOptionData.SPECTATOR_LIMIT);
+        options.scoreGoal = assign(score, options.scoreGoal, json, Consts.GameOptionData.SCORE_LIMIT);
+        options.winBy = assign(winBy, options.winBy, json, Consts.GameOptionData.WIN_BY);
+        options.timerMultiplier = TimeMultiplier.opt(json, options.timerMultiplier);
+        options.password = assign(json, options.password, Consts.GameOptionData.PASSWORD);
 
         return options;
+    }
+
+    private static int assign(Preferences.MinDefaultMax minDefaultMax, int current, JsonObject obj, Consts.GameOptionData field) {
+        int value;
+        JsonElement element = obj.get(field.toString());
+        if (element == null) value = current;
+        else value = element.getAsInt();
+
+        return Math.max(minDefaultMax.min, Math.min(minDefaultMax.max, value));
+    }
+
+    private static String assign(JsonObject obj, String current, Consts.GameOptionData field) {
+        JsonElement element = obj.get(field.toString());
+        if (element == null) return current;
+        else return element.getAsString();
     }
 
     /**
@@ -136,38 +154,17 @@ public class GameOptions {
         }
     }
 
-    /**
-     * Get the options in a form that can be sent to clients.
-     *
-     * @param includePassword Include the actual password with the information. This should only be
-     *                        sent to people in the game.
-     * @return This game's general information: ID, host, state, player list, etc.
-     */
-    public Map<GameOptionData, Object> serialize(final boolean includePassword) {
-        Map<GameOptionData, Object> info = new HashMap<>();
-        info.put(GameOptionData.CARD_SETS, cardSetIds);
-        info.put(GameOptionData.CARDCAST_SETS, cardcastSetCodes);
-        info.put(GameOptionData.BLANKS_LIMIT, blanksInDeck);
-        info.put(GameOptionData.PLAYER_LIMIT, playerLimit);
-        info.put(GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
-        info.put(GameOptionData.SCORE_LIMIT, scoreGoal);
-        info.put(GameOptionData.WIN_BY, winBy);
-        info.put(GameOptionData.TIMER_MULTIPLIER, timerMultiplier);
-        if (includePassword) info.put(GameOptionData.PASSWORD, password);
-        return info;
-    }
-
-    public JsonObject toJson(boolean includePassword) {
-        JsonObject obj = new JsonObject();
-        obj.add(GameOptionData.CARD_SETS.toString(), Utils.toIntsJsonArray(cardSetIds));
-        obj.add(GameOptionData.CARDCAST_SETS.toString(), Utils.toStringsJsonArray(cardcastSetCodes));
-        obj.addProperty(GameOptionData.BLANKS_LIMIT.toString(), blanksInDeck);
-        obj.addProperty(GameOptionData.PLAYER_LIMIT.toString(), playerLimit);
-        obj.addProperty(GameOptionData.SPECTATOR_LIMIT.toString(), spectatorLimit);
-        obj.addProperty(GameOptionData.SCORE_LIMIT.toString(), scoreGoal);
-        obj.addProperty(GameOptionData.WIN_BY.toString(), winBy);
-        obj.addProperty(GameOptionData.TIMER_MULTIPLIER.toString(), timerMultiplier.val);
-        if (includePassword) obj.addProperty(GameOptionData.PASSWORD.toString(), password);
+    public JsonWrapper toJson(boolean includePassword) {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GameOptionData.CARD_SETS, Utils.toIntsJsonArray(cardSetIds));
+        obj.add(Consts.GameOptionData.CARDCAST_SETS, Utils.toStringsJsonArray(cardcastSetCodes));
+        obj.add(Consts.GameOptionData.BLANKS_LIMIT, blanksInDeck);
+        obj.add(Consts.GameOptionData.PLAYER_LIMIT, playerLimit);
+        obj.add(Consts.GameOptionData.SPECTATOR_LIMIT, spectatorLimit);
+        obj.add(Consts.GameOptionData.SCORE_LIMIT, scoreGoal);
+        obj.add(Consts.GameOptionData.WIN_BY, winBy);
+        obj.add(Consts.GameOptionData.TIMER_MULTIPLIER, timerMultiplier.val);
+        if (includePassword) obj.add(Consts.GameOptionData.PASSWORD, password);
         return obj;
     }
 
@@ -196,9 +193,11 @@ public class GameOptions {
             this.val = val;
         }
 
-        public static TimeMultiplier opt(JsonObject obj, String key, TimeMultiplier fallback) {
-            if (obj.has(key)) return TimeMultiplier.parse(obj.get(key).getAsString(), fallback);
-            else return fallback;
+        public static TimeMultiplier opt(JsonObject obj, TimeMultiplier current) {
+            if (obj.has(Consts.GameOptionData.TIMER_MULTIPLIER.toString()))
+                return TimeMultiplier.parse(obj.get(Consts.GameOptionData.TIMER_MULTIPLIER.toString()).getAsString(), current);
+            else
+                return current;
         }
 
         public static JsonArray validValuesJson() {

@@ -1,67 +1,55 @@
 package net.socialgamer.cah;
 
-import net.socialgamer.cah.Constants.DuplicationAllowed;
-import org.junit.Test;
+import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.fail;
-
+import java.lang.annotation.Annotation;
 
 public class ConstantsTest {
 
-    /**
-     * Return a map of enum values in an Enum class, with the enum field names as keys and the values
-     * of toString() as the values.
-     * <p>
-     * Completely ignores enum values annotated with DuplicationAllowed.
-     *
-     * @param enumClass The Enum to examine.
-     * @return Map of field name -> toString values.
-     * @throws IllegalArgumentException Thrown if {@code enumClass} isn't actually an enum.
-     * @throws IllegalAccessException   If the value was unable to be retrieved.
-     */
-    private static Map<String, String> getEnumValues(final Class<?> enumClass)
-            throws IllegalArgumentException, IllegalAccessException {
-        if (!enumClass.isEnum()) {
-            throw new IllegalArgumentException(enumClass.getName() + " is not an enum");
-        }
-
-        final Field[] flds = enumClass.getDeclaredFields();
-        final HashMap<String, String> enumMap = new HashMap<>();
-        for (final Field f : flds) {
-            if (f.isEnumConstant() && !f.isAnnotationPresent(DuplicationAllowed.class)) {
-                enumMap.put(f.getName(), f.get(null).toString());
+    private static void crossCheck(Class firstEnum, Class secondEnum) throws NoSuchFieldException {
+        for (Object firstEnumConst : firstEnum.getEnumConstants()) {
+            for (Object secondEnumConst : secondEnum.getEnumConstants()) {
+                if (shouldIgnoreDuplicate(firstEnumConst, secondEnumConst)) continue;
+                Assertions.assertNotEquals(firstEnumConst.toString(), secondEnumConst.toString(),
+                        "Found equal value '" + firstEnumConst.toString() + "' in " + firstEnum.getSimpleName() + " and " + secondEnum.getSimpleName());
             }
         }
-        return enumMap;
     }
 
-    /**
-     * Test to make sure that no two over-the-wire message constants use the same value. In theory, we
-     * only need to make sure that it's only unique in a particular enum, but it doesn't hurt to
-     * ensure global uniqueness.
-     */
+    public static boolean shouldIgnoreDuplicate(Object firstEnumConst, Object secondEnumConst) throws NoSuchFieldException {
+        Class firstIgnoreClass = getIgnoreDuplicateClass(firstEnumConst);
+        Class secondIgnoreClass = getIgnoreDuplicateClass(secondEnumConst);
+
+        if (firstIgnoreClass == null && secondIgnoreClass == null) return false;
+
+        if (firstIgnoreClass != null) {
+            if (secondEnumConst.getClass() == firstIgnoreClass)
+                return true;
+        }
+
+        return secondIgnoreClass != null && firstEnumConst.getClass() == secondIgnoreClass;
+
+    }
+
+    @Nullable
+    public static Class getIgnoreDuplicateClass(Object enumConst) throws NoSuchFieldException {
+        for (Annotation annotation : enumConst.getClass().getField(((Enum<?>) enumConst).name()).getAnnotations()) {
+            if (annotation.annotationType() == Consts.IgnoreDuplicateIn.class)
+                return ((Consts.IgnoreDuplicateIn) annotation).value();
+        }
+
+        return null;
+    }
+
     @Test
-    public void ensureNoDuplicateValues() throws Exception {
-        final Map<String, String> allFields = new HashMap<>();
+    public void checkConstants() throws NoSuchFieldException {
+        Class[] classes = Consts.class.getClasses();
 
-        final Class<?>[] classes = Constants.class.getClasses();
-        for (final Class<?> c : classes) {
-            // We only care about enums.
-            if (!c.isEnum()) {
-                continue;
-            }
-
-            final Map<String, String> fields = getEnumValues(c);
-            for (final Map.Entry<String, String> entry : fields.entrySet()) {
-                if (allFields.containsKey(entry.getValue())) {
-                    fail(String.format("Value '%s' defined for %s.%s, already defined for %s.",
-                            entry.getValue(), c.getName(), entry.getKey(), allFields.get(entry.getValue())));
-                }
-                allFields.put(entry.getValue(), c.getName() + "." + entry.getKey());
+        for (Class klass : classes) {
+            for (Class kklass : classes) {
+                if (klass.isEnum() && kklass.isEnum() && klass != kklass) crossCheck(klass, kklass);
             }
         }
     }

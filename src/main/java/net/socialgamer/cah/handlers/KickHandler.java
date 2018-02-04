@@ -1,7 +1,7 @@
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
@@ -14,7 +14,7 @@ import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
 
 public class KickHandler extends BaseHandler {
-    public static final String OP = AjaxOperation.KICK.toString();
+    public static final String OP = Consts.Operation.KICK.toString();
     protected final Logger logger = Logger.getLogger(KickHandler.class);
     private final ConnectedUsers connectedUsers;
 
@@ -24,17 +24,18 @@ public class KickHandler extends BaseHandler {
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (!user.isAdmin()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN);
+        if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
-        String nickname = params.get(AjaxRequest.NICKNAME);
-        if (nickname == null || nickname.isEmpty()) throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
+        String nickname = params.get(Consts.GeneralKeys.NICKNAME);
+        if (nickname == null || nickname.isEmpty())
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
 
         final User kickUser = connectedUsers.getUser(nickname);
-        if (kickUser == null) throw new BaseCahHandler.CahException(ErrorCode.NO_SUCH_USER);
+        if (kickUser == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_SUCH_USER);
 
-        kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(LongPollEvent.KICKED)));
+        kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(Consts.Event.KICKED)));
 
-        connectedUsers.removeUser(kickUser, DisconnectReason.KICKED);
+        connectedUsers.removeUser(kickUser, Consts.DisconnectReason.KICKED);
         logger.warn(String.format("Kicking %s by request of %s", kickUser.getNickname(), user.getNickname()));
 
         return JsonWrapper.EMPTY;

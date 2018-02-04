@@ -1,7 +1,7 @@
 package net.socialgamer.cah.data;
 
 
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.servlets.EventsHandler;
@@ -43,10 +43,10 @@ public class User {
     }
 
     public void checkChatFlood() throws BaseCahHandler.CahException {
-        if (getLastMessageTimes().size() >= Constants.CHAT_FLOOD_MESSAGE_COUNT) {
+        if (getLastMessageTimes().size() >= Consts.CHAT_FLOOD_MESSAGE_COUNT) {
             long head = getLastMessageTimes().get(0);
-            if (System.currentTimeMillis() - head < Constants.CHAT_FLOOD_TIME)
-                throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_FAST);
+            if (System.currentTimeMillis() - head < Consts.CHAT_FLOOD_TIME)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_FAST);
 
             getLastMessageTimes().remove(0);
         }
@@ -117,7 +117,7 @@ public class User {
      */
     public void sendPing() {
         waitingPong = true;
-        enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.PING, new EventWrapper(Constants.LongPollEvent.PING)));
+        enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.PING, new EventWrapper(Consts.Event.PING)));
     }
 
     public boolean isWaitingPong() {
@@ -155,7 +155,7 @@ public class User {
      * @throws BaseCahHandler.CahException Thrown if this user is already in another game.
      */
     void joinGame(Game game) throws BaseCahHandler.CahException {
-        if (currentGame != null) throw new BaseCahHandler.CahException(Constants.ErrorCode.CANNOT_JOIN_ANOTHER_GAME);
+        if (currentGame != null) throw new BaseCahHandler.CahException(Consts.ErrorCode.CANNOT_JOIN_ANOTHER_GAME);
         currentGame = game;
     }
 

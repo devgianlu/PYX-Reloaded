@@ -11,47 +11,52 @@ public class JsonWrapper {
         obj = new JsonObject();
     }
 
-    public JsonWrapper(Constants.ReturnableData data, JsonElement element) {
+    public JsonWrapper(Consts.ReturnableKey data, JsonElement element) {
         this();
         add(data, element);
     }
 
-    public JsonWrapper(Constants.ReturnableData data, int i) {
+    public JsonWrapper(Consts.ReturnableKey data, int i) {
         this();
         add(data, i);
     }
 
-    public JsonWrapper(Constants.ReturnableData data, String str) {
+    public JsonWrapper(Consts.ReturnableKey data, String str) {
         this();
         add(data, str);
     }
 
-    public JsonWrapper(Constants.ReturnableData data, Constants.ErrorCode code) {
+    public JsonWrapper(Consts.ErrorCode code) {
         this();
-        add(Constants.AjaxResponse.ERROR, true);
-        add(data, code.toString());
+        add(Consts.GeneralKeys.ERROR, true);
+        add(Consts.GeneralKeys.ERROR_CODE, code.toString());
     }
 
     public JsonObject obj() {
         return obj;
     }
 
-    public JsonWrapper add(Constants.ReturnableData data, JsonElement element) {
+    public JsonWrapper add(Consts.ReturnableKey data, JsonElement element) {
         obj.add(data.toString(), element);
         return this;
     }
 
-    public JsonWrapper add(Constants.ReturnableData data, boolean bool) {
+    public JsonWrapper add(Consts.ReturnableKey data, JsonWrapper wrapper) {
+        add(data, wrapper == null ? null : wrapper.obj());
+        return this;
+    }
+
+    public JsonWrapper add(Consts.ReturnableKey data, boolean bool) {
         obj.addProperty(data.toString(), bool);
         return this;
     }
 
-    public JsonWrapper add(Constants.ReturnableData data, int i) {
+    public JsonWrapper add(Consts.ReturnableKey data, int i) {
         obj.addProperty(data.toString(), i);
         return this;
     }
 
-    public JsonWrapper add(Constants.ReturnableData data, String str) {
+    public JsonWrapper add(Consts.ReturnableKey data, String str) {
         obj.addProperty(data.toString(), str);
         return this;
     }
@@ -59,5 +64,9 @@ public class JsonWrapper {
     @Override
     public String toString() {
         return obj.toString();
+    }
+
+    public void addAll(JsonObject data) {
+        for (String key : data.keySet()) obj.add(key, data.get(key));
     }
 }

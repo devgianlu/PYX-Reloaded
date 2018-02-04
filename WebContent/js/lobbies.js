@@ -19,7 +19,7 @@ class Games {
 
         for (let i = 0; i < ids.length; i++) {
             for (let j = 0; j < json.length; j++) {
-                if (ids[i] === json[j].cid) names[i] = json[j].csn;
+                if (ids[i] === json[j].csi) names[i] = json[j].csn;
             }
         }
 
@@ -59,7 +59,7 @@ class Games {
             else goal = game.go.sl + " (win by " + game.go.wb + ")";
 
             let status;
-            if (game.S === "l") status = "lobby";
+            if (game.gs === "l") status = "lobby";
             else status = "started";
 
             let decksNames = Games.deckIdsToNames(game.go.css);

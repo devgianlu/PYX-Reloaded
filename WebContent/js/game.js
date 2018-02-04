@@ -94,7 +94,7 @@ class GameManager {
     /**
      * @param {array} info.pi - Players info
      * @param {string} info.gi.H - Host's nickname
-     * @param {string} info.gi.S - Game status
+     * @param {string} info.gi.gs - Game status
      */
     set gameInfo(info) {
         this.info = info;
@@ -124,8 +124,6 @@ class GameManager {
                 return "Judging";
             case "sp":
                 return "Playing";
-            case "sv":
-                return "Spectator";
             case "sw":
                 return "Winner";
         }
@@ -217,7 +215,7 @@ class GameManager {
      */
     handlePollEvent(data) { // TODO: Handle all events
         switch (data["E"]) {
-            case "c":
+            case "C":
                 this._receivedGameChatMessage(data);
                 break;
             case "gpj":
@@ -247,7 +245,7 @@ class GameManager {
                 this.addHandCards(data.h, data.h.length === 10);
                 break;
             case "gsc":
-                this.info.gi.S = data.gs;
+                this.info.gi.gs = data.gs;
                 this._handleGameStatusChange(data);
                 break;
             case "gjl":
@@ -432,7 +430,7 @@ class GameManager {
 
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
-        this.toggleStartButton(this.amHost && this.info.gi.S === "l");
+        this.toggleStartButton(this.amHost && this.info.gi.gs === "l");
         this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
 
         this._reloadScoreboard();

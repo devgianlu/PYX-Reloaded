@@ -1,7 +1,7 @@
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants.AjaxOperation;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.Game;
 import net.socialgamer.cah.data.GameManager;
@@ -11,7 +11,7 @@ import net.socialgamer.cah.servlets.Parameters;
 
 
 public class LeaveGameHandler extends GameWithPlayerHandler {
-    public static final String OP = AjaxOperation.LEAVE_GAME.toString();
+    public static final String OP = Consts.Operation.LEAVE_GAME.toString();
 
     public LeaveGameHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);

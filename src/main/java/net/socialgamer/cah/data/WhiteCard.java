@@ -1,16 +1,16 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.JsonObject;
-import net.socialgamer.cah.Constants.WhiteCardData;
+import net.socialgamer.cah.Consts;
+import net.socialgamer.cah.JsonWrapper;
 
 
 public abstract class WhiteCard {
-    public static JsonObject getFaceDownCardClientDataJson() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(WhiteCardData.ID.toString(), -1);
-        obj.addProperty(WhiteCardData.TEXT.toString(), "");
-        obj.addProperty(WhiteCardData.WATERMARK.toString(), "");
-        obj.addProperty(WhiteCardData.WRITE_IN.toString(), false);
+    public static JsonWrapper getFaceDownCardClientDataJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GeneralKeys.CARD_ID, -1);
+        obj.add(Consts.WhiteCardData.TEXT, "");
+        obj.add(Consts.WhiteCardData.WATERMARK, "");
+        obj.add(Consts.WhiteCardData.WRITE_IN, false);
         return obj;
     }
 
@@ -32,12 +32,12 @@ public abstract class WhiteCard {
         return getId();
     }
 
-    public final JsonObject getClientDataJson() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(WhiteCardData.ID.toString(), getId());
-        obj.addProperty(WhiteCardData.TEXT.toString(), getText());
-        obj.addProperty(WhiteCardData.WATERMARK.toString(), getWatermark());
-        obj.addProperty(WhiteCardData.WRITE_IN.toString(), isWriteIn());
+    public final JsonWrapper getClientDataJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GeneralKeys.CARD_ID, getId());
+        obj.add(Consts.WhiteCardData.TEXT, getText());
+        obj.add(Consts.WhiteCardData.WATERMARK, getWatermark());
+        obj.add(Consts.WhiteCardData.WRITE_IN, isWriteIn());
         return obj;
     }
 

@@ -73,7 +73,7 @@ class CreateGameDialog {
         this.pyxDecks_select.uiListener = () => this.updateTitles();
         this.pyxDecks = new List(this._pyxDecks[0], {
             item: 'pyxDeckTemplate',
-            valueNames: ['_name', {'data': ['cid']}]
+            valueNames: ['_name', {'data': ['csi']}]
         });
 
         this._cardcastDecks = this._dialog.find('#cardcastDecks');
@@ -109,6 +109,7 @@ class CreateGameDialog {
 
         /**
          * @param {string} css[].csn - Card set name
+         * @param {int} css[].csi - Card set id
          *
          * @type {object[]}
          */
@@ -119,22 +120,39 @@ class CreateGameDialog {
         this.reset();
     }
 
+    /**
+     *
+     * @param dropdown
+     * @param {object} tm
+     * @param {string[]} tm.v - Possible values
+     * @param {string} tm.def - Default value
+     * @private
+     */
     static _populateTimeMultiplier(dropdown, tm) {
         const list = dropdown.find('.mdc-simple-menu__items');
         list.empty();
 
-        for (let i = 0; i < tm.values.length; i++) {
+        for (let i = 0; i < tm.v.length; i++) {
             let item = document.createElement("li");
-            let val = tm.values[i];
+            let val = tm.v[i];
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (val === tm.default) item.setAttribute("aria-selected", '');
+            if (val === tm.def) item.setAttribute("aria-selected", '');
             item.innerHTML = val;
             list.append(item);
         }
     }
 
+    /**
+     *
+     * @param dropdown
+     * @param {object} dgo
+     * @param {int} dgo.min - Minimum value
+     * @param {int} dgo.max - Maximum value
+     * @param {int} dgo.def - Default value
+     * @private
+     */
     static _populateDropdown(dropdown, dgo) {
         const list = dropdown.find('.mdc-simple-menu__items');
         list.empty();
@@ -144,7 +162,7 @@ class CreateGameDialog {
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (i === dgo.default) item.setAttribute("aria-selected", '');
+            if (i === dgo.def) item.setAttribute("aria-selected", '');
             item.innerHTML = i;
             list.append(item);
         }
@@ -183,6 +201,7 @@ class CreateGameDialog {
             "css": this.getSelectedPyxDecks()
         };
 
+        // FIXME: Something wrong when creating game without changing default values
         games.createGame(go); // Reference to lobbies.js
     }
 
@@ -208,11 +227,11 @@ class CreateGameDialog {
             const elm = $(this.pyxDecks.add({
                 "_name": set.csn,
                 "w": set.w,
-                "cid": set.cid
+                "csi": set.csi
             })[0].elm);
 
-            elm.find('input').attr("id", "pyx_deck_" + set.cid);
-            elm.find('label').attr("for", "pyx_deck_" + set.cid);
+            elm.find('input').attr("id", "pyx_deck_" + set.csi);
+            elm.find('label').attr("for", "pyx_deck_" + set.csi);
         }
 
         // Cardcast
@@ -228,7 +247,7 @@ class CreateGameDialog {
         const selected = [];
         this._pyxDecks.find('.list').children().each(function () {
             const input = $(this).find('input');
-            if (input.prop('checked')) selected.push($(this).attr('data-cid'))
+            if (input.prop('checked')) selected.push($(this).attr('data-csi'))
 
         });
 
@@ -259,7 +278,7 @@ class CreateGameDialog {
              */
             const cardSet = this.css[i];
             for (let j = 0; j < pyxIds.length; j++) {
-                if (cardSet.cid.toString() === pyxIds[j]) {
+                if (cardSet.csi.toString() === pyxIds[j]) {
                     whites += cardSet.wcid;
                     blacks += cardSet.bcid;
                 }

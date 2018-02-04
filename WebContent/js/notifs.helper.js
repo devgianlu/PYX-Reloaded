@@ -73,14 +73,16 @@ class Notifier {
 
     static error(msg, data = undefined, progressBar = false) {
         if (Notifier._debug) {
-            console.log(msg);
-            if (data !== undefined) console.log(data);
+            console.error(msg);
+            if (data !== undefined) console.error(data);
         }
 
         return Notifier.show(Notifier.ERROR, msg, this.DEFAULT_TIMEOUT * 1.5, progressBar);
     }
 
-    static debug(data) {
-        if (Notifier._debug) console.log(data);
+    static debug(data, error = false) {
+        if (Notifier._debug)
+            if (error) console.error(data);
+            else console.log(data);
     }
 }

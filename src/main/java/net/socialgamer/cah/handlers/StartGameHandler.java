@@ -1,14 +1,8 @@
 package net.socialgamer.cah.handlers;
 
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants;
-import net.socialgamer.cah.Constants.AjaxOperation;
-import net.socialgamer.cah.Constants.ErrorCode;
-import net.socialgamer.cah.Constants.ErrorInformation;
-import net.socialgamer.cah.Constants.GameState;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.JsonWrapper;
-import net.socialgamer.cah.Utils;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
 import net.socialgamer.cah.data.CardSet;
 import net.socialgamer.cah.data.Game;
@@ -21,7 +15,7 @@ import net.socialgamer.cah.servlets.Parameters;
 import java.util.List;
 
 public class StartGameHandler extends GameWithPlayerHandler {
-    public static final String OP = AjaxOperation.START_GAME.toString();
+    public static final String OP = Consts.Operation.START_GAME.toString();
 
     public StartGameHandler(@Annotations.GameManager GameManager gameManager) {
         super(gameManager);
@@ -29,26 +23,26 @@ public class StartGameHandler extends GameWithPlayerHandler {
 
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (game.getHost() != user) throw new BaseCahHandler.CahException(ErrorCode.NOT_GAME_HOST);
-        if (game.getState() != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
+        if (game.getHost() != user) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
+        if (game.getState() != Consts.GameState.LOBBY)
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
 
         try {
             if (!game.hasEnoughCards()) {
                 List<CardSet> cardSets = game.loadCardSets();
-                JsonObject obj = new JsonObject();
-                obj.addProperty(ErrorInformation.BLACK_CARDS_PRESENT.toString(), game.blackCardsCount(cardSets));
-                obj.addProperty(ErrorInformation.BLACK_CARDS_REQUIRED.toString(), game.getRequiredBlackCardCount());
-                obj.addProperty(ErrorInformation.WHITE_CARDS_PRESENT.toString(), game.whiteCardsCount(cardSets));
-                obj.addProperty(ErrorInformation.WHITE_CARDS_REQUIRED.toString(), game.getRequiredWhiteCardCount());
-                throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_CARDS, obj);
+                JsonWrapper obj = new JsonWrapper();
+                obj.add(Consts.GeneralGameData.BLACK_CARDS_PRESENT, game.blackCardsCount(cardSets));
+                obj.add(Consts.GeneralGameData.BLACK_CARDS_REQUIRED, game.getRequiredBlackCardCount());
+                obj.add(Consts.GeneralGameData.WHITE_CARDS_PRESENT, game.whiteCardsCount(cardSets));
+                obj.add(Consts.GeneralGameData.WHITE_CARDS_REQUIRED, game.getRequiredWhiteCardCount());
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ENOUGH_CARDS, obj);
             } else {
                 game.start();
                 return JsonWrapper.EMPTY;
             }
         } catch (FailedLoadingSomeCardcastDecks ex) {
-            throw new BaseCahHandler.CahException(ErrorCode.CARDCAST_CANNOT_FIND,
-                    Utils.singletonJsonObject(Constants.AjaxResponse.CARDCAST_ID.toString(),
-                            ex.getFailedJson()));
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND,
+                    new JsonWrapper(Consts.GeneralKeys.CARDCAST_ID, ex.getFailedJson()));
         }
     }
 }

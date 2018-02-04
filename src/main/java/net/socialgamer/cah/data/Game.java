@@ -2,8 +2,7 @@ package net.socialgamer.cah.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.Preferences;
@@ -90,7 +89,7 @@ public class Game {
     private BlackDeck blackDeck;
     private BlackCard blackCard;
     private WhiteDeck whiteDeck;
-    private GameState state;
+    private Consts.GameState state;
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
 
@@ -110,7 +109,7 @@ public class Game {
         this.globalTimer = globalTimer;
         this.options = options;
         this.cardcastService = cardcastService;
-        this.state = GameState.LOBBY;
+        this.state = Consts.GameState.LOBBY;
 
         this.MAX_SKIPS_BEFORE_KICK = preferences.getInt("maxSkipsBeforeKick", 2);
         this.ROUND_INTERMISSION = preferences.getInt("roundIntermission", 8) * 1000;
@@ -124,7 +123,7 @@ public class Game {
 
     private static JsonArray getWhiteCardsDataJson(List<WhiteCard> cards) {
         JsonArray json = new JsonArray(cards.size());
-        for (WhiteCard card : cards) json.add(card.getClientDataJson());
+        for (WhiteCard card : cards) json.add(card.getClientDataJson().obj());
         return json;
     }
 
@@ -169,7 +168,8 @@ public class Game {
         logger.info(String.format("%s joined game %d.", user.toString(), id));
 
         synchronized (players) {
-            if (players.size() >= options.playerLimit) throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL);
+            if (players.size() >= options.playerLimit)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.GAME_FULL);
 
             user.joinGame(this);
             Player player = new Player(user);
@@ -177,8 +177,8 @@ public class Game {
             if (host == null) host = player;
         }
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_PLAYER_JOIN);
-        ev.add(LongPollResponse.NICKNAME, user.getNickname());
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_JOIN);
+        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -212,10 +212,10 @@ public class Game {
      */
     public JsonWrapper getLikesInfoJson(User user) {
         JsonWrapper obj = new JsonWrapper();
-        obj.add(GameInfo.I_LIKE, userLikes(user));
-        obj.add(GameInfo.I_DISLIKE, userDislikes(user));
-        obj.add(GameInfo.LIKES, getLikes());
-        obj.add(GameInfo.DISLIKES, getDislikes());
+        obj.add(Consts.GameInfoData.I_LIKE, userLikes(user));
+        obj.add(Consts.GameInfoData.I_DISLIKE, userDislikes(user));
+        obj.add(Consts.GameInfoData.LIKES, getLikes());
+        obj.add(Consts.GameInfoData.DISLIKES, getDislikes());
         return obj;
     }
 
@@ -295,9 +295,9 @@ public class Game {
 
             // If they are judge, return all played cards to hand, and move to next judge.
             boolean wasJudge = false;
-            if (getJudge() == player && (state == GameState.PLAYING || state == GameState.JUDGING)) {
-                EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_JUDGE_LEFT);
-                ev.add(LongPollResponse.INTERMISSION, ROUND_INTERMISSION);
+            if (getJudge() == player && (state == Consts.GameState.PLAYING || state == Consts.GameState.JUDGING)) {
+                EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_JUDGE_LEFT);
+                ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
                 broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
                 returnCardsToHand();
@@ -311,8 +311,8 @@ public class Game {
             players.remove(player);
             user.leaveGame(this);
 
-            EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_PLAYER_LEAVE);
-            ev.add(LongPollResponse.NICKNAME, user.getNickname());
+            EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_LEAVE);
+            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
             broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
 
             // If they are the host, choose another one
@@ -323,7 +323,7 @@ public class Game {
             }
 
             // Put game in lobby status as there aren't enough players
-            if (players.size() < 3 && state != GameState.LOBBY) {
+            if (players.size() < 3 && state != Consts.GameState.LOBBY) {
                 resetState(true);
             } else if (wasJudge) { // Start a new round if they are the judge
                 synchronized (roundTimerLock) {
@@ -349,14 +349,15 @@ public class Game {
     public void addSpectator(User user) throws BaseCahHandler.CahException {
         logger.info(String.format("%s joined game %d as a spectator.", user.toString(), id));
         synchronized (spectators) {
-            if (spectators.size() >= options.spectatorLimit) throw new BaseCahHandler.CahException(ErrorCode.GAME_FULL);
+            if (spectators.size() >= options.spectatorLimit)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.GAME_FULL);
 
             user.joinGame(this);
             spectators.add(user);
         }
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_SPECTATOR_JOIN);
-        ev.add(LongPollResponse.NICKNAME, user.getNickname());
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_SPECTATOR_JOIN);
+        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -372,8 +373,8 @@ public class Game {
             user.leaveGame(this);
         }
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_SPECTATOR_LEAVE);
-        ev.add(LongPollResponse.NICKNAME, user.getNickname());
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_SPECTATOR_LEAVE);
+        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -412,8 +413,8 @@ public class Game {
      */
     public void notifyPlayerInfoChange(Player player) {
         if (player == null) return;
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_PLAYER_INFO_CHANGE);
-        ev.add(LongPollResponse.PLAYER_INFO, getPlayerInfoJson(player));
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_INFO_CHANGE);
+        ev.add(Consts.GamePlayerInfo.INFO, getPlayerInfoJson(player));
         broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -421,15 +422,15 @@ public class Game {
      * Sends updated game information to all players in the game.
      */
     private void notifyGameOptionsChanged() {
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_OPTIONS_CHANGED);
-        ev.add(LongPollResponse.GAME_INFO, getInfoJson(null, true));
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_OPTIONS_CHANGED);
+        ev.add(Consts.GameInfoData.INFO, getInfoJson(null, true));
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
     }
 
     /**
      * @return The game's current state.
      */
-    public GameState getState() {
+    public Consts.GameState getState() {
         return state;
     }
 
@@ -489,34 +490,34 @@ public class Game {
      * @return A summary of the game information
      */
     @Nullable
-    public JsonObject getInfoJson(@Nullable User user, boolean includePassword) {
+    public JsonWrapper getInfoJson(@Nullable User user, boolean includePassword) {
         // This is probably happening because the game ceases to exist in the middle of getting the
         // game list. Just return nothing.
         if (host == null) return null;
 
-        JsonObject obj = new JsonObject();
-        obj.addProperty(GameInfo.ID.toString(), id);
-        obj.addProperty(GameInfo.LIKES.toString(), getLikes());
-        obj.addProperty(GameInfo.DISLIKES.toString(), getDislikes());
-        obj.addProperty(GameInfo.HOST.toString(), host.getUser().getNickname());
-        obj.addProperty(GameInfo.STATE.toString(), state.toString());
-        obj.add(GameInfo.GAME_OPTIONS.toString(), options.toJson(includePassword));
-        obj.addProperty(GameInfo.HAS_PASSWORD.toString(), options.password != null && !options.password.equals(""));
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GeneralKeys.GAME_ID, id);
+        obj.add(Consts.GameInfoData.LIKES, getLikes());
+        obj.add(Consts.GameInfoData.DISLIKES, getDislikes());
+        obj.add(Consts.GameInfoData.HOST, host.getUser().getNickname());
+        obj.add(Consts.GeneralGameData.STATE, state.toString());
+        obj.add(Consts.GameOptionData.OPTIONS, options.toJson(includePassword));
+        obj.add(Consts.GameInfoData.HAS_PASSWORD, options.password != null && !options.password.equals(""));
 
         if (user != null) {
-            obj.addProperty(GameInfo.I_LIKE.toString(), userLikes(user));
-            obj.addProperty(GameInfo.I_DISLIKE.toString(), userDislikes(user));
+            obj.add(Consts.GameInfoData.I_LIKE, userLikes(user));
+            obj.add(Consts.GameInfoData.I_DISLIKE, userDislikes(user));
         }
 
         JsonArray playerNames = new JsonArray();
         for (Player player : players.toArray(new Player[players.size()]))
             playerNames.add(player.getUser().getNickname());
-        obj.add(GameInfo.PLAYERS.toString(), playerNames);
+        obj.add(Consts.GameInfoData.PLAYERS, playerNames);
 
         JsonArray spectatorNames = new JsonArray();
         for (User spectator : spectators.toArray(new User[spectators.size()]))
             spectatorNames.add(spectator.getNickname());
-        obj.add(GameInfo.SPECTATORS.toString(), spectatorNames);
+        obj.add(Consts.GameInfoData.SPECTATORS, spectatorNames);
 
         return obj;
     }
@@ -527,7 +528,7 @@ public class Game {
     public JsonElement getAllPlayersInfoJson() {
         JsonArray json = new JsonArray(players.size());
         for (Player player : players.toArray(new Player[players.size()]))
-            json.add(getPlayerInfoJson(player));
+            json.add(getPlayerInfoJson(player).obj());
 
         return json;
     }
@@ -544,11 +545,11 @@ public class Game {
      * @return Info about a single player
      */
     @NotNull
-    public JsonObject getPlayerInfoJson(@NotNull Player player) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(GamePlayerInfo.NAME.toString(), player.getUser().getNickname());
-        obj.addProperty(GamePlayerInfo.SCORE.toString(), player.getScore());
-        obj.addProperty(GamePlayerInfo.STATUS.toString(), getPlayerStatus(player).toString());
+    public JsonWrapper getPlayerInfoJson(@NotNull Player player) {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GamePlayerInfo.NAME, player.getUser().getNickname());
+        obj.add(Consts.GamePlayerInfo.SCORE, player.getScore());
+        obj.add(Consts.GamePlayerInfo.STATUS, getPlayerStatus(player).toString());
         return obj;
     }
 
@@ -558,26 +559,26 @@ public class Game {
      * @param player Player for whom to get the state.
      * @return The state of {@param player}, depending on the game's state and what the player has done.
      */
-    private GamePlayerStatus getPlayerStatus(Player player) {
+    private Consts.GamePlayerState getPlayerStatus(Player player) {
         switch (state) {
             case LOBBY:
-                if (host == player) return GamePlayerStatus.HOST;
-                else return GamePlayerStatus.IDLE;
+                if (host == player) return Consts.GamePlayerState.HOST;
+                else return Consts.GamePlayerState.IDLE;
             case PLAYING:
-                if (getJudge() == player) return GamePlayerStatus.JUDGE;
-                if (!roundPlayers.contains(player)) return GamePlayerStatus.IDLE;
+                if (getJudge() == player) return Consts.GamePlayerState.JUDGE;
+                if (!roundPlayers.contains(player)) return Consts.GamePlayerState.IDLE;
 
                 List<WhiteCard> playerCards = playedCards.getCards(player);
                 if (playerCards != null && blackCard != null && playerCards.size() >= blackCard.getPick())
-                    return GamePlayerStatus.IDLE;
+                    return Consts.GamePlayerState.IDLE;
                 else
-                    return GamePlayerStatus.PLAYING;
+                    return Consts.GamePlayerState.PLAYING;
             case JUDGING:
-                if (getJudge() == player) return GamePlayerStatus.JUDGING;
-                else return GamePlayerStatus.IDLE;
+                if (getJudge() == player) return Consts.GamePlayerState.JUDGING;
+                else return Consts.GamePlayerState.IDLE;
             case ROUND_OVER:
-                if (didPlayerWonGame(player)) return GamePlayerStatus.WINNER;
-                else return GamePlayerStatus.IDLE;
+                if (didPlayerWonGame(player)) return Consts.GamePlayerState.WINNER;
+                else return Consts.GamePlayerState.IDLE;
             default:
                 throw new IllegalStateException("Unknown GameState " + state.toString());
         }
@@ -587,8 +588,9 @@ public class Game {
      * Start the game, if there are at least 3 players present
      */
     public void start() throws FailedLoadingSomeCardcastDecks, BaseCahHandler.CahException {
-        if (state != GameState.LOBBY) throw new BaseCahHandler.CahException(ErrorCode.ALREADY_STARTED);
-        if (!hasEnoughCards()) throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_CARDS);
+        if (state != Consts.GameState.LOBBY)
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
+        if (!hasEnoughCards()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ENOUGH_CARDS);
 
         int numPlayers = players.size();
         if (numPlayers >= 3) {
@@ -607,7 +609,7 @@ public class Game {
             startNextRound();
             gameManager.broadcastGameListRefresh();
         } else {
-            throw new BaseCahHandler.CahException(ErrorCode.NOT_ENOUGH_PLAYERS);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ENOUGH_PLAYERS);
         }
     }
 
@@ -723,7 +725,7 @@ public class Game {
                 for (final Player player : roundPlayers) {
                     List<WhiteCard> cards = playedCards.getCards(player);
                     if (cards == null || cards.size() < blackCard.getPick()) {
-                        player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, new EventWrapper(this, LongPollEvent.HURRY_UP)));
+                        player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.HURRY_UP)));
                     }
                 }
             }
@@ -744,10 +746,10 @@ public class Game {
         synchronized (roundTimerLock) {
             killRoundTimer();
 
-            if (state == GameState.JUDGING) {
+            if (state == Consts.GameState.JUDGING) {
                 Player judge = getJudge();
                 if (judge != null)
-                    judge.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, new EventWrapper(this, LongPollEvent.HURRY_UP)));
+                    judge.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.HURRY_UP)));
             }
 
             rescheduleTimer(new SafeTimerTask() {
@@ -767,7 +769,7 @@ public class Game {
 
         // Prevent them from playing a card while we kick them (or us kicking them while they play!)
         synchronized (judgeLock) {
-            if (state != GameState.JUDGING) return;
+            if (state != Consts.GameState.JUDGING) return;
 
             // Not sure why this would happen but it has happened before.
             // I guess they disconnected at the exact wrong time?
@@ -780,7 +782,7 @@ public class Game {
 
             logger.info(String.format("Skipping idle judge %s in game %d", judgeName, id));
 
-            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, LongPollEvent.GAME_JUDGE_SKIPPED));
+            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.GAME_JUDGE_SKIPPED));
             returnCardsToHand();
             startNextRound();
         }
@@ -802,14 +804,14 @@ public class Game {
 
                     EventWrapper ev;
                     if (player.getSkipCount() >= MAX_SKIPS_BEFORE_KICK || playedCards.size() < 2) {
-                        ev = new EventWrapper(this, LongPollEvent.GAME_PLAYER_KICKED_IDLE);
+                        ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_KICKED_IDLE);
                         playersToRemove.add(player.getUser());
                     } else {
-                        ev = new EventWrapper(this, LongPollEvent.GAME_PLAYER_SKIPPED);
+                        ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_SKIPPED);
                         playersToUpdateStatus.add(player);
                     }
 
-                    ev.add(LongPollResponse.NICKNAME, player.getUser().getNickname());
+                    ev.add(Consts.GeneralKeys.NICKNAME, player.getUser().getNickname());
                     broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
                     // Put their cards back
@@ -825,11 +827,11 @@ public class Game {
         // Remove the select players
         for (User user : playersToRemove) {
             removePlayer(user);
-            user.enqueueMessage(new QueuedMessage(MessageType.GAME_PLAYER_EVENT, new EventWrapper(this, LongPollEvent.KICKED_FROM_GAME_IDLE)));
+            user.enqueueMessage(new QueuedMessage(MessageType.GAME_PLAYER_EVENT, new EventWrapper(this, Consts.Event.KICKED_FROM_GAME_IDLE)));
         }
 
         synchronized (playedCards) {
-            if (state == GameState.PLAYING || playersToRemove.size() == 0) {
+            if (state == Consts.GameState.PLAYING || playersToRemove.size() == 0) {
                 if (players.size() < 3 || playedCards.size() < 2) {
                     logger.info(String.format("Resetting game %d due to insufficient players after removing %d idle players.", id, playersToRemove.size()));
                     resetState(true);
@@ -874,14 +876,14 @@ public class Game {
      */
     private void judgingState() {
         killRoundTimer();
-        state = GameState.JUDGING;
+        state = Consts.GameState.JUDGING;
 
         int judgeTimer = calculateTime(JUDGE_TIMEOUT_BASE + (JUDGE_TIMEOUT_PER_CARD * playedCards.size() * blackCard.getPick()));
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_STATE_CHANGE);
-        ev.add(LongPollResponse.GAME_STATE, GameState.JUDGING.toString());
-        ev.add(LongPollResponse.WHITE_CARDS, getWhiteCardsJson());
-        ev.add(LongPollResponse.PLAY_TIMER, judgeTimer);
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
+        ev.add(Consts.GeneralGameData.STATE, Consts.GameState.JUDGING.toString());
+        ev.add(Consts.OngoingGameData.WHITE_CARDS, getWhiteCardsJson());
+        ev.add(Consts.OngoingGameData.PLAY_TIMER, judgeTimer);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
         synchronized (roundTimerLock) {
@@ -918,12 +920,12 @@ public class Game {
 
         playedCards.clear();
         roundPlayers.clear();
-        state = GameState.LOBBY;
+        state = Consts.GameState.LOBBY;
         Player judge = getJudge();
         judgeIndex = 0;
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_STATE_CHANGE);
-        ev.add(LongPollResponse.GAME_STATE, GameState.LOBBY.toString());
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
+        ev.add(Consts.GeneralGameData.STATE, Consts.GameState.LOBBY.toString());
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
         if (host != null) notifyPlayerInfoChange(host);
@@ -939,7 +941,7 @@ public class Game {
      * @return True if judging should begin.
      */
     private boolean shouldStartJudging() {
-        if (state != GameState.PLAYING) return false;
+        if (state != Consts.GameState.PLAYING) return false;
 
         if (playedCards.size() == roundPlayers.size()) {
             boolean startJudging = true;
@@ -1001,13 +1003,13 @@ public class Game {
             blackCard = getNextBlackCard();
         }
 
-        state = GameState.PLAYING;
+        state = Consts.GameState.PLAYING;
         int playTimer = calculateTime(PLAY_TIMEOUT_BASE + (PLAY_TIMEOUT_PER_CARD * blackCard.getPick()));
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_STATE_CHANGE);
-        ev.add(LongPollResponse.BLACK_CARD, getBlackCardJson());
-        ev.add(LongPollResponse.GAME_STATE, GameState.PLAYING.toString());
-        ev.add(LongPollResponse.PLAY_TIMER, playTimer);
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
+        ev.add(Consts.OngoingGameData.BLACK_CARD, getBlackCardJson());
+        ev.add(Consts.GeneralGameData.STATE, Consts.GameState.PLAYING.toString());
+        ev.add(Consts.OngoingGameData.PLAY_TIMER, playTimer);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
         notifyPlayerInfoChange(getJudge());
@@ -1031,7 +1033,7 @@ public class Game {
         } catch (OutOfCardsException e) {
             whiteDeck.reshuffle();
 
-            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, LongPollEvent.GAME_WHITE_RESHUFFLE));
+            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.GAME_WHITE_RESHUFFLE));
             return getNextWhiteCard();
         }
     }
@@ -1045,7 +1047,7 @@ public class Game {
         } catch (final OutOfCardsException e) {
             blackDeck.reshuffle();
 
-            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, LongPollEvent.GAME_BLACK_RESHUFFLE));
+            broadcastToPlayers(MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.GAME_BLACK_RESHUFFLE));
             return getNextBlackCard();
         }
     }
@@ -1069,7 +1071,7 @@ public class Game {
      * @return The black card json data
      */
     @Nullable
-    public JsonObject getBlackCardJson() {
+    public JsonWrapper getBlackCardJson() {
         synchronized (blackCardLock) {
             if (blackCard != null) return blackCard.getClientDataJson();
             else return null;
@@ -1080,7 +1082,7 @@ public class Game {
      * @return The white cards json data, shuffled
      */
     private JsonArray getWhiteCardsJson() {
-        if (state != GameState.JUDGING) {
+        if (state != Consts.GameState.JUDGING) {
             return new JsonArray();
         } else {
             List<List<WhiteCard>> shuffledPlayedCards = new ArrayList<>(playedCards.cards());
@@ -1098,9 +1100,9 @@ public class Game {
      */
     public JsonArray getWhiteCardsJson(User user) {
         // If we're in judge mode, return all of the cards and ignore which user is asking
-        if (state == GameState.JUDGING) {
+        if (state == Consts.GameState.JUDGING) {
             return getWhiteCardsJson();
-        } else if (state != GameState.PLAYING) {
+        } else if (state != Consts.GameState.PLAYING) {
             return new JsonArray();
         } else {
             Player player = getPlayerForUser(user);
@@ -1117,7 +1119,7 @@ public class Game {
                 int numPick = blackCard == null ? 1 : blackCard.getPick() + blackCard.getDraw();
                 while (faceDownCards-- > 0) {
                     JsonArray array = new JsonArray(numPick);
-                    for (int i = 0; i < numPick; i++) array.add(WhiteCard.getFaceDownCardClientDataJson());
+                    for (int i = 0; i < numPick; i++) array.add(WhiteCard.getFaceDownCardClientDataJson().obj());
                     json.add(array);
                 }
 
@@ -1133,8 +1135,8 @@ public class Game {
      * @param cards  The player's hand
      */
     private void sendCardsToPlayer(Player player, List<WhiteCard> cards) {
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.HAND_DEAL);
-        ev.add(LongPollResponse.HAND, getWhiteCardsDataJson(cards));
+        EventWrapper ev = new EventWrapper(this, Consts.Event.HAND_DEAL);
+        ev.add(Consts.OngoingGameData.HAND, getWhiteCardsDataJson(cards));
         player.getUser().enqueueMessage(new QueuedMessage(MessageType.GAME_EVENT, ev));
     }
 
@@ -1189,12 +1191,12 @@ public class Game {
         Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
-            if (getJudge() == player || state != GameState.PLAYING)
-                throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
+            if (getJudge() == player || state != Consts.GameState.PLAYING)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_YOUR_TURN);
 
             int playedCardsCount = playedCards.playedCardsCount(player);
             if (playedCardsCount == blackCard.getPick())
-                throw new BaseCahHandler.CahException(ErrorCode.ALREADY_PLAYED);
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_PLAYED);
 
             WhiteCard playCard = null;
             synchronized (player.hand) {
@@ -1205,7 +1207,7 @@ public class Game {
                         playCard = card;
                         if (WhiteDeck.isBlankCard(card)) {
                             if (cardText == null || cardText.isEmpty())
-                                throw new BaseCahHandler.CahException(ErrorCode.NO_MSG_SPECIFIED);
+                                throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_MSG_SPECIFIED);
                             ((BlankWhiteCard) playCard).setText(cardText);
                         }
 
@@ -1225,10 +1227,10 @@ public class Game {
                 if (shouldStartJudging()) judgingState();
                 return blackCard.getPick() + blackCard.getDraw() - playedCardsCount;
             } else {
-                throw new BaseCahHandler.CahException(ErrorCode.DO_NOT_HAVE_CARD);
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.DO_NOT_HAVE_CARD);
             }
         } else {
-            throw new BaseCahHandler.CahException(ErrorCode.NOT_IN_THAT_GAME);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_IN_THAT_GAME);
         }
     }
 
@@ -1244,24 +1246,25 @@ public class Game {
         Player winner;
         synchronized (judgeLock) {
             Player judgePlayer = getPlayerForUser(judge);
-            if (getJudge() != judgePlayer) throw new BaseCahHandler.CahException(ErrorCode.NOT_JUDGE);
-            else if (state != GameState.JUDGING) throw new BaseCahHandler.CahException(ErrorCode.NOT_YOUR_TURN);
+            if (getJudge() != judgePlayer) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_JUDGE);
+            else if (state != Consts.GameState.JUDGING)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_YOUR_TURN);
 
             if (judgePlayer != null) judgePlayer.resetSkipCount();
 
             winner = playedCards.getPlayerForId(cardId);
-            if (winner == null) throw new BaseCahHandler.CahException(ErrorCode.INVALID_CARD);
+            if (winner == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_CARD);
 
             winner.increaseScore();
         }
 
-        state = GameState.ROUND_OVER;
+        state = Consts.GameState.ROUND_OVER;
 
-        EventWrapper ev = new EventWrapper(this, LongPollEvent.GAME_STATE_CHANGE);
-        ev.add(LongPollResponse.GAME_STATE, GameState.ROUND_OVER.toString());
-        ev.add(LongPollResponse.ROUND_WINNER, winner.getUser().getNickname());
-        ev.add(LongPollResponse.WINNING_CARD, cardId); // TODO: Return all ids
-        ev.add(LongPollResponse.INTERMISSION, ROUND_INTERMISSION);
+        EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
+        ev.add(Consts.GeneralGameData.STATE, Consts.GameState.ROUND_OVER.toString());
+        ev.add(Consts.OngoingGameData.ROUND_WINNER, winner.getUser().getNickname());
+        ev.add(Consts.OngoingGameData.WINNING_CARD, cardId); // TODO: Return all ids
+        ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
         notifyPlayerInfoChange(winner); // For score and status

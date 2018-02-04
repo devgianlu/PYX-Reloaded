@@ -1,6 +1,6 @@
 package net.socialgamer.cah.task;
 
-import net.socialgamer.cah.Constants.LongPollEvent;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
@@ -20,7 +20,7 @@ public class BroadcastGameListUpdateTask extends SafeTimerTask {
     @Override
     public void process() {
         if (needsUpdate) {
-            users.broadcastToAll(MessageType.GAME_EVENT, new EventWrapper(LongPollEvent.GAME_LIST_REFRESH));
+            users.broadcastToAll(MessageType.GAME_EVENT, new EventWrapper(Consts.Event.GAME_LIST_REFRESH));
             needsUpdate = false;
         }
     }

@@ -1,6 +1,6 @@
 package net.socialgamer.cah.data;
 
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.servlets.BaseCahHandler;
 import net.socialgamer.cah.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
@@ -45,7 +45,7 @@ public class GameManager {
     private Game createGame(GameOptions options) throws BaseCahHandler.CahException {
         synchronized (games) {
             if (games.size() >= getMaxGames())
-                throw new BaseCahHandler.CahException(Constants.ErrorCode.TOO_MANY_GAMES);
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_MANY_GAMES);
             Game game = gameProvider.create(this, options);
             games.put(game.getId(), game);
             return game;
@@ -128,10 +128,6 @@ public class GameManager {
         synchronized (games) {
             return games.get(id);
         }
-    }
-
-    Map<Integer, Game> getGames() {
-        return games;
     }
 
     public interface GameProvider {

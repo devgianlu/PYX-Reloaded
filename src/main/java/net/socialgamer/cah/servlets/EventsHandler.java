@@ -8,7 +8,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.QueuedMessage;
 import net.socialgamer.cah.data.User;
@@ -51,9 +51,9 @@ public class EventsHandler implements WebSocketConnectionCallback {
 
         User user;
         if (sid == null || (user = Sessions.getUser(sid.getValue())) == null) {
-            sendConnectionError(exchange, channel, new JsonWrapper(Constants.LongPollResponse.ERROR_CODE, Constants.ErrorCode.NOT_REGISTERED));
+            sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.NOT_REGISTERED));
         } else if (!user.isValid()) {
-            sendConnectionError(exchange, channel, new JsonWrapper(Constants.LongPollResponse.ERROR_CODE, Constants.ErrorCode.SESSION_EXPIRED));
+            sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.SESSION_EXPIRED));
         } else {
             user.establishedEventsConnection(new EventsSender(user, channel));
         }
@@ -104,7 +104,7 @@ public class EventsHandler implements WebSocketConnectionCallback {
                     array.add(message.getData().obj());
 
                 try {
-                    WebSockets.sendTextBlocking(new JsonWrapper(Constants.LongPollResponse.EVENTS, array).obj().toString(), channel);
+                    WebSockets.sendTextBlocking(new JsonWrapper(Consts.GeneralKeys.EVENTS, array).obj().toString(), channel);
                     user.userReceivedEvents();
                 } catch (IOException ex) {
                     handleIoException(ex);

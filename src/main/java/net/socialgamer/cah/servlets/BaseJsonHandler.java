@@ -1,12 +1,11 @@
 package net.socialgamer.cah.servlets;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
-import net.socialgamer.cah.Constants;
+import net.socialgamer.cah.JsonWrapper;
 
 import java.nio.charset.Charset;
 import java.util.logging.Level;
@@ -34,15 +33,8 @@ public abstract class BaseJsonHandler implements HttpHandler {
                 exchange.setStatusCode(ex.status);
 
                 if (ex instanceof BaseCahHandler.CahException) {
-                    JsonObject obj = new JsonObject();
-                    obj.addProperty(Constants.AjaxResponse.ERROR.toString(), true);
-                    obj.addProperty(Constants.AjaxResponse.ERROR_CODE.toString(), ((BaseCahHandler.CahException) ex).code.toString());
-
-                    JsonObject data = ((BaseCahHandler.CahException) ex).data;
-                    if (data != null) {
-                        for (String key : data.keySet()) obj.add(key, data.get(key));
-                    }
-
+                    JsonWrapper obj = new JsonWrapper(((BaseCahHandler.CahException) ex).code);
+                    obj.addAll(((BaseCahHandler.CahException) ex).data);
                     exchange.getResponseSender().send(obj.toString());
                 }
             } catch (Exception ex) {

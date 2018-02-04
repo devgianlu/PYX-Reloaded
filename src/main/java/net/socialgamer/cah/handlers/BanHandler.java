@@ -4,7 +4,7 @@
 package net.socialgamer.cah.handlers;
 
 import io.undertow.server.HttpServerExchange;
-import net.socialgamer.cah.Constants.*;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.JsonWrapper;
 import net.socialgamer.cah.data.ConnectedUsers;
@@ -18,7 +18,7 @@ import net.socialgamer.cah.servlets.Parameters;
 import org.apache.log4j.Logger;
 
 public class BanHandler extends BaseHandler {
-    public static final String OP = AjaxOperation.BAN.toString();
+    public static final String OP = Consts.Operation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
     private final ConnectedUsers connectedUsers; //Presumably between here to line 28, we get the list of users currently connected.
 
@@ -29,13 +29,13 @@ public class BanHandler extends BaseHandler {
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin())
-            throw new BaseCahHandler.CahException(ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
 
-        String nickname = params.get(AjaxRequest.NICKNAME); //Set a variable "nickname" to the one entered through the command.
+        String nickname = params.get(Consts.GeneralKeys.NICKNAME); //Set a variable "nickname" to the one entered through the command.
 
         //Assuming this is for when the command wasn't properly typed
         if (nickname == null || nickname.isEmpty())
-            throw new BaseCahHandler.CahException(ErrorCode.NO_NICK_SPECIFIED);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
 
         String banIp;
         User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
@@ -49,9 +49,9 @@ public class BanHandler extends BaseHandler {
         if (kickUser != null) {
             banIp = kickUser.getHostname();
 
-            kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(LongPollEvent.BANNED)));
+            kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(Consts.Event.BANNED)));
 
-            connectedUsers.removeUser(kickUser, DisconnectReason.BANNED);
+            connectedUsers.removeUser(kickUser, Consts.DisconnectReason.BANNED);
             logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), banIp, user.getNickname()));
         } else { //Ban via nickname instead of IP address.
             banIp = nickname;

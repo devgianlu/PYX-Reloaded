@@ -4,12 +4,12 @@ import net.socialgamer.cah.data.Game;
 
 public class EventWrapper extends JsonWrapper {
 
-    public EventWrapper(Game game, Constants.LongPollEvent event) {
+    public EventWrapper(Game game, Consts.Event event) {
         this(event);
-        add(Constants.LongPollResponse.GAME_ID, game.getId());
+        add(Consts.GeneralKeys.GAME_ID, game.getId());
     }
 
-    public EventWrapper(Constants.LongPollEvent event) {
-        add(Constants.LongPollResponse.EVENT, event.toString());
+    public EventWrapper(Consts.Event event) {
+        add(Consts.GeneralKeys.EVENT, event.toString());
     }
 }

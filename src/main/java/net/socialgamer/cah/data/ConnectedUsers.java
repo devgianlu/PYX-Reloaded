@@ -1,9 +1,6 @@
 package net.socialgamer.cah.data;
 
-import net.socialgamer.cah.Constants.DisconnectReason;
-import net.socialgamer.cah.Constants.ErrorCode;
-import net.socialgamer.cah.Constants.LongPollEvent;
-import net.socialgamer.cah.Constants.LongPollResponse;
+import net.socialgamer.cah.Consts;
 import net.socialgamer.cah.EventWrapper;
 import net.socialgamer.cah.data.QueuedMessage.MessageType;
 import net.socialgamer.cah.servlets.BaseCahHandler;
@@ -46,16 +43,16 @@ public class ConnectedUsers {
         synchronized (users) {
             if (this.hasUser(user.getNickname())) {
                 logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
-                throw new BaseCahHandler.CahException(ErrorCode.NICK_IN_USE);
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
             } else if (users.size() >= maxUsers && !user.isAdmin()) {
                 logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)", user.toString(), users.size(), maxUsers));
-                throw new BaseCahHandler.CahException(ErrorCode.TOO_MANY_USERS);
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_MANY_USERS);
             } else {
                 logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
                 if (broadcastConnectsAndDisconnects) {
-                    EventWrapper ev = new EventWrapper(LongPollEvent.NEW_PLAYER);
-                    ev.add(LongPollResponse.NICKNAME, user.getNickname());
+                    EventWrapper ev = new EventWrapper(Consts.Event.NEW_PLAYER);
+                    ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
                     broadcastToAll(MessageType.PLAYER_EVENT, ev);
                 }
             }
@@ -69,7 +66,7 @@ public class ConnectedUsers {
      * @param user   User to remove.
      * @param reason Reason the user is being removed.
      */
-    public void removeUser(User user, DisconnectReason reason) {
+    public void removeUser(User user, Consts.DisconnectReason reason) {
         synchronized (users) {
             if (users.containsKey(user.getNickname())) {
                 logger.info(String.format("Removing user %s because %s", user.toString(), reason));
@@ -97,12 +94,12 @@ public class ConnectedUsers {
      * @param user   User that has left.
      * @param reason Reason why the user has left.
      */
-    private void notifyRemoveUser(User user, DisconnectReason reason) {
+    private void notifyRemoveUser(User user, Consts.DisconnectReason reason) {
         // Games are informed about the user leaving when the user object is marked invalid.
         if (broadcastConnectsAndDisconnects) {
-            EventWrapper ev = new EventWrapper(LongPollEvent.PLAYER_LEAVE);
-            ev.add(LongPollResponse.NICKNAME, user.getNickname());
-            ev.add(LongPollResponse.REASON, reason.toString());
+            EventWrapper ev = new EventWrapper(Consts.Event.PLAYER_LEAVE);
+            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            ev.add(Consts.GeneralKeys.DISCONNECT_REASON, reason.toString());
             broadcastToAll(MessageType.PLAYER_EVENT, ev);
         }
     }
@@ -113,18 +110,18 @@ public class ConnectedUsers {
      * but have not actually done anything for a long time.
      */
     public void checkForPingAndIdleTimeouts() {
-        final Map<User, DisconnectReason> removedUsers = new HashMap<>();
+        final Map<User, Consts.DisconnectReason> removedUsers = new HashMap<>();
         synchronized (users) {
             Iterator<User> iterator = users.values().iterator();
             while (iterator.hasNext()) {
                 User user = iterator.next();
 
-                DisconnectReason reason = null;
+                Consts.DisconnectReason reason = null;
                 if (System.currentTimeMillis() - user.getLastReceivedEvents() > PING_TIMEOUT) {
-                    if (user.isWaitingPong()) reason = DisconnectReason.PING_TIMEOUT;
+                    if (user.isWaitingPong()) reason = Consts.DisconnectReason.PING_TIMEOUT;
                     else user.sendPing();
                 } else if (!user.isAdmin() && System.currentTimeMillis() - user.getLastUserAction() > IDLE_TIMEOUT) {
-                    reason = DisconnectReason.IDLE_TIMEOUT;
+                    reason = Consts.DisconnectReason.IDLE_TIMEOUT;
                 }
 
                 if (reason != null) {
@@ -135,7 +132,7 @@ public class ConnectedUsers {
         }
 
         // Do this later to not keep users locked
-        for (Entry<User, DisconnectReason> entry : removedUsers.entrySet()) {
+        for (Entry<User, Consts.DisconnectReason> entry : removedUsers.entrySet()) {
             try {
                 entry.getKey().noLongerValid();
                 notifyRemoveUser(entry.getKey(), entry.getValue());

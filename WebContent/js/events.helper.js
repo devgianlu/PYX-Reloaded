@@ -4,6 +4,11 @@ const ws = new WebSocket((location.protocol === "https:" ? "wss" : "ws") + "://"
 ws.onmessage = function (event) {
     /** @param {object[]} data.Es - Events **/
     const data = JSON.parse(event.data);
+    if ("e" in data) {
+        Notifier.debug(data);
+        return;
+    }
+
     const events = data.Es;
     if (events.length === 0) return;
 

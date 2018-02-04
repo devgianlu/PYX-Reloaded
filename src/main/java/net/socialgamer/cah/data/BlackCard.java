@@ -1,8 +1,7 @@
 package net.socialgamer.cah.data;
 
-import com.google.gson.JsonObject;
-import net.socialgamer.cah.Constants.BlackCardData;
-
+import net.socialgamer.cah.Consts;
+import net.socialgamer.cah.JsonWrapper;
 
 public abstract class BlackCard {
 
@@ -26,13 +25,13 @@ public abstract class BlackCard {
         return getId();
     }
 
-    public final JsonObject getClientDataJson() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(BlackCardData.ID.toString(), getId());
-        obj.addProperty(BlackCardData.TEXT.toString(), getText());
-        obj.addProperty(BlackCardData.DRAW.toString(), getDraw());
-        obj.addProperty(BlackCardData.PICK.toString(), getPick());
-        obj.addProperty(BlackCardData.WATERMARK.toString(), getWatermark());
+    public final JsonWrapper getClientDataJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.GeneralKeys.CARD_ID, getId());
+        obj.add(Consts.BlackCardData.TEXT, getText());
+        obj.add(Consts.BlackCardData.DRAW, getDraw());
+        obj.add(Consts.BlackCardData.PICK, getPick());
+        obj.add(Consts.BlackCardData.WATERMARK, getWatermark());
         return obj;
     }
 
