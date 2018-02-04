@@ -26,8 +26,10 @@ import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class Server {
+    private static final Logger logger = Logger.getLogger(Server.class.getSimpleName());
     private static final long PING_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
@@ -82,13 +84,14 @@ public class Server {
         if (preferences.getBoolean("secure", false)) {
             server.addHttpListener(port, "0.0.0.0", new HttpsRedirect())
                     .addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
-                    new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
-                    new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
+                            new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
+                            new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
         } else {
             server.addHttpListener(port, "0.0.0.0");
         }
 
         server.build().start();
+        logger.info("Server started!");
     }
 
     private static SSLContext getSSLContext(File keyStorePath, String keyStorePassword, File trustStorePath, String trustStorePassword) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, KeyManagementException {

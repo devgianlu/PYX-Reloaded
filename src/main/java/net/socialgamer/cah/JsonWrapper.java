@@ -66,7 +66,8 @@ public class JsonWrapper {
         return obj.toString();
     }
 
-    public void addAll(JsonObject data) {
-        for (String key : data.keySet()) obj.add(key, data.get(key));
+    public void addAll(JsonWrapper data) {
+        if (data == null) return;
+        for (String key : data.obj.keySet()) obj.add(key, data.obj.get(key));
     }
 }

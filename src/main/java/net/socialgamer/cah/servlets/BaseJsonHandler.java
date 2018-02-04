@@ -37,7 +37,7 @@ public abstract class BaseJsonHandler implements HttpHandler {
                     obj.addAll(((BaseCahHandler.CahException) ex).data);
                     exchange.getResponseSender().send(obj.toString());
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
             }
         } else {

@@ -306,7 +306,6 @@ class GameManager {
     }
 
     _handleHandCardSelect(card) {
-        // TODO: Support for write-in cards
         const self = this;
         $.post("AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
             /**
@@ -446,8 +445,30 @@ class GameManager {
         $.post("AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
             Notifier.debug(data);
         }).fail(function (data) {
-            Notifier.error("Failed starting the game!", data);
-            // TODO: Show nice dialog
+            /**
+             * @param {object} data.responseJSON - The response body
+             *
+             * @param {string} error.ec - Error code
+             * @param {int} error.bcp - Provided black cards
+             * @param {int} error.bcr - Required black cards
+             * @param {int} error.wcp - Provided white cards
+             * @param {int} error.wcr - Required white cards
+             */
+            const error = data.responseJSON;
+
+            switch (error.ec) {
+                case "nec":
+                    Notifier.error("Not enough cards to start the game!" +
+                        "<br>Black cards: " + error.bcp + "/" + error.bcr +
+                        "<br>White cards: " + error.wcp + "/" + error.wcr, error);
+                    break;
+                case "nep":
+                    Notifier.error("Not enough players to start the game!", data);
+                    break;
+                default:
+                    Notifier.error("Failed starting the game!", data);
+                    break;
+            }
         })
     }
 }

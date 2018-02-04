@@ -1,7 +1,6 @@
 package net.socialgamer.cah.servlets;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.util.StatusCodes;
@@ -45,24 +44,24 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
 
     public static class CahException extends StatusException {
         public final Consts.ErrorCode code;
-        public final JsonObject data;
+        public final JsonWrapper data;
 
         public CahException(Consts.ErrorCode code) {
-            super(StatusCodes.INTERNAL_SERVER_ERROR);
+            super(StatusCodes.CONFLICT);
             this.code = code;
             this.data = null;
         }
 
         public CahException(Consts.ErrorCode code, Throwable cause) {
-            super(StatusCodes.INTERNAL_SERVER_ERROR, cause);
+            super(StatusCodes.CONFLICT, cause);
             this.code = code;
             this.data = null;
         }
 
         public CahException(Consts.ErrorCode code, JsonWrapper data) {
-            super(StatusCodes.INTERNAL_SERVER_ERROR);
+            super(StatusCodes.CONFLICT);
             this.code = code;
-            this.data = data.obj();
+            this.data = data;
         }
     }
 }
