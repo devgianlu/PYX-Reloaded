@@ -198,8 +198,14 @@ body {
 }
 
 .bottom-sheet--open .bottom-sheet__content {
-    padding: 16px;
     height: auto;
+}
+
+/* MDC fix */
+@media (max-width: 959px) and (orientation: landscape) {
+    .mdc-toolbar-fixed-adjust {
+        margin-top: 56px
+    }
 }
 
 /* Noty fixes */

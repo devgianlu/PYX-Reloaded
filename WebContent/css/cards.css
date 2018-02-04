@@ -27,20 +27,11 @@
     overflow-wrap: break-word;
 }
 
-#blackCard {
-    padding: 8px;
-}
-
 #whiteCards {
     width: 100%;
 }
 
-#whiteCards > .list > .mdc-card.pyx-card {
-    margin: 8px;
-}
-
 #hand > .list > .mdc-card.pyx-card {
-    margin: 8px;
     flex-shrink: 0;
 }
 
@@ -82,59 +73,68 @@
 
 /* Default --------------- */
 @media only screen and (max-width: 320px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 50vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 0.6rem;
         --adapted-line-height: 0.7rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 2px;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 4px;
     }
 }
 
 /* Small phones ---------- */
 @media only screen and (min-width: 320px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 40vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 0.6rem;
         --adapted-line-height: 0.9rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 2px;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 4px;
     }
 }
 
 /* Medium phones --------- */
 @media only screen and (min-width: 375px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 35vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 0.7rem;
         --adapted-line-height: 1rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 4px;
     }
 }
 
 /* Large phones ---------- */
 @media only screen and (min-width: 425px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 30vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 0.85rem;
         --adapted-line-height: 1.1rem;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 6px;
     }
 }
 
 /* Tablets --------------- */
 @media only screen and (min-width: 768px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 30vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1rem;
         --adapted-line-height: 1.1rem;
     }
@@ -142,15 +142,16 @@
     .mdc-card.pyx-card > .mdc-card__supporting-text {
         padding: 12px;
     }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 6px;
+    }
 }
 
 /* Small laptops --------------- */
 @media only screen and (min-width: 1024px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 25vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1rem;
         --adapted-line-height: 1.2rem;
     }
@@ -158,23 +159,21 @@
 
 /* Medium Laptops --------------- */
 @media only screen and (min-width: 1280px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 20vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1rem;
         --adapted-line-height: 1.2rem;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 8px;
     }
 }
 
 /* Large laptops --------- */
 @media only screen and (min-width: 1440px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 20vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1rem;
         --adapted-line-height: 1.2rem;
     }
@@ -182,11 +181,8 @@
 
 /* Desktop --------- */
 @media only screen and (min-width: 1600px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 16vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1rem;
         --adapted-line-height: 1.3rem;
     }
@@ -194,20 +190,25 @@
     .mdc-card.pyx-card > .mdc-card__supporting-text {
         padding: 14px;
     }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 8px;
+    }
 }
 
 /* 4K -------------------- */
 @media only screen and (min-width: 2560px) {
-    .mdc-card.pyx-card {
+    :root {
         --adapted-card-width: 12vw;
-    }
-
-    .mdc-card.pyx-card .mdc-typography {
         --adapted-font-size: 1.5rem;
         --adapted-line-height: 1.75rem;
     }
 
     .mdc-card.pyx-card > .mdc-card__supporting-text {
         padding: 16px;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 10px;
     }
 }

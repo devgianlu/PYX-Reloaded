@@ -251,7 +251,7 @@ class GameManager {
                 break;
             case "gjl":
                 Notifier.timeout(Notifier.ALERT, "The judge left.")
-                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds..."); // FIXME: May not restart
                 break;
             case "gjs":
                 Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.")
