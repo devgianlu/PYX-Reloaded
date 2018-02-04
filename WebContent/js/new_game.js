@@ -138,7 +138,7 @@ class CreateGameDialog {
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (val === tm.def) item.setAttribute("aria-selected", '');
+            if (val === tm.def) item.setAttribute("aria-selected", "true");
             item.innerHTML = val;
             list.append(item);
         }
@@ -162,7 +162,7 @@ class CreateGameDialog {
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (i === dgo.def) item.setAttribute("aria-selected", '');
+            if (i === dgo.def) item.setAttribute("aria-selected", "true");
             item.innerHTML = i;
             list.append(item);
         }
@@ -176,6 +176,7 @@ class CreateGameDialog {
                 return item.text();
         }
 
+        console.log("DEFAULTING");
         return list.children()[0].innerHTML; // Shouldn't happen
     }
 
@@ -201,7 +202,7 @@ class CreateGameDialog {
             "css": this.getSelectedPyxDecks()
         };
 
-        // FIXME: Something wrong when creating game without changing default values
+        Notifier.debug(go);
         games.createGame(go); // Reference to lobbies.js
     }
 
