@@ -919,15 +919,14 @@ public class Game {
         playedCards.clear();
         roundPlayers.clear();
         state = Consts.GameState.LOBBY;
-        Player judge = getJudge();
         judgeIndex = 0;
 
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
         ev.add(Consts.GeneralGameData.STATE, Consts.GameState.LOBBY.toString());
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
-        if (host != null) notifyPlayerInfoChange(host);
-        if (judge != null) notifyPlayerInfoChange(judge);
+        for (Player player : players)
+            notifyPlayerInfoChange(player);
 
         gameManager.broadcastGameListRefresh();
     }
@@ -1304,16 +1303,15 @@ public class Game {
         if (player.getScore() >= options.scoreGoal) {
             if (options.winBy == 0) return true;
 
-            Player highestScore = null;
-            synchronized (players) {
-                for (Player p : players) {
+            int highestScore = -1;
+            synchronized (roundPlayers) {
+                for (Player p : roundPlayers) {
                     if (player.equals(p)) continue;
-                    if (highestScore == null) highestScore = p;
-                    if (p.getScore() > highestScore.getScore()) highestScore = p;
+                    if (p.getScore() > highestScore) highestScore = p.getScore();
                 }
             }
 
-            return highestScore == null || player.getScore() + options.winBy >= highestScore.getScore();
+            return highestScore == -1 || player.getScore() >= highestScore + options.winBy;
         } else {
             return false;
         }
