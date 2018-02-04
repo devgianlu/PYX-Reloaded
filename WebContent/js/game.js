@@ -213,6 +213,7 @@ class GameManager {
      * @param {string} data.gs - Game status
      * @param {object} data.gi - Game info
      * @param {object} data.i - Round intermission
+     * @param {boolean} data.wl - Whther the game will stop
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -251,7 +252,8 @@ class GameManager {
                 break;
             case "gjl":
                 Notifier.timeout(Notifier.ALERT, "The judge left.")
-                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds..."); // FIXME: May not restart
+                if (!data.wl)
+                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
                 break;
             case "gjs":
                 Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.")
@@ -365,6 +367,7 @@ class GameManager {
      * @param {int} data.WC - Winning card(s), comma separated list
      * @param {string} data.rw - Round winner nickname
      * @param {int} data.i - Round intermission
+     * @param {boolean} data.wl - Whther the game will stop
      */
     _handleGameStatusChange(data) {
         switch (data.gs) {
@@ -389,8 +392,14 @@ class GameManager {
                 break;
             case "ro":
                 this._highlightWinningCards(data.WC);
-                if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, "<b>" + data.rw + "</b> won this round!");
-                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                if (data.wl) {
+                    // Someone won the game
+                    if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, "<b>" + data.rw + "</b> won the game!");
+                } else {
+                    if (data.rw === this.user.n) Notifier.timeout(Notifier.ALERT, "You won this round!");
+                    else Notifier.timeout(Notifier.ALERT, "<b>" + data.rw + "</b> won this round!");
+                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                }
                 break;
         }
     }
@@ -400,7 +409,6 @@ class GameManager {
         this._tableCards_masonry.children().each(function () {
             const self = $(this);
             for (let i = 0; i < cids.length; i++) {
-                console.log(cids[i] + "::" + self.attr("data-cid"))
                 if (cids[i] === self.attr("data-cid")) self.addClass("highlighted");
             }
         });

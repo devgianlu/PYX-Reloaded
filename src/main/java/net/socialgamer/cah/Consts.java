@@ -841,14 +841,42 @@ public final class Consts {
      * Fields for ongoing games data.
      */
     public enum OngoingGameData implements ReturnableKey {
+        /**
+         * Black card.
+         */
         BLACK_CARD("bc"),
+        /**
+         * Cards left to play to complete round.
+         */
         LEFT_TO_PLAY("ltp"),
+        /**
+         * White (table) cards.
+         */
         WHITE_CARDS("wc"),
+        /**
+         * Player hand.
+         */
         HAND("h"),
+        /**
+         * Round winner nickname
+         */
         ROUND_WINNER("rw"),
+        /**
+         * Winning card ID(s)
+         */
         WINNING_CARD("WC"),
+        /**
+         * Round intermission
+         */
         INTERMISSION("i"),
-        PLAY_TIMER("Pt");
+        /**
+         * Time available to play.
+         */
+        PLAY_TIMER("Pt"),
+        /**
+         * Whether the game will be stopped.
+         */
+        WILL_STOP("ws");
 
         private final String key;
 

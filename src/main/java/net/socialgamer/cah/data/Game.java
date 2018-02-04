@@ -290,27 +290,9 @@ public class Game {
                 for (WhiteCard card : player.hand) whiteDeck.discard(card);
             }
 
-            // If they are judge, return all played cards to hand, and move to next judge.
-            boolean wasJudge = false;
-            if (getJudge() == player && (state == Consts.GameState.PLAYING || state == Consts.GameState.JUDGING)) {
-                EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_JUDGE_LEFT);
-                ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
-                broadcastToPlayers(MessageType.GAME_EVENT, ev);
-
-                returnCardsToHand();
-                judgeIndex--; // startNextRound will advance it again.
-                wasJudge = true;
-            } else if (players.indexOf(player) < judgeIndex) {
-                judgeIndex--; // If they aren't judge but are earlier in judging order, fix the judge index.
-            }
-
             // Actually remove the user
             players.remove(player);
             user.leaveGame(this);
-
-            EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_LEAVE);
-            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
-            broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
 
             // If they are the host, choose another one
             if (host == player) {
@@ -320,8 +302,30 @@ public class Game {
                 notifyPlayerInfoChange(host);
             }
 
-            // Put game in lobby status as there aren't enough players
-            if (players.size() < 3 && state != Consts.GameState.LOBBY) {
+            boolean willStop = players.size() < 3 && state != Consts.GameState.LOBBY;
+
+            // If they was judge, return all played cards to hand, and move to next judge.
+            boolean wasJudge = false;
+            if (getJudge() == player && (state == Consts.GameState.PLAYING || state == Consts.GameState.JUDGING)) {
+                EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_JUDGE_LEFT);
+                ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
+                ev.add(Consts.OngoingGameData.WILL_STOP, willStop);
+                broadcastToPlayers(MessageType.GAME_EVENT, ev);
+
+                returnCardsToHand();
+                judgeIndex--; // startNextRound will advance it again.
+                wasJudge = true;
+            } else if (players.indexOf(player) < judgeIndex) {
+                judgeIndex--; // If they aren't judge but are earlier in judging order, fix the judge index.
+            }
+
+            EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_LEAVE);
+            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            ev.add(Consts.OngoingGameData.WILL_STOP, willStop);
+            broadcastToPlayers(MessageType.GAME_PLAYER_EVENT, ev);
+
+            // Put game in lobby state as there aren't enough players
+            if (willStop) {
                 resetState(true);
             } else if (wasJudge) { // Start a new round if they are the judge
                 synchronized (roundTimerLock) {
@@ -884,6 +888,8 @@ public class Game {
         ev.add(Consts.OngoingGameData.PLAY_TIMER, judgeTimer);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
+        notifyPlayerInfoChange(getJudge());
+
         synchronized (roundTimerLock) {
             rescheduleTimer(new SafeTimerTask() {
                 @Override
@@ -1257,9 +1263,11 @@ public class Game {
 
         state = Consts.GameState.ROUND_OVER;
 
+        boolean won = didPlayerWonGame(winner);
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
         ev.add(Consts.GeneralGameData.STATE, Consts.GameState.ROUND_OVER.toString());
         ev.add(Consts.OngoingGameData.ROUND_WINNER, winner.getUser().getNickname());
+        ev.add(Consts.OngoingGameData.WILL_STOP, won);
         ev.add(Consts.OngoingGameData.WINNING_CARD, Utils.joinCardIds(playedCards.getCards(winner), ","));
         ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
@@ -1267,7 +1275,7 @@ public class Game {
         notifyPlayerInfoChange(winner); // For score and status
 
         synchronized (roundTimerLock) {
-            if (didPlayerWonGame(winner)) {
+            if (won) {
                 rescheduleTimer(new SafeTimerTask() {
                     @Override
                     public void process() {
