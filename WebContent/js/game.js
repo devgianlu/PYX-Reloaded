@@ -67,7 +67,7 @@ class GameManager {
         template.removeAttr("id");
         template.attr("data-black", "true");
 
-        template.find('._text').text(card.T);
+        template.find('._text').html(card.T);
 
         const watermark = template.find('._watermark');
         if (card.W !== undefined && card.W.length > 0) watermark.text(card.W);
@@ -212,8 +212,9 @@ class GameManager {
      * @param {string} data.pi.N - Player's name
      * @param {string} data.gs - Game status
      * @param {object} data.gi - Game info
+     * @param {object} data.i - Round intermission
      */
-    handlePollEvent(data) { // TODO: Handle all events
+    handlePollEvent(data) {
         switch (data["E"]) {
             case "C":
                 this._receivedGameChatMessage(data);
@@ -249,17 +250,23 @@ class GameManager {
                 this._handleGameStatusChange(data);
                 break;
             case "gjl":
+                Notifier.timeout(Notifier.ALERT, "The judge left.")
+                Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
                 break;
             case "gjs":
+                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.")
                 break;
             case "goc":
                 this.info.gi.go = data.gi;
                 break;
             case "gpki":
+                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for beign idle.")
                 break;
             case "gps":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for beign idle.")
                 break;
             case "kfgi":
+                this._postLeave();
                 break;
             case "hu":
                 Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!")
@@ -339,18 +346,6 @@ class GameManager {
         this._recreateMasonry();
     }
 
-    _resetPlayerStatuesToPlaying() {
-        let me;
-        for (let i = 0; i < this.info.pi.length; i++) {
-            const player = this.info.pi[i];
-            player.st = "sp";
-            if (player.N === this.user.n) me = player;
-        }
-
-        this.handleMyInfoChanged(me);
-        this._reloadScoreboard();
-    }
-
     _reloadScoreboard() {
         this.scoreboard.clear();
         for (let i = 0; i < this.info.pi.length; i++) {
@@ -367,7 +362,7 @@ class GameManager {
      * @param {string} data.gs - Game status
      * @param {object} data.bc - Black card
      * @param {object[]} data.wc - Table cards
-     * @param {int} data.WC - Winning card
+     * @param {int} data.WC - Winning card(s), comma separated list
      * @param {string} data.rw - Round winner nickname
      * @param {int} data.i - Round intermission
      */
@@ -386,7 +381,6 @@ class GameManager {
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
                 this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
-                this._resetPlayerStatuesToPlaying();
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
@@ -394,19 +388,22 @@ class GameManager {
                 this.toggleHandVisibility(false);
                 break;
             case "ro":
-                this._highlightWinningCard(data.WC);
-                if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, data.rw + " won this round!");
+                this._highlightWinningCards(data.WC);
+                if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, "<b>" + data.rw + "<b/> won this round!");
                 Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
                 break;
         }
     }
 
-    _highlightWinningCard(cid) {
+    _highlightWinningCards(cids) {
+        cids = cids.split(",");
         this._tableCards_masonry.children().each(function () {
             const self = $(this);
-            if (self.attr("data-cid") === cid.toString()) self.addClass("highlighted");
-            else self.removeClass("highlighted");
-        })
+            for (let i = 0; i < cids.length; i++) {
+                console.log(cids[i] + "::" + self.attr("data-cid"))
+                if (cids[i] === self.attr("data-cid")) self.addClass("highlighted");
+            }
+        });
     }
 
     toggleStartButton(visible) {
@@ -436,9 +433,14 @@ class GameManager {
     }
 
     leave() {
+        const self = this;
         $.post("AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
-            window.location = "lobbies.html";
+            self._postLeave();
         });
+    }
+
+    _postLeave() {
+        window.location = "lobbies.html";
     }
 
     start() {

@@ -99,7 +99,7 @@ public final class Consts {
          */
         KICKED("kk"),
         /**
-         * A player has been kicked from the game for being idle too many rounds
+         * The player has been kicked from the game for being idle too many rounds
          */
         KICKED_FROM_GAME_IDLE("kfgi"),
         /**

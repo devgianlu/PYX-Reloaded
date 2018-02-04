@@ -1,6 +1,8 @@
 package net.socialgamer.cah;
 
 import com.google.gson.JsonArray;
+import net.socialgamer.cah.data.WhiteCard;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Random;
@@ -21,6 +23,23 @@ public class Utils {
         return jsonArray;
     }
 
+
+    @NotNull
+    public static String joinCardIds(Collection<WhiteCard> items, String separator) {
+        if (items == null) return "";
+
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for (WhiteCard item : items) {
+            if (!first) builder.append(separator);
+            builder.append(item.getId());
+            first = false;
+        }
+
+        return builder.toString();
+    }
+
+    @NotNull
     public static String generateAlphanumericString(int length) {
         StringBuilder builder = new StringBuilder();
         Random random = ThreadLocalRandom.current();

@@ -52,6 +52,7 @@ class Notifier {
     static countdown(type, msg_before, interval, msg_after) {
         const noty = new Noty(Object.assign({
             type: type,
+            progressBar: true,
             text: msg_before + interval + msg_after,
             timeout: interval * 1000
         }, Notifier._notyDefault()));
@@ -60,6 +61,7 @@ class Notifier {
         window.setInterval(function () {
             if (clearOut === 0) {
                 window.clearInterval(this);
+                noty.close();
                 return;
             }
 

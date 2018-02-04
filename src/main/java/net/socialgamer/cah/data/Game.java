@@ -2,10 +2,7 @@ package net.socialgamer.cah.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import net.socialgamer.cah.Consts;
-import net.socialgamer.cah.EventWrapper;
-import net.socialgamer.cah.JsonWrapper;
-import net.socialgamer.cah.Preferences;
+import net.socialgamer.cah.*;
 import net.socialgamer.cah.cardcast.CardcastDeck;
 import net.socialgamer.cah.cardcast.CardcastService;
 import net.socialgamer.cah.cardcast.FailedLoadingSomeCardcastDecks;
@@ -317,9 +314,10 @@ public class Game {
 
             // If they are the host, choose another one
             if (host == player) {
-                // TODO: Notify new host of its condition
-                if (players.size() > 0) host = players.get(0);
+                if (!players.isEmpty()) host = players.get(0);
                 else host = null;
+
+                notifyPlayerInfoChange(host);
             }
 
             // Put game in lobby status as there aren't enough players
@@ -1012,7 +1010,7 @@ public class Game {
         ev.add(Consts.OngoingGameData.PLAY_TIMER, playTimer);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
-        notifyPlayerInfoChange(getJudge());
+        for (Player player : players) notifyPlayerInfoChange(player);
 
         synchronized (roundTimerLock) {
             rescheduleTimer(new SafeTimerTask() {
@@ -1263,7 +1261,7 @@ public class Game {
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_STATE_CHANGE);
         ev.add(Consts.GeneralGameData.STATE, Consts.GameState.ROUND_OVER.toString());
         ev.add(Consts.OngoingGameData.ROUND_WINNER, winner.getUser().getNickname());
-        ev.add(Consts.OngoingGameData.WINNING_CARD, cardId); // TODO: Return all ids
+        ev.add(Consts.OngoingGameData.WINNING_CARD, Utils.joinCardIds(playedCards.getCards(winner), ","));
         ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
         broadcastToPlayers(MessageType.GAME_EVENT, ev);
 
