@@ -246,6 +246,7 @@ let cardcastMenu = new CardcastMenu();
 
 function loadDecks(query = null, category, nsfw, sort) {
     const container = document.getElementById('cardcast-container');
+    const message = container.querySelector('.message');
     const list = new List(container, {
         valueNames: ['_name', '_category', '_author', '_sample', {data: ['code']}],
         item: 'cardcast-deck-template',
@@ -280,7 +281,8 @@ function loadDecks(query = null, category, nsfw, sort) {
             });
         }
 
-        // TODO: Handle empty list
+        if (results.length === 0) $(message).show();
+        else $(message).hide();
 
         document.querySelector('main').scrollTop = 0;
         generatePagination(container.querySelector('.pagination__inner'), data.results.count);
@@ -345,7 +347,7 @@ function generatePagination(container, itemCount) {
         });
     }
 
-    if (currPage + 1 !== maxPages) {
+    if (currPage + 1 !== maxPages && maxPages !== 0) {
         const next = document.createElement("button");
         next.className = "mdc-button";
         next.innerHTML = "&raquo;";
