@@ -549,9 +549,9 @@ function startGame() {
     gameManager.start();
 }
 
-const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
+const drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
-    drawer.open = true
+    drawer.open = !drawer.open;
 });
 
 const hand = new BottomSheet(document.getElementById('hand'));

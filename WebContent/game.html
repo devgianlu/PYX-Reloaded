@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
@@ -14,6 +14,34 @@
     <script>Theming.apply();</script>
 </head>
 <body class="mdc-typography">
+
+<aside class="mdc-drawer mdc-drawer--persistent mdc-toolbar-fixed-adjust" id="drawer">
+    <nav class="mdc-drawer__drawer">
+        <div id="scoreboard" style="">
+            <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
+            <ul class="mdc-list mdc-list--two-line list"></ul>
+        </div>
+        <div id="chat">
+            <h3 class="mdc-typography mdc-typography--title">Chat</h3>
+            <div class="list"></div>
+            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
+                 data-mdc-auto-init="MDCTextField">
+                <input type="text" id="chat-message" class="mdc-text-field__input"
+                       onkeydown="sendChatMessage(this, event);">
+                <label for="chat-message" class="mdc-text-field__label">Message</label>
+                <i class="material-icons mdc-text-field__icon" tabindex="0"
+                   onclick="sendChatMessage(this.parentElement);">send</i>
+                <div class="mdc-text-field__outline">
+                    <svg>
+                        <path class="mdc-text-field__outline-path"></path>
+                    </svg>
+                </div>
+                <div class="mdc-text-field__idle-outline"></div>
+            </div>
+        </div>
+    </nav>
+</aside>
+
 <div class="page-content">
     <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
         <div class="mdc-toolbar__row">
@@ -57,33 +85,6 @@
     <div class="list mdc-theme--background bottom-sheet__content"></div>
 </aside>
 
-<aside class="mdc-drawer--temporary" id="drawer">
-    <nav class="mdc-drawer__drawer">
-        <div id="scoreboard" style="">
-            <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
-            <ul class="mdc-list mdc-list--two-line list"></ul>
-        </div>
-        <div id="chat">
-            <h3 class="mdc-typography mdc-typography--title">Chat</h3>
-            <div class="list"></div>
-            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
-                 data-mdc-auto-init="MDCTextField">
-                <input type="text" id="chat-message" class="mdc-text-field__input"
-                       onkeydown="sendChatMessage(this, event);">
-                <label for="chat-message" class="mdc-text-field__label">Message</label>
-                <i class="material-icons mdc-text-field__icon" tabindex="0"
-                   onclick="sendChatMessage(this.parentElement);">send</i>
-                <div class="mdc-text-field__outline">
-                    <svg>
-                        <path class="mdc-text-field__outline-path"></path>
-                    </svg>
-                </div>
-                <div class="mdc-text-field__idle-outline"></div>
-            </div>
-        </div>
-    </nav>
-</aside>
-
 <div style="display: none">
     <li id="playerItemTemplate" class="mdc-list-item">
         <span class="mdc-list-item__graphic mdc-typography mdc-typography--display1 _score">{{Score}}</span>
@@ -117,7 +118,7 @@
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
-<script src="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.js"></script>
+<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
