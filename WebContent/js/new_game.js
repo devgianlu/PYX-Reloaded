@@ -95,6 +95,8 @@ class CreateGameDialog {
         this._cardcastTitle = this._dialog.find('#cardcastDecksTitle');
         this._pyxTitle = this._dialog.find('#pyxDecksTitle');
 
+        this._password = this._dialog.find('#gamePassword');
+
         /**
          * @param {int} dgo.vL - Spectators limit
          * @param {int} dgo.sl - Score limit
@@ -163,7 +165,7 @@ class CreateGameDialog {
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
             if (i === dgo.def) item.setAttribute("aria-selected", "true");
-            item.innerHTML = i;
+            item.innerHTML = i.toString();
             list.append(item);
         }
     }
@@ -198,6 +200,7 @@ class CreateGameDialog {
             "bl": CreateGameDialog.getDropdownSelectedValue(this._blanksLimit),
             "tm": CreateGameDialog.getDropdownSelectedValue(this._timeMultiplier),
             "wb": CreateGameDialog.getDropdownSelectedValue(this._winBy),
+            "pw": this.getPassword(),
             "CCs": this.getCardcastDeckCodes(),
             "css": this.getSelectedPyxDecks()
         };
@@ -231,6 +234,8 @@ class CreateGameDialog {
                 "csi": set.csi
             })[0].elm);
 
+            mdc.checkbox.MDCCheckbox.attachTo(elm[0]);
+
             elm.find('input').attr("id", "pyx_deck_" + set.csi);
             elm.find('label').attr("for", "pyx_deck_" + set.csi);
         }
@@ -242,6 +247,10 @@ class CreateGameDialog {
 
         // Titles
         this.updateTitles();
+    }
+
+    getPassword() {
+        return this._password.val();
     }
 
     getSelectedPyxDecks() {

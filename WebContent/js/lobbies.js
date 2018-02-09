@@ -137,7 +137,7 @@ class Games {
 
     joinGame(gid, hp) {
         let password = "";
-        if (hp === true) password = Games.askPassword();
+        if (hp === "true") password = Games.askPassword();
 
         $.post("AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)
@@ -148,7 +148,7 @@ class Games {
 
     spectateGame(gid, hp) {
         let password = "";
-        if (hp === true) password = Games.askPassword();
+        if (hp === "true") password = Games.askPassword();
 
         $.post("AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)

@@ -79,7 +79,7 @@
                 <section class="mdc-card__supporting-text" style="padding: 0">
                     <div class="mdc-layout-grid">
                         <div class="mdc-layout-grid__inner">
-                            <div id="scoreLimit" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="scoreLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell" role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Goal</div>
@@ -91,7 +91,8 @@
                                 </div>
                             </div>
 
-                            <div id="playersLimit" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="playersLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Players Limit
@@ -104,7 +105,8 @@
                                 </div>
                             </div>
 
-                            <div id="spectatorsLimit" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="spectatorsLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Spectators Limit
@@ -117,7 +119,8 @@
                                 </div>
                             </div>
 
-                            <div id="blanksLimit" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="blanksLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Blank cards</div>
@@ -129,7 +132,8 @@
                                 </div>
                             </div>
 
-                            <div id="timeMultiplier" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="timeMultiplier" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Time Multiplier
@@ -142,7 +146,7 @@
                                 </div>
                             </div>
 
-                            <div id="winBy" class="mdc-select mdc-layout-grid__cell" role="listbox"
+                            <div id="winBy" class="mdc-select mdc-select--box mdc-layout-grid__cell" role="listbox"
                                  data-mdc-auto-init="MDCSelect">
                                 <div class="mdc-select__surface">
                                     <div class="mdc-select__label mdc-select__label--float-above">Win By</div>
@@ -160,10 +164,15 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h3 class="mdc-card__title"></h3>
+                    <h3 class="mdc-card__title">Access</h3>
                 </div>
-                <section class="mdc-card__supporting-text">
-                    <!-- TODO -->
+                <section class="mdc-card__supporting-text" style="margin-bottom: 16px">
+                    <div class="mdc-text-field mdc-text-field--box" style="width: 100%;"
+                         data-mdc-auto-init="MDCTextField">
+                        <input type="password" id="gamePassword" autocomplete="off" class="mdc-text-field__input">
+                        <label for="gamePassword" class="mdc-text-field__label">Password</label>
+                        <div class="mdc-line-ripple"></div>
+                    </div>
                 </section>
             </div>
 
@@ -173,7 +182,8 @@
                 </div>
                 <section class="mdc-card__supporting-text">
                     <h4 id="pyxDecksTitle">PYX (0 decks)</h4>
-                    <div class="mdc-select" id="pyxDecks" role="listbox" style="width: 100%; margin-bottom: 16px">
+                    <div class="mdc-select mdc-select--box" id="pyxDecks" role="listbox"
+                         style="width: 100%; margin-bottom: 16px">
                         <div class="mdc-select__surface">
                             <div class="mdc-select__label">PYX card sets</div>
                             <div class="mdc-select__selected-text"></div>
@@ -325,7 +335,7 @@
 
 <div style="display: none">
     <li id="pyxDeckTemplate" class="mdc-list-item" role="option" tabindex="0">
-        <div class="mdc-checkbox" data-mdc-auto-init="MDCCheckbox">
+        <div class="mdc-checkbox">
             <input type="checkbox" id="pyx_deck_" class="mdc-checkbox__native-control"/>
             <div class="mdc-checkbox__background">
                 <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
@@ -363,7 +373,7 @@
             <b>Players: </b><span class="_players"></span><br>
             <b>Spectators: </b><span class="_spectators"></span><br>
             <b>Goal: </b><span class="_goal"></span><br>
-            <b>Decks: </b><span class="_decks"><!-- FIXME: May overflow --></span><br>
+            <b>Decks: </b><span class="_decks"></span><br>
             <b>Status: </b><span class="_status"></span><br>
         </section>
 
