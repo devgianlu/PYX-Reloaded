@@ -5,9 +5,9 @@ let _cardcastOffset = 0;
 class CardcastMenu {
     constructor() {
         this.menu = $('#cardcastMenu');
-        this.mdc_menu = new mdc.menu.MDCSimpleMenu(this.menu[0]);
-        this.mdc_menu.listen('MDCSimpleMenu:selected', () => this.cardcastOptionsChanged());
-        this.mdc_menu.listen('MDCSimpleMenu:cancel', () => this.cardcastOptionsChanged());
+        this.mdc_menu = new mdc.menu.MDCMenu(this.menu[0]);
+        this.mdc_menu.listen('MDCMenu:selected', () => this.cardcastOptionsChanged());
+        this.mdc_menu.listen('MDCMenu:cancel', () => this.cardcastOptionsChanged());
 
         this._toggleNsfw = this.menu.find('#toggleNsfw');
 

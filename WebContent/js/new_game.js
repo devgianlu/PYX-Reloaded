@@ -3,8 +3,8 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     constructor(root, foundation = undefined, ...args) {
         super(root, foundation, ...args);
 
-        this.menu_.unlisten("MDCSimpleMenu:cancel", this.foundation_.cancelHandler_);
-        this.menu_.unlisten("MDCSimpleMenu:selected", this.foundation_.selectionHandler_);
+        this.menu_.unlisten("MDCMenu:cancel", this.foundation_.cancelHandler_);
+        this.menu_.unlisten("MDCMenu:selected", this.foundation_.selectionHandler_);
     }
 
     set uiListener(set) {
@@ -27,12 +27,12 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     initialize(menuFactory) {
         super.initialize(menuFactory);
 
-        this.menu_.listen("MDCSimpleMenu:selected", (evt) => {
+        this.menu_.listen("MDCMenu:selected", (evt) => {
             this.updateUI();
             this.foundation_.close_();
             evt.preventDefault();
         });
-        this.menu_.listen("MDCSimpleMenu:cancel", (evt) => {
+        this.menu_.listen("MDCMenu:cancel", (evt) => {
             this.updateUI();
             this.foundation_.close_();
             evt.preventDefault();
@@ -129,7 +129,7 @@ class CreateGameDialog {
      * @private
      */
     static _populateTimeMultiplier(dropdown, tm) {
-        const list = dropdown.find('.mdc-simple-menu__items');
+        const list = dropdown.find('.mdc-menu__items');
         list.empty();
 
         for (let i = 0; i < tm.v.length; i++) {
@@ -154,7 +154,7 @@ class CreateGameDialog {
      * @private
      */
     static _populateDropdown(dropdown, dgo) {
-        const list = dropdown.find('.mdc-simple-menu__items');
+        const list = dropdown.find('.mdc-menu__items');
         list.empty();
 
         for (let i = dgo.min; i <= dgo.max; i++) {
@@ -169,7 +169,7 @@ class CreateGameDialog {
     }
 
     static getDropdownSelectedValue(dropdown) {
-        const list = dropdown.find('.mdc-simple-menu__items');
+        const list = dropdown.find('.mdc-menu__items');
         for (let i = 0; i < list.children().length; i++) {
             const item = $(list.children()[i]);
             if (item.attr("aria-selected"))

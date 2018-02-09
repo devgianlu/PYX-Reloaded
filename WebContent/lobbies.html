@@ -74,9 +74,9 @@
         <section class="mdc-dialog__body mdc-dialog__body--scrollable">
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title">Gameplay</h5>
+                    <h3 class="mdc-card__title">Gameplay</h3>
                 </div>
-                <section class="mdc-card__supporting-text">
+                <section class="mdc-card__supporting-text" style="padding: 0">
                     <div class="mdc-layout-grid">
                         <div class="mdc-layout-grid__inner">
                             <div id="scoreLimit" class="mdc-select mdc-layout-grid__cell" role="listbox"
@@ -86,8 +86,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
 
@@ -99,8 +99,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
 
@@ -112,8 +112,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
 
@@ -124,8 +124,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
 
@@ -137,8 +137,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
 
@@ -149,8 +149,8 @@
                                     <div class="mdc-select__selected-text"></div>
                                     <div class="mdc-select__bottom-line"></div>
                                 </div>
-                                <div class="mdc-simple-menu mdc-select__menu">
-                                    <ul class="mdc-list mdc-simple-menu__items"></ul>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
                                 </div>
                             </div>
                         </div>
@@ -160,7 +160,16 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h5 class="mdc-card__title" id="cardsTitle">Cards (0 decks)</h5>
+                    <h3 class="mdc-card__title"></h3>
+                </div>
+                <section class="mdc-card__supporting-text">
+                    <!-- TODO -->
+                </section>
+            </div>
+
+            <div class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h3 class="mdc-card__title" id="cardsTitle">Cards (0 decks)</h3>
                 </div>
                 <section class="mdc-card__supporting-text">
                     <h4 id="pyxDecksTitle">PYX (0 decks)</h4>
@@ -170,8 +179,8 @@
                             <div class="mdc-select__selected-text"></div>
                             <div class="mdc-select__bottom-line"></div>
                         </div>
-                        <div class="mdc-simple-menu mdc-select__menu">
-                            <ul class="mdc-list mdc-list--non-interactive list mdc-simple-menu__items"></ul>
+                        <div class="mdc-menu mdc-select__menu">
+                            <ul class="mdc-list mdc-list--non-interactive list mdc-menu__items"></ul>
                         </div>
                     </div>
                     <h4 style="margin-bottom: 0" id="cardcastDecksTitle">Cardcast (0 decks)</h4>
@@ -197,7 +206,7 @@
                                     <label for="cardcastAddDeckCode" class="mdc-text-field__label">Deck code</label>
                                     <i class="material-icons mdc-text-field__icon" tabindex="0"
                                        onclick="loadCardcastDeckInfo();">add</i>
-                                    <div class="mdc-text-field__bottom-line"></div>
+                                    <div class="mdc-line-ripple"></div>
                                 </div>
                                 <div id="cardcastAddDeckInfo">
                                     <div role="progressbar"
@@ -289,7 +298,9 @@
                             </section>
                             <section class="mdc-card__supporting-text">
                                 <p>See how your game will look when themed!</p>
-                                <button class="mdc-button mdc-button--colored mdc-button--raised">PYX-Reloaded</button>
+                                <button class="mdc-button mdc-button--colored mdc-button--raised"
+                                        style="margin-bottom: 16px">PYX-Reloaded
+                                </button>
                             </section>
                         </div>
 
@@ -318,7 +329,7 @@
             <input type="checkbox" id="pyx_deck_" class="mdc-checkbox__native-control"/>
             <div class="mdc-checkbox__background">
                 <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                    <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white"
+                    <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
                           d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
                 </svg>
                 <div class="mdc-checkbox__mixedmark"></div>
@@ -337,18 +348,18 @@
 
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
-            <h1 class="mdc-card__title mdc-card__title--large _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
+            <h2 class="mdc-card__title _host" style="flex-grow: 1">{{Name of Player's Game}}</h2>
             <button class="mdc-button mdc-button--dense mdc-button--compact _likes" onclick="likeGame(this);"
-                    style="margin-top: 8px; margin-right: 8px">
+                    style="margin-top: 16px; margin-right: 8px">
                 LIKE
             </button>
             <button class="mdc-button mdc-button--dense mdc-button--compact _dislikes" onclick="dislikeGame(this);"
-                    style="margin-top: 8px">
+                    style="margin-top: 16px">
                 DISLIKE
             </button>
         </section>
 
-        <section class="mdc-card__supporting-text">
+        <section class="mdc-card__supporting-text mdc-typography--body1 mdc-typography">
             <b>Players: </b><span class="_players"></span><br>
             <b>Spectators: </b><span class="_spectators"></span><br>
             <b>Goal: </b><span class="_goal"></span><br>

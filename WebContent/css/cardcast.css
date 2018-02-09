@@ -9,3 +9,12 @@
 .br-theme-fontawesome-stars-o .br-widget a.br-fractional:after {
     color: var(--mdc-theme-secondary) !important;
 }
+
+#cardcastSearch {
+    border-bottom-color: var(--mdc-theme-text-primary-on-dark);
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-text-field__label[for=cardcastSearch] {
+    color: var(--mdc-theme-text-secondary-on-dark) !important;
+}

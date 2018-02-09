@@ -166,6 +166,19 @@ body {
     }
 }
 
+.mdc-card > .mdc-card__primary {
+    padding: 0 16px;
+}
+
+.mdc-card > .mdc-card__supporting-text {
+    padding: 0 16px;
+    flex-grow: 1;
+}
+
+.mdc-card__title {
+    color: var(--mdc-theme-text-primary-on-light);
+}
+
 /* Bottom sheet stuff */
 .bottom-sheet {
     position: absolute;

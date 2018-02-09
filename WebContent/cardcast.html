@@ -28,7 +28,7 @@
                 <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
                     <input type="text" id="cardcastSearch" class="mdc-text-field__input">
                     <label class="mdc-text-field__label" for="cardcastSearch">Search</label>
-                    <div class="mdc-text-field__bottom-line"></div>
+                    <div class="mdc-line-ripple"></div>
                 </div>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="submitSearch();"
                         style="margin-top: 6px">search
@@ -40,8 +40,8 @@
                     <button class="material-icons align-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
                         filter_list
                     </button>
-                    <div class="mdc-simple-menu" id="cardcastMenu" tabindex="-1">
-                        <div class="mdc-simple-menu__items mdc-list-group" role="menu" aria-hidden="true">
+                    <div class="mdc-menu" id="cardcastMenu" tabindex="-1">
+                        <div class="mdc-menu__items mdc-list-group" role="menu" aria-hidden="true">
                             <h3 class="mdc-list-group__subheader">Categories</h3>
                             <ul class="mdc-list _categories"></ul>
 
@@ -54,7 +54,7 @@
                                            checked/>
                                     <div class="mdc-checkbox__background">
                                         <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                                            <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white"
+                                            <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
                                                   d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
                                         </svg>
                                         <div class="mdc-checkbox__mixedmark"></div>
@@ -84,22 +84,23 @@
 </div>
 
 <div style="display: none;">
-    <div class="mdc-card mdc-layout-grid__cell" id="cardcast-deck-template">
+    <div class="mdc-typography mdc-card mdc-layout-grid__cell" id="cardcast-deck-template">
         <section class="mdc-card__primary" style="display: inline-flex">
             <div style="flex-grow: 1">
-                <h1 class="mdc-card__title mdc-card__title--large _name">{{Deck name}}</h1>
-                <h2 class="mdc-card__subtitle _author">{{Deck author}}</h2>
+                <h2 class="mdc-card__title mdc-typography--title _name" style="margin-bottom: 0">{{Deck name}}</h2>
+                <h3 class="mdc-card__subtitle mdc-typography--subheading2 _author"
+                    style="margin-top: 0; margin-bottom: 0">{{Deck author}}</h3>
+                <select class="_rating" title="">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
             </div>
-            <span class="material-icons md-36 md-dark _category"></span>
+            <span class="material-icons md-36 md-dark _category" style="margin-top: 0.83rem"></span>
         </section>
-        <section class="mdc-card__supporting-text">
-            <select class="_rating" title="">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
+        <section class="mdc-card__supporting-text" style="margin-top: 8px">
             <span class="_sample"></span>
         </section>
         <section class="mdc-card__actions">
@@ -120,7 +121,7 @@
             <input type="checkbox" class="mdc-checkbox__native-control" id="category_"/>
             <div class="mdc-checkbox__background">
                 <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
-                    <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white"
+                    <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
                           d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
                 </svg>
                 <div class="mdc-checkbox__mixedmark"></div>
@@ -155,7 +156,7 @@
             </select>
             <span class="material-icons md-36 md-dark _category"></span>
         </header>
-        <section class="mdc-dialog__body mdc-dialog__body--scrollable">
+        <section class="mdc-typography mdc-dialog__body mdc-dialog__body--scrollable">
             <h3 class="mdc-typography--headline _author-category">{{Deck author}}</h3>
             <h1 class="mdc-typography--headline mdc-typography--adjust-margin mdc-theme--primary _code">{{Deck
                 code}}</h1>
