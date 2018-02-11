@@ -289,3 +289,13 @@ body {
     border-bottom: 1px solid #C62828; /* Red 800 */
     color: #FFFFFF;
 }
+
+/* Text field in toolbar */
+.mdc-toolbar .mdc-text-field input {
+    border-bottom-color: var(--mdc-theme-text-primary-on-dark) !important;
+    color: var(--mdc-theme-text-primary-on-dark) !important;
+}
+
+.mdc-toolbar .mdc-text-field .mdc-text-field__label {
+    color: var(--mdc-theme-text-secondary-on-dark) !important;
+}

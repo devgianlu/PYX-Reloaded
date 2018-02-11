@@ -4,6 +4,8 @@ class Games {
         this._games_list = this._games.find('.list');
         this._games_message = this._games.find('.message');
 
+        this._searchField = $('#gamesSearch');
+
         this.games = new List(this._games[0], {
             item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
@@ -147,13 +149,15 @@ class Games {
     }
 
     filterGames(query) {
-        if (query.length === 0) {
+        if (query === null || query.length === 0) {
             this.games.filter(); // Remove all filters
         } else {
             this.games.filter(function (item) {
                 return item.values()._host.indexOf(query) !== -1;
             })
         }
+
+        this.toggleNoGamesMessage(this.games.visibleItems.length === 0);
     }
 
     toggleNoGamesMessage(visible) {
@@ -195,6 +199,10 @@ class Games {
         }).fail(function (data) {
             Notifier.error("Failed spectating the game!", data);
         })
+    }
+
+    submitSearch() {
+        this.filterGames(this._searchField.val());
     }
 }
 
@@ -239,6 +247,6 @@ function loadGamesList() {
     });
 }
 
-function filterGames(query) { // TODO
-    games.filterGames(query);
+function submitSearch() {
+    games.submitSearch();
 }

@@ -23,6 +23,17 @@
                 <span class="mdc-toolbar__title">Games - PYX Reloaded</span>
             </section>
 
+            <section class="mdc-toolbar__section">
+                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                    <input type="text" id="gamesSearch" class="mdc-text-field__input search">
+                    <label class="mdc-text-field__label" for="gamesSearch">Search</label>
+                    <div class="mdc-line-ripple"></div>
+                </div>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="submitSearch();"
+                        style="margin: auto 0">search
+                </button>
+            </section>
+
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">settings
