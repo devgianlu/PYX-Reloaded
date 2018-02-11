@@ -25,7 +25,30 @@ function register(ev) {
     const nickname = $("input#nickname").val();
 
     $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
-        Notifier.error("Failed registering to the server!", data);
+        switch (data.ec) {
+            case "nns":
+                Notifier.error("Please specify a nickname.", data);
+                break;
+            case "niu":
+                Notifier.error("This nickname is already in use.", data);
+                break;
+            case "tmu":
+                Notifier.error("The server is full! Please try again later.", data);
+                break;
+            case "in":
+                Notifier.error("This nickname must contain only alphanumeric characters and be between 2-29 characters long.", data);
+                break;
+            case "rn":
+                Notifier.error("This nickname is reserved.", data);
+                break;
+            case "Bd":
+                Notifier.error("You have been banned.", data);
+                break;
+            default:
+                Notifier.error("Failed registering to the server.", data);
+                break;
+        }
+
     }).done(function () {
         window.location = "lobbies.html";
     });
