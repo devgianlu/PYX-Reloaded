@@ -155,16 +155,8 @@ class GameManager {
         else elm.on("click", () => listener(card));
     }
 
-    /**
-     * @param {string} data.m - Message
-     * @param {string} data.f - Sender
-     * @private
-     */
-    _receivedGameChatMessage(data) {
-        this.chat.add({
-            "_msg": data.m,
-            "_sender": data.f + ": "
-        })
+    static _postLeave() {
+        window.location = "/games/";
     }
 
     static _removeWhiteCard(list, card) {
@@ -185,12 +177,17 @@ class GameManager {
         GameManager._removeWhiteCard(this.hand, card);
     }
 
-    sendGameChatMessage(msg, clear) {
-        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
-            clear();
-        }).fail(function (data) {
-            Notifier.error("Failed to send the message!", data);
-        });
+    /**
+     * @param {object} data
+     * @param {string} data.m - Message
+     * @param {string} data.f - Sender
+     * @private
+     */
+    _receivedGameChatMessage(data) {
+        this.chat.add({
+            "_msg": data.m,
+            "_sender": data.f + ": "
+        })
     }
 
     _updatePlayerStatus(info) {
@@ -202,83 +199,22 @@ class GameManager {
         }
     }
 
-    /**
-     * @param {object[]} data.h - Hand cards
-     * @param {object} data.pi - Player's info
-     * @param {string} data.rw - Round winner
-     * @param {string} data.n - Player's nickname
-     * @param {object} data.pi.st - Player's status
-     * @param {int} data.pi.sc - Player's score
-     * @param {string} data.pi.N - Player's name
-     * @param {string} data.gs - Game status
-     * @param {object} data.gi - Game info
-     * @param {object} data.i - Round intermission
-     * @param {boolean} data.wl - Whther the game will stop
-     */
-    handlePollEvent(data) {
-        switch (data["E"]) {
-            case "C":
-                this._receivedGameChatMessage(data);
-                break;
-            case "gpj":
-                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!")
-                break;
-            case "gpl":
-                for (let i = 0; i < this.info.pi.length; i++) {
-                    if (this.info.pi[i].N === data.n) {
-                        this.info.pi.splice(i, 1);
-                        break;
-                    }
+    sendGameChatMessage(msg, clear) {
+        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
+            clear();
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                if (data.responseJSON.ec === "tf") {
+                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
+                    Notifier.debug(data, true);
+                    return;
                 }
+            }
 
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!")
-                break;
-            case "gpic":
-                const pi = data.pi;
-                this._updatePlayerStatus(pi);
-                this._reloadScoreboard();
-
-                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
-                break;
-            case "hd":
-                this.addHandCards(data.h, data.h.length === 10);
-                break;
-            case "gsc":
-                this.info.gi.gs = data.gs;
-                this._handleGameStatusChange(data);
-                break;
-            case "gjl":
-                Notifier.timeout(Notifier.ALERT, "The judge left.")
-                if (!data.wl)
-                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
-                break;
-            case "gjs":
-                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.")
-                break;
-            case "goc":
-                this.info.gi.go = data.gi;
-                break;
-            case "gpki":
-                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for beign idle.")
-                break;
-            case "gps":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for beign idle.")
-                break;
-            case "kfgi":
-                this._postLeave();
-                break;
-            case "hu":
-                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!")
-                break;
-        }
+            Notifier.error("Failed to send the message!", data);
+        });
     }
 
-    /**
-     * @param {string} info.st - Player's (my) status
-     */
     handleMyInfoChanged(info) {
         Notifier.debug("My status is now: " + info.st);
 
@@ -314,6 +250,85 @@ class GameManager {
         this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
+    /**
+     * @param {object[]} data.h - Hand cards
+     * @param {object} data.pi - Player's info
+     * @param {string} data.m - Message (chat)
+     * @param {string} data.f - Sender (chat)
+     * @param {string} data.n - Player's nickname
+     * @param {object} data.pi.st - Player's status
+     * @param {int} data.pi.sc - Player's score
+     * @param {string} data.pi.N - Player's name
+     * @param {object} data.gi - Game info
+     * @param {string} data.gs - Game status
+     * @param {object} data.bc - Black card
+     * @param {object[]} data.wc - Table cards
+     * @param {int} data.WC - Winning card(s), comma separated list
+     * @param {string} data.rw - Round winner nickname
+     * @param {int} data.i - Round intermission
+     * @param {boolean} data.wl - Whether the game will stop
+     */
+    handlePollEvent(data) {
+        switch (data["E"]) {
+            case "C":
+                this._receivedGameChatMessage(data);
+                break;
+            case "gpj":
+                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
+                break;
+            case "gpl":
+                for (let i = 0; i < this.info.pi.length; i++) {
+                    if (this.info.pi[i].N === data.n) {
+                        this.info.pi.splice(i, 1);
+                        break;
+                    }
+                }
+
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
+                break;
+            case "gpic":
+                const pi = data.pi;
+                this._updatePlayerStatus(pi);
+                this._reloadScoreboard();
+
+                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
+                break;
+            case "hd":
+                this.addHandCards(data.h, data.h.length === 10);
+                break;
+            case "gsc":
+                this.info.gi.gs = data.gs;
+                this._handleGameStatusChange(data);
+                break;
+            case "gjl":
+                Notifier.timeout(Notifier.ALERT, "The judge left.");
+                if (!data.wl)
+                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                break;
+            case "gjs":
+                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.");
+                break;
+            case "goc":
+                this.info.gi.go = data.gi;
+                break;
+            case "gpki":
+                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
+                break;
+            case "gps":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for being idle.");
+                break;
+            case "kfgi":
+                GameManager._postLeave();
+                break;
+            case "hu":
+                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
+                break;
+        }
+    }
+
     _handleHandCardSelect(card) {
         const self = this;
         $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
@@ -324,15 +339,21 @@ class GameManager {
             self.removeHandCard(card);
             if (data.ltp === 0) toggleHand(undefined, false);
         }).fail(function (data) {
-            Notifier.error("Failed to play the card!", data);
-        });
-    }
-
-    _handleTableCardSelect(card) {
-        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
-            // Do nothing
-        }).fail(function (data) {
-            Notifier.error("Failed to select the card!", data);
+            if ("responseJSON" in data) {
+                switch (data.responseJSON.ec) {
+                    case "ap":
+                        Notifier.error("You have already played all the necessary cards.", data);
+                        break;
+                    case "nyt":
+                        Notifier.error("This is not your turn.", data);
+                        break;
+                    default:
+                        Notifier.error("Failed to play the card!", data);
+                        break;
+                }
+            } else {
+                Notifier.error("Failed to play the card!", data);
+            }
         });
     }
 
@@ -360,15 +381,6 @@ class GameManager {
         }
     }
 
-    /**
-     * @param {string} data.gs - Game status
-     * @param {object} data.bc - Black card
-     * @param {object[]} data.wc - Table cards
-     * @param {int} data.WC - Winning card(s), comma separated list
-     * @param {string} data.rw - Round winner nickname
-     * @param {int} data.i - Round intermission
-     * @param {boolean} data.wl - Whther the game will stop
-     */
     _handleGameStatusChange(data) {
         switch (data.gs) {
             case "l":
@@ -442,15 +454,32 @@ class GameManager {
         this._reloadScoreboard();
     }
 
-    leave() {
-        const self = this;
-        $.post("/AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
-            self._postLeave();
+    _handleTableCardSelect(card) {
+        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+            // Do nothing
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                switch (data.responseJSON.ec) {
+                    case "nj":
+                        Notifier.error("You're not the judge.", data);
+                        break;
+                    case "nyt":
+                        Notifier.error("This is not your turn.", data);
+                        break;
+                    default:
+                        Notifier.error("Failed to select the card!", data);
+                        break;
+                }
+            } else {
+                Notifier.error("Failed to select the card!", data);
+            }
         });
     }
 
-    _postLeave() {
-        window.location = "/games/";
+    leave() {
+        $.post("/AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
+            GameManager._postLeave();
+        });
     }
 
     start() {
@@ -466,20 +495,23 @@ class GameManager {
              * @param {int} error.wcp - Provided white cards
              * @param {int} error.wcr - Required white cards
              */
-            const error = data.responseJSON;
-
-            switch (error.ec) {
-                case "nec":
-                    Notifier.error("Not enough cards to start the game!" +
-                        "<br>Black cards: " + error.bcp + "/" + error.bcr +
-                        "<br>White cards: " + error.wcp + "/" + error.wcr, error);
-                    break;
-                case "nep":
-                    Notifier.error("Not enough players to start the game!", data);
-                    break;
-                default:
-                    Notifier.error("Failed starting the game!", data);
-                    break;
+            if ("responseJSON" in data) {
+                const error = data.responseJSON;
+                switch (error.ec) {
+                    case "nec":
+                        Notifier.error("Not enough cards to start the game!" +
+                            "<br>Black cards: " + error.bcp + "/" + error.bcr +
+                            "<br>White cards: " + error.wcp + "/" + error.wcr, error);
+                        break;
+                    case "nep":
+                        Notifier.error("Not enough players to start the game!", data);
+                        break;
+                    default:
+                        Notifier.error("Failed starting the game!", data);
+                        break;
+                }
+            } else {
+                Notifier.error("Failed starting the game!", data);
             }
         })
     }
