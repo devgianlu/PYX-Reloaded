@@ -71,8 +71,8 @@ class Games {
             else goal = game.go.sl + " (win by " + game.go.wb + ")";
 
             let status;
-            if (game.gs === "l") status = "lobby";
-            else status = "started";
+            if (game.gs === "l") status = "hourglass_empty";
+            else status = "casino";
 
             let decksNames = Games.deckIdsToNames(game.go.css);
             let decks;

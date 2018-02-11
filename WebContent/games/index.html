@@ -361,7 +361,9 @@
 
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
-            <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
+            <span class="material-icons md-36 _status" style="margin: auto">casino</span>
+            <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1; margin-left: 8px">{{Name of
+                Player's Game}}</h1>
             <div class="mdc-chip-set mdc-typography--body1" style="margin: auto">
                 <div class="mdc-chip">
                     <div class="_likes">{{Likes}}</div>
@@ -376,16 +378,11 @@
             <b>Spectators: </b><span class="_spectators"></span><br>
             <b>Goal: </b><span class="_goal"></span><br>
             <b>Decks: </b><!-- TODO: Where are Cardcast decks? --><span class="_decks"></span><br>
-            <b>Status: </b><!-- TODO: Use icon instead --><span class="_status"></span><br>
         </section>
         <section class="mdc-card__actions">
             <div class="mdc-card__action-buttons">
-                <button class="mdc-button mdc-button--compact mdc-card__action _join">
-                    JOIN
-                </button>
-                <button class="mdc-button mdc-button--compact mdc-card__action _spectate">
-                    SPECTATE
-                </button>
+                <button class="mdc-button mdc-button--compact mdc-card__action _join">JOIN</button>
+                <button class="mdc-button mdc-button--compact mdc-card__action _spectate">SPECTATE</button>
             </div>
             <div class="mdc-card__action-icons">
                 <i class="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon _toggleLike"
