@@ -18,7 +18,7 @@
 
 <aside class="mdc-drawer mdc-drawer--persistent mdc-toolbar-fixed-adjust" id="drawer">
     <nav class="mdc-drawer__drawer">
-        <div id="scoreboard" style="">
+        <div id="scoreboard">
             <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
             <ul class="mdc-list mdc-list--two-line list"></ul>
         </div>
@@ -88,29 +88,29 @@
 
 <div style="display: none">
     <li id="playerItemTemplate" class="mdc-list-item">
-        <span class="mdc-list-item__graphic mdc-typography mdc-typography--display1 _score">{{Score}}</span>
+        <span class="mdc-list-item__graphic mdc-typography--display1 _score">{{Score}}</span>
         <span class="mdc-list-item__text">
             <span class="_name">{{Player's name}}</span>
             <span class="mdc-list-item__secondary-text _status">{{Player's status}}</span>
         </span>
     </li>
 
-    <h5 id="chatMessageTemplate" class=" mdc-typography mdc-typography--adjust-margin mdc-typography--body1">
+    <h5 id="chatMessageTemplate" class="mdc-typography--adjust-margin mdc-typography--body1">
         <b class="_sender">{{Sender}}</b><span class="_msg">{{Message}}</span>
     </h5>
 
     <div id="cardTemplate" class="mdc-card pyx-card mdc-ripple-surface">
-        <section class="mdc-card__supporting-text mdc-typography mdc-typography--body1 _text card-text">
+        <section class="mdc-card__supporting-text mdc-typography--body1 _text card-text">
             {{Text}}
         </section>
         <section class="mdc-card__supporting-text card-details">
-            <h4 class="mdc-typography mdc-typography--subheading1">Pick
+            <h4 class="mdc-typography--subheading1">Pick
                 <div class="circled _pick">?</div>
             </h4>
-            <h4 class="mdc-typography mdc-typography--subheading1" style="margin-top: 8px">Draw
+            <h4 class="mdc-typography--subheading1" style="margin-top: 8px">Draw
                 <div class="circled _draw">?</div>
             </h4>
-            <h4 class="mdc-typography mdc-typography--subheading1 _watermark"
+            <h4 class="mdc-typography--subheading1 _watermark"
                 style="margin-top: 8px; font-weight: 300;">
                 {{Watermark}}
             </h4>

@@ -26,7 +26,7 @@ function register(ev) {
     const nickname = $("input#nickname").val();
 
     $.post("/AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
-        switch (data.ec) {
+        switch (data.responseJSON.ec) {
             case "nns":
                 Notifier.error("Please specify a nickname.", data);
                 break;

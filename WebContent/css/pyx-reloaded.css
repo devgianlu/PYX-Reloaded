@@ -1,9 +1,14 @@
 .message {
     text-align: center;
+    color: var(--mdc-theme-text-secondary-on-light, rgba(0, 0, 0, .54))
 }
 
 .mdc-switch-label {
     padding-left: 8px;
+}
+
+.mdc-dialog .mdc-card__supporting-text:last-child {
+    margin-bottom: 16px;
 }
 
 .mdc-dialog__body--scrollable > .mdc-card {
@@ -105,20 +110,20 @@ body {
 }
 
 /* Rules for using icons as black on a light background. */
-.md-dark {
+.material-icons.md-dark {
     color: rgba(0, 0, 0, 0.54);
 }
 
-.md-dark.md-inactive {
+.material-icons.md-dark.md-inactive {
     color: rgba(0, 0, 0, 0.26);
 }
 
 /* Rules for using icons as white on a dark background. */
-.md-light {
+.material-icons.md-light {
     color: rgba(255, 255, 255, 1);
 }
 
-.md-light.md-inactive {
+.material-icons.md-light.md-inactive {
     color: rgba(255, 255, 255, 0.3);
 }
 
@@ -283,4 +288,14 @@ body {
     background-color: #F44336;
     border-bottom: 1px solid #C62828; /* Red 800 */
     color: #FFFFFF;
+}
+
+/* Text field in toolbar */
+.mdc-toolbar .mdc-text-field input {
+    border-bottom-color: var(--mdc-theme-text-primary-on-dark) !important;
+    color: var(--mdc-theme-text-primary-on-dark) !important;
+}
+
+.mdc-toolbar .mdc-text-field .mdc-text-field__label {
+    color: var(--mdc-theme-text-secondary-on-dark) !important;
 }

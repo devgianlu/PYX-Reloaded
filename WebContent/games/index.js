@@ -4,10 +4,12 @@ class Games {
         this._games_list = this._games.find('.list');
         this._games_message = this._games.find('.message');
 
+        this._searchField = $('#gamesSearch');
+
         this.games = new List(this._games[0], {
             item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
-                {'data': ['gid', 'hp', 'like', 'dislike']}]
+                {'data': ['gid']}]
         });
     }
 
@@ -34,6 +36,17 @@ class Games {
         window.location = "/game/" + gid;
     }
 
+    static _updateLikeDislike(elm, toggleLike, toggleDislike, data) {
+        toggleLike.on = data.iLK;
+        toggleDislike.on = data.iDLK;
+
+        const likes = elm.find('._likes');
+        likes.text(data.LK + (data.LK === 1 ? " like" : " likes"));
+
+        const dislikes = elm.find('._dislikes');
+        dislikes.text(data.DLK + (data.DLK === 1 ? " dislike" : " dislikes"));
+    }
+
     /**
      *
      * @param {object[]} list - Games list
@@ -51,6 +64,7 @@ class Games {
     setup(list) {
         this.games.clear();
 
+        const self = this;
         for (let i = 0; i < list.length; i++) {
             const game = list[i];
 
@@ -59,8 +73,8 @@ class Games {
             else goal = game.go.sl + " (win by " + game.go.wb + ")";
 
             let status;
-            if (game.gs === "l") status = "lobby";
-            else status = "started";
+            if (game.gs === "l") status = "hourglass_empty";
+            else status = "casino";
 
             let decksNames = Games.deckIdsToNames(game.go.css);
             let decks;
@@ -81,11 +95,8 @@ class Games {
 
             const elm = $(this.games.add({
                 "gid": game.gid,
-                "hp": game.hp,
-                "_likes": game.LK + (game.LK === 1 ? " LIKE" : " LIKES"),
-                "_dislikes": game.DLK + (game.DLK === 1 ? " DISLIKE" : " DISLIKES"),
-                "like": game.iLK,
-                "dislike": game.iDLK,
+                "_likes": game.LK + (game.LK === 1 ? " like" : " likes"),
+                "_dislikes": game.DLK + (game.DLK === 1 ? " dislike" : " dislikes"),
                 "_host": game.H,
                 "_decks": decks,
                 "_players": players,
@@ -94,26 +105,59 @@ class Games {
                 "_status": status
             })[0].elm);
 
-            let likeButton = elm.find('._likes');
-            if (elm.attr("data-like") === "true") likeButton.addClass('mdc-button--raised');
-            else likeButton.removeClass('mdc-button--raised');
+            elm.find('._join').on('click', function () {
+                self.joinGame(game.gid, game.hp);
+            });
 
-            let dislikeButton = elm.find('._dislikes');
-            if (elm.attr("data-dislike") === "true") dislikeButton.addClass('mdc-button--raised');
-            else dislikeButton.removeClass('mdc-button--raised');
+            elm.find('._spectate').on('click', function () {
+                self.spectateGame(game.gid, game.hp);
+            });
+
+            const _toggleLike = elm.find('._toggleLike')[0];
+            const toggleLike = mdc.iconToggle.MDCIconToggle.attachTo(_toggleLike);
+            const _toggleDislike = elm.find('._toggleDislike')[0];
+            const toggleDislike = mdc.iconToggle.MDCIconToggle.attachTo(_toggleDislike);
+
+            toggleLike.on = game.iLK;
+            _toggleLike.addEventListener('MDCIconToggle:change', () => {
+                self.toggleLike(game.gid, elm, toggleLike, toggleDislike);
+            });
+
+            toggleDislike.on = game.iDLK;
+            _toggleDislike.addEventListener('MDCIconToggle:change', () => {
+                self.toggleDislike(game.gid, elm, toggleLike, toggleDislike);
+            });
         }
 
         this.toggleNoGamesMessage(this.games.size() === 0);
     }
 
+    toggleLike(gid, elm, toggleLike, toggleDislike) {
+        $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
+            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
+        }).fail(function (data) {
+            Notifier.error("Failed liking the game!", data);
+        });
+    }
+
+    toggleDislike(gid, elm, toggleLike, toggleDislike) {
+        $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
+            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
+        }).fail(function (data) {
+            Notifier.error("Failed disliking the game!", data);
+        });
+    }
+
     filterGames(query) {
-        if (query.length === 0) {
+        if (query === null || query.length === 0) {
             this.games.filter(); // Remove all filters
         } else {
             this.games.filter(function (item) {
                 return item.values()._host.indexOf(query) !== -1;
             })
         }
+
+        this.toggleNoGamesMessage(this.games.visibleItems.length === 0);
     }
 
     toggleNoGamesMessage(visible) {
@@ -156,10 +200,13 @@ class Games {
             Notifier.error("Failed spectating the game!", data);
         })
     }
+
+    submitSearch() {
+        this.filterGames(this._searchField.val());
+    }
 }
 
 const games = new Games();
-
 
 const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
@@ -200,54 +247,6 @@ function loadGamesList() {
     });
 }
 
-function filterGames(query) {
-    games.filterGames(query);
-}
-
-function updateLikeDislike(likeButton, disLikeButton, data) {
-    if (likeButton === undefined) {
-        likeButton = $(disLikeButton.parentElement).find('._likes');
-        disLikeButton = $(disLikeButton);
-    } else if (disLikeButton === undefined) {
-        disLikeButton = $(likeButton.parentElement).find('._dislikes');
-        likeButton = $(likeButton);
-    } else {
-        return;
-    }
-
-    if (data.iLK) likeButton.addClass('mdc-button--raised');
-    else likeButton.removeClass('mdc-button--raised');
-    likeButton.text(data.LK + (data.LK === 1 ? " LIKE" : " LIKES"));
-
-    if (data.iDLK) disLikeButton.addClass('mdc-button--raised');
-    else disLikeButton.removeClass('mdc-button--raised');
-    disLikeButton.text(data.DLK + (data.DLK === 1 ? " DISLIKE" : " DISLIKES"));
-}
-
-function likeGame(button) {
-    const gid = button.parentElement.parentElement.getAttribute('data-gid');
-
-    $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
-        updateLikeDislike(button, undefined, data);
-    }).fail(function (data) {
-        Notifier.error("Failed liking the game!", data);
-    });
-}
-
-function dislikeGame(button) {
-    const gid = button.parentElement.parentElement.getAttribute('data-gid');
-
-    $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
-        updateLikeDislike(undefined, button, data);
-    }).fail(function (data) {
-        Notifier.error("Failed disliking the game!", data);
-    });
-}
-
-function joinGame(element) {
-    games.joinGame(element.getAttribute('data-gid'), element.getAttribute('data-hp'));
-}
-
-function spectateGame(element) {
-    games.spectateGame(element.getAttribute('data-gid'), element.getAttribute('data-hp'))
+function submitSearch() {
+    games.submitSearch();
 }
