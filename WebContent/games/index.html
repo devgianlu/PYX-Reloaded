@@ -362,17 +362,14 @@
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
             <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
-            <!-- TODO: Move these buttons -->
-            <button class="mdc-button mdc-button--dense mdc-button--compact _likes"
-                    onclick="likeGame(this.parentElement.parentElement);"
-                    style="margin-top: 16px; margin-right: 8px">
-                LIKE
-            </button>
-            <button class="mdc-button mdc-button--dense mdc-button--compact _dislikes"
-                    onclick="dislikeGame(this.parentElement.parentElement);"
-                    style="margin-top: 16px">
-                DISLIKE
-            </button>
+            <div class="mdc-chip-set mdc-typography--body1" style="margin: auto">
+                <div class="mdc-chip">
+                    <div class="_likes">{{Likes}}</div>
+                </div>
+                <div class="mdc-chip">
+                    <div class="_dislikes">{{Dislikes}}</div>
+                </div>
+            </div>
         </section>
         <section class="mdc-card__supporting-text mdc-typography--body1">
             <b>Players: </b><span class="_players"></span><br>
@@ -382,15 +379,25 @@
             <b>Status: </b><!-- TODO: Use icon instead --><span class="_status"></span><br>
         </section>
         <section class="mdc-card__actions">
-            <button class="mdc-button mdc-button--compact mdc-card__action"
-                    onclick="joinGame(this.parentElement.parentElement);">
-                JOIN
-            </button>
+            <div class="mdc-card__action-buttons">
+                <button class="mdc-button mdc-button--compact mdc-card__action _join">
+                    JOIN
+                </button>
+                <button class="mdc-button mdc-button--compact mdc-card__action _spectate">
+                    SPECTATE
+                </button>
+            </div>
+            <div class="mdc-card__action-icons">
+                <i class="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon _toggleLike"
+                   tabindex="0" role="button"
+                   data-toggle-on='{"cssClass": "mdc-theme--primary"}'
+                   data-toggle-off='{"cssClass": ""}'>thumb_up</i>
 
-            <button class="mdc-button mdc-button--compact mdc-card__action"
-                    onclick="spectateGame(this.parentElement.parentElement);">
-                SPECTATE
-            </button>
+                <i class="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon _toggleDislike"
+                   tabindex="0" role="button"
+                   data-toggle-on='{"cssClass": "mdc-theme--primary"}'
+                   data-toggle-off='{"cssClass": ""}'>thumb_down</i>
+            </div>
         </section>
     </div>
 </div>
