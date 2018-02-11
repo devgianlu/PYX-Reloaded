@@ -224,8 +224,8 @@ function updateLikeDislike(likeButton, disLikeButton, data) {
     disLikeButton.text(data.DLK + (data.DLK === 1 ? " DISLIKE" : " DISLIKES"));
 }
 
-function likeGame(button) {
-    const gid = button.parentElement.parentElement.getAttribute('data-gid');
+function likeGame(element) {
+    const gid = element.getAttribute('data-gid');
 
     $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
         updateLikeDislike(button, undefined, data);
@@ -234,8 +234,8 @@ function likeGame(button) {
     });
 }
 
-function dislikeGame(button) {
-    const gid = button.parentElement.parentElement.getAttribute('data-gid');
+function dislikeGame(element) {
+    const gid = element.getAttribute('data-gid');
 
     $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
         updateLikeDislike(undefined, button, data);

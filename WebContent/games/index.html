@@ -238,7 +238,7 @@
 
                                         <button class="mdc-button mdc-button--raised"
                                                 style="float: right;"
-                                                onclick="addCardcastDeck(this);">
+                                                onclick="addCardcastDeck(this.parentElement);">
                                             Add
                                         </button>
                                     </div>
@@ -355,18 +355,21 @@
             <span class="_name">{{Deck name}}</span>
             <span class="mdc-list-item__secondary-text _code">{{Deck code}}</span>
         </span>
-        <i class="mdc-list-item__meta material-icons" onclick="removeCardcastDeck(this)">remove <!-- FIXME--></i>
+        <i class="mdc-list-item__meta material-icons" style="cursor: pointer"
+           onclick="removeCardcastDeck(this.parentElement)">delete</i>
     </li>
 
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
             <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
             <!-- TODO: Move these buttons -->
-            <button class="mdc-button mdc-button--dense mdc-button--compact _likes" onclick="likeGame(this);"
+            <button class="mdc-button mdc-button--dense mdc-button--compact _likes"
+                    onclick="likeGame(this.parentElement.parentElement);"
                     style="margin-top: 16px; margin-right: 8px">
                 LIKE
             </button>
-            <button class="mdc-button mdc-button--dense mdc-button--compact _dislikes" onclick="dislikeGame(this);"
+            <button class="mdc-button mdc-button--dense mdc-button--compact _dislikes"
+                    onclick="dislikeGame(this.parentElement.parentElement);"
                     style="margin-top: 16px">
                 DISLIKE
             </button>

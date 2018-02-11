@@ -410,10 +410,10 @@ function loadCardcastDeckInfo() {
     createGameDialog.loadCardcastDeckInfo();
 }
 
-function removeCardcastDeck(button) {
-    createGameDialog.removeCardcastDeck(button.parentElement.parentElement.getAttribute("data-code"));
+function removeCardcastDeck(element) {
+    createGameDialog.removeCardcastDeck(element.getAttribute("data-code"));
 }
 
-function addCardcastDeck(button) {
-    createGameDialog.addCardcastDeck(button.parentElement.getAttribute("data-code"));
+function addCardcastDeck(element) {
+    createGameDialog.addCardcastDeck(element.getAttribute("data-code"));
 }
