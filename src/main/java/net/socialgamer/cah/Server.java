@@ -2,6 +2,7 @@ package net.socialgamer.cah;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
@@ -72,12 +73,19 @@ public class Server {
         else
             resourceManager = CacheControlHandler.disableCache(webContentHandler);
 
-        PathHandler handler = new PathHandler(resourceManager);
-        handler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
+        PathHandler pathHandler = new PathHandler(resourceManager);
+        pathHandler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
                 .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 
+        RoutingHandler router = new RoutingHandler();
+        router.setFallbackHandler(pathHandler)
+                .get("/game/{gid}/", exchange -> {
+                    exchange.setRelativePath("/game.html");
+                    resourceManager.handleRequest(exchange);
+                });
+
         Undertow.Builder server = Undertow.builder()
-                .setHandler(handler);
+                .setHandler(router);
 
         int port = preferences.getInt("port", 80);
 

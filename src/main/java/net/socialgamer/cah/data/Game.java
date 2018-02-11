@@ -290,6 +290,8 @@ public class Game {
                 for (WhiteCard card : player.hand) whiteDeck.discard(card);
             }
 
+            boolean wasJudge = getJudge() == player;
+
             // Actually remove the user
             players.remove(player);
             user.leaveGame(this);
@@ -303,10 +305,8 @@ public class Game {
             }
 
             boolean willStop = players.size() < 3 && state != Consts.GameState.LOBBY;
-
             // If they was judge, return all played cards to hand, and move to next judge.
-            boolean wasJudge = false;
-            if (getJudge() == player && (state == Consts.GameState.PLAYING || state == Consts.GameState.JUDGING)) {
+            if (wasJudge && (state == Consts.GameState.PLAYING || state == Consts.GameState.JUDGING)) {
                 EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_JUDGE_LEFT);
                 ev.add(Consts.OngoingGameData.INTERMISSION, ROUND_INTERMISSION);
                 ev.add(Consts.OngoingGameData.WILL_STOP, willStop);
@@ -314,7 +314,6 @@ public class Game {
 
                 returnCardsToHand();
                 judgeIndex--; // startNextRound will advance it again.
-                wasJudge = true;
             } else if (players.indexOf(player) < judgeIndex) {
                 judgeIndex--; // If they aren't judge but are earlier in judging order, fix the judge index.
             }

@@ -186,7 +186,7 @@ class GameManager {
     }
 
     sendGameChatMessage(msg, clear) {
-        $.post("AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
+        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
             clear();
         }).fail(function (data) {
             Notifier.error("Failed to send the message!", data);
@@ -316,7 +316,7 @@ class GameManager {
 
     _handleHandCardSelect(card) {
         const self = this;
-        $.post("AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
             /**
              * @param {int} data.ltp - Number of cards left to play
              */
@@ -329,7 +329,7 @@ class GameManager {
     }
 
     _handleTableCardSelect(card) {
-        $.post("AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
             // Do nothing
         }).fail(function (data) {
             Notifier.error("Failed to select the card!", data);
@@ -442,17 +442,17 @@ class GameManager {
 
     leave() {
         const self = this;
-        $.post("AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
+        $.post("/AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
             self._postLeave();
         });
     }
 
     _postLeave() {
-        window.location = "lobbies.html";
+        window.location = "/lobbies/";
     }
 
     start() {
-        $.post("AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
             Notifier.debug(data);
         }).fail(function (data) {
             /**
@@ -483,24 +483,24 @@ class GameManager {
     }
 }
 
-const gameManager = new GameManager(getURLParameter('gid'));
+const gameManager = new GameManager(getLastPathSegment());
 
 window.onload = function () {
     if (gameManager.id === null) {
-        window.location = "lobbies.html";
+        window.location = "/lobbies/";
     } else {
         loadUI();
     }
 };
 
 function loadUI() {
-    $.post("AjaxServlet", "o=gme").done(function (data) {
+    $.post("/AjaxServlet", "o=gme").done(function (data) {
         gameManager.me = data;
 
-        $.post("AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
             gameManager.gameInfo = data;
 
-            $.post("AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
+            $.post("/AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
                 gameManager.blackCard = data.bc;
                 gameManager.addHandCards(data.h, true);
                 gameManager.addTableCards(data.wc, true);

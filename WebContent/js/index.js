@@ -1,5 +1,5 @@
 window.onload = function () {
-    $.post("AjaxServlet", "o=fl").fail(function (data) {
+    $.post("/AjaxServlet", "o=fl").fail(function (data) {
         Notifier.error("Failed contacting the server!", data);
     }).done(function (data) {
         data.css.sort(function (a, b) {
@@ -11,9 +11,9 @@ window.onload = function () {
 
         if (data.ip) {
             if (data.next === "game") {
-                window.location = "lobbies.html?gid=" + data.gid;
+                window.location = "/?gid=" + data.gid;
             } else {
-                window.location = "lobbies.html";
+                window.location = "/lobbies/";
             }
         }
     });
@@ -24,7 +24,7 @@ function register(ev) {
 
     const nickname = $("input#nickname").val();
 
-    $.post("AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
+    $.post("/AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
         switch (data.ec) {
             case "nns":
                 Notifier.error("Please specify a nickname.", data);
@@ -50,6 +50,6 @@ function register(ev) {
         }
 
     }).done(function () {
-        window.location = "lobbies.html";
+        window.location = "/lobbies/";
     });
 }
