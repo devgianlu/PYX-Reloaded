@@ -381,10 +381,15 @@ class CreateGameDialog {
         if (deck === undefined) return;
 
         if (this.cardcastDecks.get("code", code).length === 0) {
-            this.cardcastDecks.add({
+            const elm = $(this.cardcastDecks.add({
                 "_name": deck.name,
                 "_code": deck.code,
                 "code": deck.code
+            })[0].elm);
+
+            const self = this;
+            elm.find('._remove').on('click', function () {
+                self.removeCardcastDeck(deck.code);
             });
         }
 
@@ -408,10 +413,6 @@ function showCreateGameDialog() {
 
 function loadCardcastDeckInfo() {
     createGameDialog.loadCardcastDeckInfo();
-}
-
-function removeCardcastDeck(element) {
-    createGameDialog.removeCardcastDeck(element.getAttribute("data-code"));
 }
 
 function addCardcastDeck(element) {
