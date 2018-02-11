@@ -79,6 +79,12 @@ class Notifier {
             if (data !== undefined) console.error(data);
         }
 
+        if ("ec" in data) {
+            if (data.ec === "nr" || data.ec === "se") window.location = "/";
+        } else if ("responseJSON" in data) {
+            if (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se") window.location = "/";
+        }
+
         return Notifier.show(Notifier.ERROR, msg, this.DEFAULT_TIMEOUT * 1.5, progressBar);
     }
 
