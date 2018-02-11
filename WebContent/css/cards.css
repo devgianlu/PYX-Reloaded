@@ -1,0 +1,214 @@
+.mdc-card.pyx-card[data-black=true] .circled {
+    background: var(--mdc-theme-text-secondary-on-dark);
+    color: black;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 1px;
+    width: var(--adapted-line-height);
+    text-align: center;
+    display: inline-block;
+}
+
+.mdc-card.pyx-card[data-black=true] {
+    background: black;
+}
+
+.mdc-card.pyx-card[data-black=true] .card-text {
+    background: black;
+    color: var(--mdc-theme-text-primary-on-dark);
+}
+
+.mdc-card.pyx-card > .mdc-card__supporting-text {
+    max-height: 30vh;
+    min-height: 10vh;
+    overflow-y: auto;
+    padding: 8px;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+}
+
+#whiteCards {
+    width: 100%;
+}
+
+#hand > .list > .mdc-card.pyx-card {
+    flex-shrink: 0;
+}
+
+.mdc-card.pyx-card .card-details {
+    min-height: 0;
+}
+
+.mdc-card.pyx-card[data-black=true] .card-details {
+    color: var(--mdc-theme-text-secondary-on-dark);
+}
+
+.mdc-card.pyx-card[data-black=false] .card-details {
+    color: var(--mdc-theme-text-secondary-on-light);
+}
+
+.mdc-card.pyx-card {
+    width: var(--adapted-card-width);
+    justify-content: flex-start;
+}
+
+.mdc-card.pyx-card[data-black=false].highlighted {
+    background: var(--mdc-theme-secondary);
+}
+
+.mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
+    margin: 0;
+    text-align: right;
+}
+
+.mdc-card.pyx-card > .mdc-card__supporting-text > h4 {
+    margin: 0;
+    text-align: right;
+}
+
+.mdc-card.pyx-card .mdc-typography {
+    font-size: var(--adapted-font-size);
+    line-height: var(--adapted-line-height);
+}
+
+/* Default --------------- */
+@media only screen and (max-width: 320px) {
+    :root {
+        --adapted-card-width: 50vw;
+        --adapted-font-size: 0.6rem;
+        --adapted-line-height: 0.7rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 2px;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 4px;
+    }
+}
+
+/* Small phones ---------- */
+@media only screen and (min-width: 320px) {
+    :root {
+        --adapted-card-width: 40vw;
+        --adapted-font-size: 0.6rem;
+        --adapted-line-height: 0.9rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 2px;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 4px;
+    }
+}
+
+/* Medium phones --------- */
+@media only screen and (min-width: 375px) {
+    :root {
+        --adapted-card-width: 35vw;
+        --adapted-font-size: 0.7rem;
+        --adapted-line-height: 1rem;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 4px;
+    }
+}
+
+/* Large phones ---------- */
+@media only screen and (min-width: 425px) {
+    :root {
+        --adapted-card-width: 30vw;
+        --adapted-font-size: 0.85rem;
+        --adapted-line-height: 1.1rem;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 6px;
+    }
+}
+
+/* Tablets --------------- */
+@media only screen and (min-width: 768px) {
+    :root {
+        --adapted-card-width: 30vw;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.1rem;
+    }
+
+    .mdc-card.pyx-card > .mdc-card__supporting-text {
+        padding: 12px;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 6px;
+    }
+}
+
+/* Small laptops --------------- */
+@media only screen and (min-width: 1024px) {
+    :root {
+        --adapted-card-width: 25vw;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
+    }
+}
+
+/* Medium Laptops --------------- */
+@media only screen and (min-width: 1280px) {
+    :root {
+        --adapted-card-width: 20vw;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
+    }
+
+    .mdc-card.pyx-card {
+        margin: 8px;
+    }
+}
+
+/* Large laptops --------- */
+@media only screen and (min-width: 1440px) {
+    :root {
+        --adapted-card-width: 20vw;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.2rem;
+    }
+}
+
+/* Desktop --------- */
+@media only screen and (min-width: 1600px) {
+    :root {
+        --adapted-card-width: 16vw;
+        --adapted-font-size: 1rem;
+        --adapted-line-height: 1.3rem;
+    }
+
+    .mdc-card.pyx-card > .mdc-card__supporting-text {
+        padding: 14px;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 8px;
+    }
+}
+
+/* 4K -------------------- */
+@media only screen and (min-width: 2560px) {
+    :root {
+        --adapted-card-width: 12vw;
+        --adapted-font-size: 1.5rem;
+        --adapted-line-height: 1.75rem;
+    }
+
+    .mdc-card.pyx-card > .mdc-card__supporting-text {
+        padding: 16px;
+    }
+
+    .bottom-sheet--open .bottom-sheet__content {
+        padding: 10px;
+    }
+}

@@ -3,8 +3,12 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     constructor(root, foundation = undefined, ...args) {
         super(root, foundation, ...args);
 
-        this.menu_.unlisten("MDCSimpleMenu:cancel", this.foundation_.cancelHandler_);
-        this.menu_.unlisten("MDCSimpleMenu:selected", this.foundation_.selectionHandler_);
+        this.menu_.unlisten("MDCMenu:cancel", this.foundation_.cancelHandler_);
+        this.menu_.unlisten("MDCMenu:selected", this.foundation_.selectionHandler_);
+    }
+
+    set uiListener(set) {
+        this.listener = set;
     }
 
     get getSelectedItemNames() {
@@ -19,15 +23,16 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
         return names;
     }
 
+    // noinspection JSUnusedGlobalSymbols
     initialize(menuFactory) {
         super.initialize(menuFactory);
 
-        this.menu_.listen("MDCSimpleMenu:selected", (evt) => {
+        this.menu_.listen("MDCMenu:selected", (evt) => {
             this.updateUI();
             this.foundation_.close_();
             evt.preventDefault();
         });
-        this.menu_.listen("MDCSimpleMenu:cancel", (evt) => {
+        this.menu_.listen("MDCMenu:cancel", (evt) => {
             this.updateUI();
             this.foundation_.close_();
             evt.preventDefault();
@@ -40,6 +45,8 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
 
         if (selected.length === 0) this.label_.classList.remove("mdc-select__label--float-above");
         else this.label_.classList.add("mdc-select__label--float-above");
+
+        this.listener();
     }
 
     clear() {
@@ -48,252 +55,365 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     }
 }
 
-function populateDropdown(dropdown, dgo) {
-    const list = dropdown.querySelector('.mdc-simple-menu__items');
-    clearElement(list);
-    for (let i = dgo.min; i <= dgo.max; i++) {
-        let item = document.createElement("li");
-        item.className = "mdc-list-item";
-        item.setAttribute("tabindex", "0");
-        item.setAttribute("role", "option");
-        if (i === dgo.default) item.setAttribute("aria-selected", '');
-        item.innerHTML = i;
-        list.appendChild(item);
-    }
+class CreateGameDialog {
+    constructor(id) {
+        this._dialog = $('#' + id);
+        this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
+        this.dialog.listen('MDCDialog:accept', () => this._acceptDialog());
 
-    new mdc.select.MDCSelect(dropdown);
-}
+        this._scoreLimit = this._dialog.find('#scoreLimit');
+        this._playersLimit = this._dialog.find('#playersLimit');
+        this._spectatorsLimit = this._dialog.find('#spectatorsLimit');
+        this._blanksLimit = this._dialog.find('#blanksLimit');
+        this._timeMultiplier = this._dialog.find('#timeMultiplier');
+        this._winBy = this._dialog.find('#winBy');
 
-function populateTimeMultiplier(dropdown, tm) {
-    const list = dropdown.querySelector('.mdc-simple-menu__items');
-    clearElement(list);
-    for (let i = 0; i < tm.values.length; i++) {
-        let item = document.createElement("li");
-        let val = tm.values[i];
-        item.className = "mdc-list-item";
-        item.setAttribute("tabindex", "0");
-        item.setAttribute("role", "option");
-        if (val === tm.default) item.setAttribute("aria-selected", '');
-        item.innerHTML = val;
-        list.appendChild(item);
-    }
-
-    new mdc.select.MDCSelect(dropdown);
-}
-
-function loadCardSets(container, css) {
-    const setsList = [];
-    for (let i = 0; i < css.length; i++) {
-        let set = css[i];
-        setsList.push({
-            "_name": set.csn,
-            "w": set.w,
-            "cid": set.cid
+        this._pyxDecks = this._dialog.find('#pyxDecks');
+        this.pyxDecks_select = new MDCMultiSelect(this._pyxDecks[0]);
+        this.pyxDecks_select.uiListener = () => this.updateTitles();
+        this.pyxDecks = new List(this._pyxDecks[0], {
+            item: 'pyxDeckTemplate',
+            valueNames: ['_name', {'data': ['csi']}]
         });
+
+        this._cardcastDecks = this._dialog.find('#cardcastDecks');
+        this._cardcastDecks_list = this._cardcastDecks.find('.list');
+        this._cardcastDecks_message = this._cardcastDecks.find('.message');
+        this.cardcastDecks = new List(this._cardcastDecks[0], {
+            item: 'cardcastDeckTemplate',
+            valueNames: ['_name', '_code', {'data': ['code']}]
+        });
+
+        this._cardcastAdd = this._dialog.find('#cardcastAdd');
+        this._cardcastAddDeckCode = this._cardcastAdd.find('#cardcastAddDeckCode');
+        this.cardcastAddDeckCode = new mdc.textField.MDCTextField(this._cardcastAddDeckCode.parent()[0]);
+        this._cardcastAddDeckInfo = this._dialog.find('#cardcastAddDeckInfo');
+        this._cardcastAddDeckInfo_loading = this._cardcastAddDeckInfo.find('.mdc-linear-progress');
+        this._cardcastAddDeckInfo_details = this._cardcastAddDeckInfo.find('.details');
+
+        this._cardsTitle = this._dialog.find('#cardsTitle');
+        this._cardcastTitle = this._dialog.find('#cardcastDecksTitle');
+        this._pyxTitle = this._dialog.find('#pyxDecksTitle');
+
+        this._password = this._dialog.find('#gamePassword');
+
+        /**
+         * @param {int} dgo.vL - Spectators limit
+         * @param {int} dgo.sl - Score limit
+         * @param {int} dgo.pL - Players limit
+         * @param {int} dgo.wb - Win by
+         * @param {int} dgo.tm - Time multiplier
+         * @param {int} dgo.bl - Blank cards limit
+         *
+         * @type {object}
+         */
+        this.dgo = JSON.parse(localStorage['dgo']);
+
+        /**
+         * @param {string} css[].csn - Card set name
+         * @param {int} css[].csi - Card set id
+         *
+         * @type {object[]}
+         */
+        this.css = JSON.parse(localStorage['css']);
+
+        this._loadedCardcastDecks = {};
+
+        this.reset();
     }
 
-    setsList.sort(function (a, b) {
-        return a.w - b.w;
-    });
+    /**
+     *
+     * @param dropdown
+     * @param {object} tm
+     * @param {string[]} tm.v - Possible values
+     * @param {string} tm.def - Default value
+     * @private
+     */
+    static _populateTimeMultiplier(dropdown, tm) {
+        const list = dropdown.find('.mdc-menu__items');
+        list.empty();
 
-    const sets = new List(container, {
-        item: 'card-set-template',
-        valueNames: ['_name', {'data': ['cid']}]
-    });
-
-    sets.clear();
-    sets.add(setsList, function (items) {
-        for (let i = 0; i < items.length; i++) {
-            let cid = items[i].values().cid;
-            let item = $(items[i].elm);
-
-            item.find('input').attr("id", "pyx_deck_" + cid);
-            item.find('label').attr("for", "pyx_deck_" + cid);
-        }
-    });
-}
-
-function getSelectedPyxDecks(container) {
-    const list = container.querySelector('.list');
-    let selected = [];
-    for (let i = 0; i < list.children.length; i++) {
-        let cardSet = list.children[i];
-        let checkbox = cardSet.querySelector('input');
-        if (checkbox.checked) {
-            selected.push(cardSet.getAttribute("data-cid"));
-        }
-    }
-
-    return selected;
-}
-
-function getDropdownSelectedValue(dropdown) {
-    const list = dropdown.querySelector('.mdc-simple-menu__items');
-    for (let i = 0; i < list.children.length; i++) {
-        let item = list.children[i];
-        if (item.hasAttribute("aria-selected"))
-            return item.innerHTML;
-    }
-
-    return list.children[0].innerHTML; // Shouldn't happen
-}
-
-function resetCreateGameDialog() {
-    const scoreLimitElm = document.getElementById('scoreLimit');
-    const playersLimitElm = document.getElementById('playersLimit');
-    const spectatorsLimitElm = document.getElementById('spectatorsLimit');
-    const blanksLimitElm = document.getElementById('blanksLimit');
-    const timeMultiplierElm = document.getElementById('timeMultiplier');
-    const winByElm = document.getElementById('winBy');
-
-    const dgo = JSON.parse(localStorage['dgo']);
-    populateDropdown(scoreLimitElm, dgo.sl);
-    populateDropdown(playersLimitElm, dgo.pL);
-    populateDropdown(spectatorsLimitElm, dgo.vL);
-    populateDropdown(blanksLimitElm, dgo.bl);
-    populateTimeMultiplier(timeMultiplierElm, dgo.tm);
-    populateDropdown(winByElm, dgo.wb);
-    loadCardSets(document.getElementById('pyx_decks'), JSON.parse(localStorage['css']));
-
-    resetPyxDecks();
-
-    const ccDecksElm = document.getElementById('cc_decks');
-    setupCardcastDecks(ccDecksElm);
-    resetLoadCardcast();
-}
-
-function resetPyxDecks() {
-    const element = document.querySelector('#pyx_decks');
-    const select = new MDCMultiSelect(element);
-    select.clear();
-}
-
-function resetLoadCardcast() {
-    const container = document.getElementById('cc_add');
-    const inputElm = container.querySelector('#cc_deck_code');
-    const input = new mdc.textField.MDCTextField(inputElm.parentElement);
-    input.valid = true;
-    $(inputElm.nextElementSibling).removeClass("mdc-text-field__label--float-above");
-    inputElm.value = "";
-
-    $(container.querySelector('.mdc-linear-progress')).hide();
-    $(container.querySelector('#deck_info_details')).hide();
-}
-
-function toggleCardcastNoDecksMessage(container, visible) {
-    container = $(container);
-    const message = container.find('.message');
-    const list = container.find('.list');
-    if (visible) {
-        message.show();
-        list.hide();
-    } else {
-        message.hide();
-        list.show();
-    }
-}
-
-function setupCardcastDecks(container) {
-    clearElement(container.querySelector('.mdc-list'));
-    toggleCardcastNoDecksMessage(container, true);
-}
-
-function removeCardcastDeckFromLayout(container, code) {
-    const list = container.querySelector('.mdc-list');
-    for (let i = 0; i < list.children.length; i++) {
-        let item = list.children[i];
-        if (item.getAttribute("data-code") === code) {
-            list.removeChild(item);
-            break;
+        for (let i = 0; i < tm.v.length; i++) {
+            let item = document.createElement("li");
+            let val = tm.v[i];
+            item.className = "mdc-list-item";
+            item.setAttribute("tabindex", "0");
+            item.setAttribute("role", "option");
+            if (val === tm.def) item.setAttribute("aria-selected", "true");
+            item.innerHTML = val;
+            list.append(item);
         }
     }
 
-    toggleCardcastNoDecksMessage(container, list.children.length === 0);
-}
+    /**
+     *
+     * @param dropdown
+     * @param {object} dgo
+     * @param {int} dgo.min - Minimum value
+     * @param {int} dgo.max - Maximum value
+     * @param {int} dgo.def - Default value
+     * @private
+     */
+    static _populateDropdown(dropdown, dgo) {
+        const list = dropdown.find('.mdc-menu__items');
+        list.empty();
 
-function addCardcastDeckToLayout(button) {
-    const deck = _loadedCardcastDecks[button.parentElement.getAttribute("data-code")]; // The deck must have been loaded
-    if (deck === undefined) return;
-
-    const container = document.getElementById('cc_decks');
-    const list = container.querySelector('.mdc-list');
-    for (let i = 0; i < list.children.length; i++) {
-        if (list.children[i].getAttribute("data-code") === deck.code)
-            return;
+        for (let i = dgo.min; i <= dgo.max; i++) {
+            let item = document.createElement("li");
+            item.className = "mdc-list-item";
+            item.setAttribute("tabindex", "0");
+            item.setAttribute("role", "option");
+            if (i === dgo.def) item.setAttribute("aria-selected", "true");
+            item.innerHTML = i.toString();
+            list.append(item);
+        }
     }
 
-    const li = document.createElement("li");
-    li.setAttribute("data-code", deck.code);
-    li.className = "mdc-list-item";
-    const text = document.createElement("span");
-    text.style.paddingRight = "8px";
-    text.className = "mdc-list-item__text";
-    text.innerHTML = deck.name;
-    const code = document.createElement("span");
-    code.className = "mdc-list-item__secondary-text";
-    code.innerHTML = deck.code;
-    text.appendChild(code);
-    li.appendChild(text);
+    static getDropdownSelectedValue(dropdown) {
+        const list = dropdown.find('.mdc-menu__items');
+        for (let i = 0; i < list.children().length; i++) {
+            const item = $(list.children()[i]);
+            if (item.attr("aria-selected"))
+                return item.text();
+        }
 
-    const remove = document.createElement("i");
-    remove.className = "mdc-list-item__end-detail material-icons";
-    remove.innerHTML = "delete";
-    remove.onclick = function () {
-        removeCardcastDeckFromLayout(container, deck.code);
-    };
-    li.appendChild(remove);
+        console.log("DEFAULTING");
+        return list.children()[0].innerHTML; // Shouldn't happen
+    }
 
-    list.appendChild(li);
+    static createDetailsString(decks, whites, blacks) {
+        if (decks === 0) {
+            return "0 decks";
+        } else {
+            return decks + (decks === 1 ? " deck, " : " decks, ")
+                + whites + (whites === 1 ? " white card, " : " white cards, ")
+                + blacks + (blacks === 1 ? " black card" : " black cards");
+        }
+    }
 
-    toggleCardcastNoDecksMessage(container, false);
-    resetLoadCardcast();
-}
+    _acceptDialog() {
+        const go = {
+            "vL": CreateGameDialog.getDropdownSelectedValue(this._spectatorsLimit),
+            "pL": CreateGameDialog.getDropdownSelectedValue(this._playersLimit),
+            "sl": CreateGameDialog.getDropdownSelectedValue(this._scoreLimit),
+            "bl": CreateGameDialog.getDropdownSelectedValue(this._blanksLimit),
+            "tm": CreateGameDialog.getDropdownSelectedValue(this._timeMultiplier),
+            "wb": CreateGameDialog.getDropdownSelectedValue(this._winBy),
+            "pw": this.getPassword(),
+            "CCs": this.getCardcastDeckCodes(),
+            "css": this.getSelectedPyxDecks()
+        };
 
-const _loadedCardcastDecks = {};
+        Notifier.debug(go);
+        games.createGame(go); // Reference to index.js
+    }
 
-function loadCardcastDeckInfo(button) {
-    const container = document.getElementById('deck_info');
-    const inputElm = button.parentElement.querySelector('input');
-    const input = new mdc.textField.MDCTextField(inputElm.parentElement);
-    const loading = $(container.querySelector('.mdc-linear-progress'));
-    const details = $(container.querySelector('#deck_info_details'));
-    loading.show();
-    details.hide();
+    show() {
+        this.reset();
+        this.dialog.show();
+    }
 
-    const code = inputElm.value;
-    if (code.match(/[A-Z0-9]{5}/) !== null) {
-        let cc = new Cardcast(code);
-        cc.info(function (info) {
-            loading.hide();
-            if (info === undefined) {
-                details.hide();
-                input.valid = false;
-                return;
+    reset() {
+        // Gameplay
+        CreateGameDialog._populateDropdown(this._scoreLimit, this.dgo.sl);
+        CreateGameDialog._populateDropdown(this._playersLimit, this.dgo.pL);
+        CreateGameDialog._populateDropdown(this._spectatorsLimit, this.dgo.vL);
+        CreateGameDialog._populateDropdown(this._blanksLimit, this.dgo.bl);
+        CreateGameDialog._populateTimeMultiplier(this._timeMultiplier, this.dgo.tm);
+        CreateGameDialog._populateDropdown(this._winBy, this.dgo.wb);
+
+        // PYX
+        this.pyxDecks_select.clear();
+        this.pyxDecks.clear();
+        for (let i = 0; i < this.css.length; i++) {
+            const set = this.css[i];
+            const elm = $(this.pyxDecks.add({
+                "_name": set.csn,
+                "w": set.w,
+                "csi": set.csi
+            })[0].elm);
+
+            mdc.checkbox.MDCCheckbox.attachTo(elm[0]);
+
+            elm.find('input').attr("id", "pyx_deck_" + set.csi);
+            elm.find('label').attr("for", "pyx_deck_" + set.csi);
+        }
+
+        // Cardcast
+        this.cardcastDecks.clear();
+        this.toggleCardcastNoDecksMessage(true);
+        this._resetAddCardcast();
+
+        // Titles
+        this.updateTitles();
+    }
+
+    getPassword() {
+        return this._password.val();
+    }
+
+    getSelectedPyxDecks() {
+        const selected = [];
+        this._pyxDecks.find('.list').children().each(function () {
+            const input = $(this).find('input');
+            if (input.prop('checked')) selected.push($(this).attr('data-csi'))
+
+        });
+
+        return selected;
+    }
+
+    updateTitles() {
+        const pyxDetails = this.getPyxDecksDetails();
+        this._pyxTitle.text("PYX (" + CreateGameDialog.createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")");
+
+        const ccDetails = this.getCardcastDecksDetails();
+        this._cardcastTitle.text("Cardcast (" + CreateGameDialog.createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")");
+
+        this._cardsTitle.text("Cards (" + CreateGameDialog.createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")");
+    }
+
+    getPyxDecksDetails() {
+        const pyxIds = this.getSelectedPyxDecks();
+
+        let whites = 0;
+        let blacks = 0;
+
+        for (let i = 0; i < this.css.length; i++) {
+            /**
+             * @param {int} cardSet.wcid - White cards in deck
+             * @param {int} cardSet.bcid - Black cards in deck
+             * @type {object}
+             */
+            const cardSet = this.css[i];
+            for (let j = 0; j < pyxIds.length; j++) {
+                if (cardSet.csi.toString() === pyxIds[j]) {
+                    whites += cardSet.wcid;
+                    blacks += cardSet.bcid;
+                }
             }
+        }
 
-            _loadedCardcastDecks[info.code] = info;
+        return {"decks": pyxIds.length, "whites": whites, "blacks": blacks}
+    }
 
-            details.show();
-            input.valid = true;
+    // *******************
+    // Cardcast stuff
+    // *******************
 
-            details.attr("data-code", info.code);
+    getCardcastDecksDetails() {
+        const deckCodes = this.getCardcastDeckCodes();
 
-            details.find('.\_name').text(info.name);
-            details.find('.\_author').text("by " + info.author.username);
-        });
-    } else {
-        details.hide();
-        loading.hide();
-        input.valid = false;
+        let whites = 0;
+        let blacks = 0;
+
+        for (let i = 0; i < deckCodes.length; i++) {
+            const deck = this._loadedCardcastDecks[deckCodes[i]];
+            whites += deck.response_count;
+            blacks += deck.call_count;
+        }
+
+        return {"decks": deckCodes.length, "whites": whites, "blacks": blacks}
+    }
+
+    _resetAddCardcast() {
+        this.cardcastAddDeckCode.valid = true;
+        this._cardcastAddDeckCode.val("");
+        this._cardcastAddDeckCode.next().removeClass("mdc-text-field__label--float-above");
+
+        this._cardcastAddDeckInfo_loading.hide();
+        this._cardcastAddDeckInfo_details.hide();
+    }
+
+    toggleCardcastNoDecksMessage(visible) {
+        if (visible) {
+            this._cardcastDecks_list.hide();
+            this._cardcastDecks_message.show();
+        } else {
+            this._cardcastDecks_list.show();
+            this._cardcastDecks_message.hide();
+        }
+    }
+
+    getCardcastDeckCodes() {
+        const codes = [];
+        for (let i = 0; i < this.cardcastDecks.items.length; i++)
+            codes.push(this.cardcastDecks.items[i]._values.code);
+        return codes;
+    }
+
+    loadCardcastDeckInfo() {
+        const code = this._cardcastAddDeckCode.val();
+        this._cardcastAddDeckInfo_loading.show();
+        this._cardcastAddDeckInfo_details.hide();
+
+        if (code.match(/[A-Z0-9]{5}/) !== null) {
+            const self = this;
+            new Cardcast(code).info(function (info, error) {
+                self._cardcastAddDeckInfo_loading.hide();
+                if (info === null) {
+                    Notifier.debug(error);
+                    self._cardcastAddDeckInfo_details.hide();
+                    self.cardcastAddDeckCode.valid = false;
+                    return;
+                }
+
+                self._loadedCardcastDecks[info.code] = info;
+
+                self._cardcastAddDeckInfo_details.show();
+                self.cardcastAddDeckCode.valid = true;
+
+                self._cardcastAddDeckInfo_details.attr("data-code", info.code);
+
+                self._cardcastAddDeckInfo_details.find('.\_name').text(info.name);
+                self._cardcastAddDeckInfo_details.find('.\_author').text("by " + info.author.username);
+            });
+        } else {
+            this._cardcastAddDeckInfo_loading.hide();
+            this._cardcastAddDeckInfo_details.hide();
+            this.cardcastAddDeckCode.valid = false;
+        }
+    }
+
+    addCardcastDeck(code) {
+        const deck = this._loadedCardcastDecks[code]; // The deck must have been loaded
+        if (deck === undefined) return;
+
+        if (this.cardcastDecks.get("code", code).length === 0) {
+            this.cardcastDecks.add({
+                "_name": deck.name,
+                "_code": deck.code,
+                "code": deck.code
+            });
+        }
+
+        this.toggleCardcastNoDecksMessage(false);
+        this._resetAddCardcast();
+        this.updateTitles();
+    }
+
+    removeCardcastDeck(code) {
+        this.cardcastDecks.remove("code", code);
+        this.toggleCardcastNoDecksMessage(this.cardcastDecks.size() === 0);
+        this.updateTitles();
     }
 }
 
-function getCardcastDeckCodes(container) {
-    const codes = [];
-    const list = container.querySelector('.mdc-list');
-    for (let i = 0; i < list.children.length; i++) {
-        codes.push(list.children[i].getAttribute("data-code"));
-    }
+const createGameDialog = new CreateGameDialog('createGameDialog');
 
-    return codes;
+function showCreateGameDialog() {
+    createGameDialog.show();
+}
+
+function loadCardcastDeckInfo() {
+    createGameDialog.loadCardcastDeckInfo();
+}
+
+function removeCardcastDeck(button) {
+    createGameDialog.removeCardcastDeck(button.parentElement.parentElement.getAttribute("data-code"));
+}
+
+function addCardcastDeck(button) {
+    createGameDialog.addCardcastDeck(button.parentElement.getAttribute("data-code"));
 }

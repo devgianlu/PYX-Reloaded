@@ -3,13 +3,16 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.css">
+    <meta name="google-site-verification" content="d1mgvYymY1hPvJcf0buZ-4e8RMETSFNRFz6aeD4BueI"/>
+    <title>PYX-Reloaded</title>
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
-    <link rel="stylesheet" href="css/pyx-reloaded.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
+    <link rel="stylesheet" href="/css/pyx-reloaded.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-    <script src="js/theming.js"></script>
-    <script>applyCustomTheme();</script>
+    <script src="/js/theming.js"></script>
+    <script>Theming.apply();</script>
 </head>
 
 <body class="mdc-typography">
@@ -25,14 +28,14 @@
     <main class="mdc-layout-grid mdc-toolbar-fixed-adjust">
         <div class="mdc-layout-grid__inner centered_cards" style="">
             <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-                <section class="mdc-card__primary ">
-                    <h1 class="mdc-card__title mdc-card__title--large">Choose a Nickname to Start!</h1>
+                <section class="mdc-card__primary">
+                    <h1 class="mdc-card__title" style="margin-bottom: 0">Choose a Nickname to Start!</h1>
                 </section>
                 <section class="mdc-card__supporting-text">
                     <label class="mdc-text-field" data-mdc-auto-init="MDCTextField" style="width: 75%">
-                        <input type="text" class="mdc-text-field__input" id="nickname">
+                        <input type="text" class="mdc-text-field__input" id="nickname" onkeydown="register(event);">
                         <span class="mdc-text-field__label">Nickname</span>
-                        <div class="mdc-text-field__bottom-line"></div>
+                        <div class="mdc-line-ripple"></div>
                     </label>
                 </section>
                 <section class="mdc-card__actions">
@@ -59,11 +62,9 @@
                 </section>
                 <section class="mdc-card__actions">
                     <a class="mdc-button mdc-button--compact mdc-card__action"
-                       data-mdc-auto-init="MDCRipple"
-                       target="_blank"
+                       data-mdc-auto-init="MDCRipple" target="_blank"
                        href="https://github.com/devgianlu/PYX-Reloaded/">
-                        We're on <img src="./images/octicons/mark-github.svg">&nbsp;<img
-                            src="./images/octicons/logo-github.svg"> !!
+                        We're on GitHub!!
                     </a>
                 </section>
             </div>
@@ -72,8 +73,10 @@
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
-<script src="//unpkg.com/material-components-web@0.28.0/dist/material-components-web.min.js"></script>
-<script src="js/index.js"></script>
+<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+<script src="/js/notifs.helper.js"></script>
+<script src="/js/index.js"></script>
 <script>window.mdc.autoInit();</script>
 
 </body>

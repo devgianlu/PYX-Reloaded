@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardcast - PYX-Reloaded</title>
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/jquery-bar-rating/1.2.2/themes/fontawesome-stars-o.min.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
+    <link rel="stylesheet" href="/css/pyx-reloaded.css">
+    <link rel="stylesheet" href="/cardcast/index.css"/>
+    <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="/js/theming.js"></script>
+    <script>Theming.apply();</script>
+</head>
+<body class="mdc-typography">
+
+<div class="page-content">
+    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
+        <div class="mdc-toolbar__row">
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                <span class="mdc-toolbar__title">Cardcast - PYX Reloaded</span>
+            </section>
+
+            <section class="mdc-toolbar__section">
+                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                    <input type="text" id="cardcastSearch" class="mdc-text-field__input">
+                    <label class="mdc-text-field__label" for="cardcastSearch">Search</label>
+                    <div class="mdc-line-ripple"></div>
+                </div>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="submitSearch();"
+                        style="margin-top: 6px">search
+                </button>
+            </section>
+
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <div class="mdc-menu-anchor">
+                    <button class="material-icons align-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
+                        filter_list
+                    </button>
+                    <div class="mdc-menu" id="cardcastMenu" tabindex="-1">
+                        <div class="mdc-menu__items mdc-list-group" role="menu" aria-hidden="true">
+                            <h3 class="mdc-list-group__subheader">Categories</h3>
+                            <ul class="mdc-list _categories"></ul>
+
+                            <hr class="mdc-list-divider">
+
+                            <h3 class="mdc-list-group__subheader" style="display: inline-block;">
+                                <div class="mdc-checkbox" data-mdc-auto-init="MDCCheckbox"
+                                     style="vertical-align: middle;">
+                                    <input type="checkbox" class="mdc-checkbox__native-control" id="toggleNsfw"
+                                           checked/>
+                                    <div class="mdc-checkbox__background">
+                                        <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                            <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
+                                                  d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                                        </svg>
+                                        <div class="mdc-checkbox__mixedmark"></div>
+                                    </div>
+                                </div>
+                                <label for="toggleNsfw" class="_name" style="vertical-align: middle">NSFW</label>
+                            </h3>
+
+                            <hr class="mdc-list-divider">
+
+                            <h3 class="mdc-list-group__subheader">Order by</h3>
+                            <ul class="mdc-list _sort"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </header>
+
+    <main class="mdc-layout-grid mdc-toolbar-fixed-adjust" id="cardcast-container">
+        <div class="mdc-layout-grid__inner list"></div>
+        <div class="message" style="margin-top: 48px">
+            <div class="material-icons md-48 md-dark">info_outline</div>
+            <h3 class="mdc-typography md-dark">No decks found.</h3>
+        </div>
+        <div class="pagination">
+            <div class="pagination__inner"></div>
+        </div>
+    </main>
+
+</div>
+
+<div style="display: none;">
+    <div class="mdc-typography mdc-card mdc-layout-grid__cell" id="cardcast-deck-template">
+        <section class="mdc-card__primary" style="display: inline-flex">
+            <div style="flex-grow: 1">
+                <h2 class="mdc-card__title mdc-typography--title _name" style="margin-bottom: 0">{{Deck name}}</h2>
+                <h3 class="mdc-card__subtitle mdc-typography--subheading2 _author"
+                    style="margin-top: 0; margin-bottom: 0">{{Deck author}}</h3>
+                <select class="_rating" title="">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <span class="material-icons md-36 md-dark _category" style="margin-top: 0.83rem"></span>
+        </section>
+        <section class="mdc-card__supporting-text" style="margin-top: 8px">
+            <span class="_sample"></span>
+        </section>
+        <section class="mdc-card__actions">
+            <button class="mdc-button mdc-button--compact mdc-card__action"
+                    onclick="showCardcastDetailsDialog(this.parentElement.parentElement.getAttribute('data-code'))">More
+            </button>
+        </section>
+    </div>
+
+    <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-3 cc-card" id="cardTemplate">
+        <section class="mdc-card__supporting-text">
+            <h1 class="mdc-typography mdc-typography--body1 _text"></h1>
+        </section>
+    </div>
+
+    <div class="mdc-list-item" id="category-item-template">
+        <div class="mdc-checkbox" data-mdc-auto-init="MDCCheckbox">
+            <input type="checkbox" class="mdc-checkbox__native-control" id="category_"/>
+            <div class="mdc-checkbox__background">
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
+                          d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                </svg>
+                <div class="mdc-checkbox__mixedmark"></div>
+            </div>
+        </div>
+        <i class="material-icons mdc-list-item__graphic _icon">more</i>
+        <label for="category_" class="_name">{{Category name}}</label>
+    </div>
+
+    <div class="mdc-list-item" id="sort-item-template">
+        <div class="mdc-radio" data-mdc-auto-init="MDCRadio">
+            <input class="mdc-radio__native-control" type="radio" id="sort_">
+            <div class="mdc-radio__background">
+                <div class="mdc-radio__outer-circle"></div>
+                <div class="mdc-radio__inner-circle"></div>
+            </div>
+        </div>
+        <label for="sort_" class="_name">{{Sort name}}</label>
+    </div>
+</div>
+
+<aside class="mdc-dialog" id="cardcastDetailsDialog">
+    <div class="mdc-dialog__surface" style="transform: none">
+        <header class="mdc-dialog__header">
+            <h2 class="mdc-dialog__header__title _name">{{Deck name}}</h2>
+            <select class="_rating" title="">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <span class="material-icons md-36 md-dark _category"></span>
+        </header>
+        <section class="mdc-typography mdc-dialog__body mdc-dialog__body--scrollable">
+            <h3 class="mdc-typography--headline _author-category">{{Deck author}}</h3>
+            <h1 class="mdc-typography--headline mdc-typography--adjust-margin mdc-theme--primary _code">{{Deck
+                code}}</h1>
+            <span class="_desc mdc-typography--body1" style="text-align: justify"></span>
+
+            <h2 class="mdc-typography mdc-typography--display1 _calls">Calls</h2>
+            <div class="mdc-layout-grid" id="callsList">
+                <div class="mdc-layout-grid__inner list">
+                </div>
+            </div>
+
+            <h2 class="mdc-typography mdc-typography--display1 _responses">Responses</h2>
+            <div class="mdc-layout-grid" id="responsesList">
+                <div class="mdc-layout-grid__inner list">
+                </div>
+            </div>
+        </section>
+        <footer class="mdc-dialog__footer">
+        </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>
+
+<script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-bar-rating/1.2.2/jquery.barrating.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+<script src="/js/notifs.helper.js"></script>
+<script src="/js/cardcast.helper.js"></script>
+<script src="/cardcast/index.js"></script>
+<script>window.mdc.autoInit();</script>
+
+</body>
+</html>
