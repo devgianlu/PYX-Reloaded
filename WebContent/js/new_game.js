@@ -206,7 +206,7 @@ class CreateGameDialog {
         };
 
         Notifier.debug(go);
-        games.createGame(go); // Reference to lobbies.js
+        games.createGame(go); // Reference to index.js
     }
 
     show() {

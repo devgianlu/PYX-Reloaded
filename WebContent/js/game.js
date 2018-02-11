@@ -434,6 +434,8 @@ class GameManager {
 
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
+        document.title = this.info.gi.H + " - PYX Reloaded";
+
         this.toggleStartButton(this.amHost && this.info.gi.gs === "l");
         this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
 
@@ -448,7 +450,7 @@ class GameManager {
     }
 
     _postLeave() {
-        window.location = "/lobbies/";
+        window.location = "/games/";
     }
 
     start() {
@@ -487,7 +489,7 @@ const gameManager = new GameManager(getLastPathSegment());
 
 window.onload = function () {
     if (gameManager.id === null) {
-        window.location = "/lobbies/";
+        window.location = "/games/";
     } else {
         loadUI();
     }

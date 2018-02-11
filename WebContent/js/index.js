@@ -1,6 +1,7 @@
 window.onload = function () {
     $.post("/AjaxServlet", "o=fl").fail(function (data) {
-        Notifier.error("Failed contacting the server!", data);
+        if (data.ec === "se" || data.ec === "nr") Notifier.debug(data);
+        else Notifier.error("Failed contacting the server!", data);
     }).done(function (data) {
         data.css.sort(function (a, b) {
             return a.w - b.w;
@@ -11,9 +12,9 @@ window.onload = function () {
 
         if (data.ip) {
             if (data.next === "game") {
-                window.location = "/lobbies/?gid=" + data.gid;
+                window.location = "/games/?gid=" + data.gid;
             } else {
-                window.location = "/lobbies/";
+                window.location = "/games/";
             }
         }
     });
@@ -50,6 +51,6 @@ function register(ev) {
         }
 
     }).done(function () {
-        window.location = "/lobbies/";
+        window.location = "/games/";
     });
 }
