@@ -11,7 +11,7 @@ window.onload = function () {
 
         if (data.ip) {
             if (data.next === "game") {
-                window.location = "/?gid=" + data.gid;
+                window.location = "/lobbies/?gid=" + data.gid;
             } else {
                 window.location = "/lobbies/";
             }
