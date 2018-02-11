@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>pyx</groupId>
-    <artifactId>pyx-reloaded</artifactId>
+    <groupId>com.gianlu.pyxreloaded</groupId>
+    <artifactId>server</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
@@ -55,7 +55,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>net.socialgamer.cah.Server</mainClass>
+                            <mainClass>com.gianlu.pyxreloaded.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -92,11 +92,6 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.21.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
