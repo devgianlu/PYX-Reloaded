@@ -38,10 +38,7 @@
                 <!-- Games list  -->
             </div>
 
-            <div class="message" style="margin-top: 48px">
-                <div class="material-icons md-48 md-dark">info_outline</div>
-                <h3 class="mdc-typography md-dark">No games available.</h3>
-            </div>
+            <h1 class="message mdc-typography--display1">No games available.</h1>
         </div>
     </main>
 
@@ -51,15 +48,15 @@
     </button>
 </div>
 
-<aside class="mdc-drawer--temporary mdc-typography" id="drawer">
+<aside class="mdc-drawer--temporary" id="drawer">
     <nav class="mdc-drawer__drawer">
         <header class="mdc-drawer__header">
-            <div class="mdc-drawer__header-content">
+            <div class="mdc-drawer__header-content mdc-theme--text-primary-on-primary mdc-theme--primary-bg">
                 PYX-Reloaded
             </div>
         </header>
         <nav class="mdc-drawer__content mdc-list">
-            <a class="mdc-list-item mdc-drawer--selected" href="/cardcast" target="_blank">
+            <a class="mdc-list-item" href="/cardcast/" target="_blank">
                 <i class="material-icons mdc-list-item__start-detail">cast</i>
                 Cardcast
             </a>
@@ -75,7 +72,7 @@
         <section class="mdc-dialog__body mdc-dialog__body--scrollable">
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h3 class="mdc-card__title">Gameplay</h3>
+                    <h1 class="mdc-card__title mdc-typography--title">Gameplay</h1>
                 </div>
                 <section class="mdc-card__supporting-text" style="padding: 0">
                     <div class="mdc-layout-grid">
@@ -165,9 +162,9 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h3 class="mdc-card__title">Access</h3>
+                    <h1 class="mdc-card__title mdc-typography--title">Access</h1>
                 </div>
-                <section class="mdc-card__supporting-text" style="margin-bottom: 16px">
+                <section class="mdc-card__supporting-text">
                     <div class="mdc-text-field mdc-text-field--box" style="width: 100%;"
                          data-mdc-auto-init="MDCTextField">
                         <input type="password" id="gamePassword" autocomplete="off" class="mdc-text-field__input">
@@ -179,14 +176,14 @@
 
             <div class="mdc-card">
                 <div class="mdc-card__primary">
-                    <h3 class="mdc-card__title" id="cardsTitle">Cards (0 decks)</h3>
+                    <h1 class="mdc-card__title mdc-typography--title" id="cardsTitle">Cards (0 decks)</h1>
                 </div>
                 <section class="mdc-card__supporting-text">
-                    <h4 id="pyxDecksTitle">PYX (0 decks)</h4>
+                    <h2 class="mdc-typography--subheading1" id="pyxDecksTitle">PYX (0 decks)</h2>
                     <div class="mdc-select mdc-select--box" id="pyxDecks" role="listbox"
                          style="width: 100%; margin-bottom: 16px">
                         <div class="mdc-select__surface">
-                            <div class="mdc-select__label">PYX card sets</div>
+                            <div class="mdc-select__label">PYX decks</div>
                             <div class="mdc-select__selected-text"></div>
                             <div class="mdc-select__bottom-line"></div>
                         </div>
@@ -194,20 +191,18 @@
                             <ul class="mdc-list mdc-list--non-interactive list mdc-menu__items"></ul>
                         </div>
                     </div>
-                    <h4 style="margin-bottom: 0" id="cardcastDecksTitle">Cardcast (0 decks)</h4>
-                    <div style="padding-top: 8px" class="mdc-layout-grid">
+                    <h2 class="mdc-typography--subheading1" id="cardcastDecksTitle" style="margin-bottom: 0">Cardcast (0
+                        decks)</h2>
+                    <div class="mdc-layout-grid">
                         <div class="mdc-layout-grid__inner">
                             <div id="cardcastDecks" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                                <h5>Decks</h5>
+                                <h4 class="mdc-typography--body2 mdc-typography--adjust-margin">Decks</h4>
                                 <ul class="mdc-list mdc-list--two-line mdc-list--dense mdc-list--non-interactive list"
                                     style="max-height: 256px; overflow-y: auto;"></ul>
-                                <div class="message" style="margin-top: 48px">
-                                    <div class="material-icons md-48 md-dark">info_outline</div>
-                                    <h3 class="md-dark">No Cardcast decks.</h3>
-                                </div>
+                                <h3 class="message mdc-typography--headline">No Cardcast decks.</h3>
                             </div>
                             <div id="cardcastAdd" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                                <h5>Add deck</h5>
+                                <h4 class="mdc-typography--body2 mdc-typography--adjust-margin">Add deck</h4>
                                 <div class="mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon"
                                      style="width: 100%;"
                                      data-mdc-auto-init="MDCTextField">
@@ -233,12 +228,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="details" style="display: none; margin-top: 16px;">
+                                    <div class="details mdc-theme--text-primary-on-light"
+                                         style="display: none; margin-top: 16px">
                                         <h1 class="mdc-typography--headline mdc-typography--adjust-margin _name">{{Deck
                                             name}}</h1>
 
-                                        <h4 class="mdc-typography--caption mdc-typography--adjust-margin _author">{{Deck
-                                            author}}</h4>
+                                        <h2 class="mdc-typography--caption mdc-typography--adjust-margin _author">{{Deck
+                                            author}}</h2>
 
                                         <button class="mdc-button mdc-button--raised"
                                                 style="float: right;"
@@ -270,55 +266,60 @@
         <header class="mdc-dialog__header">
             <h2 class="mdc-dialog__header__title">Customize Appearance</h2>
         </header>
-        <section class="mdc-dialog__body mdc-dialog__body--scrollable mdc-layout-grid">
-            <div class="mdc-layout-grid__inner">
-                <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                    <div id="themingWheel">
-                        <svg xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <filter id="drop-shadow">
-                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
-                                    <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
-                                    <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
-                                    <feComposite in2="offsetblur" operator="in"></feComposite>
-                                    <feMerge>
-                                        <feMergeNode></feMergeNode>
-                                        <feMergeNode in="SourceGraphic"></feMergeNode>
-                                    </feMerge>
-                                </filter>
-                            </defs>
-                            <g class="wheel--maing"></g>
-                        </svg>
+        <section class="mdc-dialog__body mdc-dialog__body--scrollable">
+            <div class="mdc-layout-grid">
+                <div class="mdc-layout-grid__inner">
+                    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                        <div id="themingWheel">
+                            <svg xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <filter id="drop-shadow">
+                                        <feGaussianBlur in="SourceAlpha" stdDeviation="3.2"></feGaussianBlur>
+                                        <feOffset dx="0" dy="0" result="offsetblur"></feOffset>
+                                        <feFlood flood-color="rgba(0,0,0,1)"></feFlood>
+                                        <feComposite in2="offsetblur" operator="in"></feComposite>
+                                        <feMerge>
+                                            <feMergeNode></feMergeNode>
+                                            <feMergeNode in="SourceGraphic"></feMergeNode>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <g class="wheel--maing"></g>
+                            </svg>
+                        </div>
+                        <script>initWheel();</script>
                     </div>
-                    <script>initWheel();</script>
-                </div>
-                <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
-                     style="display: flex; flex-flow: column">
-                    <header class="mdc-toolbar mdc-elevation--z4">
-                        <div class="mdc-toolbar__row">
-                            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                                <button class="material-icons mdc-toolbar__menu-icon">menu</button>
-                                <span class="mdc-toolbar__title">PYX-Reloaded</span>
-                            </section>
-                        </div>
-                    </header>
-                    <main style="padding: 16px; position: relative; flex-grow: 1; overflow-y: visible">
-                        <div class="mdc-card">
-                            <section class="mdc-card__primary">
-                                <h1 class="mdc-card__title">Try it out</h1>
-                            </section>
-                            <section class="mdc-card__supporting-text">
-                                <p>See how your game will look when themed!</p>
-                                <button class="mdc-button mdc-button--colored mdc-button--raised"
-                                        style="margin-bottom: 16px">PYX-Reloaded
-                                </button>
-                            </section>
-                        </div>
+                    <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                         style="display: flex; flex-flow: column">
+                        <header class="mdc-toolbar mdc-elevation--z4">
+                            <div class="mdc-toolbar__row">
+                                <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+                                    <button class="material-icons mdc-toolbar__menu-icon">menu</button>
+                                    <span class="mdc-toolbar__title">PYX-Reloaded</span>
+                                </section>
+                            </div>
+                        </header>
+                        <main style="padding: 16px; position: relative; flex-grow: 1; overflow-y: visible">
+                            <div class="mdc-card">
+                                <section class="mdc-card__primary">
+                                    <h1 class="mdc-card__title mdc-typography--body2">Try it out</h1>
+                                </section>
+                                <section class="mdc-card__supporting-text mdc-typography--body1">
+                                    See how your game will look when themed!
+                                </section>
+                                <section class="mdc-card__actions">
+                                    <button class="mdc-button mdc-button--compact mdc-card__action">
+                                        PYX-Reloaded
+                                    </button>
+                                </section>
+                            </div>
 
-                        <button class="mdc-fab material-icons" style="position:absolute; bottom: 0; right: 0;">
-                            <span class="mdc-fab__icon">add</span>
-                        </button>
-                    </main>
+                            <button class="mdc-fab material-icons"
+                                    style="position:absolute; bottom: 1rem; right: 1rem;">
+                                <span class="mdc-fab__icon">add</span>
+                            </button>
+                        </main>
+                    </div>
                 </div>
             </div>
         </section>
@@ -353,13 +354,14 @@
         <span class="mdc-list-item__text">
             <span class="_name">{{Deck name}}</span>
             <span class="mdc-list-item__secondary-text _code">{{Deck code}}</span>
-            <i class="mdc-list-item__end-detail material-icons" onclick="removeCardcastDeck(this)">remove</i>
         </span>
+        <i class="mdc-list-item__meta material-icons" onclick="removeCardcastDeck(this)">remove <!-- FIXME--></i>
     </li>
 
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
-            <h2 class="mdc-card__title _host" style="flex-grow: 1">{{Name of Player's Game}}</h2>
+            <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1">{{Name of Player's Game}}</h1>
+            <!-- TODO: Move these buttons -->
             <button class="mdc-button mdc-button--dense mdc-button--compact _likes" onclick="likeGame(this);"
                     style="margin-top: 16px; margin-right: 8px">
                 LIKE
@@ -369,15 +371,13 @@
                 DISLIKE
             </button>
         </section>
-
-        <section class="mdc-card__supporting-text mdc-typography--body1 mdc-typography">
+        <section class="mdc-card__supporting-text mdc-typography--body1">
             <b>Players: </b><span class="_players"></span><br>
             <b>Spectators: </b><span class="_spectators"></span><br>
             <b>Goal: </b><span class="_goal"></span><br>
-            <b>Decks: </b><span class="_decks"></span><br>
-            <b>Status: </b><span class="_status"></span><br>
+            <b>Decks: </b><!-- TODO: Where are Cardcast decks? --><span class="_decks"></span><br>
+            <b>Status: </b><!-- TODO: Use icon instead --><span class="_status"></span><br>
         </section>
-
         <section class="mdc-card__actions">
             <button class="mdc-button mdc-button--compact mdc-card__action"
                     onclick="joinGame(this.parentElement.parentElement);">
