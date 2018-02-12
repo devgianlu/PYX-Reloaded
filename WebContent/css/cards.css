@@ -1,14 +1,3 @@
-.mdc-card.pyx-card[data-black=true] .circled {
-    background: var(--mdc-theme-text-secondary-on-dark);
-    color: black;
-    font-weight: bold;
-    border-radius: 50%;
-    padding: 1px;
-    width: var(--adapted-line-height);
-    text-align: center;
-    display: inline-block;
-}
-
 .mdc-card.pyx-card[data-black=true] {
     background: black;
 }
@@ -40,11 +29,11 @@
 }
 
 .mdc-card.pyx-card[data-black=true] .card-details {
-    color: var(--mdc-theme-text-secondary-on-dark);
+    color: var(--mdc-theme-text-primary-on-dark);
 }
 
 .mdc-card.pyx-card[data-black=false] .card-details {
-    color: var(--mdc-theme-text-secondary-on-light);
+    color: var(--mdc-theme-text-primary-on-light);
 }
 
 .mdc-card.pyx-card {

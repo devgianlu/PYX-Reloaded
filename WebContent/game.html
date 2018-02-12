@@ -70,16 +70,14 @@
 </div>
 
 <aside class="bottom-sheet" id="hand">
-    <div style="flex-grow: 1" onclick="toggleHand(undefined);"></div>
+    <div class="_toggleHand_mask" style="flex-grow: 1"></div>
     <div class="mdc-elevation--z16 mdc-toolbar" style="display: none">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Hand cards</span>
             </section>
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon" id="toggleHand" onclick="toggleHand(this)">
-                    keyboard_arrow_up
-                </button>
+                <button class="material-icons align-icons mdc-toolbar__icon _toggleHand">keyboard_arrow_up</button>
             </section>
         </div>
     </div>
@@ -104,12 +102,8 @@
             {{Text}}
         </section>
         <section class="mdc-card__supporting-text card-details">
-            <h4 class="mdc-typography--subheading1">Pick
-                <div class="circled _pick">?</div>
-            </h4>
-            <h4 class="mdc-typography--subheading1" style="margin-top: 8px">Draw
-                <div class="circled _draw">?</div>
-            </h4>
+            <h4 class="mdc-typography--subheading1">Pick <span class="_pick"></span></h4>
+            <h4 class="mdc-typography--subheading1">Draw <span class="_draw"></span></h4>
             <h4 class="mdc-typography--subheading1 _watermark"
                 style="margin-top: 8px; font-weight: 300;">
                 {{Watermark}}

@@ -14,10 +14,18 @@ class GameManager {
         });
 
         this._hand = this.root.find('#hand');
+        this._hand_list = this._hand.find('.list');
         this.hand = new List(this._hand[0], {
             item: 'cardTemplate',
             valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}]
         });
+
+        this.hand_sheet = new BottomSheet(this._hand[0]);
+
+        this._toggle_hand_mask = this._hand.find('._toggleHand_mask');
+        this._toggle_hand_mask.on('click', () => this._handleToggleHand());
+        this._toggle_hand = this._hand.find('._toggleHand');
+        this._toggle_hand.on('click', () => this._handleToggleHand());
 
         this.masonryOptions = {
             itemSelector: '.pyx-card',
@@ -39,6 +47,23 @@ class GameManager {
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
         this._hand_toolbar = this._hand.find(".mdc-toolbar");
+    }
+
+    /**
+     * @returns {boolean} - Whether I am the host or not
+     */
+    get amHost() {
+        return this.info.gi.H === this.user.n;
+    }
+
+    closeHand() {
+        this._toggle_hand.innerHTML = "keyboard_arrow_up";
+        this.hand_sheet.open = false;
+    }
+
+    openHand() {
+        this._toggle_hand.innerHTML = "keyboard_arrow_down";
+        this.hand_sheet.open = true;
     }
 
     /**
@@ -101,11 +126,10 @@ class GameManager {
         this.setup();
     }
 
-    /**
-     * @returns {boolean} - Wheteter I am the host or not
-     */
-    get amHost() {
-        return this.info.gi.H === this.user.n;
+    _handleToggleHand() {
+        this._hand_list.scrollLeft(0);
+        if (this.hand_sheet.open) this.closeHand();
+        else this.openHand();
     }
 
     /**
@@ -351,7 +375,7 @@ class GameManager {
              */
 
             self.removeHandCard(card);
-            if (data.ltp === 0) toggleHand(undefined, false);
+            if (data.ltp === 0) self.closeHand();
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.ec) {
@@ -604,25 +628,7 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
     Cookies.set("PYX-Drawer", drawer.open);
 });
 
-let drawerStatus = Cookies.get("PYX-Drawer");
+let drawerStatus = Cookies.getJSON("PYX-Drawer");
 if (drawerStatus === undefined) drawerStatus = false;
 drawer.open = drawerStatus;
-
-
-const hand = new BottomSheet(document.getElementById('hand'));
-function toggleHand(button, open = undefined) {
-    if (button === undefined) button = document.getElementById('toggleHand');
-    const list = document.querySelector("#hand .list");
-    list.scrollLeft = 0;
-
-    if (open === undefined) open = !hand.open;
-
-    if (open) {
-        button.innerHTML = "keyboard_arrow_down";
-        hand.open = true;
-    } else {
-        button.innerHTML = "keyboard_arrow_up";
-        hand.open = false;
-    }
-}
 

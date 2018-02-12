@@ -512,7 +512,7 @@ public class Game {
         obj.add(Consts.GameInfoData.HOST, host.getUser().getNickname());
         obj.add(Consts.GeneralGameData.STATE, state.toString());
         obj.add(Consts.GameOptionData.OPTIONS, options.toJson(includePassword));
-        obj.add(Consts.GameInfoData.HAS_PASSWORD, options.password != null && !options.password.equals(""));
+        obj.add(Consts.GameInfoData.HAS_PASSWORD, options.password != null && !options.password.isEmpty());
 
         if (user != null) {
             obj.add(Consts.GameInfoData.I_LIKE, userLikes(user));
