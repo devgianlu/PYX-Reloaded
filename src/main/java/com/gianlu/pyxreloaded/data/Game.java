@@ -146,12 +146,14 @@ public class Game {
      * @param other The other list
      * @param user  The user who submitted the toggle
      */
-    private static void toggleLikeDislike(Set<User> one, Set<User> other, User user) {
+    private static boolean toggleLikeDislike(Set<User> one, Set<User> other, User user) {
         if (!one.contains(user)) {
             if (other.contains(user)) other.remove(user);
             one.add(user);
+            return true;
         } else {
             one.remove(user);
+            return false;
         }
     }
 
@@ -241,7 +243,11 @@ public class Game {
      * @param user The user who submitted the action
      */
     public void toggleLikeGame(User user) {
-        toggleLikeDislike(likes, dislikes, user);
+        if (toggleLikeDislike(likes, dislikes, user)) {
+            EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_LIKE);
+            obj.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, obj);
+        }
     }
 
     /**
@@ -250,7 +256,11 @@ public class Game {
      * @param user The user who submitted the action
      */
     public void toggleDislikeGame(User user) {
-        toggleLikeDislike(dislikes, likes, user);
+        if (toggleLikeDislike(dislikes, likes, user)) {
+            EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_DISLIKE);
+            obj.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, obj);
+        }
     }
 
     /**

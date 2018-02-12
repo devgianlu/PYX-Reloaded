@@ -326,6 +326,12 @@ class GameManager {
             case "hu":
                 Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
                 break;
+            case "glk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> liked this game.");
+                break;
+            case "gdlk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
+                break;
         }
     }
 

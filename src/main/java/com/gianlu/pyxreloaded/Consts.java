@@ -113,7 +113,15 @@ public final class Consts {
         /**
          * Ping request, should respond with pong
          */
-        PING("pp");
+        PING("pp"),
+        /**
+         * Someone disliked this game
+         */
+        GAME_DISLIKE("gdlk"),
+        /**
+         * Someone liked this game
+         */
+        GAME_LIKE("glk");
 
         private final String event;
 
