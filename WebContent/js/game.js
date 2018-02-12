@@ -91,6 +91,7 @@ class GameManager {
         const template = this._cardTemplate.clone();
         template.removeAttr("id");
         template.attr("data-black", "true");
+        template.removeClass("mdc-ripple-surface");
 
         template.find('._text').html(card.T);
 

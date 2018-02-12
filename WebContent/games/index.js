@@ -109,6 +109,12 @@ class Games {
         });
     }
 
+    static wrapCardcastDecks(CCs) {
+        const names = [];
+        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
+        return names;
+    }
+
     /**
      *
      * @param {object[]} list - Games list
@@ -140,6 +146,8 @@ class Games {
             else status = "casino";
 
             let decksNames = Games.deckIdsToNames(game.go.css);
+            decksNames = decksNames.concat(Games.wrapCardcastDecks(game.go.CCs));
+
             let decks;
             if (decksNames.length === 0) decks = "none";
             else decks = decksNames.join(", ");
