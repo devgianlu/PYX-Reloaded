@@ -28,6 +28,10 @@
     color: var(--mdc-theme-text-primary-on-dark);
 }
 
+.mdc-toolbar .mdc-text-field__icon {
+    color: var(--mdc-theme-text-primary-on-dark) !important;
+}
+
 .mdc-toolbar .mdc-text-field__input {
     color: var(--mdc-theme-text-primary-on-dark);
     border-color: var(--mdc-theme-text-primary-on-dark);
