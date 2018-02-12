@@ -3,6 +3,13 @@ class GameManager {
         this.root = $('body');
         this.gid = gid;
 
+        this.drawer = new mdc.drawer.MDCPersistentDrawer($('#drawer')[0]);
+        $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
+
+        let drawerStatus = Cookies.getJSON("PYX-Drawer");
+        if (drawerStatus === undefined) drawerStatus = false;
+        this.drawer.open = drawerStatus;
+
         this.scoreboard = new List(this.root.find('#scoreboard')[0], {
             item: 'playerItemTemplate',
             valueNames: ['_name', '_score', '_status']
@@ -47,6 +54,14 @@ class GameManager {
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
         this._hand_toolbar = this._hand.find(".mdc-toolbar");
+
+        this._unreadNotifs = this.root.find('._unreadNotifs');
+        this._unreadNotifs.parent().on('click', () => this.toggleDrawer());
+        this.unreadNotifications = 0;
+    }
+
+    get unreadNotifications() {
+        return this.unreadNotifs_count;
     }
 
     /**
@@ -54,6 +69,23 @@ class GameManager {
      */
     get amHost() {
         return this.info.gi.H === this.user.n;
+    }
+
+    set unreadNotifications(value) {
+        this.unreadNotifs_count = value;
+
+        if (value === 0) {
+            this._unreadNotifs.parent().hide();
+        } else {
+            this._unreadNotifs.parent().show();
+            this._unreadNotifs.text(value + " unread");
+        }
+    }
+
+    toggleDrawer() {
+        this.drawer.open = !this.drawer.open;
+        Cookies.set("PYX-Drawer", this.drawer.open);
+        this.unreadNotifications = 0;
     }
 
     closeHand() {
@@ -212,7 +244,11 @@ class GameManager {
         this.chat.add({
             "_msg": data.m,
             "_sender": data.f + ": "
-        })
+        });
+
+        if (!this.drawer.open) {
+            this.unreadNotifications = this.unreadNotifications + 1;
+        }
     }
 
     _updatePlayerStatus(info) {
@@ -621,15 +657,3 @@ function leaveGame() {
 function startGame() {
     gameManager.start();
 }
-
-
-const drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('drawer'));
-document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
-    drawer.open = !drawer.open;
-    Cookies.set("PYX-Drawer", drawer.open);
-});
-
-let drawerStatus = Cookies.getJSON("PYX-Drawer");
-if (drawerStatus === undefined) drawerStatus = false;
-drawer.open = drawerStatus;
-

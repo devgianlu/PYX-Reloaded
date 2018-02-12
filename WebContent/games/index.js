@@ -119,7 +119,7 @@ class Games {
      *
      * @param {object[]} list - Games list
      * @param {object} list[].go - Game options
-     * @param {boolean} list[].hp - Has passowrd
+     * @param {boolean} list[].hp - Has password
      * @param {int[]} list[].go.css - Card set IDs
      * @param {int} list[].go.wb - Win by X
      * @param {int} list[].go.sl - Score limit (goal)
