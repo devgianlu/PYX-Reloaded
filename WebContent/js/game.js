@@ -583,13 +583,19 @@ function startGame() {
     gameManager.start();
 }
 
+
 const drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('drawer'));
 document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
     drawer.open = !drawer.open;
+    Cookies.set("PYX-Drawer", drawer.open);
 });
 
-const hand = new BottomSheet(document.getElementById('hand'));
+let drawerStatus = Cookies.get("PYX-Drawer");
+if (drawerStatus === undefined) drawerStatus = false;
+drawer.open = drawerStatus;
 
+
+const hand = new BottomSheet(document.getElementById('hand'));
 function toggleHand(button, open = undefined) {
     if (button === undefined) button = document.getElementById('toggleHand');
     const list = document.querySelector("#hand .list");
