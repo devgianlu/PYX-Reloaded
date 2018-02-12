@@ -73,16 +73,23 @@ class Notifier {
         return noty;
     }
 
-    static error(msg, data = undefined, progressBar = false) {
-        if (Notifier._debug) {
-            console.error(msg);
-            if (data !== undefined) console.error(data);
-        }
+    static error(msg, data = undefined, progressBar = false, overrideRelocate = false) {
+        if (Notifier._debug) console.error(msg);
 
-        if ("ec" in data) {
-            if (data.ec === "nr" || data.ec === "se") window.location = "/";
-        } else if ("responseJSON" in data) {
-            if (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se") window.location = "/";
+        if (data !== undefined) {
+            if ("ec" in data) {
+                if (Notifier._debug) console.error(data);
+                if (!overrideRelocate && (data.ec === "nr" || data.ec === "se")) window.location = "/";
+            } else if ("responseJSON" in data) {
+                if (Notifier._debug) {
+                    console.error(data);
+                    console.error(data.responseJSON);
+                }
+
+                if (!overrideRelocate && (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se")) window.location = "/";
+            } else {
+                if (Notifier._debug) console.error(data);
+            }
         }
 
         return Notifier.show(Notifier.ERROR, msg, this.DEFAULT_TIMEOUT * 1.5, progressBar);

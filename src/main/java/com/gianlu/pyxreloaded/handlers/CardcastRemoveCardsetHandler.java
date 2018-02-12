@@ -36,13 +36,14 @@ public class CardcastRemoveCardsetHandler extends GameWithPlayerHandler {
         deckId = deckId.toUpperCase();
 
         // Remove it from the set regardless if it loads or not.
-        game.getCardcastDeckCodes().remove(deckId);
-        final CardcastDeck deck = cardcastService.loadSet(deckId);
-        if (deck == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND);
+        if (game.getCardcastDeckCodes().remove(deckId)) {
+            CardcastDeck deck = cardcastService.loadSet(deckId);
+            if (deck == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND);
 
-        EventWrapper ev = new EventWrapper(game, Consts.Event.CARDCAST_REMOVE_CARDSET);
-        ev.add(Consts.GeneralKeys.CARDCAST_DECK_INFO, deck.getClientMetadataJson());
-        game.broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
+            EventWrapper ev = new EventWrapper(game, Consts.Event.CARDCAST_REMOVE_CARDSET);
+            ev.add(Consts.GeneralKeys.CARDCAST_DECK_INFO, deck.getClientMetadataJson());
+            game.broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
+        }
 
         return JsonWrapper.EMPTY;
     }

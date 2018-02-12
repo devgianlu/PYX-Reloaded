@@ -267,9 +267,17 @@ class GameManager {
      * @param {string} data.rw - Round winner nickname
      * @param {int} data.i - Round intermission
      * @param {boolean} data.wl - Whether the game will stop
+     * @param {object} data.cdi - Cardcast deck info
+     * @param {string} data.cdi.csn - Card set name
      */
     handlePollEvent(data) {
         switch (data["E"]) {
+            case "cAc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been added to the game!");
+                break;
+            case "cRc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
+                break;
             case "C":
                 this._receivedGameChatMessage(data);
                 break;
