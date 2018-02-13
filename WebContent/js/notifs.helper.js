@@ -34,14 +34,14 @@ class Notifier {
         }
     }
 
-    static show(type, msg, timeout = false, progressBar = false) {
+    static show(type, msg, timeout = false, progressBar = false, show = true) {
         const noty = new Noty(Object.assign({
             type: type,
             text: msg,
             timeout: timeout * 1000,
             progressBar: progressBar
         }, Notifier._notyDefault()));
-        noty.show();
+        if (show) noty.show();
         return noty;
     }
 

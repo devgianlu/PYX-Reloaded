@@ -58,6 +58,7 @@ class GameManager {
         this._unreadNotifs = this.root.find('._unreadNotifs');
         this._unreadNotifs.parent().on('click', () => this.toggleDrawer());
         this.unreadNotifications = 0;
+        this.unreadNotifs_last = 0;
     }
 
     get unreadNotifications() {
@@ -79,6 +80,11 @@ class GameManager {
         } else {
             this._unreadNotifs.parent().show();
             this._unreadNotifs.text(value + " unread");
+        }
+
+        if (value >= 5 && new Date().getTime() - this.unreadNotifs_last >= (30 + Notifier.DEFAULT_TIMEOUT) * 1000) {
+            Notifier.timeout(Notifier.ALERT, "You have " + value + " unread notifications!");
+            this.unreadNotifs_last = new Date().getTime();
         }
     }
 
