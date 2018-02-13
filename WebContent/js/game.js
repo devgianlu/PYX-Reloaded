@@ -200,6 +200,7 @@ class GameManager {
      * @param {string} card.W - Card watermark
      * @param {string} card.T - Card text
      * @param {int} card.cid - Card ID
+     * @param {boolean} card.wi - Whether it is a blank card
      * @param listener - A click listener
      * @private
      */
@@ -268,20 +269,8 @@ class GameManager {
         }
     }
 
-    sendGameChatMessage(msg, clear) {
-        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
-            clear();
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                if (data.responseJSON.ec === "tf") {
-                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
-                    Notifier.debug(data, true);
-                    return;
-                }
-            }
-
-            Notifier.error("Failed to send the message!", data);
-        });
+    static _askCardText() {
+        return prompt("Enter the card text:", "");
     }
 
     handleMyInfoChanged(info) {
@@ -412,9 +401,34 @@ class GameManager {
         }
     }
 
+    sendGameChatMessage(msg, clear) {
+        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + this.id).done(function () {
+            clear();
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                if (data.responseJSON.ec === "tf") {
+                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
+                    Notifier.debug(data, true);
+                    return;
+                }
+            }
+
+            Notifier.error("Failed to send the message!", data);
+        });
+    }
+
     _handleHandCardSelect(card) {
+        let text = "";
+        if (card.wi) {
+            text = GameManager._askCardText();
+            if (text.length === 0) {
+                Notifier.timeout(Notifier.WARN, "The card text must not be empty!");
+                return;
+            }
+        }
+
         const self = this;
-        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&m=" + text).done(function (data) {
             /**
              * @param {int} data.ltp - Number of cards left to play
              */
@@ -538,7 +552,7 @@ class GameManager {
     }
 
     _handleTableCardSelect(card) {
-        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + this.id).done(function () {
             // Do nothing
         }).fail(function (data) {
             if ("responseJSON" in data) {
@@ -560,13 +574,13 @@ class GameManager {
     }
 
     leave() {
-        $.post("/AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
+        $.post("/AjaxServlet", "o=lg&gid=" + this.id).always(function () {
             GameManager._postLeave();
         });
     }
 
     start() {
-        $.post("/AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=sg&gid=" + this.id).done(function (data) {
             Notifier.debug(data);
         }).fail(function (data) {
             /**
