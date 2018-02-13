@@ -92,6 +92,8 @@ class GameManager {
         this.drawer.open = !this.drawer.open;
         Cookies.set("PYX-Drawer", this.drawer.open);
         this.unreadNotifications = 0;
+
+        this._recreateMasonry();
     }
 
     closeHand() {
