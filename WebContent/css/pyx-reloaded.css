@@ -26,20 +26,20 @@
 
 /* Text field in toolbar */
 .mdc-toolbar .mdc-text-field__label {
-    color: var(--mdc-theme-text-primary-on-dark);
+    color: var(--mdc-theme-text-primary-on-primary);
 }
 
 .mdc-toolbar .mdc-text-field__icon {
-    color: var(--mdc-theme-text-primary-on-dark) !important;
+    color: var(--mdc-theme-text-primary-on-primary) !important;
 }
 
 .mdc-toolbar .mdc-text-field__input {
-    color: var(--mdc-theme-text-primary-on-dark);
-    border-color: var(--mdc-theme-text-primary-on-dark);
+    color: var(--mdc-theme-text-primary-on-primary);
+    border-color: var(--mdc-theme-text-primary-on-primary);
 }
 
 .mdc-toolbar .mdc-text-field__input:hover {
-    color: var(--mdc-theme-text-primary-on-dark);
+    color: var(--mdc-theme-text-primary-on-primary);
 }
 
 /* Chip in toolbar */
