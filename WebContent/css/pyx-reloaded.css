@@ -24,6 +24,7 @@
     margin-bottom: 16px !important;
 }
 
+/* Text field in toolbar */
 .mdc-toolbar .mdc-text-field__label {
     color: var(--mdc-theme-text-primary-on-dark);
 }
@@ -39,6 +40,11 @@
 
 .mdc-toolbar .mdc-text-field__input:hover {
     color: var(--mdc-theme-text-primary-on-dark);
+}
+
+/* Chip in toolbar */
+.mdc-toolbar .mdc-chip-set > .mdc-chip > .mdc-chip__text {
+    color: var(--mdc-theme-text-secondary-on-primary);
 }
 
 main {
