@@ -113,15 +113,7 @@ public final class Consts {
         /**
          * Ping request, should respond with pong
          */
-        PING("pp"),
-        /**
-         * Someone disliked this game
-         */
-        GAME_DISLIKE("gdlk"),
-        /**
-         * Someone liked this game
-         */
-        GAME_LIKE("glk");
+        PING("pp");
 
         private final String event;
 
@@ -280,13 +272,9 @@ public final class Consts {
          */
         WRONG_PASSWORD("wp"),
         /**
-         * You have already played all the necessary cards.
+         * You have already played all the necessary cards
          */
-        ALREADY_PLAYED("ap"),
-        /**
-         * The user already played all pick cards and should draw the remaining.
-         */
-        SHOULD_DRAW_CARD("sdc");
+        ALREADY_PLAYED("ap");
 
         private final String code;
 
@@ -860,11 +848,7 @@ public final class Consts {
         /**
          * Cards left to play to complete round.
          */
-        LEFT_TO_PICK("ltp"),
-        /**
-         * Cards left to draw to complete round.
-         */
-        LEFT_TO_DRAW("ltd"),
+        LEFT_TO_PLAY("ltp"),
         /**
          * White (table) cards.
          */
@@ -892,11 +876,7 @@ public final class Consts {
         /**
          * Whether the game will be stopped.
          */
-        WILL_STOP("ws"),
-        /**
-         * Whether the hand should be cleared from the old cards
-         */
-        CLEAR_HAND("ch");
+        WILL_STOP("ws");
 
         private final String key;
 

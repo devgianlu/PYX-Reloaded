@@ -27,14 +27,16 @@
                 <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
                     <input type="text" id="gamesSearch" class="mdc-text-field__input search">
                     <label class="mdc-text-field__label" for="gamesSearch">Search</label>
-                    <i class="material-icons mdc-text-field__icon" tabindex="0" onclick="submitSearch();">search</i>
                     <div class="mdc-line-ripple"></div>
                 </div>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="submitSearch();"
+                        style="margin: auto 0">search
+                </button>
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">format_paint
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">settings
                 </button>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="logout();">exit_to_app</button>
             </section>
@@ -370,8 +372,8 @@
     <div id="gameInfoTemplate" class="mdc-layout-grid__cell mdc-card">
         <section class="mdc-card__primary" style="display: inline-flex;">
             <span class="material-icons md-36 _status" style="margin: auto">casino</span>
-            <h1 class="mdc-card__title mdc-typography--title _host"
-                style="flex-grow: 1; margin: auto;">{{Name of Player's Game}}</h1>
+            <h1 class="mdc-card__title mdc-typography--title _host" style="flex-grow: 1; margin-left: 8px">{{Name of
+                Player's Game}}</h1>
             <div class="mdc-chip-set mdc-typography--body1" style="margin: auto">
                 <div class="mdc-chip">
                     <div class="_likes">{{Likes}}</div>
@@ -385,7 +387,7 @@
             <b>Players: </b><span class="_players"></span><br>
             <b>Spectators: </b><span class="_spectators"></span><br>
             <b>Goal: </b><span class="_goal"></span><br>
-            <b>Decks: </b><span class="_decks"></span><br>
+            <b>Decks: </b><!-- TODO: Where are Cardcast decks? --><span class="_decks"></span><br>
         </section>
         <section class="mdc-card__actions">
             <div class="mdc-card__action-buttons">
