@@ -4,10 +4,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlankWhiteCard extends WhiteCard {
     private static final String BLANK_TEXT = "____";
-    private final int id;
+    private final int id; // Always negative
     private String text = null;
 
-    public BlankWhiteCard(final int id) {
+    public BlankWhiteCard(int id) {
         this.id = id;
         clear();
     }

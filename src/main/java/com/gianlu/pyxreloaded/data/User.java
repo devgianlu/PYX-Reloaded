@@ -5,6 +5,7 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.EventWrapper;
 import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
 import com.gianlu.pyxreloaded.servlets.EventsHandler;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -142,6 +143,7 @@ public class User {
     /**
      * @return The current game in which this user is participating.
      */
+    @Nullable
     public Game getGame() {
         return currentGame;
     }

@@ -20,6 +20,7 @@ public class GetCardsHandler extends GameWithPlayerHandler {
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();
         obj.add(Consts.OngoingGameData.HAND, game.getHandJson(user));
+        obj.addAll(game.getPlayerToPlayCards(user));
         obj.add(Consts.OngoingGameData.BLACK_CARD, game.getBlackCardJson());
         obj.add(Consts.OngoingGameData.WHITE_CARDS, game.getWhiteCardsJson(user));
         obj.add(Consts.GeneralKeys.GAME_ID, game.getId());
