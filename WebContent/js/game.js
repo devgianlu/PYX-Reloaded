@@ -98,12 +98,12 @@ class GameManager {
     }
 
     closeHand() {
-        this._toggle_hand.innerHTML = "keyboard_arrow_up";
+        this._toggle_hand.html("keyboard_arrow_up");
         this.hand_sheet.open = false;
     }
 
     openHand() {
-        this._toggle_hand.innerHTML = "keyboard_arrow_down";
+        this._toggle_hand.html("keyboard_arrow_down");
         this.hand_sheet.open = true;
     }
 
