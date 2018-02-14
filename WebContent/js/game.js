@@ -33,6 +33,7 @@ class GameManager {
         this._toggle_hand_mask.on('click', () => this._handleToggleHand());
         this._toggle_hand = this._hand.find('._toggleHand');
         this._toggle_hand.on('click', () => this._handleToggleHand());
+        this._hand_info = this._hand.find('._handInfo');
 
         this.masonryOptions = {
             itemSelector: '.pyx-card',
@@ -418,6 +419,18 @@ class GameManager {
         });
     }
 
+    static _getHandInfoText(ltp, ltd) {
+        if (ltd === 0 && ltp === 0) return "";
+
+        if (ltd === 0 && ltp !== 0) {
+            return "pick or draw " + ltp + " more card" + (ltp === 1 ? "" : "s");
+        } else if (ltp === 0 && ltd !== 0) {
+            return "draw " + ltd + " more card" + (ltd === 1 ? "" : "s");
+        } else {
+            return "draw at least " + ltd + " more card" + (ltd === 1 ? "" : "s") + " for a total of " + (ltd + ltp) + " cards";
+        }
+    }
+
     _handleHandCardSelect(card) {
         let text = "";
         if (card.wi) {
@@ -431,12 +444,11 @@ class GameManager {
         const self = this;
         $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&wit=" + text).done(function (data) {
             /**
-             * @param {int} data.ltp - Number of cards left to play
+             * @param {int} data.ltp - Number of cards left to pick
              * @param {int} data.ltd - Number of cards left to draw
              */
 
-            // TODO: Show some info in the toolbar
-
+            self.updateHandInfo(data.ltp, data.ltd);
             self.removeHandCard(card);
             if (data.ltp === 0 && data.ltd === 0) self.closeHand(); // TODO: If user played all pick cards, let him pick only blank cards!
         }).fail(function (data) {
@@ -497,6 +509,7 @@ class GameManager {
                 break;
             case "p":
                 this.blackCard = data.bc;
+                this.updateHandInfo(this.bc.PK - this.bc.D, this.bc.D);
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
                 this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
@@ -619,6 +632,11 @@ class GameManager {
             }
         })
     }
+
+    updateHandInfo(ltp, ltd) {
+        console.error(ltp + ":" + ltd);
+        this._hand_info.text(GameManager._getHandInfoText(ltp, ltd));
+    }
 }
 
 const gameManager = new GameManager(getLastPathSegment());
@@ -637,17 +655,18 @@ function loadUI() {
 
         $.post("/AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
             gameManager.gameInfo = data;
+            Notifier.debug(data);
 
             $.post("/AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
                 gameManager.blackCard = data.bc;
+                gameManager.updateHandInfo(data.ltp, data.ltd);
+
                 gameManager.addHandCards(data.h, true);
                 gameManager.addTableCards(data.wc, true);
                 Notifier.debug(data);
             }).fail(function (data) {
                 Notifier.error("Failed loading the game!", data);
             });
-
-            Notifier.debug(data);
         }).fail(function (data) {
             Notifier.error("Failed loading the game!", data);
         });

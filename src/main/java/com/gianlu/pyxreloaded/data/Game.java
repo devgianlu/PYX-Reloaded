@@ -1267,6 +1267,24 @@ public class Game {
         }
     }
 
+    @Nullable
+    public JsonWrapper getPlayerToPlayCards(User user) {
+        Player player = getPlayerForUser(user);
+        if (player == null) // The user may be a spectator
+            return null;
+
+        if (blackCard == null)
+            return null;
+
+        int playedBlankCards = playedCards.playedWriteInCardsCount(player);
+
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.OngoingGameData.LEFT_TO_DRAW, blackCard.getDraw() - playedBlankCards);
+        obj.add(Consts.OngoingGameData.LEFT_TO_PICK, blackCard.getPick() - blackCard.getDraw()
+                - (playedCards.playedCardsCount(player) - playedBlankCards));
+        return obj;
+    }
+
     /**
      * The judge has selected a card. The {@code cardId} passed in may be any white card's ID for
      * black cards that have multiple selection, however only the first card in the set's ID will be
