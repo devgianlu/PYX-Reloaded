@@ -34,6 +34,6 @@ public class PlayCardHandler extends GameWithPlayerHandler {
         String text = params.get(Consts.GeneralKeys.WRITE_IN_TEXT);
         if (text != null && text.contains("<")) text = StringEscapeUtils.escapeXml11(text);
 
-        return new JsonWrapper(Consts.OngoingGameData.LEFT_TO_PLAY, game.playCard(user, cardId, text));
+        return game.playCard(user, cardId, text);
     }
 }

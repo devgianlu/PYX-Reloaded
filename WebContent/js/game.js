@@ -310,6 +310,7 @@ class GameManager {
 
     /**
      * @param {object[]} data.h - Hand cards
+     * @param {boolean} data.ch - Clear hand cards before adding newer
      * @param {object} data.pi - Player's info
      * @param {string} data.m - Message (chat)
      * @param {string} data.f - Sender (chat)
@@ -363,7 +364,7 @@ class GameManager {
                 if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
                 break;
             case "hd":
-                this.addHandCards(data.h, data.h.length === 10);
+                this.addHandCards(data.h, data.ch);
                 break;
             case "gsc":
                 this.info.gi.gs = data.gs;
@@ -428,13 +429,16 @@ class GameManager {
         }
 
         const self = this;
-        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&m=" + text).done(function (data) {
+        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&wit=" + text).done(function (data) {
             /**
              * @param {int} data.ltp - Number of cards left to play
+             * @param {int} data.ltd - Number of cards left to draw
              */
 
+            // TODO: Show some info in the toolbar
+
             self.removeHandCard(card);
-            if (data.ltp === 0) self.closeHand();
+            if (data.ltp === 0 && data.ltd === 0) self.closeHand(); // TODO: If user played all pick cards, let him pick only blank cards!
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.ec) {
@@ -443,6 +447,9 @@ class GameManager {
                         break;
                     case "nyt":
                         Notifier.error("This is not your turn.", data);
+                        break;
+                    case "sdc":
+                        Notifier.error("You have to draw all the remaining cards.", data);
                         break;
                     default:
                         Notifier.error("Failed to play the card!", data);
