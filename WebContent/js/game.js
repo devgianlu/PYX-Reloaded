@@ -450,7 +450,9 @@ class GameManager {
 
             self.updateHandInfo(data.ltp, data.ltd);
             self.removeHandCard(card);
-            if (data.ltp === 0 && data.ltd === 0) self.closeHand(); // TODO: If user played all pick cards, let him pick only blank cards!
+            if (data.ltp === 0 && data.ltd === 0) {
+                self.closeHand();
+            }
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.ec) {
@@ -634,8 +636,15 @@ class GameManager {
     }
 
     updateHandInfo(ltp, ltd) {
-        console.error(ltp + ":" + ltd);
         this._hand_info.text(GameManager._getHandInfoText(ltp, ltd));
+
+        if (ltp === 0 && ltd !== 0) {
+            this.hand.filter(function (item) {
+                return item.values()._watermark === "____";
+            });
+        } else {
+            this.hand.filter();
+        }
     }
 }
 
