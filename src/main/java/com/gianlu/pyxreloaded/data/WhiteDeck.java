@@ -77,7 +77,7 @@ public class WhiteDeck {
      *
      * @return A newly created blank card.
      */
-    private WhiteCard createBlankCard() {
+    public WhiteCard createBlankCard() {
         return new BlankWhiteCard(--lastBlankCardId);
     }
 }

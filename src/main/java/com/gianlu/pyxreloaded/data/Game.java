@@ -397,7 +397,7 @@ public class Game {
                 List<WhiteCard> cards = playedCards.getCards(player);
                 if (cards != null) {
                     player.hand.addAll(cards);
-                    sendCardsToPlayer(player, cards);
+                    sendCardsToPlayer(player, cards, false);
                 }
             }
 
@@ -421,7 +421,7 @@ public class Game {
      *
      * @param player The player whose information has been changed.
      */
-    public void notifyPlayerInfoChange(Player player) {
+    private void notifyPlayerInfoChange(Player player) {
         if (player == null) return;
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_INFO_CHANGE);
         ev.add(Consts.GamePlayerInfo.INFO, getPlayerInfoJson(player));
@@ -828,7 +828,7 @@ public class Game {
                     List<WhiteCard> returnCards = playedCards.remove(player);
                     if (returnCards != null) {
                         player.hand.addAll(returnCards);
-                        sendCardsToPlayer(player, returnCards);
+                        sendCardsToPlayer(player, returnCards, false);
                     }
                 }
             }
@@ -995,9 +995,16 @@ public class Game {
             }
         }
 
-        // Deal cards so that everyone has 10 cards
+        // Discard old black card and pick a new one
+        synchronized (blackCardLock) {
+            if (blackCard != null) blackDeck.discard(blackCard);
+            blackCard = getNextBlackCard();
+        }
+
+        // Deal cards so that everyone has 10 cards or more if draw > 0
         Player[] playersCopy = players.toArray(new Player[players.size()]);
         for (Player player : playersCopy) {
+            boolean clearHand = player.hand.size() == 0;
             List<WhiteCard> newCards = new LinkedList<>();
             while (player.hand.size() < 10) {
                 WhiteCard card = getNextWhiteCard();
@@ -1005,13 +1012,14 @@ public class Game {
                 newCards.add(card);
             }
 
-            sendCardsToPlayer(player, newCards);
-        }
+            // Add blank cards if the black card requires them
+            for (int i = 0; i < blackCard.getDraw(); i++) {
+                WhiteCard blank = whiteDeck.createBlankCard();
+                newCards.add(blank);
+                player.hand.add(blank);
+            }
 
-        // Discard old black card and pick a new one
-        synchronized (blackCardLock) {
-            if (blackCard != null) blackDeck.discard(blackCard);
-            blackCard = getNextBlackCard();
+            sendCardsToPlayer(player, newCards, clearHand);
         }
 
         state = Consts.GameState.PLAYING;
@@ -1145,9 +1153,10 @@ public class Game {
      * @param player Hand owner
      * @param cards  The player's hand
      */
-    private void sendCardsToPlayer(Player player, List<WhiteCard> cards) {
+    private void sendCardsToPlayer(Player player, List<WhiteCard> cards, boolean clear) {
         EventWrapper ev = new EventWrapper(this, Consts.Event.HAND_DEAL);
         ev.add(Consts.OngoingGameData.HAND, getWhiteCardsDataJson(cards));
+        ev.add(Consts.OngoingGameData.CLEAR_HAND, clear);
         player.getUser().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT, ev));
     }
 
@@ -1198,7 +1207,8 @@ public class Game {
      * @param cardText User text for a blank card. Ignored for normal cards.
      * @return The number of cards left to play
      */
-    public int playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
+    @NotNull
+    public JsonWrapper playCard(User user, int cardId, @Nullable String cardText) throws BaseCahHandler.CahException {
         Player player = getPlayerForUser(user);
         if (player != null) {
             player.resetSkipCount();
@@ -1208,6 +1218,9 @@ public class Game {
             int playedCardsCount = playedCards.playedCardsCount(player);
             if (playedCardsCount == blackCard.getPick())
                 throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_PLAYED);
+
+            int playedBlankCards = playedCards.playedWriteInCardsCount(player);
+            int playedPickCards = playedCardsCount - playedBlankCards;
 
             WhiteCard playCard = null;
             synchronized (player.hand) {
@@ -1219,11 +1232,17 @@ public class Game {
                         if (WhiteDeck.isBlankCard(card)) {
                             if (cardText == null || cardText.isEmpty())
                                 throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_MSG_SPECIFIED);
+
                             ((BlankWhiteCard) playCard).setText(cardText);
+                            playedBlankCards++;
+                        } else {
+                            if (playedPickCards == blackCard.getPick() - blackCard.getDraw())
+                                throw new BaseCahHandler.CahException(Consts.ErrorCode.SHOULD_DRAW_CARD);
+
+                            playedPickCards++;
                         }
 
-                        // remove the card from their hand. the client will also do so when we return
-                        // success, so no need to tell it to do so here.
+                        // Remove the card from their hand. The client will also do so when we return success, so no need to tell it to do so here.
                         iter.remove();
                         break;
                     }
@@ -1232,17 +1251,38 @@ public class Game {
 
             if (playCard != null) {
                 playedCards.addCard(player, playCard);
-                playedCardsCount++;
 
                 notifyPlayerInfoChange(player);
                 if (shouldStartJudging()) judgingState();
-                return blackCard.getPick() + blackCard.getDraw() - playedCardsCount;
+
+                JsonWrapper obj = new JsonWrapper();
+                obj.add(Consts.OngoingGameData.LEFT_TO_DRAW, blackCard.getDraw() - playedBlankCards);
+                obj.add(Consts.OngoingGameData.LEFT_TO_PICK, blackCard.getPick() - blackCard.getDraw() - playedPickCards);
+                return obj;
             } else {
                 throw new BaseCahHandler.CahException(Consts.ErrorCode.DO_NOT_HAVE_CARD);
             }
         } else {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_IN_THAT_GAME);
         }
+    }
+
+    @Nullable
+    public JsonWrapper getPlayerToPlayCards(User user) {
+        Player player = getPlayerForUser(user);
+        if (player == null) // The user may be a spectator
+            return null;
+
+        if (blackCard == null)
+            return null;
+
+        int playedBlankCards = playedCards.playedWriteInCardsCount(player);
+
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.OngoingGameData.LEFT_TO_DRAW, blackCard.getDraw() - playedBlankCards);
+        obj.add(Consts.OngoingGameData.LEFT_TO_PICK, blackCard.getPick() - blackCard.getDraw()
+                - (playedCards.playedCardsCount(player) - playedBlankCards));
+        return obj;
     }
 
     /**
