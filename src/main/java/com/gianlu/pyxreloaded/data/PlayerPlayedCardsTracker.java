@@ -93,20 +93,6 @@ public class PlayerPlayedCardsTracker {
     }
 
     /**
-     * @return The number of player blank cards per player
-     */
-    public synchronized int playedWriteInCardsCount(Player player) {
-        List<WhiteCard> cards = getCards(player);
-        if (cards == null) return 0;
-
-        int count = 0;
-        for (WhiteCard card : cards)
-            if (WhiteDeck.isBlankCard(card)) count++;
-
-        return count;
-    }
-
-    /**
      * @return A {@code Set} of all players that have played this round.
      */
     public synchronized Set<Player> playedPlayers() {

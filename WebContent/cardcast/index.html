@@ -28,9 +28,11 @@
                 <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
                     <input type="text" id="cardcastSearch" class="mdc-text-field__input">
                     <label class="mdc-text-field__label" for="cardcastSearch">Search</label>
-                    <i class="material-icons mdc-text-field__icon" tabindex="0" onclick="submitSearch();">search</i>
                     <div class="mdc-line-ripple"></div>
                 </div>
+                <button class="material-icons align-icons mdc-toolbar__icon" onclick="submitSearch();"
+                        style="margin: auto 0">search
+                </button>
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
@@ -104,10 +106,6 @@
         <section class="mdc-card__actions">
             <button class="mdc-button mdc-button--compact mdc-card__action"
                     onclick="showCardcastDetailsDialog(this.parentElement.parentElement.getAttribute('data-code'))">More
-            </button>
-            <button class="mdc-button mdc-button--compact mdc-card__action"
-                    onclick="addDeckToGame(this.parentElement.parentElement.getAttribute('data-code'))">Add
-                to game
             </button>
         </section>
     </div>

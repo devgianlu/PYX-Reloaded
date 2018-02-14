@@ -25,14 +25,19 @@ public abstract class CardSet {
     public abstract Set<? extends WhiteCard> getWhiteCards();
 
     public final JsonWrapper getClientMetadataJson() {
+        JsonWrapper obj = getCommonClientMetadataJson();
+        obj.add(Consts.CardSetData.BLACK_CARDS_IN_DECK, getBlackCards().size());
+        obj.add(Consts.CardSetData.WHITE_CARDS_IN_DECK, getWhiteCards().size());
+        return obj;
+    }
+
+    private JsonWrapper getCommonClientMetadataJson() {
         JsonWrapper obj = new JsonWrapper();
         obj.add(Consts.CardSetData.ID, getId());
         obj.add(Consts.CardSetData.CARD_SET_NAME, getName());
         obj.add(Consts.CardSetData.CARD_SET_DESCRIPTION, getDescription());
         obj.add(Consts.CardSetData.WEIGHT, getWeight());
         obj.add(Consts.CardSetData.BASE_DECK, isBaseDeck());
-        obj.add(Consts.CardSetData.BLACK_CARDS_IN_DECK, getBlackCards().size());
-        obj.add(Consts.CardSetData.WHITE_CARDS_IN_DECK, getWhiteCards().size());
         return obj;
     }
 

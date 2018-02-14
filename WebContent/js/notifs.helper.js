@@ -34,14 +34,14 @@ class Notifier {
         }
     }
 
-    static show(type, msg, timeout = false, progressBar = false, show = true) {
+    static show(type, msg, timeout = false, progressBar = false) {
         const noty = new Noty(Object.assign({
             type: type,
             text: msg,
             timeout: timeout * 1000,
             progressBar: progressBar
         }, Notifier._notyDefault()));
-        if (show) noty.show();
+        noty.show();
         return noty;
     }
 
@@ -73,23 +73,16 @@ class Notifier {
         return noty;
     }
 
-    static error(msg, data = undefined, progressBar = false, overrideRelocate = false) {
-        if (Notifier._debug) console.error(msg);
+    static error(msg, data = undefined, progressBar = false) {
+        if (Notifier._debug) {
+            console.error(msg);
+            if (data !== undefined) console.error(data);
+        }
 
-        if (data !== undefined) {
-            if ("ec" in data) {
-                if (Notifier._debug) console.error(data);
-                if (!overrideRelocate && (data.ec === "nr" || data.ec === "se")) window.location = "/";
-            } else if ("responseJSON" in data) {
-                if (Notifier._debug) {
-                    console.error(data);
-                    console.error(data.responseJSON);
-                }
-
-                if (!overrideRelocate && (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se")) window.location = "/";
-            } else {
-                if (Notifier._debug) console.error(data);
-            }
+        if ("ec" in data) {
+            if (data.ec === "nr" || data.ec === "se") window.location = "/";
+        } else if ("responseJSON" in data) {
+            if (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se") window.location = "/";
         }
 
         return Notifier.show(Notifier.ERROR, msg, this.DEFAULT_TIMEOUT * 1.5, progressBar);

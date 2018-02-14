@@ -37,11 +37,10 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         CardcastDeck deck = cardcastService.loadSet(deckId);
         if (deck == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND);
 
-        if (game.getCardcastDeckCodes().add(deckId)) {
-            EventWrapper ev = new EventWrapper(game, Consts.Event.CARDCAST_ADD_CARDSET);
-            ev.add(Consts.GeneralKeys.CARDCAST_DECK_INFO, deck.getClientMetadataJson());
-            game.broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
-        }
+        EventWrapper ev = new EventWrapper(game, Consts.Event.CARDCAST_ADD_CARDSET);
+        ev.add(Consts.GeneralKeys.CARDCAST_DECK_INFO, deck.getClientMetadataJson());
+        game.broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
+        game.getCardcastDeckCodes().add(deckId);
 
         return JsonWrapper.EMPTY;
     }
