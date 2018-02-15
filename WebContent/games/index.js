@@ -6,10 +6,26 @@ class Games {
 
         this._searchField = $('#gamesSearch');
 
+        this._refresh = $('._refresh');
+        this._refresh.on('click', () => this.loadGamesList());
+
+        this._theming = $('._themingDialog');
+        this._theming.on('click', () => showThemingDialog());
+
+        this._logout = $('._logout');
+        this._logout.on('click', () => Games.logout());
+
         this.games = new List(this._games[0], {
             item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
                 {'data': ['gid']}]
+        });
+    }
+
+    static logout() {
+        closeWebSocket();
+        $.post("/AjaxServlet", "o=lo").always(function () {
+            window.location = "/";
         });
     }
 
@@ -101,9 +117,10 @@ class Games {
     }
 
     createGame(go) {
+        const self = this;
         $.post("/AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
             Games.postJoinSpectate(data.gid);
-            loadGamesList();
+            self.loadGamesList();
         }).fail(function (data) {
             Notifier.error("Failed creating the game!", data);
         });
@@ -113,6 +130,23 @@ class Games {
         const names = [];
         for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
         return names;
+    }
+
+    loadGamesList() {
+        const self = this;
+        $.post("/AjaxServlet", "o=ggl").done(function (data) {
+            /**
+             * @param {object[]} data.gl - Games list
+             */
+
+            self.setup(data.gl);
+        }).fail(function (data) {
+            Notifier.error("Failed loading the games!", data);
+        });
+
+        registerPollListener("LOBBIES", function (data) {
+            if (data["E"] === "glr") self.loadGamesList();
+        });
     }
 
     /**
@@ -236,38 +270,10 @@ document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', func
 });
 
 window.onload = function () {
-    loadGamesList();
-
     let gid = getURLParameter('gid');
-    if (gid !== null) {
-        Games.postJoinSpectate(gid) // No need to join or spectate, just move the UI there
-    }
+    if (gid !== null) Games.postJoinSpectate(gid); // No need to join or spectate, just move the UI there
+    else games.loadGamesList();
 };
-
-function logout() {
-    closeWebSocket();
-    $.post("/AjaxServlet", "o=lo").always(function () {
-        window.location = "/";
-    });
-}
-
-function loadGamesList() {
-    $.post("/AjaxServlet", "o=ggl").done(function (data) {
-        /**
-         * @param {object[]} data.gl - Games list
-         */
-
-        games.setup(data.gl);
-    }).fail(function (data) {
-        Notifier.error("Failed loading the games!", data);
-    });
-
-    registerPollListener("LOBBIES", function (data) {
-        if (data["E"] === "glr") {
-            loadGamesList();
-        }
-    });
-}
 
 function submitSearch() {
     games.submitSearch();

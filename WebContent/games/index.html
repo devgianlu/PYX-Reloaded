@@ -24,7 +24,8 @@
             </section>
 
             <section class="mdc-toolbar__section">
-                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
+                <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField"
+                     style="margin-left: 16px">
                     <input type="text" id="gamesSearch" class="mdc-text-field__input search">
                     <label class="mdc-text-field__label" for="gamesSearch">Search</label>
                     <i class="material-icons mdc-text-field__icon" tabindex="0" onclick="submitSearch();">search</i>
@@ -33,10 +34,9 @@
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="loadGamesList();">refresh</button>
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="showThemingDialog();">format_paint
-                </button>
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="logout();">exit_to_app</button>
+                <button class="material-icons align-icons mdc-toolbar__icon _refresh">refresh</button>
+                <button class="material-icons align-icons mdc-toolbar__icon _themingDialog">format_paint</button>
+                <button class="material-icons align-icons mdc-toolbar__icon _logout">exit_to_app</button>
             </section>
         </div>
     </header>
@@ -68,6 +68,14 @@
             <a class="mdc-list-item" href="/cardcast/" target="_blank">
                 <i class="material-icons mdc-list-item__start-detail">cast</i>
                 Cardcast
+            </a>
+            <a class="mdc-list-item _themingDialog">
+                <i class="material-icons mdc-list-item__start-detail">format_paint</i>
+                Customize
+            </a>
+            <a class="mdc-list-item _logout">
+                <i class="material-icons mdc-list-item__start-detail">exit_to_app</i>
+                Logout
             </a>
         </nav>
     </nav>

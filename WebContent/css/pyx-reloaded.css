@@ -24,6 +24,17 @@
     margin-bottom: 16px !important;
 }
 
+/* Hide stuff in toolbar on mobile */
+.mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
+    display: none;
+}
+
+@media only screen and (min-width: 425px) {
+    .mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
+        display: inherit;
+    }
+}
+
 /* Text field in toolbar */
 .mdc-toolbar .mdc-text-field__label {
     color: var(--mdc-theme-text-primary-on-primary);
