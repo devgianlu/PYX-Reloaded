@@ -5,7 +5,7 @@
 
     <groupId>com.gianlu.pyxreloaded</groupId>
     <artifactId>server</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3-again</version>
     <packaging>jar</packaging>
 
     <name>pyx-reloaded</name>
