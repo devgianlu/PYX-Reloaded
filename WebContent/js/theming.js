@@ -14,8 +14,8 @@ class Theming {
     }
 
     static apply() {
-        const primary = Cookies.getJSON("PYX-Theme-Primary");
-        const secondary = Cookies.getJSON("PYX-Theme-Secondary");
+        const primary = Cookies.get("PYX-Theme-Primary");
+        const secondary = Cookies.get("PYX-Theme-Secondary");
 
         if (primary === undefined || secondary === undefined) {
             Theming.setPrimaryColor(DEFAULT_PRIMARY);
@@ -46,8 +46,8 @@ let wheel_ = undefined;
 
 function initWheel() {
     wheel_ = new MaterialCustomizer(document.querySelector("#themingWheel > svg"));
-    const primary = Cookies.getJSON("PYX-Theme-Primary");
-    const secondary = Cookies.getJSON("PYX-Theme-Secondary");
+    const primary = Cookies.get("PYX-Theme-Primary");
+    const secondary = Cookies.get("PYX-Theme-Secondary");
     if (primary === undefined || secondary === undefined) {
         wheel_.highlightField(DEFAULT_PRIMARY);
         wheel_.highlightField(DEFAULT_SECONDARY);
@@ -90,9 +90,7 @@ class MaterialCustomizer {
             colors: this.colors
         };
         this.calculateValues_();
-        if (this.wheel) {
-            this.buildWheel_();
-        }
+        if (this.wheel) this.buildWheel_();
     }
 
     calculateValues_() {
