@@ -433,7 +433,7 @@ public class Game {
      */
     private void notifyGameOptionsChanged() {
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_OPTIONS_CHANGED);
-        ev.add(Consts.GameInfoData.INFO, getInfoJson(null, true));
+        ev.add(Consts.GameOptionData.OPTIONS, options.toJson(true));
         broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
     }
 

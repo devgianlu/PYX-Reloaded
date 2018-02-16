@@ -161,6 +161,7 @@ class GameManager {
     /**
      * @param {array} info.pi - Players info
      * @param {string} info.gi.H - Host's nickname
+     * @param {object} info.gi.go - Game options
      * @param {string} info.gi.gs - Game status
      */
     set gameInfo(info) {
@@ -172,6 +173,11 @@ class GameManager {
         this._hand_list.scrollLeft(0);
         if (this.hand_sheet.open) this.closeHand();
         else this.openHand();
+    }
+
+    set attachOptionsDialog(dialog) {
+        this.gameOptionsDialog = dialog;
+        this._updateOptionsDialog();
     }
 
     /**
@@ -309,98 +315,26 @@ class GameManager {
         this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
-    /**
-     * @param {object[]} data.h - Hand cards
-     * @param {boolean} data.ch - Clear hand cards before adding newer
-     * @param {object} data.pi - Player's info
-     * @param {string} data.m - Message (chat)
-     * @param {string} data.f - Sender (chat)
-     * @param {string} data.n - Player's nickname
-     * @param {object} data.pi.st - Player's status
-     * @param {int} data.pi.sc - Player's score
-     * @param {string} data.pi.N - Player's name
-     * @param {object} data.gi - Game info
-     * @param {string} data.gs - Game status
-     * @param {object} data.bc - Black card
-     * @param {object[]} data.wc - Table cards
-     * @param {int} data.WC - Winning card(s), comma separated list
-     * @param {string} data.rw - Round winner nickname
-     * @param {int} data.i - Round intermission
-     * @param {boolean} data.wl - Whether the game will stop
-     * @param {object} data.cdi - Cardcast deck info
-     * @param {string} data.cdi.csn - Card set name
-     */
-    handlePollEvent(data) {
-        switch (data["E"]) {
-            case "cAc":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been added to the game!");
-                break;
-            case "cRc":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
-                break;
-            case "C":
-                this._receivedGameChatMessage(data);
-                break;
-            case "gpj":
-                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
-                break;
-            case "gpl":
-                for (let i = 0; i < this.info.pi.length; i++) {
-                    if (this.info.pi[i].N === data.n) {
-                        this.info.pi.splice(i, 1);
+    changeGameOptions(go) {
+        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function () {
+            Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                switch (data.responseJSON.data) {
+                    case "ngh":
+                        Notifier.error("You have to be the game host.", data);
                         break;
-                    }
+                    case "as":
+                        Notifier.error("The game must be in lobby state.", data);
+                        break;
+                    default:
+                        Notifier.error("Failed changing the game options.", data);
+                        break;
                 }
-
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
-                break;
-            case "gpic":
-                const pi = data.pi;
-                this._updatePlayerStatus(pi);
-                this._reloadScoreboard();
-
-                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
-                break;
-            case "hd":
-                this.addHandCards(data.h, data.ch);
-                break;
-            case "gsc":
-                this.info.gi.gs = data.gs;
-                this._handleGameStatusChange(data);
-                break;
-            case "gjl":
-                Notifier.timeout(Notifier.ALERT, "The judge left.");
-                if (!data.wl)
-                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
-                break;
-            case "gjs":
-                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.");
-                break;
-            case "goc":
-                this.info.gi.go = data.gi;
-                break;
-            case "gpki":
-                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
-                break;
-            case "gps":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for being idle.");
-                break;
-            case "kfgi":
-                GameManager._postLeave();
-                break;
-            case "hu":
-                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
-                break;
-            case "glk":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> liked this game.");
-                break;
-            case "gdlk":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
-                break;
-        }
+            } else {
+                Notifier.error("Failed changing the game options.", data);
+            }
+        });
     }
 
     sendGameChatMessage(msg, clear) {
@@ -646,19 +580,113 @@ class GameManager {
             this.hand.filter();
         }
     }
+
+    /**
+     * @param {object[]} data.h - Hand cards
+     * @param {boolean} data.ch - Clear hand cards before adding newer
+     * @param {object} data.pi - Player's info
+     * @param {string} data.m - Message (chat)
+     * @param {string} data.f - Sender (chat)
+     * @param {string} data.n - Player's nickname
+     * @param {object} data.pi.st - Player's status
+     * @param {int} data.pi.sc - Player's score
+     * @param {string} data.pi.N - Player's name
+     * @param {object} data.gi - Game info
+     * @param {string} data.gs - Game status
+     * @param {object} data.bc - Black card
+     * @param {object[]} data.wc - Table cards
+     * @param {int} data.WC - Winning card(s), comma separated list
+     * @param {string} data.rw - Round winner nickname
+     * @param {int} data.i - Round intermission
+     * @param {object} data.go - Game options
+     * @param {boolean} data.wl - Whether the game will stop
+     * @param {object} data.cdi - Cardcast deck info
+     * @param {string} data.cdi.csn - Card set name
+     */
+    handlePollEvent(data) {
+        switch (data["E"]) {
+            case "cAc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been added to the game!");
+                break;
+            case "cRc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
+                break;
+            case "C":
+                this._receivedGameChatMessage(data);
+                break;
+            case "gpj":
+                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
+                break;
+            case "gpl":
+                for (let i = 0; i < this.info.pi.length; i++) {
+                    if (this.info.pi[i].N === data.n) {
+                        this.info.pi.splice(i, 1);
+                        break;
+                    }
+                }
+
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
+                break;
+            case "gpic":
+                const pi = data.pi;
+                this._updatePlayerStatus(pi);
+                this._reloadScoreboard();
+
+                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
+                break;
+            case "hd":
+                this.addHandCards(data.h, data.ch);
+                break;
+            case "gsc":
+                this.info.gi.gs = data.gs;
+                this._handleGameStatusChange(data);
+                break;
+            case "gjl":
+                Notifier.timeout(Notifier.ALERT, "The judge left.");
+                if (!data.wl)
+                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                break;
+            case "gjs":
+                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.");
+                break;
+            case "goc":
+                this.info.gi.go = data.go;
+                this._updateOptionsDialog();
+                break;
+            case "gpki":
+                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
+                break;
+            case "gps":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for being idle.");
+                break;
+            case "kfgi":
+                GameManager._postLeave();
+                break;
+            case "hu":
+                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
+                break;
+            case "glk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> liked this game.");
+                break;
+            case "gdlk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
+                break;
+        }
+    }
+
+    _updateOptionsDialog() {
+        this.gameOptionsDialog.updateOptions(this.info.gi.go);
+    }
 }
 
-const gameManager = new GameManager(getLastPathSegment());
-
-window.onload = function () {
-    if (gameManager.id === null) {
-        window.location = "/games/";
-    } else {
-        loadUI();
-    }
-};
-
-function loadUI() {
+/**
+ * @param {GameManager} gameManager
+ * @param {GameOptionsDialog} gameOptionsDialog
+ */
+function loadUI(gameManager, gameOptionsDialog) {
     $.post("/AjaxServlet", "o=gme").done(function (data) {
         gameManager.me = data;
 
@@ -672,6 +700,9 @@ function loadUI() {
 
                 gameManager.addHandCards(data.h, true);
                 gameManager.addTableCards(data.wc, true);
+
+                gameManager.attachOptionsDialog = gameOptionsDialog;
+
                 Notifier.debug(data);
             }).fail(function (data) {
                 Notifier.error("Failed loading the game!", data);
@@ -688,6 +719,9 @@ function loadUI() {
         gameManager.handlePollEvent(data);
     });
 }
+
+
+// TODO: Move stuff below here into GameManager
 
 function sendChatMessage(field, ev = undefined) {
     if (ev !== undefined && ev.keyCode !== 13) return;

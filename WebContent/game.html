@@ -61,6 +61,7 @@
                         onclick="startGame()">
                     done
                 </button>
+                <button class="material-icons align-icons mdc-toolbar__icon" id="gameOptions">settings</button>
                 <button class="material-icons align-icons mdc-toolbar__icon" onclick="leaveGame();">close</button>
             </section>
         </div>
@@ -128,10 +129,24 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
+<script src="/js/cardcast.helper.js"></script>
 <script src="/js/notifs.helper.js"></script>
 <script src="/js/events.helper.js"></script>
+<script src="/game_options/dialog.js"></script>
 <script src="/js/game.js"></script>
-<script>window.mdc.autoInit();</script>
+<script>
+    window.mdc.autoInit();
+    const gameManager = new GameManager(getLastPathSegment());
+    if (gameManager.id === null) {
+        window.location = "/games/";
+    } else {
+        setupGameOptionsDialog($('#gameOptions'), "Game options", false, "Apply", (go) => {
+            gameManager.changeGameOptions(go);
+        }, (gameOptionsDialog) => {
+            loadUI(gameManager, gameOptionsDialog);
+        });
+    }
+</script>
 
 </body>
 </html>

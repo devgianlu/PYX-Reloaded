@@ -207,7 +207,9 @@
 <script src="./index.js"></script>
 <script>
     window.mdc.autoInit();
-    setupGameOptionsDialog($('body .mdc-fab'), "Start a New Game");
+    setupGameOptionsDialog($('body .mdc-fab'), "Start a New Game", true, "Create", (go) => {
+        games.createGame(go)
+    });
 </script>
 
 </body>
