@@ -6,6 +6,16 @@ class GameManager {
         this.drawer = new mdc.drawer.MDCPersistentDrawer($('#drawer')[0]);
         $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
 
+        this._leaveGame = this.root.find('#leaveGame');
+        this._leaveGame.on('click', () => this.leave());
+
+        this._startGame = this.root.find('#startGame');
+        this._startGame.on('click', () => this.start());
+
+        this._chatMessage = this.root.find('#chatMessage');
+        this._chatMessage.on('keydown', (ev) => this._handleSendChatMessage(ev));
+        this._chatMessage.parent().find('.mdc-text-field__icon').on('click', () => this._handleSendChatMessage(undefined));
+
         let drawerStatus = Cookies.getJSON("PYX-Drawer");
         if (drawerStatus === undefined) drawerStatus = false;
         this.drawer.open = drawerStatus;
@@ -60,6 +70,19 @@ class GameManager {
         this._unreadNotifs.parent().on('click', () => this.toggleDrawer());
         this.unreadNotifications = 0;
         this.unreadNotifs_last = 0;
+    }
+
+    _handleSendChatMessage(ev) {
+        if (ev !== undefined && ev.keyCode !== 13) return;
+
+        const msg = this._chatMessage.val();
+        if (msg.length === 0) return;
+
+        this.sendGameChatMessage(msg, () => {
+            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
+            this._chatMessage.val("");
+            this._chatMessage.blur();
+        });
     }
 
     get unreadNotifications() {
@@ -530,6 +553,7 @@ class GameManager {
     }
 
     leave() {
+        closeWebSocket();
         $.post("/AjaxServlet", "o=lg&gid=" + this.id).always(function () {
             GameManager._postLeave();
         });
@@ -718,33 +742,4 @@ function loadUI(gameManager, gameOptionsDialog) {
         Notifier.debug(data);
         gameManager.handlePollEvent(data);
     });
-}
-
-
-// TODO: Move stuff below here into GameManager
-
-function sendChatMessage(field, ev = undefined) {
-    if (ev !== undefined && ev.keyCode !== 13) return;
-
-    let input;
-    if (field.tagName === "INPUT") input = field;
-    else input = field.querySelector('input');
-
-    const msg = input.value;
-    if (msg.length === 0) return;
-
-    gameManager.sendGameChatMessage(msg, () => {
-        $(input.nextElementSibling).removeClass("mdc-text-field__label--float-above");
-        input.value = "";
-        $(input).blur();
-    });
-}
-
-function leaveGame() {
-    closeWebSocket();
-    gameManager.leave();
-}
-
-function startGame() {
-    gameManager.start();
 }
