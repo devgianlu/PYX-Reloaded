@@ -14,14 +14,12 @@ import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 
 import javax.net.ssl.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
@@ -66,14 +64,8 @@ public class Server {
         GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
-        ResourceHandler webContentHandler = Handlers.resource(new PathResourceManager(Paths.get(preferences.getString("webContent", "./WebContent")).toAbsolutePath()));
-        CacheControlHandler resourceManager;
-        if (preferences.getBoolean("cacheEnabled", true))
-            resourceManager = CacheControlHandler.browserManagedCache(webContentHandler);
-        else
-            resourceManager = CacheControlHandler.disableCache(webContentHandler);
-
-        PathHandler pathHandler = new PathHandler(resourceManager);
+        ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
+        PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
                 .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
 
@@ -81,7 +73,7 @@ public class Server {
         router.setFallbackHandler(pathHandler)
                 .get("/game/{gid}/", exchange -> {
                     exchange.setRelativePath("/game.html");
-                    resourceManager.handleRequest(exchange);
+                    resourceHandler.handleRequest(exchange);
                 });
 
         Undertow.Builder server = Undertow.builder()
