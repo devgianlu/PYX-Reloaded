@@ -55,11 +55,13 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     }
 }
 
-class CreateGameDialog {
-    constructor(id) {
+class GameOptionsDialog {
+    constructor(id, title) {
         this._dialog = $('#' + id);
         this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
         this.dialog.listen('MDCDialog:accept', () => this._acceptDialog());
+
+        this._dialog.find('.mdc-dialog__header__title').text(title);
 
         this._scoreLimit = this._dialog.find('#scoreLimit');
         this._playersLimit = this._dialog.find('#playersLimit');
@@ -67,6 +69,8 @@ class CreateGameDialog {
         this._blanksLimit = this._dialog.find('#blanksLimit');
         this._timeMultiplier = this._dialog.find('#timeMultiplier');
         this._winBy = this._dialog.find('#winBy');
+
+        this._initDropdowns = false;
 
         this._pyxDecks = this._dialog.find('#pyxDecks');
         this.pyxDecks_select = new MDCMultiSelect(this._pyxDecks[0]);
@@ -86,16 +90,20 @@ class CreateGameDialog {
 
         this._cardcastAdd = this._dialog.find('#cardcastAdd');
         this._cardcastAddDeckCode = this._cardcastAdd.find('#cardcastAddDeckCode');
+        this._cardcastAddDeckCode.parent().find('.mdc-text-field__icon').on('click', () => this.loadCardcastDeckInfo());
         this.cardcastAddDeckCode = new mdc.textField.MDCTextField(this._cardcastAddDeckCode.parent()[0]);
         this._cardcastAddDeckInfo = this._dialog.find('#cardcastAddDeckInfo');
         this._cardcastAddDeckInfo_loading = this._cardcastAddDeckInfo.find('.mdc-linear-progress');
         this._cardcastAddDeckInfo_details = this._cardcastAddDeckInfo.find('.details');
+        this._cardcastAddDeckButton = this._cardcastAddDeckInfo.find('.details .mdc-button');
+        this._cardcastAddDeckButton.on('click', () => this.addCardcastDeck(this._cardcastAddDeckInfo_details.data('code')));
 
         this._cardsTitle = this._dialog.find('#cardsTitle');
         this._cardcastTitle = this._dialog.find('#cardcastDecksTitle');
         this._pyxTitle = this._dialog.find('#pyxDecksTitle');
 
         this._password = this._dialog.find('#gamePassword');
+        mdc.textField.MDCTextField.attachTo(this._password.parent()[0]);
 
         /**
          * @param {int} dgo.vL - Spectators limit
@@ -178,7 +186,6 @@ class CreateGameDialog {
                 return item.text();
         }
 
-        console.log("DEFAULTING");
         return list.children()[0].innerHTML; // Shouldn't happen
     }
 
@@ -194,12 +201,12 @@ class CreateGameDialog {
 
     _acceptDialog() {
         const go = {
-            "vL": CreateGameDialog.getDropdownSelectedValue(this._spectatorsLimit),
-            "pL": CreateGameDialog.getDropdownSelectedValue(this._playersLimit),
-            "sl": CreateGameDialog.getDropdownSelectedValue(this._scoreLimit),
-            "bl": CreateGameDialog.getDropdownSelectedValue(this._blanksLimit),
-            "tm": CreateGameDialog.getDropdownSelectedValue(this._timeMultiplier),
-            "wb": CreateGameDialog.getDropdownSelectedValue(this._winBy),
+            "vL": GameOptionsDialog.getDropdownSelectedValue(this._spectatorsLimit),
+            "pL": GameOptionsDialog.getDropdownSelectedValue(this._playersLimit),
+            "sl": GameOptionsDialog.getDropdownSelectedValue(this._scoreLimit),
+            "bl": GameOptionsDialog.getDropdownSelectedValue(this._blanksLimit),
+            "tm": GameOptionsDialog.getDropdownSelectedValue(this._timeMultiplier),
+            "wb": GameOptionsDialog.getDropdownSelectedValue(this._winBy),
             "pw": this.getPassword(),
             "CCs": this.getCardcastDeckCodes(),
             "css": this.getSelectedPyxDecks()
@@ -216,12 +223,22 @@ class CreateGameDialog {
 
     reset() {
         // Gameplay
-        CreateGameDialog._populateDropdown(this._scoreLimit, this.dgo.sl);
-        CreateGameDialog._populateDropdown(this._playersLimit, this.dgo.pL);
-        CreateGameDialog._populateDropdown(this._spectatorsLimit, this.dgo.vL);
-        CreateGameDialog._populateDropdown(this._blanksLimit, this.dgo.bl);
-        CreateGameDialog._populateTimeMultiplier(this._timeMultiplier, this.dgo.tm);
-        CreateGameDialog._populateDropdown(this._winBy, this.dgo.wb);
+        GameOptionsDialog._populateDropdown(this._scoreLimit, this.dgo.sl);
+        GameOptionsDialog._populateDropdown(this._playersLimit, this.dgo.pL);
+        GameOptionsDialog._populateDropdown(this._spectatorsLimit, this.dgo.vL);
+        GameOptionsDialog._populateDropdown(this._blanksLimit, this.dgo.bl);
+        GameOptionsDialog._populateTimeMultiplier(this._timeMultiplier, this.dgo.tm);
+        GameOptionsDialog._populateDropdown(this._winBy, this.dgo.wb);
+
+        if (!this._initDropdowns) {
+            mdc.select.MDCSelect.attachTo(this._scoreLimit[0]);
+            mdc.select.MDCSelect.attachTo(this._playersLimit[0]);
+            mdc.select.MDCSelect.attachTo(this._spectatorsLimit[0]);
+            mdc.select.MDCSelect.attachTo(this._blanksLimit[0]);
+            mdc.select.MDCSelect.attachTo(this._timeMultiplier[0]);
+            mdc.select.MDCSelect.attachTo(this._winBy[0]);
+            this._initDropdowns = true;
+        }
 
         // PYX
         this.pyxDecks_select.clear();
@@ -239,6 +256,10 @@ class CreateGameDialog {
             elm.find('input').attr("id", "pyx_deck_" + set.csi);
             elm.find('label').attr("for", "pyx_deck_" + set.csi);
         }
+
+        // Access
+        this._password.val("");
+        this._password.next().removeClass("mdc-text-field__label--float-above");
 
         // Cardcast
         this.cardcastDecks.clear();
@@ -266,12 +287,12 @@ class CreateGameDialog {
 
     updateTitles() {
         const pyxDetails = this.getPyxDecksDetails();
-        this._pyxTitle.text("PYX (" + CreateGameDialog.createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")");
+        this._pyxTitle.text("PYX (" + GameOptionsDialog.createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")");
 
         const ccDetails = this.getCardcastDecksDetails();
-        this._cardcastTitle.text("Cardcast (" + CreateGameDialog.createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")");
+        this._cardcastTitle.text("Cardcast (" + GameOptionsDialog.createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")");
 
-        this._cardsTitle.text("Cards (" + CreateGameDialog.createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")");
+        this._cardsTitle.text("Cards (" + GameOptionsDialog.createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")");
     }
 
     getPyxDecksDetails() {
@@ -405,16 +426,13 @@ class CreateGameDialog {
     }
 }
 
-const createGameDialog = new CreateGameDialog('createGameDialog');
+function setupGameOptionsDialog(trigger, title) {
+    $.get("/game_options/dialog.html").done(function (data) {
+        $('body').append($(data));
 
-function showCreateGameDialog() {
-    createGameDialog.show();
-}
-
-function loadCardcastDeckInfo() {
-    createGameDialog.loadCardcastDeckInfo();
-}
-
-function addCardcastDeck(element) {
-    createGameDialog.addCardcastDeck(element.getAttribute("data-code"));
+        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title);
+        trigger.on('click', () => gameOptionsDialog.show())
+    }).fail(function (data) {
+        Notifier.debug(data, true); // Shouldn't happen!!
+    });
 }
