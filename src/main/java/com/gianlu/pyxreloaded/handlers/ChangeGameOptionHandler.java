@@ -12,8 +12,6 @@ import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
 import com.gianlu.pyxreloaded.servlets.Parameters;
 import io.undertow.server.HttpServerExchange;
 
-import java.util.Objects;
-
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CHANGE_GAME_OPTIONS.toString();
     private final Preferences preferences;
@@ -25,21 +23,22 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
 
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (game.getHost() != user) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
         if (game.getState() != Consts.GameState.LOBBY)
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
 
+        GameOptions options;
         try {
             String value = params.get(Consts.GameOptionData.OPTIONS);
-            GameOptions options = GameOptions.deserialize(preferences, value);
-            String oldPassword = game.getPassword();
-            game.updateGameSettings(options);
-
-            // only broadcast an update if the password state has changed, because it needs to change
-            // the text on the join button and the sort order
-            if (!Objects.equals(game.getPassword(), oldPassword)) gameManager.broadcastGameListRefresh();
+            options = GameOptions.deserialize(preferences, value);
         } catch (Exception ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
+        }
+
+        if (game.getHost() == user) {
+            game.updateGameSettings(options);
+        } else {
+            // TODO: Suggest options modification
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
         }
 
         return JsonWrapper.EMPTY;
