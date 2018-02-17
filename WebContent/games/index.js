@@ -5,21 +5,39 @@ class Games {
         this._games_message = this._games.find('.message');
 
         this._searchField = $('#gamesSearch');
+        this._searchField.on('keydown', () => this.submitSearch());
+        this._searchField.parent().find('.mdc-text-field__icon').on('click', () => this.submitSearch());
 
         this._refresh = $('._refresh');
-        this._refresh.on('click', () => this.loadGamesList());
+        this._refresh.on('click', () => {
+            this.loadGamesList();
+            this.closeDrawer();
+        });
 
         this._theming = $('._themingDialog');
-        this._theming.on('click', () => showThemingDialog());
+        this._theming.on('click', () => {
+            showThemingDialog();
+            this.closeDrawer();
+        });
 
         this._logout = $('._logout');
-        this._logout.on('click', () => Games.logout());
+        this._logout.on('click', () => {
+            Games.logout();
+            this.closeDrawer();
+        });
 
         this.games = new List(this._games[0], {
             item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
                 {'data': ['gid']}]
         });
+
+        this.drawer = new mdc.drawer.MDCTemporaryDrawer($('#drawer')[0]);
+        $('.mdc-toolbar__menu-icon').on('click', () => this.drawer.open = true);
+    }
+
+    closeDrawer() {
+        this.drawer.open = false;
     }
 
     static logout() {
@@ -263,18 +281,6 @@ class Games {
 }
 
 const games = new Games();
-
-const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
-document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
-    drawer.open = true
-});
-
-window.onload = function () {
-    let gid = getURLParameter('gid');
-    if (gid !== null) Games.postJoinSpectate(gid); // No need to join or spectate, just move the UI there
-    else games.loadGamesList();
-};
-
-function submitSearch() {
-    games.submitSearch();
-}
+const gid = getURLParameter('gid');
+if (gid !== null) Games.postJoinSpectate(gid); // No need to join or spectate, just move the UI there
+else games.loadGamesList();
