@@ -91,6 +91,7 @@ public class Game {
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
 
+
     /**
      * Create a new game.
      *
@@ -157,6 +158,10 @@ public class Game {
             one.remove(user);
             return false;
         }
+    }
+
+    public Map<String, SuggestedGameOptions> getSuggestedGameOptions() {
+        return suggestedGameOptions;
     }
 
     /**

@@ -498,9 +498,14 @@ public final class Consts {
          */
         PONG("PP"),
         /**
+         * Get a list of suggested game options.
+         */
+        GET_SUGGESTED_GAME_OPTIONS("ggso"),
+        /**
          * Decide whether to accept or decline the game options suggested modification.
          */
         GAME_OPTIONS_SUGGESTION_DECISION("gosd");
+
 
         private final String op;
 
@@ -820,7 +825,11 @@ public final class Consts {
         /**
          * Accepted or declined, boolean
          */
-        DECISION("d");
+        DECISION("d"),
+        /**
+         * List of suggested game options
+         */
+        LIST("sol");
 
         private final String key;
 

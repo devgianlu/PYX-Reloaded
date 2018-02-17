@@ -718,7 +718,7 @@ class GameManager {
                 Notifier.timeout(Notifier.SUCCESS, "Your suggested game options modification has been accepted.");
                 break;
             case "gdso":
-                Notifier.timeout(Notifier.WARN, "Your suggested game options modification has been declined.");
+                Notifier.timeout(Notifier.ERROR, "Your suggested game options modification has been declined.");
                 break;
             case "goms":
                 const noty = Notifier.show(Notifier.WARN, "<b>" + data.s + "</b> suggested to modify the game options.", false, false, true,

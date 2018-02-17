@@ -36,5 +36,6 @@ public class Handlers {
         LIST.put(GetMeHandler.OP, GetMeHandler.class);
         LIST.put(PongHandler.OP, PongHandler.class);
         LIST.put(GameOptionsSuggestionDecisionHandler.OP, GameOptionsSuggestionDecisionHandler.class);
+        LIST.put(GetSuggestedGameOptionsHandler.OP, GetSuggestedGameOptionsHandler.class);
     }
 }
