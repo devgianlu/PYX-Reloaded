@@ -160,6 +160,11 @@ class GameOptionsDialog {
         this.reset();
     }
 
+    set acceptVisible(set) {
+        if (set) this._accept.show();
+        else this._accept.hide();
+    }
+
     /**
      *
      * @param dropdown
@@ -226,11 +231,6 @@ class GameOptionsDialog {
         dropdown.selectedIndex = selected;
     }
 
-    static getDropdownSelectedValue(dropdown) {
-        const list = $(dropdown.root_).find('.mdc-menu__items');
-        return list.children()[dropdown.selectedIndex].innerText;
-    }
-
     static createDetailsString(decks, whites, blacks) {
         if (decks === 0) {
             return "0 decks";
@@ -239,6 +239,11 @@ class GameOptionsDialog {
                 + whites + (whites === 1 ? " white card, " : " white cards, ")
                 + blacks + (blacks === 1 ? " black card" : " black cards");
         }
+    }
+
+    static getDropdownSelectedValue(dropdown) {
+        const list = $(dropdown.root_).find('.mdc-menu__items');
+        return list.children()[dropdown.selectedIndex].innerText;
     }
 
     _acceptDialog() {
@@ -256,11 +261,6 @@ class GameOptionsDialog {
 
         Notifier.debug(go);
         this.acceptListener(go);
-    }
-
-    set acceptVisible(set) {
-        if (set) this._accept.show();
-        else this._accept.hide();
     }
 
     show(reset = false) {

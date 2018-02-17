@@ -72,28 +72,8 @@ class GameManager {
         this.unreadNotifs_last = 0;
     }
 
-    _handleSendChatMessage(ev) {
-        if (ev !== undefined && ev.keyCode !== 13) return;
-
-        const msg = this._chatMessage.val();
-        if (msg.length === 0) return;
-
-        this.sendGameChatMessage(msg, () => {
-            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
-            this._chatMessage.val("");
-            this._chatMessage.blur();
-        });
-    }
-
     get unreadNotifications() {
         return this.unreadNotifs_count;
-    }
-
-    /**
-     * @returns {boolean} - Whether I am the host or not
-     */
-    get amHost() {
-        return this.info.gi.H === this.user.n;
     }
 
     set unreadNotifications(value) {
@@ -112,29 +92,11 @@ class GameManager {
         }
     }
 
-    toggleDrawer() {
-        this.drawer.open = !this.drawer.open;
-        Cookies.set("PYX-Drawer", this.drawer.open);
-        this.unreadNotifications = 0;
-
-        this._recreateMasonry();
-    }
-
-    closeHand() {
-        this._toggle_hand.html("keyboard_arrow_up");
-        this.hand_sheet.open = false;
-    }
-
-    openHand() {
-        this._toggle_hand.html("keyboard_arrow_down");
-        this.hand_sheet.open = true;
-    }
-
     /**
-     * @param {string} user.n - Nickname
+     * @returns {boolean} - Whether I am the host or not
      */
-    set me(user) {
-        this.user = user;
+    get amHost() {
+        return this.info.gi.H === this.user.n;
     }
 
     /**
@@ -177,10 +139,6 @@ class GameManager {
         this._recreateMasonry(); // Width changed
     }
 
-    get id() {
-        return this.gid;
-    }
-
     /**
      * @param {array} info.pi - Players info
      * @param {string} info.gi.H - Host's nickname
@@ -192,39 +150,12 @@ class GameManager {
         this.setup();
     }
 
-    _handleToggleHand() {
-        this._hand_list.scrollLeft(0);
-        if (this.hand_sheet.open) this.closeHand();
-        else this.openHand();
-    }
-
     /**
      * @param {GameOptionsDialog} dialog
      */
     set attachOptionsDialog(dialog) {
         this.gameOptionsDialog = dialog;
         this._updateOptionsDialog();
-    }
-
-    /**
-     * @param st - Status code
-     * @returns {string} - Status string
-     */
-    static getStatusFromCode(st) {
-        switch (st) {
-            case "sh":
-                return "Host";
-            case "si":
-                return "Idle";
-            case "sj":
-                return "Judge";
-            case "sjj":
-                return "Judging";
-            case "sp":
-                return "Playing";
-            case "sw":
-                return "Winner";
-        }
     }
 
     /**
@@ -254,6 +185,80 @@ class GameManager {
         else elm.on("click", () => listener(card));
     }
 
+    /**
+     * @param {string} user.n - Nickname
+     */
+    set me(user) {
+        this.user = user;
+    }
+
+    get id() {
+        return this.gid;
+    }
+
+    static _askCardText() {
+        return prompt("Enter the card text:", "");
+    }
+
+    static _getHandInfoText(ltp, ltd) {
+        if (ltd === 0 && ltp === 0) return "";
+
+        if (ltd === 0 && ltp !== 0) {
+            return "pick or draw " + ltp + " more card" + (ltp === 1 ? "" : "s");
+        } else if (ltp === 0 && ltd !== 0) {
+            return "draw " + ltd + " more card" + (ltd === 1 ? "" : "s");
+        } else {
+            return "draw at least " + ltd + " more card" + (ltd === 1 ? "" : "s") + " for a total of " + (ltd + ltp) + " cards";
+        }
+    }
+
+    /**
+     * @param st - Status code
+     * @returns {string} - Status string
+     */
+    static getStatusFromCode(st) {
+        switch (st) {
+            case "sh":
+                return "Host";
+            case "si":
+                return "Idle";
+            case "sj":
+                return "Judge";
+            case "sjj":
+                return "Judging";
+            case "sp":
+                return "Playing";
+            case "sw":
+                return "Winner";
+        }
+    }
+
+    _handleSendChatMessage(ev) {
+        if (ev !== undefined && ev.keyCode !== 13) return;
+
+        const msg = this._chatMessage.val();
+        if (msg.length === 0) return;
+
+        this.sendGameChatMessage(msg, () => {
+            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
+            this._chatMessage.val("");
+            this._chatMessage.blur();
+        });
+    }
+
+    toggleDrawer() {
+        this.drawer.open = !this.drawer.open;
+        Cookies.set("PYX-Drawer", this.drawer.open);
+        this.unreadNotifications = 0;
+
+        this._recreateMasonry();
+    }
+
+    closeHand() {
+        this._toggle_hand.html("keyboard_arrow_up");
+        this.hand_sheet.open = false;
+    }
+
     static _postLeave() {
         window.location = "/games/";
     }
@@ -276,6 +281,26 @@ class GameManager {
         GameManager._removeWhiteCard(this.hand, card);
     }
 
+    openHand() {
+        this._toggle_hand.html("keyboard_arrow_down");
+        this.hand_sheet.open = true;
+    }
+
+    _updatePlayerStatus(info) {
+        for (let i = 0; i < this.info.pi.length; i++) {
+            if (this.info.pi[i].N === info.N) {
+                this.info.pi[i] = info;
+                break;
+            }
+        }
+    }
+
+    _handleToggleHand() {
+        this._hand_list.scrollLeft(0);
+        if (this.hand_sheet.open) this.closeHand();
+        else this.openHand();
+    }
+
     /**
      * @param {object} data
      * @param {string} data.m - Message
@@ -293,17 +318,9 @@ class GameManager {
         }
     }
 
-    _updatePlayerStatus(info) {
-        for (let i = 0; i < this.info.pi.length; i++) {
-            if (this.info.pi[i].N === info.N) {
-                this.info.pi[i] = info;
-                break;
-            }
-        }
-    }
-
-    static _askCardText() {
-        return prompt("Enter the card text:", "");
+    _recreateMasonry() {
+        this._tableCards_masonry.masonry('destroy');
+        this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
     handleMyInfoChanged(info) {
@@ -336,11 +353,6 @@ class GameManager {
                 Notifier.timeout(Notifier.ALERT, "You won the game!");
                 break;
         }
-    }
-
-    _recreateMasonry() {
-        this._tableCards_masonry.masonry('destroy');
-        this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
     changeGameOptions(go) {
@@ -379,18 +391,6 @@ class GameManager {
 
             Notifier.error("Failed to send the message!", data);
         });
-    }
-
-    static _getHandInfoText(ltp, ltd) {
-        if (ltd === 0 && ltp === 0) return "";
-
-        if (ltd === 0 && ltp !== 0) {
-            return "pick or draw " + ltp + " more card" + (ltp === 1 ? "" : "s");
-        } else if (ltp === 0 && ltd !== 0) {
-            return "draw " + ltd + " more card" + (ltd === 1 ? "" : "s");
-        } else {
-            return "draw at least " + ltd + " more card" + (ltd === 1 ? "" : "s") + " for a total of " + (ltd + ltp) + " cards";
-        }
     }
 
     _handleHandCardSelect(card) {
