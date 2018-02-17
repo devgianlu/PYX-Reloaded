@@ -4,19 +4,19 @@
     flex-direction: column;
 }
 
-#drawer > .mdc-drawer__drawer > div {
-    flex-grow: 1;
+#scoreboard {
     flex-shrink: 1;
     flex-basis: auto;
 }
 
 #scoreboard > .list {
-    max-height: 30vh;
     overflow-y: auto;
+    max-height: 25vh;
 }
 
 #chat {
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
 }
 
@@ -25,7 +25,6 @@
     overflow-wrap: break-word;
     padding-top: 0.25rem;
     overflow-y: auto;
-    min-height: 100px;
 }
 
 #chat > .mdc-text-field {

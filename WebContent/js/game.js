@@ -44,6 +44,7 @@ class GameManager {
         this._toggle_hand = this._hand.find('._toggleHand');
         this._toggle_hand.on('click', () => this._handleToggleHand());
         this._hand_info = this._hand.find('._handInfo');
+        this._hand_toolbar = this._hand.find('.mdc-toolbar');
 
         this.masonryOptions = {
             itemSelector: '.pyx-card',
@@ -64,7 +65,6 @@ class GameManager {
         this._blackCardContainer = this.root.find('#blackCard');
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
-        this._hand_toolbar = this._hand.find(".mdc-toolbar");
 
         this._unreadNotifs = this.root.find('._unreadNotifs');
         this._unreadNotifs.parent().on('click', () => this.toggleDrawer());
@@ -512,9 +512,17 @@ class GameManager {
         else this._startGame.hide();
     }
 
+    _reloadDrawerPadding() {
+        if (this._hand_toolbar.is(':visible'))
+            this.drawer.root_.style.marginBottom = this._hand_toolbar.height() + "px";
+        else
+            this.drawer.root_.style.marginBottom = "0";
+    }
+
     toggleHandVisibility(visible) {
         if (visible) this._hand_toolbar.show();
         else this._hand_toolbar.hide();
+        this._reloadDrawerPadding();
     }
 
     _getPlayer(nick) {
@@ -608,6 +616,8 @@ class GameManager {
         } else {
             this.hand.filter();
         }
+
+        this._reloadDrawerPadding();
     }
 
     /**
