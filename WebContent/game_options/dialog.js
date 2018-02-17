@@ -91,7 +91,7 @@ class GameOptionsDialog {
         this._dialog.find('.mdc-dialog__header__title').text(title);
 
         this._accept = this._dialog.find('.mdc-dialog__footer__button--accept');
-        this._accept.text(acceptText);
+        this.acceptText = acceptText;
 
         this.scoreLimit = new mdc.select.MDCSelect(this._dialog.find('#scoreLimit')[0]);
         this.playersLimit = new mdc.select.MDCSelect(this._dialog.find('#playersLimit')[0]);
@@ -258,9 +258,8 @@ class GameOptionsDialog {
         this.acceptListener(go);
     }
 
-    set acceptVisible(set) {
-        if (set) this._accept.show();
-        else this._accept.hide();
+    set acceptText(text) {
+        this._accept.text(text);
     }
 
     show(reset = false) {

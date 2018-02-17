@@ -185,6 +185,39 @@ public class GameOptions {
         return pyxCardSetIds;
     }
 
+    @Override
+    @SuppressWarnings("SimplifiableIfStatement")
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameOptions that = (GameOptions) o;
+
+        if (winBy != that.winBy) return false;
+        if (blanksInDeck != that.blanksInDeck) return false;
+        if (playerLimit != that.playerLimit) return false;
+        if (spectatorLimit != that.spectatorLimit) return false;
+        if (scoreGoal != that.scoreGoal) return false;
+        if (!cardSetIds.equals(that.cardSetIds)) return false;
+        if (!cardcastSetCodes.equals(that.cardcastSetCodes)) return false;
+        if (password != null ? !password.equals(that.password) : that.password != null) return false;
+        return timerMultiplier == that.timerMultiplier;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cardSetIds.hashCode();
+        result = 31 * result + cardcastSetCodes.hashCode();
+        result = 31 * result + winBy;
+        result = 31 * result + blanksInDeck;
+        result = 31 * result + playerLimit;
+        result = 31 * result + spectatorLimit;
+        result = 31 * result + scoreGoal;
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + timerMultiplier.hashCode();
+        return result;
+    }
+
     public enum TimeMultiplier {
         X0_25("0.25x"), X0_50("0.50x"), X0_75("0.75x"),
         X1("1x"), X1_25("1.25x"), X1_50("1.50x"),

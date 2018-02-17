@@ -12,11 +12,11 @@ import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
 import com.gianlu.pyxreloaded.servlets.Parameters;
 import io.undertow.server.HttpServerExchange;
 
-public class ChangeGameOptionHandler extends GameWithPlayerHandler {
+public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CHANGE_GAME_OPTIONS.toString();
     private final Preferences preferences;
 
-    public ChangeGameOptionHandler(@Annotations.GameManager GameManager gameManager, @Annotations.Preferences Preferences preferences) {
+    public ChangeGameOptionsHandler(@Annotations.GameManager GameManager gameManager, @Annotations.Preferences Preferences preferences) {
         super(gameManager);
         this.preferences = preferences;
     }
@@ -34,13 +34,15 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
 
-        if (game.getHost() == user) {
-            game.updateGameSettings(options);
-        } else {
-            // TODO: Suggest options modification
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
-        }
+        User host = game.getHost();
+        if (host == null) return JsonWrapper.EMPTY;
 
-        return JsonWrapper.EMPTY;
+        if (host == user) {
+            game.updateGameSettings(options);
+            return JsonWrapper.EMPTY;
+        } else {
+            game.suggestGameOptionsModification(user, options);
+            return new JsonWrapper(Consts.GeneralKeys.NICKNAME, host.getNickname());
+        }
     }
 }

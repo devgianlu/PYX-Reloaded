@@ -309,7 +309,7 @@ class GameManager {
     handleMyInfoChanged(info) {
         Notifier.debug("My status is now: " + info.st);
 
-        this.gameOptionsDialog.acceptVisible = this.amHost;
+        this._updateOptionsDialog(); // For accept button text
 
         switch (info.st) {
             case "sj":
@@ -344,8 +344,9 @@ class GameManager {
     }
 
     changeGameOptions(go) {
-        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function () {
-            Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
+        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function (data) {
+            if ("n" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.n + "</b>.");
+            else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.data) {
@@ -713,12 +714,22 @@ class GameManager {
             case "gdlk":
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
                 break;
+            case "goms":
+                const noty = Notifier.show(Notifier.WARN, "<b>" + data.n + "</b> suggested to modify the game options.", false, false, true,
+                    Notifier.button("Accept", () => {
+                        this.changeGameOptions(data.go);
+                        noty.close();
+                    }),
+                    Notifier.button("Decline", () => {
+                        noty.close();
+                    }));
+                break;
         }
     }
 
     _updateOptionsDialog() {
         this.gameOptionsDialog.updateOptions(this.info.gi.go);
-        this.gameOptionsDialog.acceptVisible = this.amHost;
+        this.gameOptionsDialog.acceptText = this.amHost ? "Apply" : "Suggest";
     }
 }
 

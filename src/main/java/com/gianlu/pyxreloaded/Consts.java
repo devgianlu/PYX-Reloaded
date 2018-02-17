@@ -121,7 +121,11 @@ public final class Consts {
         /**
          * Someone liked this game
          */
-        GAME_LIKE("glk");
+        GAME_LIKE("glk"),
+        /**
+         * Someone suggested to modify the game options
+         */
+        GAME_OPTIONS_MODIFICATION_SUGGESTED("goms");
 
         private final String event;
 
