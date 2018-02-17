@@ -198,6 +198,9 @@ class GameManager {
         else this.openHand();
     }
 
+    /**
+     * @param {GameOptionsDialog} dialog
+     */
     set attachOptionsDialog(dialog) {
         this.gameOptionsDialog = dialog;
         this._updateOptionsDialog();
@@ -305,6 +308,8 @@ class GameManager {
 
     handleMyInfoChanged(info) {
         Notifier.debug("My status is now: " + info.st);
+
+        this.gameOptionsDialog.acceptVisible = this.amHost;
 
         switch (info.st) {
             case "sj":
@@ -703,6 +708,7 @@ class GameManager {
 
     _updateOptionsDialog() {
         this.gameOptionsDialog.updateOptions(this.info.gi.go);
+        this.gameOptionsDialog.acceptVisible = this.amHost;
     }
 }
 
