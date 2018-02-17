@@ -1,18 +1,22 @@
 #drawer > .mdc-drawer__drawer {
     padding: 16px;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
 
-#drawer > .mdc-drawer__drawer > div {
-    flex-grow: 1;
+#scoreboard {
     flex-shrink: 1;
     flex-basis: auto;
 }
 
+#scoreboard > .list {
+    overflow-y: auto;
+    max-height: 25vh;
+}
+
 #chat {
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
 }
 
@@ -20,7 +24,7 @@
     flex-grow: 1;
     overflow-wrap: break-word;
     padding-top: 0.25rem;
-    min-height: 100px;
+    overflow-y: auto;
 }
 
 #chat > .mdc-text-field {

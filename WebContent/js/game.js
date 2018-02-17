@@ -3,6 +3,23 @@ class GameManager {
         this.root = $('body');
         this.gid = gid;
 
+        this.drawer = new mdc.drawer.MDCPersistentDrawer($('#drawer')[0]);
+        $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
+
+        this._leaveGame = this.root.find('#leaveGame');
+        this._leaveGame.on('click', () => this.leave());
+
+        this._startGame = this.root.find('#startGame');
+        this._startGame.on('click', () => this.start());
+
+        this._chatMessage = this.root.find('#chatMessage');
+        this._chatMessage.on('keydown', (ev) => this._handleSendChatMessage(ev));
+        this._chatMessage.parent().find('.mdc-text-field__icon').on('click', () => this._handleSendChatMessage(undefined));
+
+        let drawerStatus = Cookies.getJSON("PYX-Drawer");
+        if (drawerStatus === undefined) drawerStatus = false;
+        this.drawer.open = drawerStatus;
+
         this.scoreboard = new List(this.root.find('#scoreboard')[0], {
             item: 'playerItemTemplate',
             valueNames: ['_name', '_score', '_status']
@@ -14,10 +31,20 @@ class GameManager {
         });
 
         this._hand = this.root.find('#hand');
+        this._hand_list = this._hand.find('.list');
         this.hand = new List(this._hand[0], {
             item: 'cardTemplate',
             valueNames: ['_text', '_pick', '_draw', '_watermark', {data: ['black', 'cid']}]
         });
+
+        this.hand_sheet = new BottomSheet(this._hand[0]);
+
+        this._toggle_hand_mask = this._hand.find('._toggleHand_mask');
+        this._toggle_hand_mask.on('click', () => this._handleToggleHand());
+        this._toggle_hand = this._hand.find('._toggleHand');
+        this._toggle_hand.on('click', () => this._handleToggleHand());
+        this._hand_info = this._hand.find('._handInfo');
+        this._hand_toolbar = this._hand.find('.mdc-toolbar');
 
         this.masonryOptions = {
             itemSelector: '.pyx-card',
@@ -38,7 +65,69 @@ class GameManager {
         this._blackCardContainer = this.root.find('#blackCard');
         this._title = this.root.find('header ._title');
         this._startGame = this.root.find('#startGame');
-        this._hand_toolbar = this._hand.find(".mdc-toolbar");
+
+        this._unreadNotifs = this.root.find('._unreadNotifs');
+        this._unreadNotifs.parent().on('click', () => this.toggleDrawer());
+        this.unreadNotifications = 0;
+        this.unreadNotifs_last = 0;
+    }
+
+    _handleSendChatMessage(ev) {
+        if (ev !== undefined && ev.keyCode !== 13) return;
+
+        const msg = this._chatMessage.val();
+        if (msg.length === 0) return;
+
+        this.sendGameChatMessage(msg, () => {
+            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
+            this._chatMessage.val("");
+            this._chatMessage.blur();
+        });
+    }
+
+    get unreadNotifications() {
+        return this.unreadNotifs_count;
+    }
+
+    /**
+     * @returns {boolean} - Whether I am the host or not
+     */
+    get amHost() {
+        return this.info.gi.H === this.user.n;
+    }
+
+    set unreadNotifications(value) {
+        this.unreadNotifs_count = value;
+
+        if (value === 0) {
+            this._unreadNotifs.parent().hide();
+        } else {
+            this._unreadNotifs.parent().show();
+            this._unreadNotifs.text(value + " unread");
+        }
+
+        if (value >= 5 && new Date().getTime() - this.unreadNotifs_last >= (30 + Notifier.DEFAULT_TIMEOUT) * 1000) {
+            Notifier.timeout(Notifier.ALERT, "You have " + value + " unread notifications!");
+            this.unreadNotifs_last = new Date().getTime();
+        }
+    }
+
+    toggleDrawer() {
+        this.drawer.open = !this.drawer.open;
+        Cookies.set("PYX-Drawer", this.drawer.open);
+        this.unreadNotifications = 0;
+
+        this._recreateMasonry();
+    }
+
+    closeHand() {
+        this._toggle_hand.html("keyboard_arrow_up");
+        this.hand_sheet.open = false;
+    }
+
+    openHand() {
+        this._toggle_hand.html("keyboard_arrow_down");
+        this.hand_sheet.open = true;
     }
 
     /**
@@ -66,6 +155,7 @@ class GameManager {
         const template = this._cardTemplate.clone();
         template.removeAttr("id");
         template.attr("data-black", "true");
+        template.removeClass("mdc-ripple-surface");
 
         template.find('._text').html(card.T);
 
@@ -94,6 +184,7 @@ class GameManager {
     /**
      * @param {array} info.pi - Players info
      * @param {string} info.gi.H - Host's nickname
+     * @param {object} info.gi.go - Game options
      * @param {string} info.gi.gs - Game status
      */
     set gameInfo(info) {
@@ -101,11 +192,18 @@ class GameManager {
         this.setup();
     }
 
+    _handleToggleHand() {
+        this._hand_list.scrollLeft(0);
+        if (this.hand_sheet.open) this.closeHand();
+        else this.openHand();
+    }
+
     /**
-     * @returns {boolean} - Wheteter I am the host or not
+     * @param {GameOptionsDialog} dialog
      */
-    get amHost() {
-        return this.info.gi.H === this.user.n;
+    set attachOptionsDialog(dialog) {
+        this.gameOptionsDialog = dialog;
+        this._updateOptionsDialog();
     }
 
     /**
@@ -135,6 +233,7 @@ class GameManager {
      * @param {string} card.W - Card watermark
      * @param {string} card.T - Card text
      * @param {int} card.cid - Card ID
+     * @param {boolean} card.wi - Whether it is a blank card
      * @param listener - A click listener
      * @private
      */
@@ -187,7 +286,11 @@ class GameManager {
         this.chat.add({
             "_msg": data.m,
             "_sender": data.f + ": "
-        })
+        });
+
+        if (!this.drawer.open) {
+            this.unreadNotifications = this.unreadNotifications + 1;
+        }
     }
 
     _updatePlayerStatus(info) {
@@ -199,24 +302,14 @@ class GameManager {
         }
     }
 
-    sendGameChatMessage(msg, clear) {
-        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + gameManager.id).done(function () {
-            clear();
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                if (data.responseJSON.ec === "tf") {
-                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
-                    Notifier.debug(data, true);
-                    return;
-                }
-            }
-
-            Notifier.error("Failed to send the message!", data);
-        });
+    static _askCardText() {
+        return prompt("Enter the card text:", "");
     }
 
     handleMyInfoChanged(info) {
         Notifier.debug("My status is now: " + info.st);
+
+        this.gameOptionsDialog.acceptVisible = this.amHost;
 
         switch (info.st) {
             case "sj":
@@ -250,94 +343,78 @@ class GameManager {
         this._tableCards_masonry.masonry(this.masonryOptions)
     }
 
-    /**
-     * @param {object[]} data.h - Hand cards
-     * @param {object} data.pi - Player's info
-     * @param {string} data.m - Message (chat)
-     * @param {string} data.f - Sender (chat)
-     * @param {string} data.n - Player's nickname
-     * @param {object} data.pi.st - Player's status
-     * @param {int} data.pi.sc - Player's score
-     * @param {string} data.pi.N - Player's name
-     * @param {object} data.gi - Game info
-     * @param {string} data.gs - Game status
-     * @param {object} data.bc - Black card
-     * @param {object[]} data.wc - Table cards
-     * @param {int} data.WC - Winning card(s), comma separated list
-     * @param {string} data.rw - Round winner nickname
-     * @param {int} data.i - Round intermission
-     * @param {boolean} data.wl - Whether the game will stop
-     */
-    handlePollEvent(data) {
-        switch (data["E"]) {
-            case "C":
-                this._receivedGameChatMessage(data);
-                break;
-            case "gpj":
-                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
-                break;
-            case "gpl":
-                for (let i = 0; i < this.info.pi.length; i++) {
-                    if (this.info.pi[i].N === data.n) {
-                        this.info.pi.splice(i, 1);
+    changeGameOptions(go) {
+        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function () {
+            Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                switch (data.responseJSON.data) {
+                    case "ngh":
+                        Notifier.error("You have to be the game host.", data);
                         break;
-                    }
+                    case "as":
+                        Notifier.error("The game must be in lobby state.", data);
+                        break;
+                    default:
+                        Notifier.error("Failed changing the game options.", data);
+                        break;
                 }
+            } else {
+                Notifier.error("Failed changing the game options.", data);
+            }
+        });
+    }
 
-                this._reloadScoreboard();
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
-                break;
-            case "gpic":
-                const pi = data.pi;
-                this._updatePlayerStatus(pi);
-                this._reloadScoreboard();
+    sendGameChatMessage(msg, clear) {
+        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + this.id).done(function () {
+            clear();
+        }).fail(function (data) {
+            if ("responseJSON" in data) {
+                if (data.responseJSON.ec === "tf") {
+                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
+                    Notifier.debug(data, true);
+                    return;
+                }
+            }
 
-                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
-                break;
-            case "hd":
-                this.addHandCards(data.h, data.h.length === 10);
-                break;
-            case "gsc":
-                this.info.gi.gs = data.gs;
-                this._handleGameStatusChange(data);
-                break;
-            case "gjl":
-                Notifier.timeout(Notifier.ALERT, "The judge left.");
-                if (!data.wl)
-                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
-                break;
-            case "gjs":
-                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.");
-                break;
-            case "goc":
-                this.info.gi.go = data.gi;
-                break;
-            case "gpki":
-                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
-                break;
-            case "gps":
-                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for being idle.");
-                break;
-            case "kfgi":
-                GameManager._postLeave();
-                break;
-            case "hu":
-                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
-                break;
+            Notifier.error("Failed to send the message!", data);
+        });
+    }
+
+    static _getHandInfoText(ltp, ltd) {
+        if (ltd === 0 && ltp === 0) return "";
+
+        if (ltd === 0 && ltp !== 0) {
+            return "pick or draw " + ltp + " more card" + (ltp === 1 ? "" : "s");
+        } else if (ltp === 0 && ltd !== 0) {
+            return "draw " + ltd + " more card" + (ltd === 1 ? "" : "s");
+        } else {
+            return "draw at least " + ltd + " more card" + (ltd === 1 ? "" : "s") + " for a total of " + (ltd + ltp) + " cards";
         }
     }
 
     _handleHandCardSelect(card) {
+        let text = "";
+        if (card.wi) {
+            text = GameManager._askCardText();
+            if (text.length === 0) {
+                Notifier.timeout(Notifier.WARN, "The card text must not be empty!");
+                return;
+            }
+        }
+
         const self = this;
-        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&wit=" + text).done(function (data) {
             /**
-             * @param {int} data.ltp - Number of cards left to play
+             * @param {int} data.ltp - Number of cards left to pick
+             * @param {int} data.ltd - Number of cards left to draw
              */
 
+            self.updateHandInfo(data.ltp, data.ltd);
             self.removeHandCard(card);
-            if (data.ltp === 0) toggleHand(undefined, false);
+            if (data.ltp === 0 && data.ltd === 0) {
+                self.closeHand();
+            }
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.ec) {
@@ -346,6 +423,9 @@ class GameManager {
                         break;
                     case "nyt":
                         Notifier.error("This is not your turn.", data);
+                        break;
+                    case "sdc":
+                        Notifier.error("You have to draw all the remaining cards.", data);
                         break;
                     default:
                         Notifier.error("Failed to play the card!", data);
@@ -393,6 +473,7 @@ class GameManager {
                 break;
             case "p":
                 this.blackCard = data.bc;
+                this.updateHandInfo(this.bc.PK - this.bc.D, this.bc.D);
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
                 this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
@@ -431,9 +512,17 @@ class GameManager {
         else this._startGame.hide();
     }
 
+    _reloadDrawerPadding() {
+        if (this._hand_toolbar.is(':visible'))
+            this.drawer.root_.style.marginBottom = this._hand_toolbar.height() + "px";
+        else
+            this.drawer.root_.style.marginBottom = "0";
+    }
+
     toggleHandVisibility(visible) {
         if (visible) this._hand_toolbar.show();
         else this._hand_toolbar.hide();
+        this._reloadDrawerPadding();
     }
 
     _getPlayer(nick) {
@@ -455,7 +544,7 @@ class GameManager {
     }
 
     _handleTableCardSelect(card) {
-        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + gameManager.id).done(function () {
+        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + this.id).done(function () {
             // Do nothing
         }).fail(function (data) {
             if ("responseJSON" in data) {
@@ -477,13 +566,14 @@ class GameManager {
     }
 
     leave() {
-        $.post("/AjaxServlet", "o=lg&gid=" + gameManager.id).always(function () {
+        closeWebSocket();
+        $.post("/AjaxServlet", "o=lg&gid=" + this.id).always(function () {
             GameManager._postLeave();
         });
     }
 
     start() {
-        $.post("/AjaxServlet", "o=sg&gid=" + gameManager.id).done(function (data) {
+        $.post("/AjaxServlet", "o=sg&gid=" + this.id).done(function (data) {
             Notifier.debug(data);
         }).fail(function (data) {
             /**
@@ -515,35 +605,148 @@ class GameManager {
             }
         })
     }
+
+    updateHandInfo(ltp, ltd) {
+        this._hand_info.text(GameManager._getHandInfoText(ltp, ltd));
+
+        if (ltp === 0 && ltd !== 0) {
+            this.hand.filter(function (item) {
+                return item.values()._watermark === "____";
+            });
+        } else {
+            this.hand.filter();
+        }
+
+        this._reloadDrawerPadding();
+    }
+
+    /**
+     * @param {object[]} data.h - Hand cards
+     * @param {boolean} data.ch - Clear hand cards before adding newer
+     * @param {object} data.pi - Player's info
+     * @param {string} data.m - Message (chat)
+     * @param {string} data.f - Sender (chat)
+     * @param {string} data.n - Player's nickname
+     * @param {object} data.pi.st - Player's status
+     * @param {int} data.pi.sc - Player's score
+     * @param {string} data.pi.N - Player's name
+     * @param {object} data.gi - Game info
+     * @param {string} data.gs - Game status
+     * @param {object} data.bc - Black card
+     * @param {object[]} data.wc - Table cards
+     * @param {int} data.WC - Winning card(s), comma separated list
+     * @param {string} data.rw - Round winner nickname
+     * @param {int} data.i - Round intermission
+     * @param {object} data.go - Game options
+     * @param {boolean} data.wl - Whether the game will stop
+     * @param {object} data.cdi - Cardcast deck info
+     * @param {string} data.cdi.csn - Card set name
+     */
+    handlePollEvent(data) {
+        switch (data["E"]) {
+            case "cAc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been added to the game!");
+                break;
+            case "cRc":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
+                break;
+            case "C":
+                this._receivedGameChatMessage(data);
+                break;
+            case "gpj":
+                this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
+                break;
+            case "gpl":
+                for (let i = 0; i < this.info.pi.length; i++) {
+                    if (this.info.pi[i].N === data.n) {
+                        this.info.pi.splice(i, 1);
+                        break;
+                    }
+                }
+
+                this._reloadScoreboard();
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
+                break;
+            case "gpic":
+                const pi = data.pi;
+                this._updatePlayerStatus(pi);
+                this._reloadScoreboard();
+
+                if (pi.N === this.user.n) this.handleMyInfoChanged(pi);
+                break;
+            case "hd":
+                this.addHandCards(data.h, data.ch);
+                break;
+            case "gsc":
+                this.info.gi.gs = data.gs;
+                this._handleGameStatusChange(data);
+                break;
+            case "gjl":
+                Notifier.timeout(Notifier.ALERT, "The judge left.");
+                if (!data.wl)
+                    Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
+                break;
+            case "gjs":
+                Notifier.timeout(Notifier.ALERT, "The judge has been skipped for beign idle. A new round just started.");
+                break;
+            case "goc":
+                this.info.gi.go = data.go;
+                this._updateOptionsDialog();
+                break;
+            case "gpki":
+                Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
+                break;
+            case "gps":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> has been skipped for being idle.");
+                break;
+            case "kfgi":
+                GameManager._postLeave();
+                break;
+            case "hu":
+                Notifier.countdown(Notifier.WARN, "Hurry up! You have ", 10, " seconds to play!");
+                break;
+            case "glk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> liked this game.");
+                break;
+            case "gdlk":
+                Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
+                break;
+        }
+    }
+
+    _updateOptionsDialog() {
+        this.gameOptionsDialog.updateOptions(this.info.gi.go);
+        this.gameOptionsDialog.acceptVisible = this.amHost;
+    }
 }
 
-const gameManager = new GameManager(getLastPathSegment());
-
-window.onload = function () {
-    if (gameManager.id === null) {
-        window.location = "/games/";
-    } else {
-        loadUI();
-    }
-};
-
-function loadUI() {
+/**
+ * @param {GameManager} gameManager
+ * @param {GameOptionsDialog} gameOptionsDialog
+ */
+function loadUI(gameManager, gameOptionsDialog) {
     $.post("/AjaxServlet", "o=gme").done(function (data) {
         gameManager.me = data;
 
         $.post("/AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
             gameManager.gameInfo = data;
+            Notifier.debug(data);
 
             $.post("/AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
                 gameManager.blackCard = data.bc;
+                gameManager.updateHandInfo(data.ltp, data.ltd);
+
                 gameManager.addHandCards(data.h, true);
                 gameManager.addTableCards(data.wc, true);
+
+                gameManager.attachOptionsDialog = gameOptionsDialog;
+
                 Notifier.debug(data);
             }).fail(function (data) {
                 Notifier.error("Failed loading the game!", data);
             });
-
-            Notifier.debug(data);
         }).fail(function (data) {
             Notifier.error("Failed loading the game!", data);
         });
@@ -556,53 +759,3 @@ function loadUI() {
         gameManager.handlePollEvent(data);
     });
 }
-
-function sendChatMessage(field, ev = undefined) {
-    if (ev !== undefined && ev.keyCode !== 13) return;
-
-    let input;
-    if (field.tagName === "INPUT") input = field;
-    else input = field.querySelector('input');
-
-    const msg = input.value;
-    if (msg.length === 0) return;
-
-    gameManager.sendGameChatMessage(msg, () => {
-        $(input.nextElementSibling).removeClass("mdc-text-field__label--float-above");
-        input.value = "";
-        $(input).blur();
-    });
-}
-
-function leaveGame() {
-    closeWebSocket();
-    gameManager.leave();
-}
-
-function startGame() {
-    gameManager.start();
-}
-
-const drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('drawer'));
-document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
-    drawer.open = !drawer.open;
-});
-
-const hand = new BottomSheet(document.getElementById('hand'));
-
-function toggleHand(button, open = undefined) {
-    if (button === undefined) button = document.getElementById('toggleHand');
-    const list = document.querySelector("#hand .list");
-    list.scrollLeft = 0;
-
-    if (open === undefined) open = !hand.open;
-
-    if (open) {
-        button.innerHTML = "keyboard_arrow_down";
-        hand.open = true;
-    } else {
-        button.innerHTML = "keyboard_arrow_up";
-        hand.open = false;
-    }
-}
-

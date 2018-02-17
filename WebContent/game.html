@@ -19,7 +19,7 @@
 <aside class="mdc-drawer mdc-drawer--persistent mdc-toolbar-fixed-adjust" id="drawer">
     <nav class="mdc-drawer__drawer">
         <div id="scoreboard">
-            <h3 class="mdc-typography mdc-typography--title">Scoreboard</h3>
+            <h3 class="mdc-typography mdc-typography--title mdc-typography--adjust-margin">Scoreboard</h3>
             <ul class="mdc-list mdc-list--two-line list"></ul>
         </div>
         <div id="chat">
@@ -27,11 +27,9 @@
             <div class="list"></div>
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
                  data-mdc-auto-init="MDCTextField">
-                <input type="text" id="chat-message" class="mdc-text-field__input"
-                       onkeydown="sendChatMessage(this, event);">
-                <label for="chat-message" class="mdc-text-field__label">Message</label>
-                <i class="material-icons mdc-text-field__icon" tabindex="0"
-                   onclick="sendChatMessage(this.parentElement);">send</i>
+                <input type="text" id="chatMessage" class="mdc-text-field__input">
+                <label for="chatMessage" class="mdc-text-field__label">Message</label>
+                <i class="material-icons mdc-text-field__icon" tabindex="0">send</i>
                 <div class="mdc-text-field__outline">
                     <svg>
                         <path class="mdc-text-field__outline-path"></path>
@@ -52,11 +50,11 @@
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon" style="display: none;" id="startGame"
-                        onclick="startGame()">
+                <button class="material-icons align-icons mdc-toolbar__icon" style="display: none;" id="startGame">
                     done
                 </button>
-                <button class="material-icons align-icons mdc-toolbar__icon" onclick="leaveGame();">close</button>
+                <button class="material-icons align-icons mdc-toolbar__icon" id="gameOptions">settings</button>
+                <button class="material-icons align-icons mdc-toolbar__icon" id="leaveGame">close</button>
             </section>
         </div>
     </header>
@@ -125,10 +123,24 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
+<script src="/js/cardcast.helper.js"></script>
 <script src="/js/notifs.helper.js"></script>
 <script src="/js/events.helper.js"></script>
+<script src="/game_options/dialog.js"></script>
 <script src="/js/game.js"></script>
-<script>window.mdc.autoInit();</script>
+<script>
+    window.mdc.autoInit();
+    const gameManager = new GameManager(getLastPathSegment());
+    if (gameManager.id === null) {
+        window.location = "/games/";
+    } else {
+        setupGameOptionsDialog($('#gameOptions'), "Game options", false, "Apply", (go) => {
+            gameManager.changeGameOptions(go);
+        }, (gameOptionsDialog) => {
+            loadUI(gameManager, gameOptionsDialog);
+        });
+    }
+</script>
 
 </body>
 </html>

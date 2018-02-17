@@ -1,0 +1,210 @@
+<aside class="mdc-dialog" id="gameOptionsDialog">
+    <div class="mdc-dialog__surface" style="transform: none">
+        <header class="mdc-dialog__header">
+            <h2 class="mdc-dialog__header__title">{{Dialog title}}</h2>
+        </header>
+        <section class="mdc-dialog__body mdc-dialog__body--scrollable">
+            <div class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title">Gameplay</h1>
+                </div>
+                <section class="mdc-card__supporting-text" style="padding: 0">
+                    <div class="mdc-layout-grid">
+                        <div class="mdc-layout-grid__inner">
+                            <div id="scoreLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Goal</div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+
+                            <div id="playersLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Players Limit
+                                    </div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+
+                            <div id="spectatorsLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Spectators Limit
+                                    </div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+
+                            <div id="blanksLimit" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Blank cards</div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+
+                            <div id="timeMultiplier" class="mdc-select mdc-select--box mdc-layout-grid__cell"
+                                 role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Time Multiplier
+                                    </div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+
+                            <div id="winBy" class="mdc-select mdc-select--box mdc-layout-grid__cell" role="listbox">
+                                <div class="mdc-select__surface">
+                                    <div class="mdc-select__label mdc-select__label--float-above">Win By</div>
+                                    <div class="mdc-select__selected-text"></div>
+                                    <div class="mdc-select__bottom-line"></div>
+                                </div>
+                                <div class="mdc-menu mdc-select__menu">
+                                    <ul class="mdc-list mdc-menu__items"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title">Access</h1>
+                </div>
+                <section class="mdc-card__supporting-text">
+                    <div class="mdc-text-field mdc-text-field--box" style="width: 100%;">
+                        <input type="password" id="gamePassword" autocomplete="off" class="mdc-text-field__input">
+                        <label for="gamePassword" class="mdc-text-field__label">Password</label>
+                        <div class="mdc-line-ripple"></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title" id="cardsTitle">Cards (0 decks)</h1>
+                </div>
+                <section class="mdc-card__supporting-text">
+                    <h2 class="mdc-typography--subheading1" id="pyxDecksTitle">PYX (0 decks)</h2>
+                    <div class="mdc-select mdc-select--box" id="pyxDecks" role="listbox"
+                         style="width: 100%; margin-bottom: 16px">
+                        <div class="mdc-select__surface">
+                            <div class="mdc-select__label">PYX decks</div>
+                            <div class="mdc-select__selected-text"></div>
+                            <div class="mdc-select__bottom-line"></div>
+                        </div>
+                        <div class="mdc-menu mdc-select__menu">
+                            <ul class="mdc-list mdc-list--non-interactive list mdc-menu__items"></ul>
+                        </div>
+                    </div>
+                    <h2 class="mdc-typography--subheading1" id="cardcastDecksTitle" style="margin-bottom: 0">Cardcast (0
+                        decks)</h2>
+                    <div class="mdc-layout-grid">
+                        <div class="mdc-layout-grid__inner">
+                            <div id="cardcastDecks" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                <h4 class="mdc-typography--body2 mdc-typography--adjust-margin">Decks</h4>
+                                <ul class="mdc-list mdc-list--two-line mdc-list--dense mdc-list--non-interactive list"
+                                    style="max-height: 256px; overflow-y: auto;"></ul>
+                                <h3 class="message mdc-typography--headline">No Cardcast decks.</h3>
+                            </div>
+                            <div id="cardcastAdd" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                <h4 class="mdc-typography--body2 mdc-typography--adjust-margin">Add deck</h4>
+                                <div class="mdc-text-field mdc-text-field--box mdc-text-field--with-trailing-icon"
+                                     style="width: 100%;">
+                                    <input maxlength="5" minlength="5" type="text" id="cardcastAddDeckCode"
+                                           class="mdc-text-field__input"
+                                           style="text-transform: uppercase">
+                                    <label for="cardcastAddDeckCode" class="mdc-text-field__label">Deck code</label>
+                                    <i class="material-icons mdc-text-field__icon" tabindex="0">add</i>
+                                    <div class="mdc-line-ripple"></div>
+                                </div>
+                                <div id="cardcastAddDeckInfo">
+                                    <div role="progressbar"
+                                         class="mdc-linear-progress mdc-linear-progress--indeterminate"
+                                         style="display: none">
+                                        <div class="mdc-linear-progress__buffering-dots"></div>
+                                        <div class="mdc-linear-progress__buffer"></div>
+                                        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                                            <span class="mdc-linear-progress__bar-inner"></span>
+                                        </div>
+                                        <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                                            <span class="mdc-linear-progress__bar-inner"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="details mdc-theme--text-primary-on-light"
+                                         style="display: none; margin-top: 16px">
+                                        <h1 class="mdc-typography--headline mdc-typography--adjust-margin _name">{{Deck
+                                            name}}</h1>
+
+                                        <h2 class="mdc-typography--caption mdc-typography--adjust-margin _author">{{Deck
+                                            author}}</h2>
+
+                                        <button class="mdc-button mdc-button--raised" style="float: right;">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+        <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--accept">
+                Start
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">
+                Cancel
+            </button>
+        </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>
+
+<div style="display: none">
+    <li id="pyxDeckTemplate" class="mdc-list-item" role="option" tabindex="0">
+        <div class="mdc-checkbox">
+            <input type="checkbox" id="pyx_deck_" class="mdc-checkbox__native-control"/>
+            <div class="mdc-checkbox__background">
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                    <path class="mdc-checkbox__checkmark-path" fill="none" stroke="white"
+                          d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                </svg>
+                <div class="mdc-checkbox__mixedmark"></div>
+            </div>
+        </div>
+        <label for="pyx_deck_" class="_name">{{Name of Card Set}}</label>
+    </li>
+
+    <li id="cardcastDeckTemplate" class="mdc-list-item">
+        <span class="mdc-list-item__text">
+            <span class="_name">{{Deck name}}</span>
+            <span class="mdc-list-item__secondary-text _code">{{Deck code}}</span>
+        </span>
+        <i class="mdc-list-item__meta material-icons _remove" style="cursor: pointer">delete</i>
+    </li>
+</div>

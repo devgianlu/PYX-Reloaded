@@ -5,11 +5,45 @@ class Games {
         this._games_message = this._games.find('.message');
 
         this._searchField = $('#gamesSearch');
+        this._searchField.on('keydown', () => this.submitSearch());
+        this._searchField.parent().find('.mdc-text-field__icon').on('click', () => this.submitSearch());
+
+        this._refresh = $('._refresh');
+        this._refresh.on('click', () => {
+            this.loadGamesList();
+            this.closeDrawer();
+        });
+
+        this._theming = $('._themingDialog');
+        this._theming.on('click', () => {
+            showThemingDialog();
+            this.closeDrawer();
+        });
+
+        this._logout = $('._logout');
+        this._logout.on('click', () => {
+            Games.logout();
+            this.closeDrawer();
+        });
 
         this.games = new List(this._games[0], {
             item: 'gameInfoTemplate',
             valueNames: ['_host', '_players', '_spectators', '_goal', '_status', '_decks', '_likes', '_dislikes',
                 {'data': ['gid']}]
+        });
+
+        this.drawer = new mdc.drawer.MDCTemporaryDrawer($('#drawer')[0]);
+        $('.mdc-toolbar__menu-icon').on('click', () => this.drawer.open = true);
+    }
+
+    closeDrawer() {
+        this.drawer.open = false;
+    }
+
+    static logout() {
+        closeWebSocket();
+        $.post("/AjaxServlet", "o=lo").always(function () {
+            window.location = "/";
         });
     }
 
@@ -47,10 +81,97 @@ class Games {
         dislikes.text(data.DLK + (data.DLK === 1 ? " dislike" : " dislikes"));
     }
 
+    static _handleJoinSpectateError(data, generalError) {
+        if ("responseJSON" in data) {
+            switch (data.responseJSON.ec) {
+                case "wp":
+                    Notifier.error("Wrong game password.", data);
+                    break;
+                default:
+                    Notifier.error(generalError, data);
+                    break;
+            }
+        } else {
+            Notifier.error(generalError, data);
+        }
+    }
+
+    toggleLike(gid, elm, toggleLike, toggleDislike) {
+        $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
+            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
+        }).fail(function (data) {
+            Notifier.error("Failed liking the game!", data);
+        });
+    }
+
+    toggleDislike(gid, elm, toggleLike, toggleDislike) {
+        $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
+            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
+        }).fail(function (data) {
+            Notifier.error("Failed disliking the game!", data);
+        });
+    }
+
+    filterGames(query) {
+        if (query === null || query.length === 0) {
+            this.games.filter(); // Remove all filters
+        } else {
+            this.games.filter(function (item) {
+                return item.values()._host.indexOf(query) !== -1;
+            })
+        }
+
+        this.toggleNoGamesMessage(this.games.visibleItems.length === 0);
+    }
+
+    toggleNoGamesMessage(visible) {
+        if (visible) {
+            this._games_list.hide();
+            this._games_message.show();
+        } else {
+            this._games_list.show();
+            this._games_message.hide();
+        }
+    }
+
+    createGame(go) {
+        const self = this;
+        $.post("/AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
+            Games.postJoinSpectate(data.gid);
+            self.loadGamesList();
+        }).fail(function (data) {
+            Notifier.error("Failed creating the game!", data);
+        });
+    }
+
+    static wrapCardcastDecks(CCs) {
+        const names = [];
+        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
+        return names;
+    }
+
+    loadGamesList() {
+        const self = this;
+        $.post("/AjaxServlet", "o=ggl").done(function (data) {
+            /**
+             * @param {object[]} data.gl - Games list
+             */
+
+            self.setup(data.gl);
+        }).fail(function (data) {
+            Notifier.error("Failed loading the games!", data);
+        });
+
+        registerPollListener("LOBBIES", function (data) {
+            if (data["E"] === "glr") self.loadGamesList();
+        });
+    }
+
     /**
      *
      * @param {object[]} list - Games list
      * @param {object} list[].go - Game options
+     * @param {boolean} list[].hp - Has password
      * @param {int[]} list[].go.css - Card set IDs
      * @param {int} list[].go.wb - Win by X
      * @param {int} list[].go.sl - Score limit (goal)
@@ -77,6 +198,8 @@ class Games {
             else status = "casino";
 
             let decksNames = Games.deckIdsToNames(game.go.css);
+            decksNames = decksNames.concat(Games.wrapCardcastDecks(game.go.CCs));
+
             let decks;
             if (decksNames.length === 0) decks = "none";
             else decks = decksNames.join(", ");
@@ -132,72 +255,23 @@ class Games {
         this.toggleNoGamesMessage(this.games.size() === 0);
     }
 
-    toggleLike(gid, elm, toggleLike, toggleDislike) {
-        $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
-            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
-        }).fail(function (data) {
-            Notifier.error("Failed liking the game!", data);
-        });
-    }
-
-    toggleDislike(gid, elm, toggleLike, toggleDislike) {
-        $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
-            Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
-        }).fail(function (data) {
-            Notifier.error("Failed disliking the game!", data);
-        });
-    }
-
-    filterGames(query) {
-        if (query === null || query.length === 0) {
-            this.games.filter(); // Remove all filters
-        } else {
-            this.games.filter(function (item) {
-                return item.values()._host.indexOf(query) !== -1;
-            })
-        }
-
-        this.toggleNoGamesMessage(this.games.visibleItems.length === 0);
-    }
-
-    toggleNoGamesMessage(visible) {
-        if (visible) {
-            this._games_list.hide();
-            this._games_message.show();
-        } else {
-            this._games_list.show();
-            this._games_message.hide();
-        }
-    }
-
-    createGame(go) {
-        $.post("/AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
-            Games.postJoinSpectate(data.gid);
-            loadGamesList();
-        }).fail(function (data) {
-            Notifier.error("Failed creating the game!", data);
-        });
-    }
-
     joinGame(gid, hp) {
         let password = "";
-        if (hp === "true") password = Games.askPassword();
-
+        if (hp) password = Games.askPassword();
         $.post("/AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)
         }).fail(function (data) {
-            Notifier.error("Failed joining the game!", data);
+            Games._handleJoinSpectateError(data, "Failed joining the game.");
         })
     }
 
     spectateGame(gid, hp) {
         let password = "";
-        if (hp === "true") password = Games.askPassword();
-
+        if (hp) password = Games.askPassword();
         $.post("/AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function () {
             Games.postJoinSpectate(gid)
         }).fail(function (data) {
-            Notifier.error("Failed spectating the game!", data);
+            Games._handleJoinSpectateError(data, "Failed spectating the game.");
         })
     }
 
@@ -207,46 +281,6 @@ class Games {
 }
 
 const games = new Games();
-
-const drawer = new mdc.drawer.MDCTemporaryDrawer(document.getElementById('drawer'));
-document.querySelector('.mdc-toolbar__menu-icon').addEventListener('click', function () {
-    drawer.open = true
-});
-
-window.onload = function () {
-    loadGamesList();
-
-    let gid = getURLParameter('gid');
-    if (gid !== null) {
-        Games.postJoinSpectate(gid) // No need to join or spectate, just move the UI there
-    }
-};
-
-function logout() {
-    closeWebSocket();
-    $.post("/AjaxServlet", "o=lo").always(function () {
-        window.location = "/";
-    });
-}
-
-function loadGamesList() {
-    $.post("/AjaxServlet", "o=ggl").done(function (data) {
-        /**
-         * @param {object[]} data.gl - Games list
-         */
-
-        games.setup(data.gl);
-    }).fail(function (data) {
-        Notifier.error("Failed loading the games!", data);
-    });
-
-    registerPollListener("LOBBIES", function (data) {
-        if (data["E"] === "glr") {
-            loadGamesList();
-        }
-    });
-}
-
-function submitSearch() {
-    games.submitSearch();
-}
+const gid = getURLParameter('gid');
+if (gid !== null) Games.postJoinSpectate(gid); // No need to join or spectate, just move the UI there
+else games.loadGamesList();

@@ -12,6 +12,8 @@ import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
 import com.gianlu.pyxreloaded.servlets.Parameters;
 import io.undertow.server.HttpServerExchange;
 
+import java.util.Objects;
+
 public class ChangeGameOptionHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CHANGE_GAME_OPTIONS.toString();
     private final Preferences preferences;
@@ -35,7 +37,7 @@ public class ChangeGameOptionHandler extends GameWithPlayerHandler {
 
             // only broadcast an update if the password state has changed, because it needs to change
             // the text on the join button and the sort order
-            if (!game.getPassword().equals(oldPassword)) gameManager.broadcastGameListRefresh();
+            if (!Objects.equals(game.getPassword(), oldPassword)) gameManager.broadcastGameListRefresh();
         } catch (Exception ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }

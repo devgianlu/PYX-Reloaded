@@ -11,16 +11,40 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
         this.listener = set;
     }
 
-    get getSelectedItemNames() {
+    /**
+     * @returns {array}
+     */
+    get selectedItems() {
         const names = [];
 
         for (let i = 0; i < this.options.length; i++) {
-            let item = this.options[i];
+            const item = this.options[i];
             if (item.querySelector('input').checked)
                 names.push(item.querySelector('label').innerText);
         }
 
         return names;
+    }
+
+    /**
+     * @param {array} items
+     */
+    set selectedItems(items) {
+        for (let i = 0; i < this.options.length; i++) {
+            const item = this.options[i];
+            item.querySelector('input').checked = MDCMultiSelect._contains(items, item);
+        }
+
+        this.updateUI();
+    }
+
+    static _contains(items, item) {
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].toString() === item.getAttribute('data-csi'))
+                return true;
+        }
+
+        return false;
     }
 
     // noinspection JSUnusedGlobalSymbols
@@ -40,11 +64,14 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     }
 
     updateUI() {
-        const selected = this.getSelectedItemNames;
-        this.selectedText_.textContent = selected.join(", ");
+        const selected = this.selectedItems;
 
-        if (selected.length === 0) this.label_.classList.remove("mdc-select__label--float-above");
-        else this.label_.classList.add("mdc-select__label--float-above");
+        if (selected.length === 0) {
+            this.label_.classList.remove("mdc-select__label--float-above");
+        } else {
+            this.selectedText_.textContent = selected.join(", ");
+            this.label_.classList.add("mdc-select__label--float-above");
+        }
 
         this.listener();
     }
@@ -55,18 +82,23 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
     }
 }
 
-class CreateGameDialog {
-    constructor(id) {
+class GameOptionsDialog {
+    constructor(id, title, acceptText, accept) {
         this._dialog = $('#' + id);
         this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
         this.dialog.listen('MDCDialog:accept', () => this._acceptDialog());
 
-        this._scoreLimit = this._dialog.find('#scoreLimit');
-        this._playersLimit = this._dialog.find('#playersLimit');
-        this._spectatorsLimit = this._dialog.find('#spectatorsLimit');
-        this._blanksLimit = this._dialog.find('#blanksLimit');
-        this._timeMultiplier = this._dialog.find('#timeMultiplier');
-        this._winBy = this._dialog.find('#winBy');
+        this._dialog.find('.mdc-dialog__header__title').text(title);
+
+        this._accept = this._dialog.find('.mdc-dialog__footer__button--accept');
+        this._accept.text(acceptText);
+
+        this.scoreLimit = new mdc.select.MDCSelect(this._dialog.find('#scoreLimit')[0]);
+        this.playersLimit = new mdc.select.MDCSelect(this._dialog.find('#playersLimit')[0]);
+        this.spectatorsLimit = new mdc.select.MDCSelect(this._dialog.find('#spectatorsLimit')[0]);
+        this.blanksLimit = new mdc.select.MDCSelect(this._dialog.find('#blanksLimit')[0]);
+        this.timeMultiplier = new mdc.select.MDCSelect(this._dialog.find('#timeMultiplier')[0]);
+        this.winBy = new mdc.select.MDCSelect(this._dialog.find('#winBy')[0]);
 
         this._pyxDecks = this._dialog.find('#pyxDecks');
         this.pyxDecks_select = new MDCMultiSelect(this._pyxDecks[0]);
@@ -86,16 +118,22 @@ class CreateGameDialog {
 
         this._cardcastAdd = this._dialog.find('#cardcastAdd');
         this._cardcastAddDeckCode = this._cardcastAdd.find('#cardcastAddDeckCode');
+        this._cardcastAddDeckCode.parent().find('.mdc-text-field__icon').on('click', () => this.loadCardcastDeckInfo(this._cardcastAddDeckCode.val()));
         this.cardcastAddDeckCode = new mdc.textField.MDCTextField(this._cardcastAddDeckCode.parent()[0]);
         this._cardcastAddDeckInfo = this._dialog.find('#cardcastAddDeckInfo');
         this._cardcastAddDeckInfo_loading = this._cardcastAddDeckInfo.find('.mdc-linear-progress');
         this._cardcastAddDeckInfo_details = this._cardcastAddDeckInfo.find('.details');
+        this._cardcastAddDeckButton = this._cardcastAddDeckInfo.find('.details .mdc-button');
+        this._cardcastAddDeckButton.on('click', () => this.addCardcastDeck(this._cardcastAddDeckInfo_details.data('code')));
 
         this._cardsTitle = this._dialog.find('#cardsTitle');
         this._cardcastTitle = this._dialog.find('#cardcastDecksTitle');
         this._pyxTitle = this._dialog.find('#pyxDecksTitle');
 
         this._password = this._dialog.find('#gamePassword');
+        mdc.textField.MDCTextField.attachTo(this._password.parent()[0]);
+
+        this.acceptListener = accept;
 
         /**
          * @param {int} dgo.vL - Spectators limit
@@ -131,19 +169,22 @@ class CreateGameDialog {
      * @private
      */
     static _populateTimeMultiplier(dropdown, tm) {
-        const list = dropdown.find('.mdc-menu__items');
+        const list = $(dropdown.root_).find('.mdc-menu__items');
         list.empty();
 
+        let selected = 0;
         for (let i = 0; i < tm.v.length; i++) {
             let item = document.createElement("li");
             let val = tm.v[i];
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (val === tm.def) item.setAttribute("aria-selected", "true");
+            if (val === tm.def) selected = i;
             item.innerHTML = val;
             list.append(item);
         }
+
+        dropdown.selectedIndex = selected;
     }
 
     /**
@@ -156,30 +197,38 @@ class CreateGameDialog {
      * @private
      */
     static _populateDropdown(dropdown, dgo) {
-        const list = dropdown.find('.mdc-menu__items');
+        const list = $(dropdown.root_).find('.mdc-menu__items');
         list.empty();
 
+        let selected = 0;
         for (let i = dgo.min; i <= dgo.max; i++) {
             let item = document.createElement("li");
             item.className = "mdc-list-item";
             item.setAttribute("tabindex", "0");
             item.setAttribute("role", "option");
-            if (i === dgo.def) item.setAttribute("aria-selected", "true");
+            if (i === dgo.def) selected = i - dgo.min; // Gives us the index
             item.innerHTML = i.toString();
             list.append(item);
         }
+
+        dropdown.selectedIndex = selected;
+    }
+
+    static setDropdownSelectedValue(dropdown, value) {
+        const list = $(dropdown.root_).find('.mdc-menu__items');
+
+        let selected = 0;
+        for (let i = 0; i < list.children().length; i++) {
+            const item = $(list.children()[i]);
+            if (item.text() === value.toString()) selected = i;
+        }
+
+        dropdown.selectedIndex = selected;
     }
 
     static getDropdownSelectedValue(dropdown) {
-        const list = dropdown.find('.mdc-menu__items');
-        for (let i = 0; i < list.children().length; i++) {
-            const item = $(list.children()[i]);
-            if (item.attr("aria-selected"))
-                return item.text();
-        }
-
-        console.log("DEFAULTING");
-        return list.children()[0].innerHTML; // Shouldn't happen
+        const list = $(dropdown.root_).find('.mdc-menu__items');
+        return list.children()[dropdown.selectedIndex].innerText;
     }
 
     static createDetailsString(decks, whites, blacks) {
@@ -194,34 +243,69 @@ class CreateGameDialog {
 
     _acceptDialog() {
         const go = {
-            "vL": CreateGameDialog.getDropdownSelectedValue(this._spectatorsLimit),
-            "pL": CreateGameDialog.getDropdownSelectedValue(this._playersLimit),
-            "sl": CreateGameDialog.getDropdownSelectedValue(this._scoreLimit),
-            "bl": CreateGameDialog.getDropdownSelectedValue(this._blanksLimit),
-            "tm": CreateGameDialog.getDropdownSelectedValue(this._timeMultiplier),
-            "wb": CreateGameDialog.getDropdownSelectedValue(this._winBy),
+            "vL": GameOptionsDialog.getDropdownSelectedValue(this.spectatorsLimit),
+            "pL": GameOptionsDialog.getDropdownSelectedValue(this.playersLimit),
+            "sl": GameOptionsDialog.getDropdownSelectedValue(this.scoreLimit),
+            "bl": GameOptionsDialog.getDropdownSelectedValue(this.blanksLimit),
+            "tm": GameOptionsDialog.getDropdownSelectedValue(this.timeMultiplier),
+            "wb": GameOptionsDialog.getDropdownSelectedValue(this.winBy),
             "pw": this.getPassword(),
             "CCs": this.getCardcastDeckCodes(),
             "css": this.getSelectedPyxDecks()
         };
 
         Notifier.debug(go);
-        games.createGame(go); // Reference to index.js
+        this.acceptListener(go);
     }
 
-    show() {
-        this.reset();
+    set acceptVisible(set) {
+        if (set) this._accept.show();
+        else this._accept.hide();
+    }
+
+    show(reset = false) {
+        if (reset) this.reset();
         this.dialog.show();
+    }
+
+    updateOptions(go) {
+        if (go === undefined) return;
+
+        // Gameplay
+        GameOptionsDialog.setDropdownSelectedValue(this.scoreLimit, go.sl);
+        GameOptionsDialog.setDropdownSelectedValue(this.playersLimit, go.pL);
+        GameOptionsDialog.setDropdownSelectedValue(this.spectatorsLimit, go.vL);
+        GameOptionsDialog.setDropdownSelectedValue(this.blanksLimit, go.bl);
+        GameOptionsDialog.setDropdownSelectedValue(this.timeMultiplier, go.tm);
+        GameOptionsDialog.setDropdownSelectedValue(this.winBy, go.wb);
+
+        // Access
+        if (go.pw.length > 0) {
+            this._password.next().addClass("mdc-text-field__label--float-above");
+            this._password.val(go.pw);
+        } else {
+            this._password.next().removeClass("mdc-text-field__label--float-above");
+            this._password.val("");
+        }
+
+        // PYX
+        this.pyxDecks_select.selectedItems = go.css;
+
+        // Cardcast
+        for (let i = 0; i < go.CCs.length; i++) {
+            const code = go.CCs[i];
+            this.loadCardcastDeckInfo(code, () => this.addCardcastDeck(code));
+        }
     }
 
     reset() {
         // Gameplay
-        CreateGameDialog._populateDropdown(this._scoreLimit, this.dgo.sl);
-        CreateGameDialog._populateDropdown(this._playersLimit, this.dgo.pL);
-        CreateGameDialog._populateDropdown(this._spectatorsLimit, this.dgo.vL);
-        CreateGameDialog._populateDropdown(this._blanksLimit, this.dgo.bl);
-        CreateGameDialog._populateTimeMultiplier(this._timeMultiplier, this.dgo.tm);
-        CreateGameDialog._populateDropdown(this._winBy, this.dgo.wb);
+        GameOptionsDialog._populateDropdown(this.scoreLimit, this.dgo.sl);
+        GameOptionsDialog._populateDropdown(this.playersLimit, this.dgo.pL);
+        GameOptionsDialog._populateDropdown(this.spectatorsLimit, this.dgo.vL);
+        GameOptionsDialog._populateDropdown(this.blanksLimit, this.dgo.bl);
+        GameOptionsDialog._populateTimeMultiplier(this.timeMultiplier, this.dgo.tm);
+        GameOptionsDialog._populateDropdown(this.winBy, this.dgo.wb);
 
         // PYX
         this.pyxDecks_select.clear();
@@ -239,6 +323,10 @@ class CreateGameDialog {
             elm.find('input').attr("id", "pyx_deck_" + set.csi);
             elm.find('label').attr("for", "pyx_deck_" + set.csi);
         }
+
+        // Access
+        this._password.val("");
+        this._password.next().removeClass("mdc-text-field__label--float-above");
 
         // Cardcast
         this.cardcastDecks.clear();
@@ -266,12 +354,12 @@ class CreateGameDialog {
 
     updateTitles() {
         const pyxDetails = this.getPyxDecksDetails();
-        this._pyxTitle.text("PYX (" + CreateGameDialog.createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")");
+        this._pyxTitle.text("PYX (" + GameOptionsDialog.createDetailsString(pyxDetails.decks, pyxDetails.whites, pyxDetails.blacks) + ")");
 
         const ccDetails = this.getCardcastDecksDetails();
-        this._cardcastTitle.text("Cardcast (" + CreateGameDialog.createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")");
+        this._cardcastTitle.text("Cardcast (" + GameOptionsDialog.createDetailsString(ccDetails.decks, ccDetails.whites, ccDetails.blacks) + ")");
 
-        this._cardsTitle.text("Cards (" + CreateGameDialog.createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")");
+        this._cardsTitle.text("Cards (" + GameOptionsDialog.createDetailsString(pyxDetails.decks + ccDetails.decks, pyxDetails.whites + ccDetails.whites, pyxDetails.blacks + ccDetails.blacks) + ")");
     }
 
     getPyxDecksDetails() {
@@ -343,8 +431,7 @@ class CreateGameDialog {
         return codes;
     }
 
-    loadCardcastDeckInfo() {
-        const code = this._cardcastAddDeckCode.val();
+    loadCardcastDeckInfo(code, loaded = undefined) {
         this._cardcastAddDeckInfo_loading.show();
         this._cardcastAddDeckInfo_details.hide();
 
@@ -368,6 +455,8 @@ class CreateGameDialog {
 
                 self._cardcastAddDeckInfo_details.find('.\_name').text(info.name);
                 self._cardcastAddDeckInfo_details.find('.\_author').text("by " + info.author.username);
+
+                if (loaded !== undefined) loaded();
             });
         } else {
             this._cardcastAddDeckInfo_loading.hide();
@@ -405,16 +494,14 @@ class CreateGameDialog {
     }
 }
 
-const createGameDialog = new CreateGameDialog('createGameDialog');
+function setupGameOptionsDialog(trigger, title, resetBeforeShow = false, acceptText, accept, done = undefined) {
+    $.get("/game_options/dialog.html").done(function (data) {
+        $('body').append($(data));
 
-function showCreateGameDialog() {
-    createGameDialog.show();
-}
-
-function loadCardcastDeckInfo() {
-    createGameDialog.loadCardcastDeckInfo();
-}
-
-function addCardcastDeck(element) {
-    createGameDialog.addCardcastDeck(element.getAttribute("data-code"));
+        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title, acceptText, accept);
+        if (done !== undefined) done(gameOptionsDialog);
+        trigger.on('click', () => gameOptionsDialog.show(resetBeforeShow))
+    }).fail(function (data) {
+        Notifier.debug(data, true); // Shouldn't happen!!
+    });
 }

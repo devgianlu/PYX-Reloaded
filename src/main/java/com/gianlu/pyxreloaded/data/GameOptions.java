@@ -152,6 +152,11 @@ public class GameOptions {
             this.cardSetIds.clear();
             this.cardSetIds.addAll(newOptions.cardSetIds);
         }
+
+        synchronized (this.cardcastSetCodes) {
+            this.cardcastSetCodes.clear();
+            this.cardcastSetCodes.addAll(newOptions.cardcastSetCodes);
+        }
     }
 
     public JsonWrapper toJson(boolean includePassword) {
