@@ -633,7 +633,7 @@ class GameManager {
      * @param {string} data.pi.N - Player's name
      * @param {object} data.gi - Game info
      * @param {string} data.gs - Game status
-     * @param {object} data.bc - Black card
+     * @param {object} data.bc - Blank card
      * @param {object[]} data.wc - Table cards
      * @param {int} data.WC - Winning card(s), comma separated list
      * @param {string} data.rw - Round winner nickname
@@ -642,6 +642,7 @@ class GameManager {
      * @param {boolean} data.wl - Whether the game will stop
      * @param {object} data.cdi - Cardcast deck info
      * @param {string} data.cdi.csn - Card set name
+     * @param {string} data.H - Game host
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -715,7 +716,7 @@ class GameManager {
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
                 break;
             case "goms":
-                const noty = Notifier.show(Notifier.WARN, "<b>" + data.n + "</b> suggested to modify the game options.", false, false, true,
+                const noty = Notifier.show(Notifier.WARN, "<b>" + data.H + "</b> suggested to modify the game options.", false, false, true,
                     Notifier.button("Accept", () => {
                         this.changeGameOptions(data.go);
                         noty.close();

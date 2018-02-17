@@ -490,13 +490,13 @@ public class Game {
      *
      * @param newOptions The suggested options
      */
-    public void suggestGameOptionsModification(User suggester, GameOptions newOptions) {
+    public void suggestGameOptionsModification(SuggestedGameOptions newOptions) {
         if (this.options.equals(newOptions) || getHost() == null) return;
 
         // TODO: Should check if the user suggests stuff too often, something like the chat flood checker
 
         EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_OPTIONS_MODIFICATION_SUGGESTED);
-        obj.add(Consts.GeneralKeys.NICKNAME, suggester.getNickname());
+        obj.add(Consts.GeneralKeys.NICKNAME, newOptions.getSuggester().getNickname());
         obj.add(Consts.GameOptionData.OPTIONS, newOptions.toJson(true));
         getHost().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT, obj));
     }

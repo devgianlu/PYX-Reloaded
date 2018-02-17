@@ -3,10 +3,7 @@ package com.gianlu.pyxreloaded.handlers;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.JsonWrapper;
 import com.gianlu.pyxreloaded.Preferences;
-import com.gianlu.pyxreloaded.data.Game;
-import com.gianlu.pyxreloaded.data.GameManager;
-import com.gianlu.pyxreloaded.data.GameOptions;
-import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.data.*;
 import com.gianlu.pyxreloaded.servlets.Annotations;
 import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
 import com.gianlu.pyxreloaded.servlets.Parameters;
@@ -26,23 +23,18 @@ public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
         if (game.getState() != Consts.GameState.LOBBY)
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
 
-        GameOptions options;
-        try {
-            String value = params.get(Consts.GameOptionData.OPTIONS);
-            options = GameOptions.deserialize(preferences, value);
-        } catch (Exception ex) {
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
-        }
-
         User host = game.getHost();
         if (host == null) return JsonWrapper.EMPTY;
 
+        String value = params.get(Consts.GameOptionData.OPTIONS);
+        if (value == null || value.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+
         if (host == user) {
-            game.updateGameSettings(options);
+            game.updateGameSettings(new GameOptions(preferences, value));
             return JsonWrapper.EMPTY;
         } else {
-            game.suggestGameOptionsModification(user, options);
-            return new JsonWrapper(Consts.GeneralKeys.NICKNAME, host.getNickname());
+            game.suggestGameOptionsModification(new SuggestedGameOptions(preferences, user, value));
+            return new JsonWrapper(Consts.GameInfoData.HOST, host.getNickname());
         }
     }
 }
