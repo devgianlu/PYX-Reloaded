@@ -345,14 +345,11 @@ class GameManager {
 
     changeGameOptions(go) {
         $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function (data) {
-            if ("n" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.n + "</b>.");
+            if ("H" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.H + "</b>.");
             else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.data) {
-                    case "ngh":
-                        Notifier.error("You have to be the game host.", data);
-                        break;
                     case "as":
                         Notifier.error("The game must be in lobby state.", data);
                         break;
@@ -643,6 +640,8 @@ class GameManager {
      * @param {object} data.cdi - Cardcast deck info
      * @param {string} data.cdi.csn - Card set name
      * @param {string} data.H - Game host
+     * @param {string} data.soid - Suggested game options modification
+     * @param {string} data.ss - Game options modification suggester
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -715,17 +714,32 @@ class GameManager {
             case "gdlk":
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
                 break;
+            case "gaso":
+                Notifier.timeout(Notifier.SUCCESS, "Your suggested game options modification has been accepted.");
+                break;
+            case "gdso":
+                Notifier.timeout(Notifier.WARN, "Your suggested game options modification has been declined.");
+                break;
             case "goms":
-                const noty = Notifier.show(Notifier.WARN, "<b>" + data.H + "</b> suggested to modify the game options.", false, false, true,
+                const noty = Notifier.show(Notifier.WARN, "<b>" + data.s + "</b> suggested to modify the game options.", false, false, true,
                     Notifier.button("Accept", () => {
-                        this.changeGameOptions(data.go);
+                        this.submitGameOptionsModificationDecision(data.soid, true);
                         noty.close();
                     }),
                     Notifier.button("Decline", () => {
+                        this.submitGameOptionsModificationDecision(data.soid, false);
                         noty.close();
                     }));
                 break;
         }
+    }
+
+    submitGameOptionsModificationDecision(id, decision) {
+        $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(function () {
+            // Nothing
+        }).fail(function (data) {
+            Notifier.error("Failed submitting decision on the suggested game options.", data);
+        });
     }
 
     _updateOptionsDialog() {

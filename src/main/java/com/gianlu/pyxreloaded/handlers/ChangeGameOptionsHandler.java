@@ -26,7 +26,7 @@ public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
         User host = game.getHost();
         if (host == null) return JsonWrapper.EMPTY;
 
-        String value = params.get(Consts.GameOptionData.OPTIONS);
+        String value = params.get(Consts.GameOptionsData.OPTIONS);
         if (value == null || value.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         if (host == user) {

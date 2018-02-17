@@ -125,7 +125,15 @@ public final class Consts {
         /**
          * Someone suggested to modify the game options
          */
-        GAME_OPTIONS_MODIFICATION_SUGGESTED("goms");
+        GAME_OPTIONS_MODIFICATION_SUGGESTED("goms"),
+        /**
+         * Suggested game options has been accepted
+         */
+        GAME_ACCEPTED_SUGGESTED_OPTIONS("gaso"),
+        /**
+         * Suggested game options has been declined
+         */
+        GAME_DECLINED_SUGGESTED_OPTIONS("gdso");
 
         private final String event;
 
@@ -290,7 +298,11 @@ public final class Consts {
         /**
          * The user already played all pick cards and should draw the remaining.
          */
-        SHOULD_DRAW_CARD("sdc");
+        SHOULD_DRAW_CARD("sdc"),
+        /**
+         * Given suggested options id is invalid.
+         */
+        INVALID_SUGGESTED_OPTIONS_ID("isoi");
 
         private final String code;
 
@@ -484,7 +496,11 @@ public final class Consts {
         /**
          * Response to a ping
          */
-        PONG("PP");
+        PONG("PP"),
+        /**
+         * Decide whether to accept or decline the game options suggested modification.
+         */
+        GAME_OPTIONS_SUGGESTION_DECISION("gosd");
 
         private final String op;
 
@@ -792,14 +808,41 @@ public final class Consts {
         }
     }
 
+    public enum GameSuggestedOptionsData implements ReturnableKey, ReceivableKey {
+        /**
+         * Suggested options id
+         */
+        ID("soid"),
+        /**
+         * Suggester nickname
+         */
+        SUGGESTER("s"),
+        /**
+         * Accepted or declined, boolean
+         */
+        DECISION("d");
+
+        private final String key;
+
+        GameSuggestedOptionsData(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
     /**
      * Fields for options about a game.
      */
-    public enum GameOptionData implements ReturnableKey, ReceivableKey {
+    public enum GameOptionsData implements ReturnableKey, ReceivableKey {
         /**
          * The options object itself.
          */
         OPTIONS("go"),
+
         /**
          * The default options object.
          */
@@ -843,7 +886,7 @@ public final class Consts {
 
         private final String key;
 
-        GameOptionData(String key) {
+        GameOptionsData(String key) {
             this.key = key;
         }
 

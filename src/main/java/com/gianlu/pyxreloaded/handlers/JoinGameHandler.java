@@ -19,7 +19,7 @@ public class JoinGameHandler extends GameHandler {
 
     @Override
     public JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        if (!game.isPasswordCorrect(params.get(Consts.GameOptionData.PASSWORD)))
+        if (!game.isPasswordCorrect(params.get(Consts.GameOptionsData.PASSWORD)))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
         game.addPlayer(user);

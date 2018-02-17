@@ -34,6 +34,10 @@ public final class Parameters extends HashMap<String, String> {
         return params;
     }
 
+    public boolean has(Consts.ReceivableKey key) {
+        return get(key) != null;
+    }
+
     @Nullable
     public String get(Consts.ReceivableKey key) {
         return get(key.toString());
@@ -43,12 +47,12 @@ public final class Parameters extends HashMap<String, String> {
         return getBoolean(key.toString(), fallback);
     }
 
-    public boolean getBoolean(String key, boolean fallback) {
+    private boolean getBoolean(String key, boolean fallback) {
         String val = get(key);
         if (val == null) return false;
 
         try {
-            return Boolean.parseBoolean(key);
+            return Boolean.parseBoolean(val);
         } catch (IllegalArgumentException | NullPointerException ex) {
             return fallback;
         }

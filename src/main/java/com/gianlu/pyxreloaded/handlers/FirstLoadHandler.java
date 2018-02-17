@@ -46,8 +46,8 @@ public class FirstLoadHandler extends BaseHandler {
         Set<PyxCardSet> cardSets = LoadedCards.getLoadedSets();
         JsonArray json = new JsonArray(cardSets.size());
         for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson().obj());
-        obj.add(Consts.GameOptionData.CARD_SETS, json)
-                .add(Consts.GameOptionData.DEFAULT_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
+        obj.add(Consts.GameOptionsData.CARD_SETS, json)
+                .add(Consts.GameOptionsData.DEFAULT_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
 
         return obj;
     }
