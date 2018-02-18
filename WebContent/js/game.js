@@ -759,8 +759,3 @@ function loadUI(gameManager, gameOptionsDialog) {
         gameManager.handlePollEvent(data);
     });
 }
-
-const tabs = new mdc.tabs.MDCTabBar(document.getElementById('tabs'));
-tabs.listen('MDCTabBar:change', function ({detail: tabs}) {
-    console.log(tabs);
-});

@@ -73,9 +73,14 @@
     </header>
 
     <main class="mdc-toolbar-fixed-adjust" style="display: flex; flex-flow: row">
-        <div id="blackCard"></div>
-        <div id="whiteCards">
-            <div class="list"></div>
+        <div id="gameLayout">
+            <div id="blackCard"></div>
+            <div id="whiteCards">
+                <div class="list"></div>
+            </div>
+        </div>
+        <div id="otherStuffLayout">
+            MORE STUFF!
         </div>
     </main>
 </div>
@@ -134,6 +139,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
+<script src="/js/tabs.helper.js"></script>
 <script src="/js/cardcast.helper.js"></script>
 <script src="/js/notifs.helper.js"></script>
 <script src="/js/events.helper.js"></script>
@@ -141,6 +147,8 @@
 <script src="/js/game.js"></script>
 <script>
     window.mdc.autoInit();
+    TabsManager.init("tabs", ["gameLayout", "otherStuffLayout"]);
+
     const gameManager = new GameManager(getLastPathSegment());
     if (gameManager.id === null) {
         window.location = "/games/";
