@@ -27,15 +27,10 @@ public class GetSuggestedGameOptionsHandler extends GameWithPlayerHandler {
 
         JsonWrapper obj = new JsonWrapper();
         JsonArray array = new JsonArray();
-        for (Map.Entry<String, SuggestedGameOptions> entry : game.getSuggestedGameOptions().entrySet()) {
-            JsonWrapper option = new JsonWrapper();
-            option.add(Consts.GameSuggestedOptionsData.SUGGESTER, entry.getValue().getSuggester().getNickname());
-            option.add(Consts.GameSuggestedOptionsData.ID, entry.getKey());
-            option.add(Consts.GameOptionsData.OPTIONS, entry.getValue().toJson(true));
-            array.add(option.obj());
-        }
+        for (Map.Entry<String, SuggestedGameOptions> entry : game.getSuggestedGameOptions().entrySet())
+            array.add(entry.getValue().toJson(entry.getKey(), true).obj());
 
-        obj.add(Consts.GameSuggestedOptionsData.LIST, array);
+        obj.add(Consts.GameSuggestedOptionsData.OPTIONS, array);
         return obj;
     }
 }

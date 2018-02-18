@@ -505,9 +505,7 @@ public class Game {
         // TODO: Should check if the user suggests stuff too often, something like the chat flood checker
 
         EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_OPTIONS_MODIFICATION_SUGGESTED);
-        obj.add(Consts.GameSuggestedOptionsData.SUGGESTER, newOptions.getSuggester().getNickname());
-        obj.add(Consts.GameSuggestedOptionsData.ID, id);
-        obj.add(Consts.GameOptionsData.OPTIONS, newOptions.toJson(true));
+        obj.add(Consts.GameSuggestedOptionsData.OPTIONS, newOptions.toJson(id, true));
         getHost().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT, obj));
     }
 
@@ -523,7 +521,7 @@ public class Game {
         updateGameSettings(options);
 
         if (getPlayerForUser(options.getSuggester()) != null) {
-            options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT,
+            options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_PLAYER_EVENT,
                     new EventWrapper(this, Consts.Event.GAME_ACCEPTED_SUGGESTED_OPTIONS)));
         }
     }
@@ -537,7 +535,7 @@ public class Game {
         SuggestedGameOptions options = suggestedGameOptions.remove(id);
         if (options != null) {
             if (getPlayerForUser(options.getSuggester()) != null) {
-                options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT,
+                options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_PLAYER_EVENT,
                         new EventWrapper(this, Consts.Event.GAME_DECLINED_SUGGESTED_OPTIONS)));
             }
         }

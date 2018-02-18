@@ -815,6 +815,10 @@ public final class Consts {
 
     public enum GameSuggestedOptionsData implements ReturnableKey, ReceivableKey {
         /**
+         * The options object itself.
+         */
+        OPTIONS("sgo"),
+        /**
          * Suggested options id
          */
         ID("soid"),
@@ -825,11 +829,7 @@ public final class Consts {
         /**
          * Accepted or declined, boolean
          */
-        DECISION("d"),
-        /**
-         * List of suggested game options
-         */
-        LIST("sol");
+        DECISION("d");
 
         private final String key;
 
@@ -851,7 +851,6 @@ public final class Consts {
          * The options object itself.
          */
         OPTIONS("go"),
-
         /**
          * The default options object.
          */

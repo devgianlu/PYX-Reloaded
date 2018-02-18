@@ -642,8 +642,9 @@ class GameManager {
      * @param {object} data.cdi - Cardcast deck info
      * @param {string} data.cdi.csn - Card set name
      * @param {string} data.H - Game host
-     * @param {string} data.soid - Suggested game options modification
-     * @param {string} data.ss - Game options modification suggester
+     * @param {object} data.sgo- Suggested game options
+     * @param {string} data.sgo.soid - Suggested game options modification
+     * @param {string} data.sgo.s - Game options modification suggester
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -723,22 +724,23 @@ class GameManager {
                 Notifier.timeout(Notifier.ERROR, "Your suggested game options modification has been declined.");
                 break;
             case "goms":
-                const noty = Notifier.show(Notifier.WARN, "<b>" + data.s + "</b> suggested to modify the game options.", false, false, true,
+                const sgo = data.sgo;
+                const noty = Notifier.show(Notifier.WARN, "<b>" + sgo.s + "</b> suggested to modify the game options.", false, false, true,
+                    "SGO_" + sgo.soid,
                     Notifier.button("Accept", () => {
-                        this.submitGameOptionsModificationDecision(data.soid, true);
-                        noty.close();
+                        this.submitGameOptionsModificationDecision(sgo.soid, true, () => noty.close());
                     }),
                     Notifier.button("Decline", () => {
-                        this.submitGameOptionsModificationDecision(data.soid, false);
-                        noty.close();
+                        this.submitGameOptionsModificationDecision(sgo.soid, false, () => noty.close());
                     }));
                 break;
         }
     }
 
-    submitGameOptionsModificationDecision(id, decision) {
+    submitGameOptionsModificationDecision(id, decision, done = undefined) {
         $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(function () {
-            // Nothing
+            if (done !== undefined) done();
+            // TODO: Should remove item from card
         }).fail(function (data) {
             Notifier.error("Failed submitting decision on the suggested game options.", data);
         });
