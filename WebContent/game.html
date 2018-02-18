@@ -82,15 +82,26 @@
                 <div class="list"></div>
             </div>
         </div>
-        <div id="otherStuffLayout" style="display: none; padding: 16px">
-            <div id="suggestedGameOptions" class="mdc-card">
-                <div class="mdc-card__primary">
-                    <h1 class="mdc-card__title mdc-typography--title">Suggested game options modifications</h1>
+        <div id="otherStuffLayout" class="mdc-layout-grid" style="display: none">
+            <div class="mdc-layout-grid__inner">
+                <div id="spectatorsList" class="mdc-card mdc-layout-grid__cell">
+                    <div class="mdc-card__primary">
+                        <h1 class="mdc-card__title mdc-typography--title">Spectators</h1>
+                    </div>
+                    <section class="mdc-card__supporting-text">
+                        <ul class="mdc-list list mdc-list--non-interactive"></ul>
+                        <h1 class="message mdc-typography--headline">No spectators.</h1>
+                    </section>
                 </div>
-                <section class="mdc-card__supporting-text">
-                    <ul class="mdc-list list mdc-list--non-interactive"></ul>
-                    <h1 class="message mdc-typography--headline">No suggested game options.</h1>
-                </section>
+                <div id="suggestedGameOptions" class="mdc-card mdc-layout-grid__cell">
+                    <div class="mdc-card__primary">
+                        <h1 class="mdc-card__title mdc-typography--title">Suggested game options modifications</h1>
+                    </div>
+                    <section class="mdc-card__supporting-text">
+                        <ul class="mdc-list list mdc-list--non-interactive"></ul>
+                        <h1 class="message mdc-typography--headline">No suggested game options.</h1>
+                    </section>
+                </div>
             </div>
         </div>
     </main>
@@ -141,6 +152,10 @@
             </h4>
         </section>
     </div>
+
+    <li id="spectatorTemplate" class="mdc-list-item">
+        <span class="_name"></span>
+    </li>
 
     <li id="suggestedGameOptionsTemplate" class="mdc-list-item">
         <span class="material-icons _info" style="margin-right: 8px">info</span>

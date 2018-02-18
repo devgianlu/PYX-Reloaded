@@ -479,7 +479,7 @@ class GameManager {
                 this.updateHandInfo(this.bc.PK - this.bc.D, this.bc.D);
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
-                this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+                this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
@@ -528,12 +528,14 @@ class GameManager {
         this._reloadDrawerPadding();
     }
 
-    _getPlayer(nick) {
+    getPlayerStatus(nick) {
         for (let i = 0; i < this.info.pi.length; i++) {
             const player = this.info.pi[i];
             if (player.N === nick)
-                return player;
+                return player.st;
         }
+
+        return undefined;
     }
 
     setup() {
@@ -541,7 +543,7 @@ class GameManager {
         document.title = this.info.gi.H + " - PYX Reloaded";
 
         this.toggleStartButton(this.amHost && this.info.gi.gs === "l");
-        this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+        this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");
 
         this._reloadScoreboard();
     }
@@ -815,11 +817,11 @@ class GameManager {
         } else {
             decks.show();
 
-            let oldDecks = OtherStuffManager.deckIdsToNames(go.css);
-            oldDecks = oldDecks.concat(OtherStuffManager.wrapCardcastDecks(go.CCs));
+            let oldDecks = GameManager.deckIdsToNames(go.css);
+            oldDecks = oldDecks.concat(GameManager.wrapCardcastDecks(go.CCs));
 
-            let newDecks = OtherStuffManager.deckIdsToNames(sgo.go.css);
-            newDecks = newDecks.concat(OtherStuffManager.wrapCardcastDecks(sgo.go.CCs));
+            let newDecks = GameManager.deckIdsToNames(sgo.go.css);
+            newDecks = newDecks.concat(GameManager.wrapCardcastDecks(sgo.go.CCs));
 
             decks.html("<b>Decks:</b> " + oldDecks.join(", ") + " &#8594; " + newDecks.join(", "));
         }

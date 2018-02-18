@@ -39,23 +39,10 @@ function processPollData(events) {
 
 }
 
-/**
- * @callback pollListener
- * @param {object} data - An event
- * @param {string} data.E - Event code
- */
-
-/**
- * @param {string} key - A key to identify the listener
- * @param {pollListener} listener
- */
 function registerPollListener(key, listener) {
     _pollingListeners[key] = listener;
 }
 
-/**
- * @param {string} key - A key to identify the listener
- */
 function unregisterPollListener(key) {
     delete _pollingListeners[key];
 }

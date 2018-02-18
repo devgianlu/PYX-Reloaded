@@ -16,16 +16,32 @@ class OtherStuffManager {
         });
     }
 
+    static get SPECTATORS() {
+        return "spectatorsList";
+    }
+
+    static get SUGGESTED_GAME_OPTIONS() {
+        return "suggestedGameOptions";
+    }
+
+    /**
+     * @param {string} data.n - Nickname
+     * @param {string} data.E - Event code
+     * @param {object} data.sgo - Suggested game options
+     * @private
+     */
     _handleEvent(data) {
         switch (data.E) {
             case "goms":
                 this.addSuggestedOptionsItem(data.sgo);
                 break;
+            case "gvj":
+                this.addSpectator(data.n);
+                break;
+            case "gvl":
+                this.removeSpectator(data.n);
+                break;
         }
-    }
-
-    static get SUGGESTED_GAME_OPTIONS() {
-        return "suggestedGameOptions";
     }
 
     static _failedLoadingStuff(card, data) {
@@ -37,6 +53,8 @@ class OtherStuffManager {
         switch (id) {
             case OtherStuffManager.SUGGESTED_GAME_OPTIONS:
                 return this.gameManager.amHost;
+            case OtherStuffManager.SPECTATORS:
+                return true;
         }
 
         return false;
@@ -77,27 +95,6 @@ class OtherStuffManager {
         this.suggestedGameOptions_empty.hide();
     }
 
-    static wrapCardcastDecks(CCs) {
-        const names = [];
-        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
-        return names;
-    }
-
-    static deckIdsToNames(ids) {
-        const names = [];
-        const css = localStorage["css"];
-        if (css === undefined) return ids; // Shouldn't happen
-        const json = JSON.parse(css);
-
-        for (let i = 0; i < ids.length; i++) {
-            for (let j = 0; j < json.length; j++) {
-                if (ids[i] === json[j].csi) names[i] = json[j].csn;
-            }
-        }
-
-        return names;
-    }
-
     /**
      * One time setup method
      *
@@ -121,11 +118,36 @@ class OtherStuffManager {
                     OtherStuffManager._failedLoadingStuff(card, data);
                 });
                 break;
+            case OtherStuffManager.SPECTATORS:
+                this.spectators_empty = card.find('.message');
+                this.spectators_list = new List(card[0], {
+                    item: 'spectatorTemplate',
+                    valueNames: ['_name']
+                });
+                this.spectators_list.clear();
+
+                for (let i = 0; i < this.gameManager.info.gi.V.length; i++)
+                    this.addSpectator(this.gameManager.info.gi.V[i])
+
+                if (this.gameManager.info.gi.V.length === 0) this.spectators_empty.show();
+                else this.spectators_empty.hide();
+                break;
         }
     }
 
+    removeSpectator(name) {
+        this.spectators_list.remove("_name", name);
+        if (this.spectators_list.size() === 0) this.spectators_empty.show();
+        else this.spectators_empty.hide();
+    }
+
+    addSpectator(name) {
+        this.spectators_list.add({"_name": name});
+        this.spectators_empty.hide();
+    }
+
     _setup() {
-        this.root.children('.mdc-card').each((i, elm) => {
+        this.root.find('.mdc-card').each((i, elm) => {
             elm = $(elm);
             const id = elm.attr('id');
             if (this.shouldShow(id)) {
