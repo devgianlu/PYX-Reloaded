@@ -361,7 +361,7 @@ class GameManager {
             else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
         }).fail(function (data) {
             if ("responseJSON" in data) {
-                switch (data.responseJSON.data) {
+                switch (data.responseJSON.ec) {
                     case "AS":
                         Notifier.error("You have already suggested a modification. Wait for it to be accepted or declined.", data);
                         break;
