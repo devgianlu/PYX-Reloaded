@@ -1,6 +1,6 @@
 .message {
     text-align: center;
-    color: var(--mdc-theme-text-secondary-on-light, rgba(0, 0, 0, .54))
+    color: var(--mdc-theme-text-secondary-on-background, rgba(0, 0, 0, .54))
 }
 
 .mdc-switch-label {
@@ -17,11 +17,6 @@
 
 .mdc-dialog__body--scrollable {
     max-height: 60vh;
-}
-
-.mdc-toolbar .mdc-text-field {
-    margin-top: 0 !important;
-    margin-bottom: 16px !important;
 }
 
 /* Hide stuff in toolbar on mobile */
@@ -53,9 +48,27 @@
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
+.mdc-toolbar .mdc-text-field {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
 /* Chip in toolbar */
 .mdc-toolbar .mdc-chip-set > .mdc-chip > .mdc-chip__text {
     color: var(--mdc-theme-text-secondary-on-primary);
+}
+
+/* Tabs in toolbar */
+.mdc-toolbar .mdc-tab {
+    color: var(--mdc-theme-text-secondary-on-primary);
+}
+
+.mdc-toolbar .mdc-tab.mdc-tab--active {
+    color: var(--mdc-theme-text-primary-on-primary);
+}
+
+.mdc-toolbar .mdc-tab-bar .mdc-tab-bar__indicator {
+    background-color: var(--mdc-theme-text-primary-on-primary);
 }
 
 main {

@@ -54,6 +54,14 @@
                 </div>
             </section>
 
+            <section class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit">
+                <nav id="tabs" class="mdc-tab-bar">
+                    <a class="mdc-tab mdc-tab--active">Game</a>
+                    <a class="mdc-tab">Other stuff</a>
+                    <span class="mdc-tab-bar__indicator"></span>
+                </nav>
+            </section>
+
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <button class="material-icons align-icons mdc-toolbar__icon" style="display: none;" id="startGame">
                     done
@@ -65,9 +73,14 @@
     </header>
 
     <main class="mdc-toolbar-fixed-adjust" style="display: flex; flex-flow: row">
-        <div id="blackCard"></div>
-        <div id="whiteCards">
-            <div class="list"></div>
+        <div id="gameLayout" style="display: none">
+            <div id="blackCard"></div>
+            <div id="whiteCards">
+                <div class="list"></div>
+            </div>
+        </div>
+        <div id="otherStuffLayout" style="display: none">
+            MORE STUFF!
         </div>
     </main>
 </div>
@@ -126,6 +139,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
+<script src="/js/tabs.helper.js"></script>
 <script src="/js/cardcast.helper.js"></script>
 <script src="/js/notifs.helper.js"></script>
 <script src="/js/events.helper.js"></script>
@@ -133,6 +147,8 @@
 <script src="/js/game.js"></script>
 <script>
     window.mdc.autoInit();
+    TabsManager.init("tabs", ["gameLayout", "otherStuffLayout"]);
+
     const gameManager = new GameManager(getLastPathSegment());
     if (gameManager.id === null) {
         window.location = "/games/";
