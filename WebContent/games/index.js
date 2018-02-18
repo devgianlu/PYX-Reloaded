@@ -36,15 +36,26 @@ class Games {
         $('.mdc-toolbar__menu-icon').on('click', () => this.drawer.open = true);
     }
 
-    closeDrawer() {
-        this.drawer.open = false;
-    }
-
     static logout() {
         closeWebSocket();
         $.post("/AjaxServlet", "o=lo").always(function () {
             window.location = "/";
         });
+    }
+
+    static _handleJoinSpectateError(data, generalError) {
+        if ("responseJSON" in data) {
+            switch (data.responseJSON.ec) {
+                case "wp":
+                    Notifier.error("Wrong game password.", data);
+                    break;
+                default:
+                    Notifier.error(generalError, data);
+                    break;
+            }
+        } else {
+            Notifier.error(generalError, data);
+        }
     }
 
     static deckIdsToNames(ids) {
@@ -81,19 +92,14 @@ class Games {
         dislikes.text(data.DLK + (data.DLK === 1 ? " dislike" : " dislikes"));
     }
 
-    static _handleJoinSpectateError(data, generalError) {
-        if ("responseJSON" in data) {
-            switch (data.responseJSON.ec) {
-                case "wp":
-                    Notifier.error("Wrong game password.", data);
-                    break;
-                default:
-                    Notifier.error(generalError, data);
-                    break;
-            }
-        } else {
-            Notifier.error(generalError, data);
-        }
+    static wrapCardcastDecks(CCs) {
+        const names = [];
+        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
+        return names;
+    }
+
+    closeDrawer() {
+        this.drawer.open = false;
     }
 
     toggleLike(gid, elm, toggleLike, toggleDislike) {
@@ -142,12 +148,6 @@ class Games {
         }).fail(function (data) {
             Notifier.error("Failed creating the game!", data);
         });
-    }
-
-    static wrapCardcastDecks(CCs) {
-        const names = [];
-        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
-        return names;
     }
 
     loadGamesList() {
