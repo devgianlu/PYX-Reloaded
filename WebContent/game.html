@@ -79,8 +79,15 @@
                 <div class="list"></div>
             </div>
         </div>
-        <div id="otherStuffLayout" style="display: none">
-            MORE STUFF!
+        <div id="otherStuffLayout" style="display: none; padding: 16px">
+            <div id="suggestedGameOptions" class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title">Suggested game options modifications</h1>
+                </div>
+                <section class="mdc-card__supporting-text">
+                    <ul class="mdc-list list mdc-list--non-interactive"></ul>
+                </section>
+            </div>
         </div>
     </main>
 </div>
@@ -130,6 +137,12 @@
             </h4>
         </section>
     </div>
+
+    <li id="suggestedGameOptionsTemplate" class="mdc-list-item">
+        <span class="_suggester">{{Suggester}}</span>
+        <button class="mdc-button _accept">Accept</button>
+        <button class="mdc-button _decline">Decline</button>
+    </li>
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
