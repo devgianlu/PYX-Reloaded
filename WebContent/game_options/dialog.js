@@ -83,7 +83,7 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
 }
 
 class GameOptionsDialog {
-    constructor(id, title, acceptText, accept) {
+    constructor(id, title, acceptText, acceptListener) {
         this._dialog = $('#' + id);
         this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
         this.dialog.listen('MDCDialog:accept', () => this._acceptDialog());
@@ -133,7 +133,7 @@ class GameOptionsDialog {
         this._password = this._dialog.find('#gamePassword');
         mdc.textField.MDCTextField.attachTo(this._password.parent()[0]);
 
-        this.acceptListener = accept;
+        this.acceptListener = acceptListener;
 
         /**
          * @param {int} dgo.vL - Spectators limit
@@ -493,11 +493,11 @@ class GameOptionsDialog {
     }
 }
 
-function setupGameOptionsDialog(trigger, title, resetBeforeShow = false, acceptText, accept, done = undefined) {
+function setupGameOptionsDialog(trigger, title, resetBeforeShow = false, acceptText, acceptListener, done = undefined) {
     $.get("/game_options/dialog.html").done(function (data) {
         $('body').append($(data));
 
-        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title, acceptText, accept);
+        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title, acceptText, acceptListener);
         if (done !== undefined) done(gameOptionsDialog);
         trigger.on('click', () => gameOptionsDialog.show(resetBeforeShow))
     }).fail(function (data) {
