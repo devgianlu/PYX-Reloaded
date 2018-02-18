@@ -737,10 +737,15 @@ class GameManager {
         }
     }
 
+    set submitGameOptionsModificationDecision_listener(set) {
+        this._submitGameOptionsModificationDecision_listener = set;
+    }
+
     submitGameOptionsModificationDecision(id, decision, done = undefined) {
-        $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(function () {
+        $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(() => {
             if (done !== undefined) done();
-            // TODO: Should remove item from card
+            if (this._submitGameOptionsModificationDecision_listener !== undefined)
+                this._submitGameOptionsModificationDecision_listener(id);
         }).fail(function (data) {
             Notifier.error("Failed submitting decision on the suggested game options.", data);
         });

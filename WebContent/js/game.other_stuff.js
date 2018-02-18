@@ -9,6 +9,8 @@ class OtherStuffManager {
 
         this._setup();
 
+        this.gameManager.submitGameOptionsModificationDecision_listener = (id) => this.removeSuggestedOptionsItem(id);
+
         registerPollListener("GAME_OTHER_STUFF", (data) => {
             this._handleEvent(data);
         });
@@ -43,6 +45,9 @@ class OtherStuffManager {
     removeSuggestedOptionsItem(id) {
         this.suggestedGameOptions_list.remove("id", id);
         Noty.closeAll("SGO_" + id);
+
+        if (this.suggestedGameOptions_list.size() === 0) this.suggestedGameOptions_empty.show();
+        else this.suggestedGameOptions_empty.hide();
     }
 
     /**
@@ -62,6 +67,8 @@ class OtherStuffManager {
         elm.find('._decline').on('click', () => {
             this.gameManager.submitGameOptionsModificationDecision(item.soid, false, () => this.removeSuggestedOptionsItem(item.soid));
         });
+
+        this.suggestedGameOptions_empty.hide();
     }
 
     /**
@@ -73,6 +80,7 @@ class OtherStuffManager {
     setupCard(id, card) {
         switch (id) {
             case OtherStuffManager.SUGGESTED_GAME_OPTIONS:
+                this.suggestedGameOptions_empty = card.find('.message');
                 this.suggestedGameOptions_list = new List(card[0], {
                     item: 'suggestedGameOptionsTemplate',
                     valueNames: ['_suggester', {data: ['id']}]
