@@ -52,6 +52,7 @@ class OtherStuffManager {
 
     /**
      * @param {string} item.s - Suggester
+     * @param {object} item.go - Game options
      * @param {string} item.soid - ID
      */
     addSuggestedOptionsItem(item) {
@@ -68,7 +69,78 @@ class OtherStuffManager {
             this.gameManager.submitGameOptionsModificationDecision(item.soid, false, () => this.removeSuggestedOptionsItem(item.soid));
         });
 
+        elm.find('._info').tooltipster({
+            content: () => this._generateGameOptionsDiffsFor(item),
+            theme: 'tooltipster-light'
+        });
+
         this.suggestedGameOptions_empty.hide();
+    }
+
+    _generateGameOptionsDiffsFor(sgo) {
+        const div = $('#gameOptionsDiffTooltipTemplate').clone();
+
+        const go = this.gameManager.info.gi.go;
+
+        const sl = div.find('._goal');
+        if (sgo.go.sl === go.sl) {
+            sl.hide();
+        } else {
+            sl.show();
+            sl.text("Goal: " + go.sl + " -> " + sgo.go.sl);
+        }
+
+        const pL = div.find('._playersLimit');
+        if (sgo.go.pL === go.pL) {
+            pL.hide();
+        } else {
+            pL.show();
+            pL.text("Players limit: " + go.pL + " -> " + sgo.go.pL);
+        }
+
+        const vL = div.find('._spectatorsLimit');
+        if (sgo.go.vL === go.vL) {
+            vL.hide();
+        } else {
+            vL.show();
+            vL.text("Spectators limit: " + go.vL + " -> " + sgo.go.vL);
+        }
+
+        const bl = div.find('._blanksLimit');
+        if (sgo.go.bl === go.bl) {
+            bl.hide();
+        } else {
+            bl.show();
+            bl.text("Blank cards: " + go.bl + " -> " + sgo.go.bl);
+        }
+
+        const tm = div.find('._timeMultiplier');
+        if (sgo.go.tm === go.tm) {
+            tm.hide();
+        } else {
+            tm.show();
+            tm.text("Time multiplier: " + go.tm + " -> " + sgo.go.tm);
+        }
+
+        const wb = div.find('._winBy');
+        if (sgo.go.wb === go.wb) {
+            wb.hide();
+        } else {
+            wb.show();
+            wb.text("Win by: " + go.wb + " -> " + sgo.go.wb);
+        }
+
+        const pw = div.find('._password');
+        if (sgo.go.pw === go.pw) {
+            pw.hide();
+        } else {
+            pw.show();
+            pw.text("Password: " + go.pw + " -> " + sgo.go.pw);
+        }
+
+        // TODO: Decks missing
+
+        return div;
     }
 
     /**
