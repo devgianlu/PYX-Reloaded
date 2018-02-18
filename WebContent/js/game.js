@@ -725,7 +725,7 @@ class GameManager {
                 break;
             case "goms":
                 const sgo = data.sgo;
-                const noty = Notifier.show(Notifier.WARN, "<b>" + sgo.s + "</b> suggested to modify the game options.", false, false, true,
+                const noty = Notifier.show(Notifier.WARN, "<b>" + sgo.s + "</b> suggested to modify the game options.", false, false, false,
                     "SGO_" + sgo.soid,
                     Notifier.button("Accept", () => {
                         this.submitGameOptionsModificationDecision(sgo.soid, true, () => noty.close());
@@ -733,8 +733,95 @@ class GameManager {
                     Notifier.button("Decline", () => {
                         this.submitGameOptionsModificationDecision(sgo.soid, false, () => noty.close());
                     }));
+
+                const self = this;
+                noty.on('onTemplate', function () {
+                    $(this.barDom).tooltipster({
+                        content: () => self.generateGameOptionsDiffsFor(sgo),
+                        theme: 'tooltipster-light'
+                    });
+                }).show();
                 break;
         }
+    }
+
+    generateGameOptionsDiffsFor(sgo) {
+        const div = $('#gameOptionsDiffTooltipTemplate').clone();
+
+        const go = this.info.gi.go;
+
+        const sl = div.find('._goal');
+        if (sgo.go.sl === go.sl) {
+            sl.hide();
+        } else {
+            sl.show();
+            sl.html("<b>Goal:</b> " + go.sl + " &#8594; " + sgo.go.sl);
+        }
+
+        const pL = div.find('._playersLimit');
+        if (sgo.go.pL === go.pL) {
+            pL.hide();
+        } else {
+            pL.show();
+            pL.html("<b>Players limit:</b> " + go.pL + " &#8594; " + sgo.go.pL);
+        }
+
+        const vL = div.find('._spectatorsLimit');
+        if (sgo.go.vL === go.vL) {
+            vL.hide();
+        } else {
+            vL.show();
+            vL.html("<b>Spectators limit:</b> " + go.vL + " &#8594; " + sgo.go.vL);
+        }
+
+        const bl = div.find('._blanksLimit');
+        if (sgo.go.bl === go.bl) {
+            bl.hide();
+        } else {
+            bl.show();
+            bl.html("<b>Blank cards:</b> " + go.bl + " &#8594; " + sgo.go.bl);
+        }
+
+        const tm = div.find('._timeMultiplier');
+        if (sgo.go.tm === go.tm) {
+            tm.hide();
+        } else {
+            tm.show();
+            tm.html("<b>Time multiplier:</b> " + go.tm + " &#8594; " + sgo.go.tm);
+        }
+
+        const wb = div.find('._winBy');
+        if (sgo.go.wb === go.wb) {
+            wb.hide();
+        } else {
+            wb.show();
+            wb.html("<b>Win by:</b> " + go.wb + " &#8594; " + sgo.go.wb);
+        }
+
+        const pw = div.find('._password');
+        if (sgo.go.pw === go.pw) {
+            pw.hide();
+        } else {
+            pw.show();
+            pw.html("<b>Password:</b> " + go.pw + " &#8594; " + sgo.go.pw);
+        }
+
+        const decks = div.find('._decks');
+        if (arraysEqual(sgo.go.css, go.css) && arraysEqual(sgo.go.CCs, go.CCs)) {
+            decks.hide();
+        } else {
+            decks.show();
+
+            let oldDecks = OtherStuffManager.deckIdsToNames(go.css);
+            oldDecks = oldDecks.concat(OtherStuffManager.wrapCardcastDecks(go.CCs));
+
+            let newDecks = OtherStuffManager.deckIdsToNames(sgo.go.css);
+            newDecks = newDecks.concat(OtherStuffManager.wrapCardcastDecks(sgo.go.CCs));
+
+            decks.html("<b>Decks:</b> " + oldDecks.join(", ") + " &#8594; " + newDecks.join(", "));
+        }
+
+        return div;
     }
 
     set submitGameOptionsModificationDecision_listener(set) {
