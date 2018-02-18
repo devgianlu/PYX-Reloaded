@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css"/>
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/themes/tooltipster-light.min.css"/>
     <link rel="stylesheet" href="/css/pyx-reloaded.css">
     <link rel="stylesheet" href="/css/cards.css">
     <link rel="stylesheet" href="/css/game.css">
@@ -79,8 +82,16 @@
                 <div class="list"></div>
             </div>
         </div>
-        <div id="otherStuffLayout" style="display: none">
-            MORE STUFF!
+        <div id="otherStuffLayout" style="display: none; padding: 16px">
+            <div id="suggestedGameOptions" class="mdc-card">
+                <div class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title">Suggested game options modifications</h1>
+                </div>
+                <section class="mdc-card__supporting-text">
+                    <ul class="mdc-list list mdc-list--non-interactive"></ul>
+                    <h1 class="message mdc-typography--headline">No suggested game options.</h1>
+                </section>
+            </div>
         </div>
     </main>
 </div>
@@ -130,6 +141,24 @@
             </h4>
         </section>
     </div>
+
+    <li id="suggestedGameOptionsTemplate" class="mdc-list-item">
+        <span class="material-icons _info" style="margin-right: 8px">info</span>
+        <span class="_suggester" style="flex-grow: 1">{{Suggester}}</span>
+        <button class="mdc-button _accept">Accept</button>
+        <button class="mdc-button _decline">Decline</button>
+    </li>
+
+    <div id="gameOptionsDiffTooltipTemplate">
+        <h1 class="_goal mdc-typography--body1"></h1>
+        <h1 class="_playersLimit mdc-typography--body1"></h1>
+        <h1 class="_spectatorsLimit mdc-typography--body1"></h1>
+        <h1 class="_blanksLimit mdc-typography--body1"></h1>
+        <h1 class="_timeMultiplier mdc-typography--body1"></h1>
+        <h1 class="_winBy mdc-typography--body1"></h1>
+        <h1 class="_password mdc-typography--body1"></h1>
+        <h1 class="_decks mdc-typography--body1"></h1>
+    </div>
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
@@ -137,6 +166,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/js/jquery.tooltipster.min.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
 <script src="/js/tabs.helper.js"></script>
@@ -145,6 +175,7 @@
 <script src="/js/events.helper.js"></script>
 <script src="/game_options/dialog.js"></script>
 <script src="/js/game.js"></script>
+<script src="/js/game.other_stuff.js"></script>
 <script>
     window.mdc.autoInit();
     TabsManager.init("tabs", ["gameLayout", "otherStuffLayout"]);
@@ -153,7 +184,7 @@
     if (gameManager.id === null) {
         window.location = "/games/";
     } else {
-        setupGameOptionsDialog($('#gameOptions'), "Game options", false, "Apply", (go) => {
+        setupGameOptionsDialog($('#gameOptions'), "Game options", false, "??", (go) => {
             gameManager.changeGameOptions(go);
         }, (gameOptionsDialog) => {
             loadUI(gameManager, gameOptionsDialog);

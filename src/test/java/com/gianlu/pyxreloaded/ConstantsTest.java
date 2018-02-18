@@ -11,7 +11,8 @@ public class ConstantsTest {
     private static void crossCheck(Class firstEnum, Class secondEnum) throws NoSuchFieldException {
         for (Object firstEnumConst : firstEnum.getEnumConstants()) {
             for (Object secondEnumConst : secondEnum.getEnumConstants()) {
-                if (shouldIgnoreDuplicate(firstEnumConst, secondEnumConst)) continue;
+                if (firstEnumConst == secondEnumConst || shouldIgnoreDuplicate(firstEnumConst, secondEnumConst))
+                    continue;
                 Assertions.assertNotEquals(firstEnumConst.toString(), secondEnumConst.toString(),
                         "Found equal value '" + firstEnumConst.toString() + "' in " + firstEnum.getSimpleName() + " and " + secondEnum.getSimpleName());
             }
@@ -49,7 +50,7 @@ public class ConstantsTest {
 
         for (Class klass : classes) {
             for (Class kklass : classes) {
-                if (klass.isEnum() && kklass.isEnum() && klass != kklass) crossCheck(klass, kklass);
+                if (klass.isEnum() && kklass.isEnum()) crossCheck(klass, kklass);
             }
         }
     }

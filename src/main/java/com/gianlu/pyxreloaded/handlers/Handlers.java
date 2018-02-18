@@ -12,7 +12,7 @@ public class Handlers {
         LIST.put(CardcastAddCardsetHandler.OP, CardcastAddCardsetHandler.class);
         LIST.put(CardcastListCardsetsHandler.OP, CardcastListCardsetsHandler.class);
         LIST.put(CardcastRemoveCardsetHandler.OP, CardcastRemoveCardsetHandler.class);
-        LIST.put(ChangeGameOptionHandler.OP, ChangeGameOptionHandler.class);
+        LIST.put(ChangeGameOptionsHandler.OP, ChangeGameOptionsHandler.class);
         LIST.put(ChatHandler.OP, ChatHandler.class);
         LIST.put(CreateGameHandler.OP, CreateGameHandler.class);
         LIST.put(FirstLoadHandler.OP, FirstLoadHandler.class);
@@ -35,5 +35,7 @@ public class Handlers {
         LIST.put(DislikeGameHandler.OP, DislikeGameHandler.class);
         LIST.put(GetMeHandler.OP, GetMeHandler.class);
         LIST.put(PongHandler.OP, PongHandler.class);
+        LIST.put(GameOptionsSuggestionDecisionHandler.OP, GameOptionsSuggestionDecisionHandler.class);
+        LIST.put(GetSuggestedGameOptionsHandler.OP, GetSuggestedGameOptionsHandler.class);
     }
 }

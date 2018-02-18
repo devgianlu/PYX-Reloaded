@@ -83,7 +83,7 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
 }
 
 class GameOptionsDialog {
-    constructor(id, title, acceptText, accept) {
+    constructor(id, title, acceptText, acceptListener) {
         this._dialog = $('#' + id);
         this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
         this.dialog.listen('MDCDialog:accept', () => this._acceptDialog());
@@ -91,7 +91,7 @@ class GameOptionsDialog {
         this._dialog.find('.mdc-dialog__header__title').text(title);
 
         this._accept = this._dialog.find('.mdc-dialog__footer__button--accept');
-        this._accept.text(acceptText);
+        this.acceptText = acceptText;
 
         this.scoreLimit = new mdc.select.MDCSelect(this._dialog.find('#scoreLimit')[0]);
         this.playersLimit = new mdc.select.MDCSelect(this._dialog.find('#playersLimit')[0]);
@@ -133,7 +133,7 @@ class GameOptionsDialog {
         this._password = this._dialog.find('#gamePassword');
         mdc.textField.MDCTextField.attachTo(this._password.parent()[0]);
 
-        this.acceptListener = accept;
+        this.acceptListener = acceptListener;
 
         /**
          * @param {int} dgo.vL - Spectators limit
@@ -158,11 +158,6 @@ class GameOptionsDialog {
         this._loadedCardcastDecks = {};
 
         this.reset();
-    }
-
-    set acceptVisible(set) {
-        if (set) this._accept.show();
-        else this._accept.hide();
     }
 
     /**
@@ -261,6 +256,10 @@ class GameOptionsDialog {
 
         Notifier.debug(go);
         this.acceptListener(go);
+    }
+
+    set acceptText(text) {
+        this._accept.text(text);
     }
 
     show(reset = false) {
@@ -494,11 +493,11 @@ class GameOptionsDialog {
     }
 }
 
-function setupGameOptionsDialog(trigger, title, resetBeforeShow = false, acceptText, accept, done = undefined) {
+function setupGameOptionsDialog(trigger, title, resetBeforeShow = false, acceptText, acceptListener, done = undefined) {
     $.get("/game_options/dialog.html").done(function (data) {
         $('body').append($(data));
 
-        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title, acceptText, accept);
+        const gameOptionsDialog = new GameOptionsDialog('gameOptionsDialog', title, acceptText, acceptListener);
         if (done !== undefined) done(gameOptionsDialog);
         trigger.on('click', () => gameOptionsDialog.show(resetBeforeShow))
     }).fail(function (data) {
