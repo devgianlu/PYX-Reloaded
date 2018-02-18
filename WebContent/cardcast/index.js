@@ -390,7 +390,7 @@ function addDeckToGame(code) {
         Notifier.error("Failed contacting the server.", data, false, true);
     }).done(function (data) {
         if (data.gid === -1) {
-            Notifier.timeout(Notifier.WARN, "In order to add the deck you have to be the host of the game.");
+            Notifier.timeout(Notifier.WARN, "You have to be in a game.");
         } else {
             $.post("/AjaxServlet", "o=cac&gid=" + data.gid + "&cci=" + code).fail(function (data) {
                 if ("responseJSON" in data) {
