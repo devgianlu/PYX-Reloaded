@@ -362,6 +362,9 @@ class GameManager {
         }).fail(function (data) {
             if ("responseJSON" in data) {
                 switch (data.responseJSON.data) {
+                    case "AS":
+                        Notifier.error("You have already suggested a modification. Wait for it to be accepted or declined.", data);
+                        break;
                     case "as":
                         Notifier.error("The game must be in lobby state.", data);
                         break;

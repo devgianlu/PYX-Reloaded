@@ -496,13 +496,18 @@ public class Game {
      *
      * @param newOptions The suggested options
      */
-    public void suggestGameOptionsModification(SuggestedGameOptions newOptions) {
+    public void suggestGameOptionsModification(SuggestedGameOptions newOptions) throws BaseCahHandler.CahException {
         if (this.options.equals(newOptions) || getHost() == null) return;
+
+        synchronized (suggestedGameOptions) {
+            for (SuggestedGameOptions options : suggestedGameOptions.values()) {
+                if (options.getSuggester() == newOptions.getSuggester())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_SUGGESTED);
+            }
+        }
 
         String id = Utils.generateAlphanumericString(5);
         suggestedGameOptions.put(id, newOptions);
-
-        // TODO: Should check if the user suggests stuff too often, something like the chat flood checker
 
         EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_OPTIONS_MODIFICATION_SUGGESTED);
         obj.add(Consts.GameSuggestedOptionsData.OPTIONS, newOptions.toJson(id, true));

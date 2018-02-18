@@ -302,7 +302,11 @@ public final class Consts {
         /**
          * Given suggested options id is invalid.
          */
-        INVALID_SUGGESTED_OPTIONS_ID("isoi");
+        INVALID_SUGGESTED_OPTIONS_ID("isoi"),
+        /**
+         * The user has already suggested a modification.
+         */
+        ALREADY_SUGGESTED("AS");
 
         private final String code;
 
