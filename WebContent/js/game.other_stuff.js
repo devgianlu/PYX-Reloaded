@@ -77,6 +77,27 @@ class OtherStuffManager {
         this.suggestedGameOptions_empty.hide();
     }
 
+    static wrapCardcastDecks(CCs) {
+        const names = [];
+        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
+        return names;
+    }
+
+    static deckIdsToNames(ids) {
+        const names = [];
+        const css = localStorage["css"];
+        if (css === undefined) return ids; // Shouldn't happen
+        const json = JSON.parse(css);
+
+        for (let i = 0; i < ids.length; i++) {
+            for (let j = 0; j < json.length; j++) {
+                if (ids[i] === json[j].csi) names[i] = json[j].csn;
+            }
+        }
+
+        return names;
+    }
+
     _generateGameOptionsDiffsFor(sgo) {
         const div = $('#gameOptionsDiffTooltipTemplate').clone();
 
@@ -87,7 +108,7 @@ class OtherStuffManager {
             sl.hide();
         } else {
             sl.show();
-            sl.text("Goal: " + go.sl + " -> " + sgo.go.sl);
+            sl.html("<b>Goal:</b> " + go.sl + " &#8594; " + sgo.go.sl);
         }
 
         const pL = div.find('._playersLimit');
@@ -95,7 +116,7 @@ class OtherStuffManager {
             pL.hide();
         } else {
             pL.show();
-            pL.text("Players limit: " + go.pL + " -> " + sgo.go.pL);
+            pL.html("<b>Players limit:</b> " + go.pL + " &#8594; " + sgo.go.pL);
         }
 
         const vL = div.find('._spectatorsLimit');
@@ -103,7 +124,7 @@ class OtherStuffManager {
             vL.hide();
         } else {
             vL.show();
-            vL.text("Spectators limit: " + go.vL + " -> " + sgo.go.vL);
+            vL.html("<b>Spectators limit:</b> " + go.vL + " &#8594; " + sgo.go.vL);
         }
 
         const bl = div.find('._blanksLimit');
@@ -111,7 +132,7 @@ class OtherStuffManager {
             bl.hide();
         } else {
             bl.show();
-            bl.text("Blank cards: " + go.bl + " -> " + sgo.go.bl);
+            bl.html("<b>Blank cards:</b> " + go.bl + " &#8594; " + sgo.go.bl);
         }
 
         const tm = div.find('._timeMultiplier');
@@ -119,7 +140,7 @@ class OtherStuffManager {
             tm.hide();
         } else {
             tm.show();
-            tm.text("Time multiplier: " + go.tm + " -> " + sgo.go.tm);
+            tm.html("<b>Time multiplier:</b> " + go.tm + " &#8594; " + sgo.go.tm);
         }
 
         const wb = div.find('._winBy');
@@ -127,7 +148,7 @@ class OtherStuffManager {
             wb.hide();
         } else {
             wb.show();
-            wb.text("Win by: " + go.wb + " -> " + sgo.go.wb);
+            wb.html("<b>Win by:</b> " + go.wb + " &#8594; " + sgo.go.wb);
         }
 
         const pw = div.find('._password');
@@ -135,10 +156,23 @@ class OtherStuffManager {
             pw.hide();
         } else {
             pw.show();
-            pw.text("Password: " + go.pw + " -> " + sgo.go.pw);
+            pw.html("<b>Password:</b> " + go.pw + " &#8594; " + sgo.go.pw);
         }
 
-        // TODO: Decks missing
+        const decks = div.find('._decks');
+        if (arraysEqual(sgo.go.css, go.css) && arraysEqual(sgo.go.CCs, go.CCs)) {
+            decks.hide();
+        } else {
+            decks.show();
+
+            let oldDecks = OtherStuffManager.deckIdsToNames(go.css);
+            oldDecks = oldDecks.concat(OtherStuffManager.wrapCardcastDecks(go.CCs));
+
+            let newDecks = OtherStuffManager.deckIdsToNames(sgo.go.css);
+            newDecks = newDecks.concat(OtherStuffManager.wrapCardcastDecks(sgo.go.CCs));
+
+            decks.html("<b>Decks:</b> " + oldDecks.join(", ") + " &#8594; " + newDecks.join(", "));
+        }
 
         return div;
     }
