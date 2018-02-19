@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded.cardcast;
 
-import com.gianlu.pyxreloaded.data.BlackCard;
+import com.gianlu.pyxreloaded.cards.BlackCard;
 
 
 public class CardcastBlackCard extends BlackCard {

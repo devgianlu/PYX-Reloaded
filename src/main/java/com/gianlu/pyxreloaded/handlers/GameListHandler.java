@@ -1,12 +1,12 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.JsonWrapper;
-import com.gianlu.pyxreloaded.data.Game;
-import com.gianlu.pyxreloaded.data.GameManager;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.servlets.Annotations;
-import com.gianlu.pyxreloaded.servlets.Parameters;
+import com.gianlu.pyxreloaded.game.Game;
+import com.gianlu.pyxreloaded.game.GameManager;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.Parameters;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
 

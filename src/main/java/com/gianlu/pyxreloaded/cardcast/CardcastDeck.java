@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded.cardcast;
 
-import com.gianlu.pyxreloaded.data.CardSet;
+import com.gianlu.pyxreloaded.cards.CardSet;
 
 import java.util.HashSet;
 import java.util.Set;

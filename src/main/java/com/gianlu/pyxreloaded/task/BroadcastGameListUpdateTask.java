@@ -1,9 +1,9 @@
 package com.gianlu.pyxreloaded.task;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.EventWrapper;
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
+import com.gianlu.pyxreloaded.data.EventWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage.MessageType;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 
 public class BroadcastGameListUpdateTask extends SafeTimerTask {
     private final ConnectedUsers users;

@@ -1,12 +1,16 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.JsonWrapper;
-import com.gianlu.pyxreloaded.Preferences;
-import com.gianlu.pyxreloaded.data.*;
-import com.gianlu.pyxreloaded.servlets.Annotations;
-import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
-import com.gianlu.pyxreloaded.servlets.Parameters;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
+import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.game.Game;
+import com.gianlu.pyxreloaded.game.GameManager;
+import com.gianlu.pyxreloaded.game.GameOptions;
+import com.gianlu.pyxreloaded.game.SuggestedGameOptions;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
 
 public class ChangeGameOptionsHandler extends GameWithPlayerHandler {

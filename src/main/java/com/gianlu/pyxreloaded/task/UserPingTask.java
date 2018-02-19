@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded.task;
 
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 

@@ -1,6 +1,5 @@
 package com.gianlu.pyxreloaded.data;
 
-import com.gianlu.pyxreloaded.EventWrapper;
 import org.jetbrains.annotations.NotNull;
 
 public class QueuedMessage implements Comparable<QueuedMessage> {

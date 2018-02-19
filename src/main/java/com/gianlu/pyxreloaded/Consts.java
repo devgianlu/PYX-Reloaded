@@ -1068,7 +1068,7 @@ public final class Consts {
     /**
      * Can be used in responses as key
      */
-    interface ReturnableKey {
+    public interface ReturnableKey {
     }
 
     /**

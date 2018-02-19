@@ -4,16 +4,16 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.EventWrapper;
-import com.gianlu.pyxreloaded.JsonWrapper;
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
+import com.gianlu.pyxreloaded.data.EventWrapper;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.data.QueuedMessage.MessageType;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.servlets.Annotations;
-import com.gianlu.pyxreloaded.servlets.BanList;
-import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
-import com.gianlu.pyxreloaded.servlets.Parameters;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.BanList;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import io.undertow.server.HttpServerExchange;
 import org.apache.log4j.Logger;
 
@@ -58,7 +58,7 @@ public class BanHandler extends BaseHandler {
             logger.info(String.format("Banning %s by request of %s", banIp, user.getNickname()));
         }
 
-        BanList.add(banIp); //Whatever banIp was determined to be, it was documented server-side right here.
+        BanList.get().add(banIp); //Whatever banIp was determined to be, it was documented server-side right here.
         return JsonWrapper.EMPTY; //Doesn't return any JSON
     }
 }

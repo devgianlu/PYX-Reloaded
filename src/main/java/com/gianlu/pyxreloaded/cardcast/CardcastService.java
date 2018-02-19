@@ -22,12 +22,20 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 
 public class CardcastService {
+    private final static AtomicInteger cardId = new AtomicInteger(Integer.MIN_VALUE);
     private static final Logger LOG = Logger.getLogger(CardcastService.class);
     private static final String HOSTNAME = "api.cardcastgame.com";
+
+    public static int getNewCardId() {
+        synchronized (cardId) {
+            return cardId.decrementAndGet();
+        }
+    }
 
     /**
      * Base URL to the Cardcast API.
@@ -132,7 +140,7 @@ public class CardcastService {
                         String text = StringUtils.join(strs, "____");
                         int pick = strs.size() - 1;
                         int draw = (pick >= 3 ? pick - 1 : 0);
-                        deck.getBlackCards().add(new CardcastBlackCard(CardIdUtils.getNewId(), StringEscapeUtils.escapeXml11(text), draw, pick, setId));
+                        deck.getBlackCards().add(new CardcastBlackCard(getNewCardId(), StringEscapeUtils.escapeXml11(text), draw, pick, setId));
                     }
                 }
             }
@@ -168,7 +176,7 @@ public class CardcastService {
                         String text = StringUtils.join(strs, "");
                         // don't add blank cards, they don't do anything
                         if (!text.isEmpty())
-                            deck.getWhiteCards().add(new CardcastWhiteCard(CardIdUtils.getNewId(), StringEscapeUtils.escapeXml11(text), setId));
+                            deck.getWhiteCards().add(new CardcastWhiteCard(getNewCardId(), StringEscapeUtils.escapeXml11(text), setId));
                     }
                 }
             }

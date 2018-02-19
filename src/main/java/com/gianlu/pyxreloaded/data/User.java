@@ -2,9 +2,9 @@ package com.gianlu.pyxreloaded.data;
 
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.EventWrapper;
-import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
-import com.gianlu.pyxreloaded.servlets.EventsHandler;
+import com.gianlu.pyxreloaded.game.Game;
+import com.gianlu.pyxreloaded.paths.EventsPath;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class User {
     private long lastUserAction = 0;
     private Game currentGame;
     private boolean valid = true;
-    private EventsHandler.EventsSender eventsSender = null;
+    private EventsPath.EventsSender eventsSender = null;
     private boolean waitingPong = false;
 
     /**
@@ -30,7 +30,7 @@ public class User {
      *
      * @param nickname  The user's nickname.
      * @param hostname  The user's Internet hostname (which will likely just be their IP address).
-     * @param sessionId The unique ID of this session for this server instance.
+     * @param sessionId The unique ID of this session for this server singletons.
      */
     public User(String nickname, String hostname, String sessionId, boolean admin) {
         this.nickname = nickname;
@@ -88,7 +88,7 @@ public class User {
         return getNickname();
     }
 
-    public void establishedEventsConnection(EventsHandler.EventsSender sender) {
+    public void establishedEventsConnection(EventsPath.EventsSender sender) {
         this.eventsSender = sender;
     }
 
@@ -156,7 +156,7 @@ public class User {
      * @param game Game in which this user is playing.
      * @throws BaseCahHandler.CahException Thrown if this user is already in another game.
      */
-    void joinGame(Game game) throws BaseCahHandler.CahException {
+    public void joinGame(Game game) throws BaseCahHandler.CahException {
         if (currentGame != null) throw new BaseCahHandler.CahException(Consts.ErrorCode.CANNOT_JOIN_ANOTHER_GAME);
         currentGame = game;
     }
@@ -168,7 +168,7 @@ public class User {
      *
      * @param game Game from which to remove the user.
      */
-    void leaveGame(Game game) {
+    public void leaveGame(Game game) {
         if (currentGame == game) currentGame = null;
     }
 
