@@ -34,10 +34,16 @@ class Notifier {
         }
     }
 
-    static show(type, msg, timeout = false, progressBar = false, show = true) {
+    static button(text, cb) {
+        return Noty.button(text, 'mdc-button', cb);
+    }
+
+    static show(type, msg, timeout = false, progressBar = false, show = true, queue = "global", ...buttons) {
         const noty = new Noty(Object.assign({
             type: type,
+            queue: queue,
             text: msg,
+            buttons: buttons,
             timeout: timeout * 1000,
             progressBar: progressBar
         }, Notifier._notyDefault()));

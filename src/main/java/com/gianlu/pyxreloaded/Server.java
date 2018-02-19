@@ -80,14 +80,15 @@ public class Server {
                 .setHandler(router);
 
         int port = preferences.getInt("port", 80);
+        String host = preferences.getString("host", "0.0.0.0");
 
         if (preferences.getBoolean("secure", false)) {
-            server.addHttpListener(port, "0.0.0.0", new HttpsRedirect())
-                    .addHttpsListener(preferences.getInt("securePort", 443), "0.0.0.0", getSSLContext(
+            server.addHttpListener(port, host, new HttpsRedirect())
+                    .addHttpsListener(preferences.getInt("securePort", 443), host, getSSLContext(
                             new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
                             new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
         } else {
-            server.addHttpListener(port, "0.0.0.0");
+            server.addHttpListener(port, host);
         }
 
         server.build().start();

@@ -326,7 +326,7 @@ class GameManager {
     handleMyInfoChanged(info) {
         Notifier.debug("My status is now: " + info.st);
 
-        this.gameOptionsDialog.acceptVisible = this.amHost;
+        this._updateOptionsDialog(); // For accept button text
 
         switch (info.st) {
             case "sj":
@@ -356,13 +356,14 @@ class GameManager {
     }
 
     changeGameOptions(go) {
-        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done(function () {
-            Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
+        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done((data) => {
+            if ("H" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.H + "</b>.");
+            else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
         }).fail(function (data) {
             if ("responseJSON" in data) {
-                switch (data.responseJSON.data) {
-                    case "ngh":
-                        Notifier.error("You have to be the game host.", data);
+                switch (data.responseJSON.ec) {
+                    case "AS":
+                        Notifier.error("You have already suggested a modification. Wait for it to be accepted or declined.", data);
                         break;
                     case "as":
                         Notifier.error("The game must be in lobby state.", data);
@@ -375,6 +376,8 @@ class GameManager {
                 Notifier.error("Failed changing the game options.", data);
             }
         });
+
+        this.gameOptionsDialog.updateOptions(this.info.gi.go); // Restore to actual state, wait for 'goc'
     }
 
     sendGameChatMessage(msg, clear) {
@@ -476,7 +479,7 @@ class GameManager {
                 this.updateHandInfo(this.bc.PK - this.bc.D, this.bc.D);
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
-                this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+                this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
@@ -525,12 +528,14 @@ class GameManager {
         this._reloadDrawerPadding();
     }
 
-    _getPlayer(nick) {
+    getPlayerStatus(nick) {
         for (let i = 0; i < this.info.pi.length; i++) {
             const player = this.info.pi[i];
             if (player.N === nick)
-                return player;
+                return player.st;
         }
+
+        return undefined;
     }
 
     setup() {
@@ -538,7 +543,7 @@ class GameManager {
         document.title = this.info.gi.H + " - PYX Reloaded";
 
         this.toggleStartButton(this.amHost && this.info.gi.gs === "l");
-        this.toggleHandVisibility(this._getPlayer(this.user.n).st === "sp");
+        this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");
 
         this._reloadScoreboard();
     }
@@ -632,7 +637,7 @@ class GameManager {
      * @param {string} data.pi.N - Player's name
      * @param {object} data.gi - Game info
      * @param {string} data.gs - Game status
-     * @param {object} data.bc - Black card
+     * @param {object} data.bc - Blank card
      * @param {object[]} data.wc - Table cards
      * @param {int} data.WC - Winning card(s), comma separated list
      * @param {string} data.rw - Round winner nickname
@@ -641,6 +646,10 @@ class GameManager {
      * @param {boolean} data.wl - Whether the game will stop
      * @param {object} data.cdi - Cardcast deck info
      * @param {string} data.cdi.csn - Card set name
+     * @param {string} data.H - Game host
+     * @param {object} data.sgo- Suggested game options
+     * @param {string} data.sgo.soid - Suggested game options modification
+     * @param {string} data.sgo.s - Game options modification suggester
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -713,12 +722,130 @@ class GameManager {
             case "gdlk":
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> disliked this game.");
                 break;
+            case "gaso":
+                Notifier.timeout(Notifier.SUCCESS, "Your suggested game options modification has been accepted.");
+                break;
+            case "gdso":
+                Notifier.timeout(Notifier.ERROR, "Your suggested game options modification has been declined.");
+                break;
+            case "goms":
+                const sgo = data.sgo;
+                const noty = Notifier.show(Notifier.WARN, "<b>" + sgo.s + "</b> suggested to modify the game options.", false, false, false,
+                    "SGO_" + sgo.soid,
+                    Notifier.button("Accept", () => {
+                        this.submitGameOptionsModificationDecision(sgo.soid, true, () => noty.close());
+                    }),
+                    Notifier.button("Decline", () => {
+                        this.submitGameOptionsModificationDecision(sgo.soid, false, () => noty.close());
+                    }));
+
+                const self = this;
+                noty.on('onTemplate', function () {
+                    $(this.barDom).tooltipster({
+                        content: () => self.generateGameOptionsDiffsFor(sgo),
+                        theme: 'tooltipster-light'
+                    });
+                }).show();
+                break;
         }
+    }
+
+    generateGameOptionsDiffsFor(sgo) {
+        const div = $('#gameOptionsDiffTooltipTemplate').clone();
+
+        const go = this.info.gi.go;
+
+        const sl = div.find('._goal');
+        if (sgo.go.sl === go.sl) {
+            sl.hide();
+        } else {
+            sl.show();
+            sl.html("<b>Goal:</b> " + go.sl + " &#8594; " + sgo.go.sl);
+        }
+
+        const pL = div.find('._playersLimit');
+        if (sgo.go.pL === go.pL) {
+            pL.hide();
+        } else {
+            pL.show();
+            pL.html("<b>Players limit:</b> " + go.pL + " &#8594; " + sgo.go.pL);
+        }
+
+        const vL = div.find('._spectatorsLimit');
+        if (sgo.go.vL === go.vL) {
+            vL.hide();
+        } else {
+            vL.show();
+            vL.html("<b>Spectators limit:</b> " + go.vL + " &#8594; " + sgo.go.vL);
+        }
+
+        const bl = div.find('._blanksLimit');
+        if (sgo.go.bl === go.bl) {
+            bl.hide();
+        } else {
+            bl.show();
+            bl.html("<b>Blank cards:</b> " + go.bl + " &#8594; " + sgo.go.bl);
+        }
+
+        const tm = div.find('._timeMultiplier');
+        if (sgo.go.tm === go.tm) {
+            tm.hide();
+        } else {
+            tm.show();
+            tm.html("<b>Time multiplier:</b> " + go.tm + " &#8594; " + sgo.go.tm);
+        }
+
+        const wb = div.find('._winBy');
+        if (sgo.go.wb === go.wb) {
+            wb.hide();
+        } else {
+            wb.show();
+            wb.html("<b>Win by:</b> " + go.wb + " &#8594; " + sgo.go.wb);
+        }
+
+        const pw = div.find('._password');
+        if (sgo.go.pw === go.pw) {
+            pw.hide();
+        } else {
+            pw.show();
+            pw.html("<b>Password:</b> " + go.pw + " &#8594; " + sgo.go.pw);
+        }
+
+        const decks = div.find('._decks');
+        if (arraysEqual(sgo.go.css, go.css) && arraysEqual(sgo.go.CCs, go.CCs)) {
+            decks.hide();
+        } else {
+            decks.show();
+
+            let oldDecks = GameManager.deckIdsToNames(go.css);
+            oldDecks = oldDecks.concat(GameManager.wrapCardcastDecks(go.CCs));
+
+            let newDecks = GameManager.deckIdsToNames(sgo.go.css);
+            newDecks = newDecks.concat(GameManager.wrapCardcastDecks(sgo.go.CCs));
+
+            decks.html("<b>Decks:</b> " + oldDecks.join(", ") + " &#8594; " + newDecks.join(", "));
+        }
+
+        return div;
+    }
+
+    set submitGameOptionsModificationDecision_listener(set) {
+        this._submitGameOptionsModificationDecision_listener = set;
+    }
+
+    submitGameOptionsModificationDecision(id, decision, done = undefined) {
+        $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(() => {
+            if (done !== undefined) done();
+            if (this._submitGameOptionsModificationDecision_listener !== undefined)
+                this._submitGameOptionsModificationDecision_listener(id);
+        }).fail(function (data) {
+            Notifier.error("Failed submitting decision on the suggested game options.", data);
+        });
     }
 
     _updateOptionsDialog() {
         this.gameOptionsDialog.updateOptions(this.info.gi.go);
-        this.gameOptionsDialog.acceptVisible = this.amHost;
+        this.gameOptionsDialog.acceptText = this.amHost ? "Apply" : "Suggest";
     }
 }
 
@@ -735,6 +862,11 @@ function loadUI(gameManager, gameOptionsDialog) {
             Notifier.debug(data);
 
             $.post("/AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
+                registerPollListener("GAME", function (data) {
+                    Notifier.debug(data);
+                    gameManager.handlePollEvent(data);
+                });
+
                 gameManager.blackCard = data.bc;
                 gameManager.updateHandInfo(data.ltp, data.ltd);
 
@@ -742,6 +874,8 @@ function loadUI(gameManager, gameOptionsDialog) {
                 gameManager.addTableCards(data.wc, true);
 
                 gameManager.attachOptionsDialog = gameOptionsDialog;
+
+                new OtherStuffManager(gameManager);
 
                 Notifier.debug(data);
             }).fail(function (data) {
@@ -752,10 +886,5 @@ function loadUI(gameManager, gameOptionsDialog) {
         });
     }).fail(function (data) {
         Notifier.error("Failed loading the game!", data);
-    });
-
-    registerPollListener("GAME", function (data) {
-        Notifier.debug(data);
-        gameManager.handlePollEvent(data);
     });
 }

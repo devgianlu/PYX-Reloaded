@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +82,7 @@ public class Game {
     private final CardcastService cardcastService;
     private final Set<User> likes = Collections.synchronizedSet(new HashSet<>());
     private final Set<User> dislikes = Collections.synchronizedSet(new HashSet<>());
+    private final Map<String, SuggestedGameOptions> suggestedGameOptions = new ConcurrentHashMap<>();
     private Player host;
     private BlackDeck blackDeck;
     private BlackCard blackCard;
@@ -88,6 +90,7 @@ public class Game {
     private Consts.GameState state;
     private int judgeIndex = 0;
     private volatile ScheduledFuture<?> lastScheduledFuture;
+
 
     /**
      * Create a new game.
@@ -155,6 +158,10 @@ public class Game {
             one.remove(user);
             return false;
         }
+    }
+
+    public Map<String, SuggestedGameOptions> getSuggestedGameOptions() {
+        return suggestedGameOptions;
     }
 
     /**
@@ -433,7 +440,7 @@ public class Game {
      */
     private void notifyGameOptionsChanged() {
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_OPTIONS_CHANGED);
-        ev.add(Consts.GameOptionData.OPTIONS, options.toJson(true));
+        ev.add(Consts.GameOptionsData.OPTIONS, options.toJson(true));
         broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
     }
 
@@ -474,7 +481,6 @@ public class Game {
         return options.password;
     }
 
-
     /**
      * Update game options
      *
@@ -483,6 +489,61 @@ public class Game {
     public void updateGameSettings(GameOptions newOptions) {
         this.options.update(newOptions);
         notifyGameOptionsChanged();
+    }
+
+    /**
+     * Suggest a change in the game options
+     *
+     * @param newOptions The suggested options
+     */
+    public void suggestGameOptionsModification(SuggestedGameOptions newOptions) throws BaseCahHandler.CahException {
+        if (this.options.equals(newOptions) || getHost() == null) return;
+
+        synchronized (suggestedGameOptions) {
+            for (SuggestedGameOptions options : suggestedGameOptions.values()) {
+                if (options.getSuggester() == newOptions.getSuggester())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_SUGGESTED);
+            }
+        }
+
+        String id = Utils.generateAlphanumericString(5);
+        suggestedGameOptions.put(id, newOptions);
+
+        EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_OPTIONS_MODIFICATION_SUGGESTED);
+        obj.add(Consts.GameSuggestedOptionsData.OPTIONS, newOptions.toJson(id, true));
+        getHost().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_EVENT, obj));
+    }
+
+    /**
+     * Apply the suggested game options
+     *
+     * @param id Suggested game options id
+     */
+    public void applySuggestedOptions(String id) throws BaseCahHandler.CahException {
+        SuggestedGameOptions options = suggestedGameOptions.remove(id);
+        if (options == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_SUGGESTED_OPTIONS_ID);
+
+        updateGameSettings(options);
+
+        if (getPlayerForUser(options.getSuggester()) != null) {
+            options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_PLAYER_EVENT,
+                    new EventWrapper(this, Consts.Event.GAME_ACCEPTED_SUGGESTED_OPTIONS)));
+        }
+    }
+
+    /**
+     * Decline the suggested game options
+     *
+     * @param id Suggested game options id
+     */
+    public void declineSuggestedOptions(String id) {
+        SuggestedGameOptions options = suggestedGameOptions.remove(id);
+        if (options != null) {
+            if (getPlayerForUser(options.getSuggester()) != null) {
+                options.getSuggester().enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.GAME_PLAYER_EVENT,
+                        new EventWrapper(this, Consts.Event.GAME_DECLINED_SUGGESTED_OPTIONS)));
+            }
+        }
     }
 
     /**
@@ -511,7 +572,7 @@ public class Game {
         obj.add(Consts.GameInfoData.DISLIKES, getDislikes());
         obj.add(Consts.GameInfoData.HOST, host.getUser().getNickname());
         obj.add(Consts.GeneralGameData.STATE, state.toString());
-        obj.add(Consts.GameOptionData.OPTIONS, options.toJson(includePassword));
+        obj.add(Consts.GameOptionsData.OPTIONS, options.toJson(includePassword));
         obj.add(Consts.GameInfoData.HAS_PASSWORD, options.password != null && !options.password.isEmpty());
 
         if (user != null) {

@@ -1,3 +1,11 @@
+#gameLayout {
+    width: 100%;
+}
+
+#gameLayout > .message {
+    margin-top: 48px;
+}
+
 #drawer > .mdc-drawer__drawer {
     padding: 16px;
     display: flex;
@@ -30,4 +38,34 @@
 #chat > .mdc-text-field {
     width: 100%;
     flex-shrink: 0;
+}
+
+.error::before {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px; /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+
+    content: 'error';
+    vertical-align: middle;
+    padding-right: 8px;
+    color: #D32F2F; /* Red 700 */
 }

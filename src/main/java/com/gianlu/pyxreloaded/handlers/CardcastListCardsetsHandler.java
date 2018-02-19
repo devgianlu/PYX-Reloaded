@@ -42,7 +42,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_CANNOT_FIND,
                     new JsonWrapper(Consts.GeneralKeys.CARDCAST_ID, cardcastException.getFailedJson()));
         } else {
-            return new JsonWrapper(Consts.GameOptionData.CARD_SETS, array);
+            return new JsonWrapper(Consts.GameOptionsData.CARD_SETS, array);
         }
     }
 }
