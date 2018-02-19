@@ -1,5 +1,6 @@
 {
   "port": 80,
+  "host": "0.0.0.0",
   "secure": false,
   "securePort": 443,
   "trustStorePath": "",
