@@ -1,9 +1,18 @@
 #gameLayout {
     width: 100%;
+    display: flex;
 }
 
 #gameLayout > .message {
     margin-top: 48px;
+}
+
+#whiteCards {
+    flex-grow: 1;
+}
+
+#hand > .list > .mdc-card.pyx-card {
+    flex-shrink: 0;
 }
 
 #drawer > .mdc-drawer__drawer {
