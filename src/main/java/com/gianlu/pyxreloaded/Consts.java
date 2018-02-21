@@ -1,5 +1,8 @@
 package com.gianlu.pyxreloaded;
 
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -1063,6 +1066,36 @@ public final class Consts {
 
         GamePlayerInfo(String key) {
             this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    /**
+     * Identify auth type in database, also used to send authentication data
+     */
+    public enum AuthType implements ReceivableKey {
+        PASSWORD("pw"),
+        GOOGLE("g"),
+        FACEBOOK("fb"),
+        TWITTER("tw");
+
+        private final String key;
+
+        AuthType(String key) {
+            this.key = key;
+        }
+
+        @NotNull
+        public static AuthType parse(String key) throws BaseCahHandler.CahException {
+            for (AuthType type : values())
+                if (type.key.equals(key))
+                    return type;
+
+            throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST);
         }
 
         @Override

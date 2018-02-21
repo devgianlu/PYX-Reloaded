@@ -3,27 +3,28 @@ package com.gianlu.pyxreloaded.handlers;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.data.UserAccount;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
-import com.gianlu.pyxreloaded.singletons.AdminToken;
-import com.gianlu.pyxreloaded.singletons.BanList;
-import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
-import com.gianlu.pyxreloaded.singletons.Sessions;
+import com.gianlu.pyxreloaded.singletons.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class RegisterHandler extends BaseHandler {
     public static final String OP = Consts.Operation.REGISTER.toString();
     private static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
     private final BanList banList;
+    private final UsersWithAccount accounts;
     private final ConnectedUsers users;
 
-    public RegisterHandler(@Annotations.BanList BanList banList, @Annotations.ConnectedUsers ConnectedUsers users) {
+    public RegisterHandler(@Annotations.BanList BanList banList, @Annotations.UsersWithAccount UsersWithAccount accounts, @Annotations.ConnectedUsers ConnectedUsers users) {
         this.banList = banList;
+        this.accounts = accounts;
         this.users = users;
     }
 
@@ -43,7 +44,29 @@ public class RegisterHandler extends BaseHandler {
         String adminToken = params.get(Consts.GeneralKeys.ADMIN_TOKEN);
         admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.get().current().equals(adminToken);
 
-        user = new User(nickname, exchange.getHostName(), Sessions.generateNewId(), admin);
+        UserAccount account = accounts.getAccount(nickname);
+        if (account == null) {
+            user = new User(nickname, exchange.getHostName(), Sessions.generateNewId(), admin);
+        } else {
+            switch (account.auth) {
+                case PASSWORD:
+                    String password = params.get(Consts.AuthType.PASSWORD);
+                    if (!Objects.equals(account.password, password)) // TODO: Password hashing
+                        throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
+
+                    user = User.withAccount(account, exchange.getHostName(), admin);
+                    break;
+                case GOOGLE: // TODO
+                    break;
+                case FACEBOOK: // TODO
+                    break;
+                case TWITTER: // TODO
+                    break;
+                default:
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+            }
+        }
+
         users.checkAndAdd(user);
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.get().add(user)));
 

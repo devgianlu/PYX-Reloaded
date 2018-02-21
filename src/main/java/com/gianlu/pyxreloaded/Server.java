@@ -56,6 +56,9 @@ public class Server {
 
         ServerDatabase serverDatabase = new ServerDatabase(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
 
+        UsersWithAccount accounts = new UsersWithAccount(serverDatabase);
+        Providers.add(Annotations.UsersWithAccount.class, (Provider<UsersWithAccount>) () -> accounts);
+
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
 

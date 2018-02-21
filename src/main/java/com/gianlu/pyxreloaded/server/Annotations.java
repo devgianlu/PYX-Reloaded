@@ -40,4 +40,9 @@ public final class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface BanList {
     }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface UsersWithAccount {
+    }
 }
