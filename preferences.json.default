@@ -12,7 +12,7 @@
   "cacheEnabled": true,
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
-  "serverDbUrl": "jdbc:sqlite:server.sqlite",
+  "serverDbUrl": "jdbc:sqlite:server.sqlite.default",
   "maxSkipsBeforeKick": 2,
   "roundIntermission": 8,
   "minBlackCards": 50,
