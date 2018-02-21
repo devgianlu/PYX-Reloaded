@@ -306,7 +306,13 @@ public final class Consts {
         /**
          * The user has already suggested a modification.
          */
-        ALREADY_SUGGESTED("AS");
+        ALREADY_SUGGESTED("AS"),
+        /**
+         * SQL error, fatal.
+         * <p>
+         * FIXME: Remove this error
+         */
+        SQL_ERROR("sqle");
 
         private final String code;
 
@@ -1068,7 +1074,7 @@ public final class Consts {
     /**
      * Can be used in responses as key
      */
-    interface ReturnableKey {
+    public interface ReturnableKey {
     }
 
     /**

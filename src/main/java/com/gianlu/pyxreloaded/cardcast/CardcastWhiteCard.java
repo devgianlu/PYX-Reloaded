@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded.cardcast;
 
-import com.gianlu.pyxreloaded.data.WhiteCard;
+import com.gianlu.pyxreloaded.cards.WhiteCard;
 
 
 public class CardcastWhiteCard extends WhiteCard {

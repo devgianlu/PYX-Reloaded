@@ -1,9 +1,9 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.JsonWrapper;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.servlets.Parameters;
+import com.gianlu.pyxreloaded.server.Parameters;
 import io.undertow.server.HttpServerExchange;
 
 /**

@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded.task;
 
-import com.gianlu.pyxreloaded.servlets.AdminToken;
+import com.gianlu.pyxreloaded.singletons.AdminToken;
 
 import java.util.logging.Logger;
 
@@ -9,7 +9,7 @@ public class RefreshAdminTokenTask extends SafeTimerTask {
 
     @Override
     public void process() {
-        String token = AdminToken.refresh();
+        String token = AdminToken.get().refresh();
         logger.info("Current admin token: " + token);
     }
 }

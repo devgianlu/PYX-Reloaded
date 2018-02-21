@@ -6,6 +6,8 @@ class GameManager {
         this.drawer = new mdc.drawer.MDCPersistentDrawer($('#drawer')[0]);
         $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
 
+        this._lobbyMessage = this.root.find('#gameLayout .message');
+
         this._leaveGame = this.root.find('#leaveGame');
         this._leaveGame.on('click', () => this.leave());
 
@@ -470,9 +472,9 @@ class GameManager {
                 this.blackCard = null;
                 this.addHandCards([], true);
                 this.addTableCards([], true);
-
                 this.toggleStartButton(this.amHost);
                 this.toggleHandVisibility(false);
+                this._lobbyMessage.show();
                 break;
             case "p":
                 this.blackCard = data.bc;
@@ -480,13 +482,16 @@ class GameManager {
                 this.toggleStartButton(false);
                 this.addTableCards([], true);
                 this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");
+                this._lobbyMessage.hide();
                 break;
             case "j":
                 this.addTableCards(data.wc, true);
                 this.toggleStartButton(false);
                 this.toggleHandVisibility(false);
+                this._lobbyMessage.hide();
                 break;
             case "ro":
+                this._lobbyMessage.hide();
                 this._highlightWinningCards(data.WC);
                 if (data.wl) {
                     // Someone won the game
@@ -523,8 +528,8 @@ class GameManager {
     }
 
     toggleHandVisibility(visible) {
-        if (visible) this._hand_toolbar.show();
-        else this._hand_toolbar.hide();
+        if (visible) this._hand.show();
+        else this._hand.hide();
         this._reloadDrawerPadding();
     }
 
@@ -541,6 +546,9 @@ class GameManager {
     setup() {
         this._title.text(this.info.gi.H + " - PYX Reloaded");
         document.title = this.info.gi.H + " - PYX Reloaded";
+
+        if (this.info.gi.gs === "l") this._lobbyMessage.show();
+        else this._lobbyMessage.hide();
 
         this.toggleStartButton(this.amHost && this.info.gi.gs === "l");
         this.toggleHandVisibility(this.getPlayerStatus(this.user.n) === "sp");

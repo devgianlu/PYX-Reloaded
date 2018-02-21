@@ -16,14 +16,6 @@
     overflow-wrap: break-word;
 }
 
-#whiteCards {
-    width: 100%;
-}
-
-#hand > .list > .mdc-card.pyx-card {
-    flex-shrink: 0;
-}
-
 .mdc-card.pyx-card .card-details {
     min-height: 0;
 }

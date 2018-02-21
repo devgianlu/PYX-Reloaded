@@ -1,15 +1,15 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.EventWrapper;
-import com.gianlu.pyxreloaded.JsonWrapper;
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
+import com.gianlu.pyxreloaded.data.EventWrapper;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage.MessageType;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.servlets.Annotations;
-import com.gianlu.pyxreloaded.servlets.BaseCahHandler;
-import com.gianlu.pyxreloaded.servlets.BaseJsonHandler;
-import com.gianlu.pyxreloaded.servlets.Parameters;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.server.BaseJsonHandler;
+import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import io.undertow.server.HttpServerExchange;
 
 public class ChatHandler extends BaseHandler {

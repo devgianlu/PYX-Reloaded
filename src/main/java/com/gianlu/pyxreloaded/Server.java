@@ -1,12 +1,15 @@
 package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
-import com.gianlu.pyxreloaded.data.Game;
-import com.gianlu.pyxreloaded.data.GameManager;
-import com.gianlu.pyxreloaded.db.LoadedCards;
-import com.gianlu.pyxreloaded.servlets.*;
-import com.gianlu.pyxreloaded.servlets.Provider;
+import com.gianlu.pyxreloaded.game.Game;
+import com.gianlu.pyxreloaded.game.GameManager;
+import com.gianlu.pyxreloaded.paths.AjaxPath;
+import com.gianlu.pyxreloaded.paths.EventsPath;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.CustomResourceHandler;
+import com.gianlu.pyxreloaded.server.HttpsRedirect;
+import com.gianlu.pyxreloaded.server.Provider;
+import com.gianlu.pyxreloaded.singletons.*;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.RefreshAdminTokenTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
@@ -45,10 +48,16 @@ public class Server {
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
-        LoadedCards.load(preferences.getString("pyxDb", "pyx.sqlite"));
+        LoadedCards loadedCards = new LoadedCards(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
+        Providers.add(Annotations.LoadedCards.class, (Provider<LoadedCards>) () -> loadedCards);
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
+
+        ServerDatabase serverDatabase = new ServerDatabase(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
+
+        BanList banList = new BanList(serverDatabase);
+        Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
@@ -61,13 +70,13 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, globalTimer, preferences, cardcastService), 100, updateGameListTask);
+        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), 100, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
         ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
         PathHandler pathHandler = new PathHandler(resourceHandler);
-        pathHandler.addExactPath("/AjaxServlet", new BaseAjaxHandler())
-                .addExactPath("/Events", Handlers.websocket(new EventsHandler()));
+        pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
+                .addExactPath("/Events", Handlers.websocket(new EventsPath()));
 
         RoutingHandler router = new RoutingHandler();
         router.setFallbackHandler(pathHandler)

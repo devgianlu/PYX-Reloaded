@@ -1,6 +1,6 @@
 package com.gianlu.pyxreloaded;
 
-import com.gianlu.pyxreloaded.data.WhiteCard;
+import com.gianlu.pyxreloaded.cards.WhiteCard;
 import com.google.gson.JsonArray;
 import org.jetbrains.annotations.NotNull;
 

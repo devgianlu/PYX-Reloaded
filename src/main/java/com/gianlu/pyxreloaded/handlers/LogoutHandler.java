@@ -1,12 +1,12 @@
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.JsonWrapper;
-import com.gianlu.pyxreloaded.data.ConnectedUsers;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.servlets.Annotations;
-import com.gianlu.pyxreloaded.servlets.Parameters;
-import com.gianlu.pyxreloaded.servlets.Sessions;
+import com.gianlu.pyxreloaded.server.Annotations;
+import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.Sessions;
 import io.undertow.server.HttpServerExchange;
 
 public class LogoutHandler extends BaseHandler {
@@ -21,7 +21,7 @@ public class LogoutHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         user.noLongerValid();
         users.removeUser(user, Consts.DisconnectReason.MANUAL);
-        Sessions.invalidate(user.getSessionId());
+        Sessions.get().invalidate(user.getSessionId());
         return JsonWrapper.EMPTY;
     }
 }
