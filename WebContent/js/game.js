@@ -528,8 +528,8 @@ class GameManager {
     }
 
     toggleHandVisibility(visible) {
-        if (visible) this._hand_toolbar.show();
-        else this._hand_toolbar.hide();
+        if (visible) this._hand.show();
+        else this._hand.hide();
         this._reloadDrawerPadding();
     }
 
