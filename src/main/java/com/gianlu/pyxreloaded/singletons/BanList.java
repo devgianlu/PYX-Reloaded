@@ -1,29 +1,32 @@
 package com.gianlu.pyxreloaded.singletons;
 
-import org.jetbrains.annotations.NotNull;
+import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public final class BanList { // TODO: Should be saved on disk
-    private static BanList instance;
-    private final List<String> list;
+public final class BanList {
+    private final ServerDatabase db;
 
-    private BanList() {
-        list = new ArrayList<>();
+    public BanList(ServerDatabase db) {
+        this.db = db;
     }
 
-    @NotNull
-    public static BanList get() {
-        if (instance == null) instance = new BanList();
-        return instance;
+    public synchronized void add(String ip) throws BaseCahHandler.CahException {
+        try {
+            if (!db.statement().execute("INSERT INTO ban_list (ip) VALUES (" + ip + ")"))
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
     }
 
-    public synchronized void add(String ban) {
-        list.add(ban);
-    }
-
-    public synchronized boolean contains(String ban) {
-        return list.contains(ban);
+    public synchronized boolean contains(String ip) throws BaseCahHandler.CahException {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM ban_list WHERE ip='" + ip + "'")) {
+            return set.next();
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
     }
 }

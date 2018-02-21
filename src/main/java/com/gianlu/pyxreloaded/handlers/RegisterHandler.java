@@ -19,15 +19,17 @@ import java.util.regex.Pattern;
 public class RegisterHandler extends BaseHandler {
     public static final String OP = Consts.Operation.REGISTER.toString();
     private static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
+    private final BanList banList;
     private final ConnectedUsers users;
 
-    public RegisterHandler(@Annotations.ConnectedUsers ConnectedUsers users) {
+    public RegisterHandler(@Annotations.BanList BanList banList, @Annotations.ConnectedUsers ConnectedUsers users) {
+        this.banList = banList;
         this.users = users;
     }
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
-        if (BanList.get().contains(exchange.getHostName()))
+        if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
         String nickname = params.get(Consts.GeneralKeys.NICKNAME);

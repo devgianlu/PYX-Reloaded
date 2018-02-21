@@ -9,10 +9,7 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
 import com.gianlu.pyxreloaded.server.HttpsRedirect;
 import com.gianlu.pyxreloaded.server.Provider;
-import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
-import com.gianlu.pyxreloaded.singletons.LoadedCards;
-import com.gianlu.pyxreloaded.singletons.Preferences;
-import com.gianlu.pyxreloaded.singletons.Providers;
+import com.gianlu.pyxreloaded.singletons.*;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.RefreshAdminTokenTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
@@ -51,11 +48,16 @@ public class Server {
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
-        LoadedCards loadedCards = new LoadedCards(preferences.getString("pyxDb", "pyx.sqlite"));
+        LoadedCards loadedCards = new LoadedCards(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
         Providers.add(Annotations.LoadedCards.class, (Provider<LoadedCards>) () -> loadedCards);
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
+
+        ServerDatabase serverDatabase = new ServerDatabase(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
+
+        BanList banList = new BanList(serverDatabase);
+        Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);

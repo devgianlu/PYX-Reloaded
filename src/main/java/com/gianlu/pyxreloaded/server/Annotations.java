@@ -35,4 +35,9 @@ public final class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface LoadedCards {
     }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface BanList {
+    }
 }

@@ -2,6 +2,6 @@ target
 .idea/
 WebContent/node_modules/
 WebContent/.backup/
-*.iml
 .old/
 preferences.json
+server.sqlite

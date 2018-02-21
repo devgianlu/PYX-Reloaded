@@ -20,9 +20,11 @@ import org.apache.log4j.Logger;
 public class BanHandler extends BaseHandler {
     public static final String OP = Consts.Operation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
+    private final BanList banList;
     private final ConnectedUsers connectedUsers; //Presumably between here to line 28, we get the list of users currently connected.
 
-    public BanHandler(@Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
+    public BanHandler(@Annotations.BanList BanList banList, @Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
+        this.banList = banList;
         this.connectedUsers = connectedUsers;
     }
 
@@ -37,7 +39,6 @@ public class BanHandler extends BaseHandler {
         if (nickname == null || nickname.isEmpty())
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
 
-        String banIp;
         User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
 
         /*
@@ -47,18 +48,14 @@ public class BanHandler extends BaseHandler {
          * To everyone else: Send a message of who banned who
          */
         if (kickUser != null) {
-            banIp = kickUser.getHostname();
+            banList.add(kickUser.getHostname());
 
             kickUser.enqueueMessage(new QueuedMessage(MessageType.KICKED, new EventWrapper(Consts.Event.BANNED)));
 
             connectedUsers.removeUser(kickUser, Consts.DisconnectReason.BANNED);
-            logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), banIp, user.getNickname()));
-        } else { //Ban via nickname instead of IP address.
-            banIp = nickname;
-            logger.info(String.format("Banning %s by request of %s", banIp, user.getNickname()));
+            logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), kickUser.getHostname(), user.getNickname()));
         }
 
-        BanList.get().add(banIp); //Whatever banIp was determined to be, it was documented server-side right here.
         return JsonWrapper.EMPTY; //Doesn't return any JSON
     }
 }
