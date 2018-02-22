@@ -11,13 +11,12 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class RegisterHandler extends BaseHandler {
     public static final String OP = Consts.Operation.REGISTER.toString();
-    private static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
     private final BanList banList;
     private final UsersWithAccount accounts;
     private final ConnectedUsers users;
@@ -34,24 +33,25 @@ public class RegisterHandler extends BaseHandler {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
         String nickname = params.get(Consts.GeneralKeys.NICKNAME);
-        if (nickname == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
-        if (!Pattern.matches(VALID_NAME_PATTERN, nickname))
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
+        if (nickname == null)
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
         if (nickname.equalsIgnoreCase("xyzzy"))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.RESERVED_NICK);
+        if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
         boolean admin;
         String adminToken = params.get(Consts.GeneralKeys.ADMIN_TOKEN);
         admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.get().current().equals(adminToken);
 
         UserAccount account = accounts.getAccount(nickname);
-        if (account == null) {
+        if (account == null) { // Without account
             user = new User(nickname, exchange.getHostName(), Sessions.generateNewId(), admin);
         } else {
             switch (account.auth) {
                 case PASSWORD:
                     String password = params.get(Consts.AuthType.PASSWORD);
-                    if (!Objects.equals(account.password, password)) // TODO: Password hashing
+                    if (password == null || password.isEmpty() || !BCrypt.checkpw(password, account.hashedPassword))
                         throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
                     user = User.withAccount(account, exchange.getHostName(), admin);

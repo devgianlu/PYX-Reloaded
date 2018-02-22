@@ -48,7 +48,7 @@ public class User {
     }
 
     public static User withAccount(UserAccount account, String hostname, boolean admin) {
-        return new User(account.nickname, hostname, Sessions.generateNewId(), admin, account);
+        return new User(account.username, hostname, Sessions.generateNewId(), admin, account);
     }
 
     public boolean isAdmin() {

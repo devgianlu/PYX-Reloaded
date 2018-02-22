@@ -12,6 +12,7 @@ public final class Consts {
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
+    public static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
 
     /**
      * Possible events.
@@ -517,8 +518,11 @@ public final class Consts {
         /**
          * Decide whether to accept or decline the game options suggested modification.
          */
-        GAME_OPTIONS_SUGGESTION_DECISION("gosd");
-
+        GAME_OPTIONS_SUGGESTION_DECISION("gosd"),
+        /**
+         * Create an user account.
+         */
+        CREATE_ACCOUNT("ca");
 
         private final String op;
 
@@ -651,7 +655,15 @@ public final class Consts {
         /**
          * Reason why a player disconnected.
          */
-        DISCONNECT_REASON("qr");
+        DISCONNECT_REASON("qr"),
+        /**
+         * Authentication type.
+         */
+        AUTH_TYPE("aT"),
+        /**
+         * Email address.
+         */
+        EMAIL("em");
 
         private final String key;
 
@@ -883,6 +895,7 @@ public final class Consts {
         /**
          * Game password.
          */
+        @IgnoreDuplicateIn(AuthType.class)
         PASSWORD("pw"),
         /**
          * Maximum number of players.
@@ -1078,6 +1091,7 @@ public final class Consts {
      * Identify auth type in database, also used to send authentication data
      */
     public enum AuthType implements ReceivableKey {
+        @IgnoreDuplicateIn(GameOptionsData.class)
         PASSWORD("pw"),
         GOOGLE("g"),
         FACEBOOK("fb"),
