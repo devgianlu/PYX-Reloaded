@@ -24,9 +24,13 @@ function register(ev) {
     if (ev !== undefined && ev.keyCode !== 13) return;
 
     const nickname = $("input#nickname").val();
+    const password = $("input#password").val();
 
-    $.post("/AjaxServlet", "o=r&n=" + nickname).fail(function (data) {
+    $.post("/AjaxServlet", "o=r&n=" + nickname + "&pw=" + password).fail(function (data) {
         switch (data.responseJSON.ec) {
+            case "wp":
+                Notifier.error("Wrong password!", data);
+                break;
             case "nns":
                 Notifier.error("Please specify a nickname.", data);
                 break;

@@ -3,6 +3,7 @@ package com.gianlu.pyxreloaded;
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.game.GameManager;
+import com.gianlu.pyxreloaded.google.GoogleTokenVerifierService;
 import com.gianlu.pyxreloaded.paths.AjaxPath;
 import com.gianlu.pyxreloaded.paths.EventsPath;
 import com.gianlu.pyxreloaded.server.Annotations;
@@ -66,6 +67,9 @@ public class Server {
         globalTimer.scheduleAtFixedRate(userPingTask, PING_START_DELAY, PING_CHECK_DELAY, TimeUnit.MILLISECONDS);
 
         Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
+
+        GoogleTokenVerifierService googleVerifier = new GoogleTokenVerifierService(preferences);
+        Providers.add(Annotations.GoogleTokenVerifier.class, (Provider<GoogleTokenVerifierService>) () -> googleVerifier);
 
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);

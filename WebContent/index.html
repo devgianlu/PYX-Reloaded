@@ -31,12 +31,22 @@
                 <section class="mdc-card__primary">
                     <h1 class="mdc-card__title mdc-typography--title">Choose a Nickname to Start!</h1>
                 </section>
-                <section class="mdc-card__supporting-text">
-                    <label class="mdc-text-field" data-mdc-auto-init="MDCTextField" style="width: 75%">
-                        <input type="text" class="mdc-text-field__input" id="nickname" onkeydown="register(event);">
-                        <span class="mdc-text-field__label">Nickname</span>
-                        <div class="mdc-line-ripple"></div>
-                    </label>
+                <section class="mdc-card__supporting-text mdc-layout-grid">
+                    <div class="mdc-layout-grid__inner">
+                        <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                               data-mdc-auto-init="MDCTextField">
+                            <input type="text" class="mdc-text-field__input" id="nickname" onkeydown="register(event);">
+                            <span class="mdc-text-field__label">Nickname</span>
+                            <div class="mdc-line-ripple"></div>
+                        </label>
+                        <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                               data-mdc-auto-init="MDCTextField">
+                            <input type="password" class="mdc-text-field__input" id="password"
+                                   onkeydown="register(event);">
+                            <span class="mdc-text-field__label">Password</span>
+                            <div class="mdc-line-ripple"></div>
+                        </label>
+                    </div>
                 </section>
                 <section class="mdc-card__actions">
                     <button class="mdc-button mdc-button--compact mdc-card__action"
