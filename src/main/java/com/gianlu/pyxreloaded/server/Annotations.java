@@ -45,4 +45,9 @@ public final class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface UsersWithAccount {
     }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface GoogleTokenVerifier {
+    }
 }

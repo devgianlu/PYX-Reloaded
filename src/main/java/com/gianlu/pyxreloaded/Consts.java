@@ -316,7 +316,13 @@ public final class Consts {
          * <p>
          * FIXME: Remove this error
          */
-        SQL_ERROR("sqle");
+        SQL_ERROR("sqle"),
+        /**
+         * Google error.
+         * <p>
+         * FIXME: Remove this error
+         */
+        GOOGLE_ERROR("ge");
 
         private final String code;
 

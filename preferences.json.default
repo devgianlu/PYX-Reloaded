@@ -13,6 +13,7 @@
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
   "serverDbUrl": "jdbc:sqlite:server.sqlite.default",
+  "googleClientId": "",
   "maxSkipsBeforeKick": 2,
   "roundIntermission": 8,
   "minBlackCards": 50,

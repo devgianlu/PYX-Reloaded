@@ -4,6 +4,7 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.data.UserAccount;
+import com.gianlu.pyxreloaded.google.GoogleTokenVerifierService;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
@@ -12,6 +13,7 @@ import com.gianlu.pyxreloaded.singletons.BanList;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import com.gianlu.pyxreloaded.singletons.UsersWithAccount;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import org.mindrot.jbcrypt.BCrypt;
@@ -23,11 +25,16 @@ public class RegisterHandler extends BaseHandler {
     private final BanList banList;
     private final UsersWithAccount accounts;
     private final ConnectedUsers users;
+    private final GoogleTokenVerifierService googleVerifier;
 
-    public RegisterHandler(@Annotations.BanList BanList banList, @Annotations.UsersWithAccount UsersWithAccount accounts, @Annotations.ConnectedUsers ConnectedUsers users) {
+    public RegisterHandler(@Annotations.BanList BanList banList,
+                           @Annotations.UsersWithAccount UsersWithAccount accounts,
+                           @Annotations.ConnectedUsers ConnectedUsers users,
+                           @Annotations.GoogleTokenVerifier GoogleTokenVerifierService googleVerifier) {
         this.banList = banList;
         this.accounts = accounts;
         this.users = users;
+        this.googleVerifier = googleVerifier;
     }
 
     @Override
@@ -56,7 +63,12 @@ public class RegisterHandler extends BaseHandler {
 
                     user = User.withAccount(account, exchange.getHostName());
                     break;
-                case GOOGLE: // TODO
+                case GOOGLE:
+                    GoogleIdToken.Payload token = googleVerifier.verify(params.get(Consts.AuthType.GOOGLE));
+                    if (token == null)
+                        throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+
+                    user = User.withAccount(account, exchange.getHostName()); // FIXME: Wrong!
                     break;
                 case FACEBOOK: // TODO
                     break;
