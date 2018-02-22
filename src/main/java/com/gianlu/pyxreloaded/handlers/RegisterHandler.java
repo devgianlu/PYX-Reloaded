@@ -42,41 +42,46 @@ public class RegisterHandler extends BaseHandler {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
-        String nickname = params.get(Consts.GeneralKeys.NICKNAME);
-        if (nickname == null)
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
-        if (nickname.equalsIgnoreCase("xyzzy"))
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.RESERVED_NICK);
-        if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
+        UserAccount account;
+        String nickname;
+        Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+        switch (type) {
+            case PASSWORD:
+                nickname = params.get(Consts.GeneralKeys.NICKNAME);
+                if (nickname == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
+                if (nickname.equalsIgnoreCase("xyzzy"))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.RESERVED_NICK);
+                if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
-
-        UserAccount account = accounts.getAccount(nickname);
-        if (account == null) { // Without account
-            user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
-        } else {
-            switch (account.auth) {
-                case PASSWORD:
+                account = accounts.getAccountByNickname(nickname);
+                if (account == null) { // Without account
+                    user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
+                } else {
                     String password = params.get(Consts.AuthType.PASSWORD);
                     if (password == null || password.isEmpty() || !BCrypt.checkpw(password, account.hashedPassword))
                         throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
                     user = User.withAccount(account, exchange.getHostName());
-                    break;
-                case GOOGLE:
-                    GoogleIdToken.Payload token = googleVerifier.verify(params.get(Consts.AuthType.GOOGLE));
-                    if (token == null)
-                        throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-
-                    user = User.withAccount(account, exchange.getHostName()); // FIXME: Wrong!
-                    break;
-                case FACEBOOK: // TODO
-                    break;
-                case TWITTER: // TODO
-                    break;
-                default:
+                }
+                break;
+            case GOOGLE:
+                String tokenStr = params.get(Consts.AuthType.GOOGLE);
+                GoogleIdToken.Payload token = googleVerifier.verify(tokenStr);
+                if (token == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-            }
+
+                account = accounts.getGoogleAccount(token.getSubject());
+                if (account == null || account.auth != Consts.AuthType.GOOGLE)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+
+                nickname = account.username;
+                break;
+            default:
+            case FACEBOOK:
+            case TWITTER:
+                throw new UnsupportedOperationException();
         }
 
         users.checkAndAdd(user);

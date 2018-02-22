@@ -6,7 +6,7 @@ import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.apache.ApacheHttpTransport;
-import com.google.api.client.testing.json.MockJsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class GoogleTokenVerifierService {
     private final GoogleIdTokenVerifier verifier;
 
     public GoogleTokenVerifierService(Preferences preferences) {
-        verifier = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new MockJsonFactory())
+        verifier = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(preferences.getString("googleClientId", "")))
                 .build();
     }

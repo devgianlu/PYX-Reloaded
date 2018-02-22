@@ -20,13 +20,23 @@ window.onload = function () {
     });
 };
 
+function googleSignedIn(user) {
+    const token = user.getAuthResponse(true).id_token;
+    console.log(user);
+    $.post("/AjaxServlet", "o=r&aT=g&g=" + token).fail(function (data) {
+        console.error(data);
+    }).done(function (data) {
+        console.log(data);
+    });
+}
+
 function register(ev) {
     if (ev !== undefined && ev.keyCode !== 13) return;
 
     const nickname = $("input#nickname").val();
     const password = $("input#password").val();
 
-    $.post("/AjaxServlet", "o=r&n=" + nickname + "&pw=" + password).fail(function (data) {
+    $.post("/AjaxServlet", "o=r&aT=pw&n=" + nickname + "&pw=" + password).fail(function (data) {
         switch (data.responseJSON.ec) {
             case "wp":
                 Notifier.error("Wrong password!", data);

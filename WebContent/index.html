@@ -4,6 +4,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta name="google-site-verification" content="d1mgvYymY1hPvJcf0buZ-4e8RMETSFNRFz6aeD4BueI"/>
+    <meta name="google-signin-client_id"
+          content="464424051073-loi5kmcc3qev5a1lr5hvrjiqb3kcu2cl.apps.googleusercontent.com">
     <title>PYX-Reloaded</title>
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
@@ -46,6 +48,7 @@
                             <span class="mdc-text-field__label">Password</span>
                             <div class="mdc-line-ripple"></div>
                         </label>
+                        <div class="g-signin2" data-onsuccess="googleSignedIn"></div>
                     </div>
                 </section>
                 <section class="mdc-card__actions">
@@ -82,6 +85,7 @@
     </main>
 </div>
 
+<script src="//apis.google.com/js/platform.js" async defer></script>
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
