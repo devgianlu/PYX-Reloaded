@@ -18,7 +18,6 @@ public class User {
     private final String nickname;
     private final String hostname;
     private final String sessionId;
-    private final boolean admin;
     private final UserAccount account;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
     private long lastReceivedEvents = 0;
@@ -35,24 +34,23 @@ public class User {
      * @param hostname  The user's Internet hostname (which will likely just be their IP address).
      * @param sessionId The unique ID of this session for this server singletons.
      */
-    public User(String nickname, String hostname, String sessionId, boolean admin) {
-        this(nickname, hostname, sessionId, admin, null);
+    public User(String nickname, String hostname, String sessionId) {
+        this(nickname, hostname, sessionId, null);
     }
 
-    private User(String nickname, String hostname, @NotNull String sessionId, boolean admin, @Nullable UserAccount account) {
+    private User(String nickname, String hostname, @NotNull String sessionId, @Nullable UserAccount account) {
         this.nickname = nickname;
         this.hostname = hostname;
         this.sessionId = sessionId;
-        this.admin = admin;
         this.account = account;
     }
 
-    public static User withAccount(UserAccount account, String hostname, boolean admin) {
-        return new User(account.username, hostname, Sessions.generateNewId(), admin, account);
+    public static User withAccount(UserAccount account, String hostname) {
+        return new User(account.username, hostname, Sessions.generateNewId(), account);
     }
 
     public boolean isAdmin() {
-        return admin;
+        return account != null && account.admin;
     }
 
     public void checkChatFlood() throws BaseCahHandler.CahException {

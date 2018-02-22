@@ -8,7 +8,10 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
-import com.gianlu.pyxreloaded.singletons.*;
+import com.gianlu.pyxreloaded.singletons.BanList;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.Sessions;
+import com.gianlu.pyxreloaded.singletons.UsersWithAccount;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import org.mindrot.jbcrypt.BCrypt;
@@ -40,13 +43,10 @@ public class RegisterHandler extends BaseHandler {
         if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
-        boolean admin;
-        String adminToken = params.get(Consts.GeneralKeys.ADMIN_TOKEN);
-        admin = adminToken != null && adminToken.length() == AdminToken.TOKEN_LENGTH && AdminToken.get().current().equals(adminToken);
 
         UserAccount account = accounts.getAccount(nickname);
         if (account == null) { // Without account
-            user = new User(nickname, exchange.getHostName(), Sessions.generateNewId(), admin);
+            user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
         } else {
             switch (account.auth) {
                 case PASSWORD:
@@ -54,7 +54,7 @@ public class RegisterHandler extends BaseHandler {
                     if (password == null || password.isEmpty() || !BCrypt.checkpw(password, account.hashedPassword))
                         throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
-                    user = User.withAccount(account, exchange.getHostName(), admin);
+                    user = User.withAccount(account, exchange.getHostName());
                     break;
                 case GOOGLE: // TODO
                     break;
@@ -72,6 +72,6 @@ public class RegisterHandler extends BaseHandler {
 
         return new JsonWrapper()
                 .add(Consts.GeneralKeys.NICKNAME, nickname)
-                .add(Consts.GeneralKeys.IS_ADMIN, admin);
+                .add(Consts.GeneralKeys.IS_ADMIN, user.isAdmin());
     }
 }

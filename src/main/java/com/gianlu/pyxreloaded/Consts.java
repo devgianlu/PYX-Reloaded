@@ -605,10 +605,6 @@ public final class Consts {
          */
         GAME_ID("gid"),
         /**
-         * Admin token, alphanumeric string.
-         */
-        ADMIN_TOKEN("at"),
-        /**
          * Cardcast ID of type 'XXXXX'.
          */
         CARDCAST_ID("cci"),

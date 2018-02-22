@@ -11,7 +11,6 @@ import com.gianlu.pyxreloaded.server.HttpsRedirect;
 import com.gianlu.pyxreloaded.server.Provider;
 import com.gianlu.pyxreloaded.singletons.*;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
-import com.gianlu.pyxreloaded.task.RefreshAdminTokenTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -36,15 +35,11 @@ public class Server {
     private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
-    private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
         int maxGames = preferences.getInt("maxGames", 100);
         int maxUsers = preferences.getInt("maxUsers", 400);
-
-        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
-        globalTimer.scheduleAtFixedRate(new RefreshAdminTokenTask(), 0, REFRESH_ADMIN_TOKEN_DELAY, TimeUnit.MILLISECONDS);
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
@@ -61,6 +56,8 @@ public class Server {
 
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
+
+        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
