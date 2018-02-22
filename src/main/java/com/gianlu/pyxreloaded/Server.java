@@ -3,7 +3,6 @@ package com.gianlu.pyxreloaded;
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.game.GameManager;
-import com.gianlu.pyxreloaded.google.GoogleTokenVerifierService;
 import com.gianlu.pyxreloaded.paths.AjaxPath;
 import com.gianlu.pyxreloaded.paths.EventsPath;
 import com.gianlu.pyxreloaded.server.Annotations;
@@ -68,8 +67,8 @@ public class Server {
 
         Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
 
-        GoogleTokenVerifierService googleVerifier = new GoogleTokenVerifierService(preferences);
-        Providers.add(Annotations.GoogleTokenVerifier.class, (Provider<GoogleTokenVerifierService>) () -> googleVerifier);
+        SocialLogin socialLogin = new SocialLogin(preferences);
+        Providers.add(Annotations.SocialLogin.class, (Provider<SocialLogin>) () -> socialLogin);
 
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);

@@ -1,34 +1,30 @@
-package com.gianlu.pyxreloaded.data;
+package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserAccount {
+public abstract class UserAccount {
     public final String username;
     public final boolean admin;
     public final String email;
     public final Consts.AuthType auth;
-    public final String hashedPassword;
 
-    public UserAccount(ResultSet set) throws SQLException, BaseCahHandler.CahException {
+    UserAccount(ResultSet set) throws SQLException, BaseCahHandler.CahException {
         username = set.getString("username");
         email = set.getString("email");
         auth = Consts.AuthType.parse(set.getString("auth"));
         admin = set.getBoolean("admin");
-
-        hashedPassword = set.getString("password");
     }
 
-    public UserAccount(String username, String email, Consts.AuthType auth, @Nullable String hashedPassword) {
+    UserAccount(String username, String email, Consts.AuthType auth) {
         this.username = username;
         this.email = email;
         this.auth = auth;
         this.admin = false;
-        this.hashedPassword = hashedPassword;
     }
 
     public JsonWrapper toJson() {

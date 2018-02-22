@@ -48,6 +48,6 @@ public final class Annotations {
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface GoogleTokenVerifier {
+    public @interface SocialLogin {
     }
 }

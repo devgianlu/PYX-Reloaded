@@ -3,16 +3,13 @@ package com.gianlu.pyxreloaded.handlers;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.data.UserAccount;
-import com.gianlu.pyxreloaded.google.GoogleTokenVerifierService;
+import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
+import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
-import com.gianlu.pyxreloaded.singletons.BanList;
-import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
-import com.gianlu.pyxreloaded.singletons.Sessions;
-import com.gianlu.pyxreloaded.singletons.UsersWithAccount;
+import com.gianlu.pyxreloaded.singletons.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
@@ -25,16 +22,16 @@ public class RegisterHandler extends BaseHandler {
     private final BanList banList;
     private final UsersWithAccount accounts;
     private final ConnectedUsers users;
-    private final GoogleTokenVerifierService googleVerifier;
+    private final SocialLogin socialLogin;
 
     public RegisterHandler(@Annotations.BanList BanList banList,
                            @Annotations.UsersWithAccount UsersWithAccount accounts,
                            @Annotations.ConnectedUsers ConnectedUsers users,
-                           @Annotations.GoogleTokenVerifier GoogleTokenVerifierService googleVerifier) {
+                           @Annotations.SocialLogin SocialLogin socialLogin) {
         this.banList = banList;
         this.accounts = accounts;
         this.users = users;
-        this.googleVerifier = googleVerifier;
+        this.socialLogin = socialLogin;
     }
 
     @Override
@@ -55,12 +52,12 @@ public class RegisterHandler extends BaseHandler {
                 if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
-                account = accounts.getAccountByNickname(nickname);
+                account = accounts.getPasswordAccount(nickname);
                 if (account == null) { // Without account
                     user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
                 } else {
                     String password = params.get(Consts.AuthType.PASSWORD);
-                    if (password == null || password.isEmpty() || !BCrypt.checkpw(password, account.hashedPassword))
+                    if (password == null || password.isEmpty() || !BCrypt.checkpw(password, ((PasswordAccount) account).hashedPassword))
                         throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
                     user = User.withAccount(account, exchange.getHostName());
@@ -68,7 +65,7 @@ public class RegisterHandler extends BaseHandler {
                 break;
             case GOOGLE:
                 String tokenStr = params.get(Consts.AuthType.GOOGLE);
-                GoogleIdToken.Payload token = googleVerifier.verify(tokenStr);
+                GoogleIdToken.Payload token = socialLogin.verifyGoogle(tokenStr);
                 if (token == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
