@@ -9,10 +9,46 @@ class LoginManager {
         this.loginSubmit.on('click', () => this._handlePossibleRegister(undefined));
 
         this._socials = $('#socialLogin');
+        this.googleSignIn = this._socials.find('#googleSignIn');
     }
 
     static _postLoggedIn() {
         window.location = "/games/";
+    }
+
+    setupGoogle() {
+        gapi.load('auth2', () => {
+            this.google_auth2 = gapi.auth2.init({
+                client_id: '464424051073-loi5kmcc3qev5a1lr5hvrjiqb3kcu2cl.apps.googleusercontent.com',
+                cookiepolicy: 'single_host_origin',
+            });
+
+            this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
+                (user) => this._googleSuccess(user),
+                (error) => this._googleError(error));
+        });
+    }
+
+    _googleSuccess(user) {
+        Requester.request("r", {
+            "aT": "g",
+            "g": user.getAuthResponse().id_token
+        }, (data) => {
+            Notifier.debug(data);
+        }, (error) => {
+            switch (error.ec) {
+                case "git":
+                    Notifier.error("Invalid Google token. Please try again.", error);
+                    break;
+                case "gnr":
+                    Notifier.error("Your Google account is not registered.", error); // TODO: Ask to create one immediately
+                    break;
+            }
+        });
+    }
+
+    _googleError(error) {
+        Notifier.error("Failed signing in with Google.", error);
     }
 
     setup() {
@@ -30,6 +66,8 @@ class LoginManager {
                     } else {
                         window.location = "/games/";
                     }
+                } else {
+                    this.setupGoogle();
                 }
             }, null,
             (error) => {

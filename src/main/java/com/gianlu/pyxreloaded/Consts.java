@@ -318,7 +318,7 @@ public final class Consts {
         /**
          * User hasn't a Google account
          */
-        GOOGLE_NOT_REGISTERED("gnt"),
+        GOOGLE_NOT_REGISTERED("gnr"),
         /**
          * User sent an invalid Google ID token
          */

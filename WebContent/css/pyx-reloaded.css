@@ -20,6 +20,11 @@
     max-height: 60vh;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
+.mdc-button.mdc-button--raised svg {
+    fill: var(--mdc-theme-text-primary-on-primary);
+}
+
 /* Hide stuff in toolbar on mobile */
 .mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
     display: none;

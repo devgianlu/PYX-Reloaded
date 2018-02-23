@@ -4,8 +4,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta name="google-site-verification" content="d1mgvYymY1hPvJcf0buZ-4e8RMETSFNRFz6aeD4BueI"/>
-    <meta name="google-signin-client_id"
-          content="464424051073-loi5kmcc3qev5a1lr5hvrjiqb3kcu2cl.apps.googleusercontent.com">
     <title>PYX-Reloaded</title>
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
@@ -31,17 +29,22 @@
         <div class="mdc-layout-grid__inner centered_cards">
             <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="login">
                 <section class="mdc-card__primary">
-                    <h1 class="mdc-card__title mdc-typography--title">Choose a Nickname to Start!</h1>
+                    <h1 class="mdc-card__title mdc-typography--title">PYX login</h1>
                 </section>
                 <section class="mdc-card__supporting-text mdc-layout-grid">
+                    <h3 class="mdc-typography--body1 mdc-typography--adjust-margin">You can login without an account by
+                        putting your nickname ONLY down here. If you want to create a personal account either register
+                        with PYX or a social network.</h3>
                     <div class="mdc-layout-grid__inner">
                         <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                               style="margin-top: 0"
                                data-mdc-auto-init="MDCTextField">
                             <input type="text" class="mdc-text-field__input">
                             <span class="mdc-text-field__label">Nickname</span>
                             <div class="mdc-line-ripple"></div>
                         </label>
                         <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
+                               style="margin-top: 0"
                                data-mdc-auto-init="MDCTextField">
                             <input type="password" class="mdc-text-field__input">
                             <span class="mdc-text-field__label">Password</span>
@@ -50,17 +53,25 @@
                     </div>
                 </section>
                 <section class="mdc-card__actions">
-                    <button class="mdc-button mdc-button--compact mdc-card__action"
-                            data-mdc-auto-init="MDCRipple">Take me to the lobby!!!
+                    <button class="mdc-button mdc-button--compact mdc-card__action" data-mdc-auto-init="MDCRipple">Sign
+                        in
                     </button>
                 </section>
             </div>
 
             <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="socialLogin">
                 <section class="mdc-card__primary">
-                    <h1 class="mdc-card__title mdc-typography--title">Socials</h1>
+                    <h1 class="mdc-card__title mdc-typography--title">Social login</h1>
                 </section>
-                <section class="mdc-card__supporting-text">
+                <section class="mdc-card__supporting-text" style="padding-bottom: 16px">
+                    <div class="mdc-button mdc-button--raised" id="googleSignIn">
+                        <i class="mdc-button__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                                <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+                            </svg>
+                        </i>
+                        Google
+                    </div>
                 </section>
             </div>
 
@@ -92,6 +103,7 @@
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="//apis.google.com/js/api:client.js"></script>
 <script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/communication.helper.js"></script>
