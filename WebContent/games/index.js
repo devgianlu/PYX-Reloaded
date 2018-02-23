@@ -280,6 +280,10 @@ class Games {
     }
 }
 
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
 const games = new Games();
 const gid = getURLParameter('gid');
 if (gid !== null) Games.postJoinSpectate(gid); // No need to join or spectate, just move the UI there

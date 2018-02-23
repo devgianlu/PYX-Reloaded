@@ -44,9 +44,9 @@ class OtherStuffManager {
         }
     }
 
-    static _failedLoadingStuff(card, data) {
+    static _failedLoadingStuff(card, error) {
         card.find('.mdc-card__title').addClass('error');
-        Notifier.debug(data, true);
+        Notifier.debug(error, true);
     }
 
     shouldShow(id) {
@@ -111,11 +111,13 @@ class OtherStuffManager {
                 });
                 this.suggestedGameOptions_list.clear();
 
-                $.post("/AjaxServlet", "o=ggso&gid=" + this.gameManager.id).done((data) => {
+                Requester.request("ggsso", {
+                    "gid": this.gameManager.id
+                }, (data) => {
                     /** @param {object[]} data.sgo */
                     for (let i = 0; i < data.sgo.length; i++) this.addSuggestedOptionsItem(data.sgo[i])
-                }).fail((data) => {
-                    OtherStuffManager._failedLoadingStuff(card, data);
+                }, (error) => {
+                    OtherStuffManager._failedLoadingStuff(card, error);
                 });
                 break;
             case OtherStuffManager.SPECTATORS:

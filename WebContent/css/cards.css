@@ -2,6 +2,7 @@
     background: black;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .mdc-card.pyx-card[data-black=true] .card-text {
     background: black;
     color: var(--mdc-theme-text-primary-on-dark);
@@ -20,10 +21,12 @@
     min-height: 0;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .mdc-card.pyx-card[data-black=true] .card-details {
     color: var(--mdc-theme-text-primary-on-dark);
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .mdc-card.pyx-card[data-black=false] .card-details {
     color: var(--mdc-theme-text-primary-on-light);
 }
@@ -33,6 +36,7 @@
     justify-content: flex-start;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .mdc-card.pyx-card[data-black=false].highlighted {
     background: var(--mdc-theme-secondary);
 }

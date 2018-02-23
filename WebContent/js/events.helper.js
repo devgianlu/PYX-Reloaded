@@ -26,7 +26,7 @@ function processPollData(events) {
     for (let i = 0; i < events.length; i++) {
         const event = events[i];
         if (event.E === "pp") {
-            $.post("/AjaxServlet", "o=PP");
+            Requester.request("PP", {});
             continue;
         }
 
