@@ -37,7 +37,7 @@ public class BanHandler extends BaseHandler {
 
         //Assuming this is for when the command wasn't properly typed
         if (nickname == null || nickname.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
 

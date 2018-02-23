@@ -44,9 +44,6 @@ class LoginManager {
                 case "wp":
                     Notifier.error("Wrong password!", data);
                     break;
-                case "nns":
-                    Notifier.error("Please specify a nickname.", data);
-                    break;
                 case "niu":
                     Notifier.error("This nickname is already in use.", data);
                     break;
@@ -55,9 +52,6 @@ class LoginManager {
                     break;
                 case "in":
                     Notifier.error("This nickname must contain only alphanumeric characters and be between 2-29 characters long.", data);
-                    break;
-                case "rn":
-                    Notifier.error("This nickname is reserved.", data);
                     break;
                 case "Bd":
                     Notifier.error("You have been banned.", data);

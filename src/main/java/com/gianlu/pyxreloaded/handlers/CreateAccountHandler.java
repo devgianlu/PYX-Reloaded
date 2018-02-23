@@ -41,9 +41,7 @@ public class CreateAccountHandler extends BaseHandler {
 
         String nickname = params.get(Consts.GeneralKeys.NICKNAME);
         if (nickname == null)
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
-        if (nickname.equalsIgnoreCase("xyzzy"))
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.RESERVED_NICK);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
         if (connectedUsers.hasUser(nickname) || accounts.hasNickname(nickname))

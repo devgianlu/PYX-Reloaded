@@ -28,7 +28,7 @@ public class KickHandler extends BaseHandler {
 
         String nickname = params.get(Consts.GeneralKeys.NICKNAME);
         if (nickname == null || nickname.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_NICK_SPECIFIED);
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         final User kickUser = connectedUsers.getUser(nickname);
         if (kickUser == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_SUCH_USER);

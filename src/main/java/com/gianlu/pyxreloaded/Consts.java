@@ -228,10 +228,6 @@ public final class Consts {
          */
         NO_MSG_SPECIFIED("nms"),
         /**
-         * No nickname specified.
-         */
-        NO_NICK_SPECIFIED("nns"),
-        /**
          * No such user.
          */
         NO_SUCH_USER("nsu"),
@@ -271,10 +267,6 @@ public final class Consts {
          * Operation not specified.
          */
         OP_NOT_SPECIFIED("ons"),
-        /**
-         * That nick is reserved.
-         */
-        RESERVED_NICK("rn"),
         /**
          * Your session has expired. Refresh the page.
          */
