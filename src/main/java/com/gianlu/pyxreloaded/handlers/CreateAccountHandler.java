@@ -49,14 +49,14 @@ public class CreateAccountHandler extends BaseHandler {
         if (connectedUsers.hasUser(nickname) || accounts.hasNickname(nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
 
-        String email = params.get(Consts.GeneralKeys.EMAIL);
-        if (email == null || email.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-
         UserAccount account = null;
         Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
         switch (type) {
             case PASSWORD:
+                String email = params.get(Consts.GeneralKeys.EMAIL);
+                if (email == null || email.isEmpty())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+
                 String password = params.get(Consts.AuthType.PASSWORD);
                 if (password == null || password.isEmpty())
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
@@ -65,7 +65,7 @@ public class CreateAccountHandler extends BaseHandler {
                 break;
             case GOOGLE:
                 GoogleIdToken.Payload token = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
-                if (token == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                if (token == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
                 account = accounts.registerWithGoogle(nickname, token);
                 break;

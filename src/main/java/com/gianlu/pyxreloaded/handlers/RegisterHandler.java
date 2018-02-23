@@ -66,12 +66,10 @@ public class RegisterHandler extends BaseHandler {
             case GOOGLE:
                 String tokenStr = params.get(Consts.AuthType.GOOGLE);
                 GoogleIdToken.Payload token = socialLogin.verifyGoogle(tokenStr);
-                if (token == null)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                if (token == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
                 account = accounts.getGoogleAccount(token.getSubject());
-                if (account == null || account.auth != Consts.AuthType.GOOGLE)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_NOT_REGISTERED);
 
                 nickname = account.username;
                 break;

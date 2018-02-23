@@ -322,7 +322,15 @@ public final class Consts {
          * <p>
          * FIXME: Remove this error
          */
-        GOOGLE_ERROR("ge");
+        GOOGLE_ERROR("ge"),
+        /**
+         * User hasn't a Google account
+         */
+        GOOGLE_NOT_REGISTERED("gnt"),
+        /**
+         * User sent an invalid Google ID token
+         */
+        GOOGLE_INVALID_TOKEN("git");
 
         private final String code;
 

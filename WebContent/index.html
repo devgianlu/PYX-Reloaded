@@ -28,8 +28,8 @@
     </header>
 
     <main class="mdc-layout-grid mdc-toolbar-fixed-adjust">
-        <div class="mdc-layout-grid__inner centered_cards" style="">
-            <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-layout-grid__inner centered_cards">
+            <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="login">
                 <section class="mdc-card__primary">
                     <h1 class="mdc-card__title mdc-typography--title">Choose a Nickname to Start!</h1>
                 </section>
@@ -37,27 +37,33 @@
                     <div class="mdc-layout-grid__inner">
                         <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
                                data-mdc-auto-init="MDCTextField">
-                            <input type="text" class="mdc-text-field__input" id="nickname" onkeydown="register(event);">
+                            <input type="text" class="mdc-text-field__input">
                             <span class="mdc-text-field__label">Nickname</span>
                             <div class="mdc-line-ripple"></div>
                         </label>
                         <label class="mdc-text-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
                                data-mdc-auto-init="MDCTextField">
-                            <input type="password" class="mdc-text-field__input" id="password"
-                                   onkeydown="register(event);">
+                            <input type="password" class="mdc-text-field__input">
                             <span class="mdc-text-field__label">Password</span>
                             <div class="mdc-line-ripple"></div>
                         </label>
-                        <div class="g-signin2" data-onsuccess="googleSignedIn"></div>
                     </div>
                 </section>
                 <section class="mdc-card__actions">
                     <button class="mdc-button mdc-button--compact mdc-card__action"
-                            data-mdc-auto-init="MDCRipple"
-                            onclick="register();">Take me to the lobby!!!
+                            data-mdc-auto-init="MDCRipple">Take me to the lobby!!!
                     </button>
                 </section>
             </div>
+
+            <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="socialLogin">
+                <section class="mdc-card__primary">
+                    <h1 class="mdc-card__title mdc-typography--title">Socials</h1>
+                </section>
+                <section class="mdc-card__supporting-text">
+                </section>
+            </div>
+
             <div class="mdc-card mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
                 <section class="mdc-card__primary">
                     <h1 class="mdc-card__title mdc-typography--title">About PYX Reloaded</h1>
@@ -85,7 +91,6 @@
     </main>
 </div>
 
-<script src="//apis.google.com/js/platform.js" async defer></script>
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
