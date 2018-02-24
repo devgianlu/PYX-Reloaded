@@ -80,12 +80,12 @@ ifconfig
 
 from your terminal. Find the one section that has ```<UP,BROADCAST,RUNNING,MULTICAST>``` and copy the IP address, which should be marked as *inet*. Paste that IP address in your browser. If all is working smoothly, you should be taken to a page asking for you to enter a username.
 
-[screen1]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen1.png?raw=true
-[screen2]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen2.png?raw=true
-[screen3]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen3.png?raw=true
-[screen4]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen4.png?raw=true
-[screen5]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen5.png?raw=true
-[screen6]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen6.png?raw=true
-[screen7]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen7.png?raw=true
-[screen8]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen8.png?raw=true
-[screen9]: https://github.com/devgianlu/PYX-Reloaded/blob/material-ui/screenshots/screen9.png?raw=true
+[screen1]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen1.png?raw=true
+[screen2]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen2.png?raw=true
+[screen3]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen3.png?raw=true
+[screen4]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen4.png?raw=true
+[screen5]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen5.png?raw=true
+[screen6]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen6.png?raw=true
+[screen7]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen7.png?raw=true
+[screen8]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen8.png?raw=true
+[screen9]: https://github.com/devgianlu/PYX-Reloaded/blob/master/screenshots/screen9.png?raw=true
