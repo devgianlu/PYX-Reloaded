@@ -1,3 +1,50 @@
+class NicknameDialog {
+    constructor() {
+        this._dialog = $('#requestNicknameDialog');
+        this.dialog = new mdc.dialog.MDCDialog(this._dialog[0]);
+        this._dialog.find('._submit').on('click', () => this._accept());
+        this.dialog.listen('MDCDialog:cancel', () => this._cancel());
+
+        this._input = this._dialog.find('input');
+        this.input = new mdc.textField.MDCTextField(this._input.parent()[0]);
+
+        this.validation = new mdc.textField.MDCTextFieldHelperText(this._input.parent().next()[0]);
+    }
+
+    set error(error) {
+        if (error === false) {
+            this.input.valid = true;
+            return;
+        }
+
+        this.input.valid = false;
+        this.validation.foundation.setContent(error);
+    }
+
+    set accept(set) {
+        this.acceptListener = set;
+    }
+
+    show() {
+        this.error = false;
+        this._input.val("");
+
+        this.dialog.show();
+    }
+
+    close() {
+        this.dialog.close();
+    }
+
+    _accept() {
+        if (this.acceptListener !== null) this.acceptListener(this._input.val());
+    }
+
+    _cancel() {
+        this.dialog.close();
+    }
+}
+
 class LoginManager {
     constructor() {
         this._pyx = $('#login');
@@ -16,19 +63,33 @@ class LoginManager {
 
         this._socials = $('#socialLogin');
         this.googleSignIn = this._socials.find('#googleSignIn');
+
+        this.nickDialog = new NicknameDialog();
     }
 
     static _postLoggedIn() {
         window.location = "/games/";
     }
 
+    static _ERR_MSG_IN() {
+        return "This nickname must contain only alphanumeric characters and be between 2-29 characters long.";
+    }
+
+    static _ERR_MSG_NIU() {
+        return "This nickname has already been taken.";
+    }
+
+    static _ERR_MSG_GIT() {
+        return "Invalid Google token. Please try again.";
+    }
+
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
             case "niu":
-                Notifier.error("This nickname is already in use.", error);
+                Notifier.error(LoginManager._ERR_MSG_NIU(), error);
                 return true;
             case "in":
-                Notifier.error("This nickname must contain only alphanumeric characters and be between 2-29 characters long.", error);
+                Notifier.error(LoginManager._ERR_MSG_IN(), error);
                 return true;
             case "Bd":
                 Notifier.error("You have been banned.", error);
@@ -63,30 +124,58 @@ class LoginManager {
 
             this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
                 (user) => this._googleSuccess(user),
-                (error) => this._googleError(error));
+                (error) => Notifier.error("Failed signing in with Google.", error));
         });
     }
 
     _googleSuccess(user) {
+        const id_token = user.getAuthResponse().id_token;
         Requester.request("r", {
             "aT": "g",
-            "g": user.getAuthResponse().id_token
+            "g": id_token
         }, (data) => {
             Notifier.debug(data);
+            LoginManager._postLoggedIn();
         }, (error) => {
             switch (error.ec) {
                 case "git":
-                    Notifier.error("Invalid Google token. Please try again.", error);
+                    Notifier.error(LoginManager._ERR_MSG_GIT(), error);
                     break;
                 case "gnr":
-                    Notifier.error("Your Google account is not registered.", error); // TODO: Ask to create one immediately
+                    Notifier.error("Your Google account is not registered.", error);
+                    this.nickDialog.accept = (nick) => {
+                        Requester.request("ca", {
+                            "aT": "g",
+                            "n": nick,
+                            "g": id_token
+                        }, (data) => {
+                            Notifier.debug(data);
+                            Notifier.timeout(Notifier.SUCCESS, "Google account successfully registered. Sing in by pressing Google again.");
+                            this.nickDialog.close();
+                        }, (error) => {
+                            Notifier.debug(error, true);
+
+                            switch (error.ec) {
+                                case "in":
+                                    this.nickDialog.error = LoginManager._ERR_MSG_IN();
+                                    break;
+                                case "niu":
+                                    this.nickDialog.error = LoginManager._ERR_MSG_NIU();
+                                    break;
+                                case "git":
+                                    this.nickDialog.error = LoginManager._ERR_MSG_GIT();
+                                    break;
+                            }
+                        })
+                    };
+
+                    this.nickDialog.show();
+                    break;
+                default:
+                    Notifier.debug(error, true);
                     break;
             }
         });
-    }
-
-    _googleError(error) {
-        Notifier.error("Failed signing in with Google.", error);
     }
 
     setup() {

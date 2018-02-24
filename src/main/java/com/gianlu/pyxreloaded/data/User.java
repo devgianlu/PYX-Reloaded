@@ -186,4 +186,8 @@ public class User {
     public List<Long> getLastMessageTimes() {
         return lastMessageTimes;
     }
+
+    public UserAccount getAccount() {
+        return account;
+    }
 }

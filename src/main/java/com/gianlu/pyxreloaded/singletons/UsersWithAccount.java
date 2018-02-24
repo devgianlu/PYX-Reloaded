@@ -21,8 +21,24 @@ public final class UsersWithAccount {
         this.db = db;
     }
 
+    @NotNull
+    private static String VALUES(String... values) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+
+        boolean first = true;
+        for (@Nullable String val : values) {
+            if (!first) builder.append(",");
+            if (val == null) builder.append("NULL");
+            else builder.append("'").append(val).append("'");
+            first = false;
+        }
+
+        return builder.append(")").toString();
+    }
+
     @Nullable
-    public PasswordAccount getPasswordAccount(String nickname) throws BaseCahHandler.CahException {
+    public PasswordAccount getPasswordAccount(@NotNull String nickname) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE username='" + nickname + "'")) {
             return set.next() ? new PasswordAccount(set) : null;
         } catch (SQLException ex) {
@@ -31,7 +47,7 @@ public final class UsersWithAccount {
     }
 
     @Nullable
-    public GoogleAccount getGoogleAccount(String subject) throws BaseCahHandler.CahException {
+    public GoogleAccount getGoogleAccount(@NotNull String subject) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE google_sub='" + subject + "'")) {
             return set.next() ? new GoogleAccount(set) : null;
         } catch (SQLException ex) {
@@ -39,7 +55,7 @@ public final class UsersWithAccount {
         }
     }
 
-    public boolean hasNickname(String nickname) throws BaseCahHandler.CahException {
+    public boolean hasNickname(@NotNull String nickname) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT count(*) FROM users WHERE username='" + nickname + "'")) {
             return set.getInt(1) > 0;
         } catch (SQLException ex) {
@@ -49,11 +65,8 @@ public final class UsersWithAccount {
 
     private void addAccount(PasswordAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
-            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, password) VALUES ('"
-                    + account.username + "', '"
-                    + Consts.AuthType.PASSWORD.toString() + "', '"
-                    + account.email + "', '"
-                    + account.hashedPassword + "')");
+            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, password) VALUES "
+                    + VALUES(account.username, Consts.AuthType.PASSWORD.toString(), account.email, account.avatarUrl, account.hashedPassword));
 
             if (result != 1) throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
         } catch (SQLException ex) {
@@ -63,11 +76,8 @@ public final class UsersWithAccount {
 
     private void addAccount(GoogleAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
-            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, google_sub) VALUES ('"
-                    + account.username + "', '"
-                    + Consts.AuthType.GOOGLE.toString() + "', '"
-                    + account.email + "', '"
-                    + account.subject + "')");
+            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, google_sub) VALUES " +
+                    VALUES(account.username, Consts.AuthType.GOOGLE.toString(), account.email, account.avatarUrl, account.subject));
 
             if (result != 1) throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
         } catch (SQLException ex) {

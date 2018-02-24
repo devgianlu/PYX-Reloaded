@@ -21,6 +21,7 @@ public class GetMeHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();
         obj.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+        if (user.getAccount() != null) obj.add(Consts.GeneralKeys.ACCOUNT, user.getAccount().toJson());
 
         if (user.getGame() != null) obj.add(Consts.GeneralKeys.GAME_ID, user.getGame().getId());
         else obj.add(Consts.GeneralKeys.GAME_ID, -1);

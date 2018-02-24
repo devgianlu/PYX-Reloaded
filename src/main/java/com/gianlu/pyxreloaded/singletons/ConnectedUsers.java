@@ -6,6 +6,7 @@ import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -40,7 +41,7 @@ public final class ConnectedUsers {
      *
      * @param user User to add. {@code getNickname()} is used to determine the nickname.
      */
-    public void checkAndAdd(User user) throws BaseCahHandler.CahException {
+    public void checkAndAdd(@NotNull User user) throws BaseCahHandler.CahException {
         synchronized (users) {
             if (this.hasUser(user.getNickname())) {
                 logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));

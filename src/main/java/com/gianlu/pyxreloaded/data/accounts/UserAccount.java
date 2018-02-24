@@ -12,7 +12,7 @@ public abstract class UserAccount {
     public final String username;
     public final boolean admin;
     public final String email;
-    public final Consts.AuthType auth;
+    private final Consts.AuthType auth;
     public final String avatarUrl;
 
     UserAccount(ResultSet set) throws SQLException, BaseCahHandler.CahException {
@@ -34,6 +34,7 @@ public abstract class UserAccount {
     public JsonWrapper toJson() {
         JsonWrapper obj = new JsonWrapper();
         obj.add(Consts.GeneralKeys.EMAIL, email);
+        obj.add(Consts.GeneralKeys.AUTH_TYPE, auth.toString());
         obj.add(Consts.GeneralKeys.NICKNAME, username);
         obj.add(Consts.GeneralKeys.IS_ADMIN, admin);
         return obj;

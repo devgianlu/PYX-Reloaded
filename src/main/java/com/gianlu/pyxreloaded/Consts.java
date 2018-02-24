@@ -665,7 +665,11 @@ public final class Consts {
         /**
          * Email address.
          */
-        EMAIL("em");
+        EMAIL("em"),
+        /**
+         * User account data.
+         */
+        ACCOUNT("a");
 
         private final String key;
 

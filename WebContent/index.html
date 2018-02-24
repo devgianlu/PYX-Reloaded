@@ -114,6 +114,31 @@
     </main>
 </div>
 
+<aside id="requestNicknameDialog" class="mdc-dialog">
+    <div class="mdc-dialog__surface">
+        <header class="mdc-dialog__header">
+            <h2 class="mdc-dialog__header__title">Choose your nickname</h2>
+        </header>
+        <section class="mdc-dialog__body">
+            <label class="mdc-text-field" style="width: 100%">
+                <input type="text" class="mdc-text-field__input">
+                <span class="mdc-text-field__label">Nickname</span>
+                <div class="mdc-line-ripple"></div>
+            </label>
+            <p class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent mdc-text-field-helper-text--validation-msg"></p>
+        </section>
+        <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button _submit">
+                Submit
+            </button>
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">
+                Cancel
+            </button>
+        </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>
+
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//apis.google.com/js/api:client.js"></script>
 <script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>

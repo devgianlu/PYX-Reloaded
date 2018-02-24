@@ -13,6 +13,7 @@ import com.gianlu.pyxreloaded.singletons.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
+import org.jetbrains.annotations.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ public class RegisterHandler extends BaseHandler {
     }
 
     @Override
-    public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
+    public JsonWrapper handle(@Nullable User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
@@ -70,6 +71,7 @@ public class RegisterHandler extends BaseHandler {
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_NOT_REGISTERED);
 
                 nickname = account.username;
+                user = User.withAccount(account, exchange.getHostName());
                 break;
             default:
             case FACEBOOK:
