@@ -33,8 +33,9 @@ public abstract class UserAccount {
 
     public JsonWrapper toJson() {
         JsonWrapper obj = new JsonWrapper();
-        obj.add(Consts.GeneralKeys.EMAIL, email);
+        obj.add(Consts.UserData.EMAIL, email);
         obj.add(Consts.GeneralKeys.AUTH_TYPE, auth.toString());
+        obj.add(Consts.UserData.PICTURE, avatarUrl);
         obj.add(Consts.GeneralKeys.NICKNAME, username);
         obj.add(Consts.GeneralKeys.IS_ADMIN, admin);
         return obj;

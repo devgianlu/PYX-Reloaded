@@ -1,0 +1,13 @@
+#drawer .mdc-drawer__header-content {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#drawer .mdc-drawer__header-content img._profileImg {
+    border-radius: 50%;
+    margin-bottom: 16px;
+}
+
+#drawer .mdc-drawer__header-content span {
+    margin: auto 0;
+}

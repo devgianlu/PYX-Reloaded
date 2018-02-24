@@ -1,5 +1,6 @@
 package com.gianlu.pyxreloaded;
 
+import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -546,7 +547,11 @@ public final class Consts {
      * Possible game state.
      */
     public enum GameState {
-        JUDGING("j"), LOBBY("l"), PLAYING("p"), ROUND_OVER("ro");
+        JUDGING("j"),
+        LOBBY("l"),
+        @IgnoreDuplicateIn(User.class)
+        PLAYING("p"),
+        ROUND_OVER("ro");
 
         private final String state;
 
@@ -662,10 +667,6 @@ public final class Consts {
          * Authentication type.
          */
         AUTH_TYPE("aT"),
-        /**
-         * Email address.
-         */
-        EMAIL("em"),
         /**
          * User account data.
          */
@@ -1116,6 +1117,32 @@ public final class Consts {
                     return type;
 
             throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST);
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    /**
+     * User data
+     */
+    public enum UserData implements ReceivableKey, ReturnableKey {
+        /**
+         * Profile picture URL.
+         */
+        @IgnoreDuplicateIn(GameState.class)
+        PICTURE("p"),
+        /**
+         * Email address.
+         */
+        EMAIL("em");
+
+        private final String key;
+
+        UserData(String key) {
+            this.key = key;
         }
 
         @Override

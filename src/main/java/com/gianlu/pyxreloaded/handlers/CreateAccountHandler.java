@@ -51,7 +51,7 @@ public class CreateAccountHandler extends BaseHandler {
         Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
         switch (type) {
             case PASSWORD:
-                String email = params.get(Consts.GeneralKeys.EMAIL);
+                String email = params.get(Consts.UserData.EMAIL);
                 if (email == null || email.isEmpty())
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 

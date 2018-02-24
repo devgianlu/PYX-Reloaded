@@ -32,8 +32,26 @@ class Games {
                 {'data': ['gid']}]
         });
 
-        this.drawer = new mdc.drawer.MDCTemporaryDrawer($('#drawer')[0]);
+        this._drawer = $('#drawer');
+        this.drawer = new mdc.drawer.MDCTemporaryDrawer(this._drawer[0]);
         $('.mdc-toolbar__menu-icon').on('click', () => this.drawer.open = true);
+
+        this.profilePicture = this._drawer.find('._profileImg');
+        this.loadUserInfo()
+    }
+
+    loadUserInfo() {
+        Requester.request("gme", {}, (data) => {
+            /**
+             * @param {object} data.a - User account
+             * @param {string} data.a.p - Profile picture URL
+             */
+            Notifier.debug(data);
+
+            this.profilePicture.attr('src', data.a.p);
+        }, (error) => {
+            Notifier.error("Failed loading user info.", error)
+        });
     }
 
     static logout() {
