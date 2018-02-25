@@ -111,7 +111,7 @@ class OtherStuffManager {
                 });
                 this.suggestedGameOptions_list.clear();
 
-                Requester.request("ggsso", {
+                Requester.request("ggso", {
                     "gid": this.gameManager.id
                 }, (data) => {
                     /** @param {object[]} data.sgo */

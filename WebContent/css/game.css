@@ -1,6 +1,11 @@
 #gameLayout {
     width: 100%;
+}
+
+#gameLayout > .__inner {
+    width: 100%;
     display: flex;
+    flex-flow: row;
 }
 
 #gameLayout > .message {

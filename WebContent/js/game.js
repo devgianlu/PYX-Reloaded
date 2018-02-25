@@ -111,7 +111,7 @@ class GameManager {
     set blackCard(card) {
         this.bc = card;
 
-        if (card === undefined) {
+        if (card === undefined || card === null) {
             this._blackCardContainer.empty();
             return;
         }
@@ -337,7 +337,7 @@ class GameManager {
                 break;
             case "sjj":
                 this.toggleHandVisibility(false);
-                Notifier.timeout(Notifier.ALERT, "Select the winning card.");
+                Notifier.timeout(Notifier.ALERT, "Select the winning card(s).");
                 break;
             case "sp":
                 this.toggleHandVisibility(true);
@@ -624,6 +624,15 @@ class GameManager {
         this._reloadDrawerPadding();
     }
 
+    _removePlayer(nick) {
+        for (let i = 0; i < this.info.pi.length; i++) {
+            if (this.info.pi[i].N === nick) {
+                this.info.pi.splice(i, 1);
+                break;
+            }
+        }
+    }
+
     /**
      * @param {object[]} data.h - Hand cards
      * @param {boolean} data.ch - Clear hand cards before adding newer
@@ -667,13 +676,7 @@ class GameManager {
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
                 break;
             case "gpl":
-                for (let i = 0; i < this.info.pi.length; i++) {
-                    if (this.info.pi[i].N === data.n) {
-                        this.info.pi.splice(i, 1);
-                        break;
-                    }
-                }
-
+                this._removePlayer(data.n);
                 this._reloadScoreboard();
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
                 break;
@@ -704,6 +707,7 @@ class GameManager {
                 this._updateOptionsDialog();
                 break;
             case "gpki":
+                this._removePlayer(data.n);
                 Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
                 break;
             case "gps":
@@ -875,7 +879,7 @@ function loadUI(gameManager, gameOptionsDialog) {
                 });
 
                 gameManager.blackCard = gcData.bc;
-                gameManager.updateHandInfo(gcData.ltp, data.ltd);
+                gameManager.updateHandInfo(gcData.ltp, gcData.ltd);
 
                 gameManager.addHandCards(gcData.h, true);
                 gameManager.addTableCards(gcData.wc, true);
