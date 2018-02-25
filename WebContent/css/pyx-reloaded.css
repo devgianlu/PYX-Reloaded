@@ -21,17 +21,12 @@
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
-.mdc-button.mdc-button--raised svg {
+.mdc-button.mdc-button--raised svg.mdc-button__icon {
     fill: var(--mdc-theme-text-primary-on-primary);
 }
 
-.mdc-button svg {
-    height: 18px;
-    width: 18px;
-}
-
-.mdc-button .mdc-button__icon--svg {
-    vertical-align: -12%;
+.mdc-button svg.mdc-button__icon {
+    vertical-align: -12% !important;
 }
 
 /* Hide stuff in toolbar on mobile */
