@@ -4,6 +4,8 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
+import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
+import com.gianlu.pyxreloaded.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
@@ -55,6 +57,9 @@ public class CreateAccountHandler extends BaseHandler {
                 if (email == null || email.isEmpty())
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
+                if (accounts.hasEmail(email))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+
                 String password = params.get(Consts.AuthType.PASSWORD);
                 if (password == null || password.isEmpty())
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
@@ -62,12 +67,24 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithPassword(nickname, email, password);
                 break;
             case GOOGLE:
-                GoogleIdToken.Payload token = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
-                if (token == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
+                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
+                if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
-                account = accounts.registerWithGoogle(nickname, token);
+                if (accounts.hasEmail(googleToken.getEmail()))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+
+                account = accounts.registerWithGoogle(nickname, googleToken);
                 break;
             case FACEBOOK:
+                FacebookToken facebookToken = socialLogin.verifyFacebook(params.get(Consts.AuthType.FACEBOOK));
+                if (facebookToken == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
+
+                FacebookProfileInfo facebookInfo = socialLogin.infoFacebook(facebookToken.userId);
+                if (accounts.hasEmail(facebookInfo.email))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+
+                account = accounts.registerWithFacebook(nickname, facebookToken, facebookInfo);
                 break;
             case TWITTER:
                 break;

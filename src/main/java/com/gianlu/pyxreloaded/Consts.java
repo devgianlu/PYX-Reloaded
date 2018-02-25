@@ -317,13 +317,31 @@ public final class Consts {
          */
         GOOGLE_ERROR("ge"),
         /**
-         * User hasn't a Google account
+         * User hasn't a Google account.
          */
         GOOGLE_NOT_REGISTERED("gnr"),
         /**
-         * User sent an invalid Google ID token
+         * User sent an invalid Google ID token.
          */
-        GOOGLE_INVALID_TOKEN("git");
+        GOOGLE_INVALID_TOKEN("git"),
+        /**
+         * Facebook error.
+         * <p>
+         * FIXME: Remove this error
+         */
+        FACEBOOK_ERROR("fe"),
+        /**
+         * User sent an invalid Facebook access token.
+         */
+        FACEBOOK_INVALID_TOKEN("fit"),
+        /**
+         * User hasn't a Facebook account.
+         */
+        FACEBOOK_NOT_REGISTERED("fnr"),
+        /**
+         * Email already in use.
+         */
+        EMAIL_IN_USE("emiu");
 
         private final String code;
 

@@ -25,6 +25,15 @@
     fill: var(--mdc-theme-text-primary-on-primary);
 }
 
+.mdc-button svg {
+    height: 18px;
+    width: 18px;
+}
+
+.mdc-button .mdc-button__icon--svg {
+    vertical-align: -12%;
+}
+
 /* Hide stuff in toolbar on mobile */
 .mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
     display: none;

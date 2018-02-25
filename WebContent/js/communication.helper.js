@@ -133,9 +133,20 @@ class Requester {
         $.post("/AjaxServlet", paramsStr + "&o=" + op).done((data) => {
             if (done !== null) done(data);
         }).fail((data) => {
-            if (failNative !== null) failNative(data);
+            let called = false;
+
+            if (failNative !== null) {
+                failNative(data);
+                called = true;
+            }
+
             /** @param {object} data.responseJSON */
-            if (fail !== null && "responseJSON" in data && "ec" in data.responseJSON) fail(data.responseJSON);
+            if (fail !== null && "responseJSON" in data && "ec" in data.responseJSON) {
+                fail(data.responseJSON);
+                called = true;
+            }
+
+            if (!called) Notifier.debug(data, true);
         });
     }
 

@@ -63,6 +63,7 @@ class LoginManager {
 
         this._socials = $('#socialLogin');
         this.googleSignIn = this._socials.find('#googleSignIn');
+        this.facebookSignIn = this._socials.find('#facebookSignIn');
 
         this.nickDialog = new NicknameDialog();
     }
@@ -75,6 +76,10 @@ class LoginManager {
         return "This nickname must contain only alphanumeric characters and be between 2-29 characters long.";
     }
 
+    static _ERR_MSG_EMIU() {
+        return "This email is already registered. You may want to login instead.";
+    }
+
     static _ERR_MSG_NIU() {
         return "This nickname has already been taken.";
     }
@@ -83,10 +88,17 @@ class LoginManager {
         return "Invalid Google token. Please try again.";
     }
 
+    static _ERR_MSG_FIT() {
+        return "Invalid Facebook token. Please try again.";
+    }
+
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
             case "niu":
                 Notifier.error(LoginManager._ERR_MSG_NIU(), error);
+                return true;
+            case "emiu":
+                Notifier.error(LoginManager._ERR_MSG_EMIU(), error);
                 return true;
             case "in":
                 Notifier.error(LoginManager._ERR_MSG_IN(), error);
@@ -128,6 +140,85 @@ class LoginManager {
         });
     }
 
+    setupFacebook() {
+        FB.init({
+            appId: '198497240899387',
+            cookie: true,
+            xfbml: true,
+            autoLogAppEvents: Notifier._debug,
+            version: 'v2.12'
+        });
+
+        FB.AppEvents.logPageView();
+
+        this.facebookSignIn.on('click', () => FB.login((user) => {
+            this._facebookSuccess(user);
+        }, {
+            scope: 'email,public_profile',
+        }));
+    }
+
+    _showNickDialog(params, success) {
+        this.nickDialog.accept = (nick) => {
+            Requester.request("ca", Object.assign(params, {"n": nick}), (data) => {
+                Notifier.debug(data);
+                success();
+                this.nickDialog.close();
+            }, (error) => {
+                if (error.ec === "in") {
+                    Notifier.debug(error, true);
+                    this.nickDialog.error = LoginManager._ERR_MSG_IN();
+                    return;
+                }
+
+                if (error.ec === "niu") {
+                    Notifier.debug(error, true);
+                    this.nickDialog.error = LoginManager._ERR_MSG_NIU();
+                    return;
+                }
+
+                this.nickDialog.close();
+                switch (error.ec) {
+                    case "emiu":
+                        Notifier.error(LoginManager._ERR_MSG_EMIU(), error);
+                        break;
+                    case "fit":
+                        Notifier.error(LoginManager._ERR_MSG_FIT(), error);
+                        break;
+                }
+            })
+        };
+
+        this.nickDialog.show();
+    }
+
+    _facebookSuccess(user) {
+        const accessToken = user.authResponse.accessToken;
+        Requester.request("r", {
+            "aT": "fb",
+            "fb": accessToken
+        }, (data) => {
+            Notifier.debug(data);
+            LoginManager._postLoggedIn();
+        }, (error) => {
+            switch (error.ec) {
+                case "fit":
+                    Notifier.error(LoginManager._ERR_MSG_FIT(), error);
+                    break;
+                case "fnr":
+                    Notifier.error("Your Facebook account is not registered.", error);
+                    this._showNickDialog({
+                        "aT": "fb",
+                        "fb": accessToken
+                    }, () => Notifier.timeout(Notifier.SUCCESS, "Facebook account successfully registered. Sing in by pressing Facebook again."));
+                    break;
+                default:
+                    Notifier.debug(error, true);
+                    break;
+            }
+        })
+    }
+
     _googleSuccess(user) {
         const id_token = user.getAuthResponse().id_token;
         Requester.request("r", {
@@ -143,33 +234,10 @@ class LoginManager {
                     break;
                 case "gnr":
                     Notifier.error("Your Google account is not registered.", error);
-                    this.nickDialog.accept = (nick) => {
-                        Requester.request("ca", {
-                            "aT": "g",
-                            "n": nick,
-                            "g": id_token
-                        }, (data) => {
-                            Notifier.debug(data);
-                            Notifier.timeout(Notifier.SUCCESS, "Google account successfully registered. Sing in by pressing Google again.");
-                            this.nickDialog.close();
-                        }, (error) => {
-                            Notifier.debug(error, true);
-
-                            switch (error.ec) {
-                                case "in":
-                                    this.nickDialog.error = LoginManager._ERR_MSG_IN();
-                                    break;
-                                case "niu":
-                                    this.nickDialog.error = LoginManager._ERR_MSG_NIU();
-                                    break;
-                                case "git":
-                                    this.nickDialog.error = LoginManager._ERR_MSG_GIT();
-                                    break;
-                            }
-                        })
-                    };
-
-                    this.nickDialog.show();
+                    this._showNickDialog({
+                        "aT": "g",
+                        "g": id_token
+                    }, () => Notifier.timeout(Notifier.SUCCESS, "Google account successfully registered. Sing in by pressing Google again."));
                     break;
                 default:
                     Notifier.debug(error, true);
@@ -195,6 +263,7 @@ class LoginManager {
                     }
                 } else {
                     this.setupGoogle();
+                    this.setupFacebook();
                 }
             }, null,
             (error) => {

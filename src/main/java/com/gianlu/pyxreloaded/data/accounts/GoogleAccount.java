@@ -16,9 +16,9 @@ public class GoogleAccount extends UserAccount {
         subject = set.getString("google_sub");
     }
 
-    public GoogleAccount(String username, String email, GoogleIdToken.Payload payload) {
-        super(username, email, Consts.AuthType.GOOGLE, (String) payload.getOrDefault("picture", null));
+    public GoogleAccount(String nickname, GoogleIdToken.Payload token) {
+        super(nickname, token.getEmail(), Consts.AuthType.GOOGLE, (String) token.getOrDefault("picture", null));
 
-        this.subject = payload.getSubject();
+        this.subject = token.getSubject();
     }
 }

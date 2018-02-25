@@ -5,6 +5,7 @@ import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
+import com.gianlu.pyxreloaded.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
@@ -63,18 +64,27 @@ public class RegisterHandler extends BaseHandler {
                 }
                 break;
             case GOOGLE:
-                String tokenStr = params.get(Consts.AuthType.GOOGLE);
-                GoogleIdToken.Payload token = socialLogin.verifyGoogle(tokenStr);
-                if (token == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
+                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
+                if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
-                account = accounts.getGoogleAccount(token.getSubject());
+                account = accounts.getGoogleAccount(googleToken.getSubject());
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_NOT_REGISTERED);
 
                 nickname = account.username;
                 user = User.withAccount(account, exchange.getHostName());
                 break;
-            default:
             case FACEBOOK:
+                FacebookToken facebookToken = socialLogin.verifyFacebook(params.get(Consts.AuthType.FACEBOOK));
+                if (facebookToken == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
+
+                account = accounts.getFacebookAccount(facebookToken.userId);
+                if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_NOT_REGISTERED);
+
+                nickname = account.username;
+                user = User.withAccount(account, exchange.getHostName());
+                break;
+            default:
             case TWITTER:
                 throw new UnsupportedOperationException();
         }
