@@ -3,11 +3,37 @@
     align-items: flex-start;
 }
 
-#drawer .mdc-drawer__header-content img._profileImg {
-    border-radius: 50%;
-    margin-bottom: 16px;
+#drawer .mdc-drawer__header-content h1 {
+    margin: auto 0 !important;
 }
 
-#drawer .mdc-drawer__header-content span {
-    margin: auto 0;
+#drawer .mdc-drawer__header-content .details {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    max-height: 96px;
+    overflow: hidden;
+}
+
+#drawer .mdc-drawer__header-content .details img.details--profile {
+    border-radius: 50%;
+    height: 100%;
+    width: auto;
+    max-height: 96px;
+    max-width: 96px;
+}
+
+#drawer .mdc-drawer__header-content .details__inner {
+    padding-left: 16px;
+    margin: auto auto auto 0;
+    overflow: hidden;
+    flex-shrink: 1;
+}
+
+#drawer .mdc-drawer__header-content .details__inner > * {
+    overflow-wrap: break-word;
+}
+
+#drawer .mdc-drawer__header-content .details__inner > :last-child {
+    margin: 0;
 }

@@ -36,7 +36,9 @@ class Games {
         this.drawer = new mdc.drawer.MDCTemporaryDrawer(this._drawer[0]);
         $('.mdc-toolbar__menu-icon').on('click', () => this.drawer.open = true);
 
-        this.profilePicture = this._drawer.find('._profileImg');
+        this.profilePicture = this._drawer.find('.details--profile');
+        this.profileNickname = this._drawer.find('.details--nick');
+        this.profileEmail = this._drawer.find('.details--email');
         this.loadUserInfo()
     }
 
@@ -44,11 +46,15 @@ class Games {
         Requester.request("gme", {}, (data) => {
             /**
              * @param {object} data.a - User account
+             * @param {string} data.n - User nickname
              * @param {string} data.a.p - Profile picture URL
+             * @param {string} data.a.em - Profile email
              */
             Notifier.debug(data);
 
-            this.profilePicture.attr('src', data.a.p);
+            if (data.a.p !== null) this.profilePicture.attr('src', data.a.p);
+            this.profileNickname.text(data.n);
+            this.profileEmail.text(data.a.em);
         }, (error) => {
             Notifier.error("Failed loading user info.", error)
         });
