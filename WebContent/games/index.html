@@ -61,17 +61,13 @@
     <nav class="mdc-drawer__drawer">
         <header class="mdc-drawer__header">
             <div class="mdc-drawer__header-content mdc-theme--text-primary-on-primary mdc-theme--primary-bg">
-                <!-- FIXME: Looks pretty bad -->
-                <div class="details">
-                    <img class="details--profile" src="/css/no-profile.svg">
-                    <div class="details__inner">
-                        <h2 class="mdc-typography--headline mdc-typography--adjust-margin details--nick">
-                            {{Nickname}}</h2>
-                        <h2 class="mdc-typography--body1 mdc-typography--adjust-margin details--email mdc-theme--text-secondary-on-primary">
-                            {{Email}}</h2>
-                    </div>
+                <img class="details--profile" src="/css/no-profile.svg">
+                <div class="details__container">
+                    <h2 class="mdc-typography--title details--nick">
+                        {{Nickname}}</h2>
+                    <h2 class="mdc-typography--body1 details--email mdc-theme--text-secondary-on-primary">
+                        {{Email}}</h2>
                 </div>
-                <h1 class="mdc-typography--title">PYX-Reloaded</h1>
             </div>
         </header>
         <nav class="mdc-drawer__content mdc-list">
