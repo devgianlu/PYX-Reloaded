@@ -84,6 +84,12 @@ public class RegisterHandler extends BaseHandler {
                 nickname = account.username;
                 user = User.withAccount(account, exchange.getHostName());
                 break;
+            case GITHUB:
+                String githubToken = params.get(Consts.AuthType.GITHUB);
+                if (githubToken == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+
+                // TODO
             default:
             case TWITTER:
                 throw new UnsupportedOperationException();

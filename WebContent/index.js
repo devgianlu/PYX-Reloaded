@@ -64,6 +64,7 @@ class LoginManager {
         this._socials = $('#socialLogin');
         this.googleSignIn = this._socials.find('#googleSignIn');
         this.facebookSignIn = this._socials.find('#facebookSignIn');
+        this.githubSignIn = this._socials.find('#githubSignIn');
 
         this.nickDialog = new NicknameDialog();
     }
@@ -158,6 +159,12 @@ class LoginManager {
         }));
     }
 
+    setupGitHub() {
+        this.githubSignIn.on('click', () => {
+            window.location = "https://github.com/login/oauth/authorize?scope=read:user&client_id=d7057c607cf69f592239"
+        })
+    }
+
     _showNickDialog(params, success) {
         this.nickDialog.accept = (nick) => {
             Requester.request("ca", Object.assign(params, {"n": nick}), (data) => {
@@ -246,6 +253,18 @@ class LoginManager {
         });
     }
 
+    _githubSuccess(token) {
+        Requester.request("r", {
+            "aT": "gh",
+            "gh": token
+        }, (data) => {
+            Notifier.debug(data);
+            LoginManager._postLoggedIn();
+        }, (error) => {
+            Notifier.debug(error, true);
+        });
+    }
+
     setup() {
         Requester.request("fl", {}, (data) => {
                 data.css.sort(function (a, b) {
@@ -264,6 +283,14 @@ class LoginManager {
                 } else {
                     this.setupGoogle();
                     this.setupFacebook();
+                    this.setupGitHub();
+
+                    const authType = getURLParameter("aT");
+                    if (authType === "gh") {
+                        const token = Cookies.getJSON("PYX-Github-Token");
+                        Cookies.remove("PYX-Github-Token");
+                        this._githubSuccess(token);
+                    }
                 }
             }, null,
             (error) => {
@@ -297,6 +324,10 @@ class LoginManager {
         });
 
     }
+}
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
 const loginManager = new LoginManager();

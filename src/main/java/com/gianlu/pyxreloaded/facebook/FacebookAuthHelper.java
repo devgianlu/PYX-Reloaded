@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class FacebookTokenVerifier {
+public class FacebookAuthHelper {
     private static final String DEBUG_TOKEN = "https://graph.facebook.com/debug_token";
     private static final String GRAPH = "https://graph.facebook.com/";
     private final HttpClient client;
@@ -23,7 +23,7 @@ public class FacebookTokenVerifier {
     private final JsonParser parser = new JsonParser();
     private final String appId;
 
-    public FacebookTokenVerifier(String appId, String appSecret) {
+    public FacebookAuthHelper(String appId, String appSecret) {
         this.client = HttpClients.createDefault();
         this.appToken = appId + "%7C" + appSecret; // URL encoded
         this.appId = appId;

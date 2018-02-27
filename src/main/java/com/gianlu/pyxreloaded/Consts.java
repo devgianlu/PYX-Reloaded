@@ -341,7 +341,13 @@ public final class Consts {
         /**
          * Email already in use.
          */
-        EMAIL_IN_USE("emiu");
+        EMAIL_IN_USE("emiu"),
+        /**
+         * Github error.
+         * <p>
+         * FIXME: Remove this error
+         */
+        GITHUB_ERROR("ghe");
 
         private final String code;
 
@@ -1120,6 +1126,7 @@ public final class Consts {
         PASSWORD("pw"),
         GOOGLE("g"),
         FACEBOOK("fb"),
+        GITHUB("gh"),
         TWITTER("tw");
 
         private final String key;

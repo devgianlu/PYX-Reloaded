@@ -16,6 +16,8 @@
   "googleClientId": "",
   "facebookAppId": "",
   "facebookAppSecret": "",
+  "githubAppId": "",
+  "githubAppSecret": "",
   "maxSkipsBeforeKick": 2,
   "roundIntermission": 8,
   "minBlackCards": 50,

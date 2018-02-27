@@ -1,10 +1,12 @@
 package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.facebook.FacebookAuthHelper;
 import com.gianlu.pyxreloaded.facebook.FacebookOAuthException;
 import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
 import com.gianlu.pyxreloaded.facebook.FacebookToken;
-import com.gianlu.pyxreloaded.facebook.FacebookTokenVerifier;
+import com.gianlu.pyxreloaded.github.GithubAuthHelper;
+import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -18,15 +20,17 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 public final class SocialLogin {
-    private final GoogleIdTokenVerifier googleVerifier;
-    private final FacebookTokenVerifier facebookVerifier;
+    private final GithubAuthHelper githubHelper;
+    private final GoogleIdTokenVerifier googleHelper;
+    private final FacebookAuthHelper facebookHelper;
 
-    public SocialLogin(Preferences preferences) {
-        googleVerifier = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
+    public SocialLogin(GithubAuthHelper githubHelper, Preferences preferences) {
+        this.githubHelper = githubHelper;
+        googleHelper = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(preferences.getString("googleClientId", "")))
                 .build();
 
-        facebookVerifier = new FacebookTokenVerifier(preferences.getString("facebookAppId", ""), preferences.getString("facebookAppSecret", ""));
+        facebookHelper = new FacebookAuthHelper(preferences.getString("facebookAppId", ""), preferences.getString("facebookAppSecret", ""));
     }
 
     @Nullable
@@ -34,7 +38,7 @@ public final class SocialLogin {
         if (tokenStr == null) return null;
 
         try {
-            GoogleIdToken token = googleVerifier.verify(tokenStr);
+            GoogleIdToken token = googleHelper.verify(tokenStr);
             return token == null ? null : token.getPayload();
         } catch (GeneralSecurityException | IOException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_ERROR, ex);
@@ -44,7 +48,7 @@ public final class SocialLogin {
     @NotNull
     public FacebookProfileInfo infoFacebook(String userId) throws BaseCahHandler.CahException {
         try {
-            return facebookVerifier.info(userId);
+            return facebookHelper.info(userId);
         } catch (FacebookOAuthException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN, ex);
         } catch (IOException ex) {
@@ -57,11 +61,20 @@ public final class SocialLogin {
         if (accessToken == null) return null;
 
         try {
-            return facebookVerifier.verify(accessToken);
+            return facebookHelper.verify(accessToken);
         } catch (IOException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_ERROR, ex);
         } catch (FacebookOAuthException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN, ex);
+        }
+    }
+
+    @NotNull
+    public GithubProfileInfo infoGithub(String accessToken) throws BaseCahHandler.CahException {
+        try {
+            return githubHelper.info(accessToken);
+        } catch (IOException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_ERROR, ex);
         }
     }
 }
