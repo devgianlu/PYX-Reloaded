@@ -129,7 +129,7 @@ public final class UsersWithAccount {
     private void addAccount(GithubAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, github_user_id) VALUES " +
-                    VALUES(account.username, Consts.AuthType.FACEBOOK.toString(), account.email, account.avatarUrl, account.id));
+                    VALUES(account.username, Consts.AuthType.GITHUB.toString(), account.email, account.avatarUrl, account.id));
 
             if (result != 1) throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
         } catch (SQLException ex) {
