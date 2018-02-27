@@ -93,6 +93,10 @@ class LoginManager {
         return "Invalid Facebook token. Please try again.";
     }
 
+    static _ERR_MSG_GHIT() {
+        return "Invalid Github token. Please try again.";
+    }
+
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
             case "niu":
@@ -192,6 +196,12 @@ class LoginManager {
                     case "fit":
                         Notifier.error(LoginManager._ERR_MSG_FIT(), error);
                         break;
+                    case "git":
+                        Notifier.error(LoginManager._ERR_MSG_GIT(), error);
+                        break;
+                    case "ghit":
+                        Notifier.error(LoginManager._ERR_MSG_GHIT(), error);
+                        break;
                 }
             })
         };
@@ -261,7 +271,21 @@ class LoginManager {
             Notifier.debug(data);
             LoginManager._postLoggedIn();
         }, (error) => {
-            Notifier.debug(error, true);
+            switch (error.ec) {
+                case "ghit":
+                    Notifier.error(LoginManager._ERR_MSG_GHIT(), error);
+                    break;
+                case "ghnr":
+                    Notifier.error("Your Github account is not registered.", error);
+                    this._showNickDialog({
+                        "aT": "gh",
+                        "gh": token
+                    }, () => Notifier.timeout(Notifier.SUCCESS, "Github account successfully registered. Sing in by pressing Github again."));
+                    break;
+                default:
+                    Notifier.debug(error, true);
+                    break;
+            }
         });
     }
 

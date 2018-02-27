@@ -6,6 +6,7 @@ import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
 import com.gianlu.pyxreloaded.facebook.FacebookToken;
+import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
@@ -85,6 +86,17 @@ public class CreateAccountHandler extends BaseHandler {
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
 
                 account = accounts.registerWithFacebook(nickname, facebookToken, facebookInfo);
+                break;
+            case GITHUB:
+                String githubToken = params.get(Consts.AuthType.GITHUB);
+                if (githubToken == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
+
+                GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
+                if (accounts.hasEmail(githubInfo.email))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+
+                account = accounts.registerWithGithub(nickname, githubInfo);
                 break;
             case TWITTER:
                 break;

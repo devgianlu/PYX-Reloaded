@@ -6,6 +6,7 @@ import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.facebook.FacebookToken;
+import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
@@ -87,9 +88,15 @@ public class RegisterHandler extends BaseHandler {
             case GITHUB:
                 String githubToken = params.get(Consts.AuthType.GITHUB);
                 if (githubToken == null)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
 
-                // TODO
+                GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
+                account = accounts.getGithubAccount(githubInfo.id);
+                if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_NOT_REGISTERED);
+
+                nickname = account.username;
+                user = User.withAccount(account, exchange.getHostName());
+                break;
             default:
             case TWITTER:
                 throw new UnsupportedOperationException();

@@ -347,7 +347,15 @@ public final class Consts {
          * <p>
          * FIXME: Remove this error
          */
-        GITHUB_ERROR("ghe");
+        GITHUB_ERROR("ghe"),
+        /**
+         * User hasn't a Github account.
+         */
+        GITHUB_NOT_REGISTERED("ghnr"),
+        /**
+         * User sent an invalid Github access token.
+         */
+        GITHUB_INVALID_TOKEN("ghit");
 
         private final String code;
 

@@ -2,10 +2,12 @@ package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.accounts.FacebookAccount;
+import com.gianlu.pyxreloaded.data.accounts.GithubAccount;
 import com.gianlu.pyxreloaded.data.accounts.GoogleAccount;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
 import com.gianlu.pyxreloaded.facebook.FacebookToken;
+import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.jetbrains.annotations.NotNull;
@@ -57,9 +59,19 @@ public final class UsersWithAccount {
         }
     }
 
+    @Nullable
     public FacebookAccount getFacebookAccount(@NotNull String userId) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE facebook_user_id='" + userId + "'")) {
             return set.next() ? new FacebookAccount(set) : null;
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
+    }
+
+    @Nullable
+    public GithubAccount getGithubAccount(@NotNull String id) throws BaseCahHandler.CahException {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE github_user_id='" + id + "'")) {
+            return set.next() ? new GithubAccount(set) : null;
         } catch (SQLException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
         }
@@ -114,6 +126,17 @@ public final class UsersWithAccount {
         }
     }
 
+    private void addAccount(GithubAccount account) throws BaseCahHandler.CahException {
+        try (Statement statement = db.statement()) {
+            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, github_user_id) VALUES " +
+                    VALUES(account.username, Consts.AuthType.FACEBOOK.toString(), account.email, account.avatarUrl, account.id));
+
+            if (result != 1) throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
+    }
+
     @NotNull
     public PasswordAccount registerWithPassword(String nickname, String email, String password) throws BaseCahHandler.CahException {
         PasswordAccount account = new PasswordAccount(nickname, email, BCrypt.hashpw(password, BCrypt.gensalt()));
@@ -130,6 +153,12 @@ public final class UsersWithAccount {
 
     public FacebookAccount registerWithFacebook(String nickname, FacebookToken token, FacebookProfileInfo info) throws BaseCahHandler.CahException {
         FacebookAccount account = new FacebookAccount(nickname, token, info);
+        addAccount(account);
+        return account;
+    }
+
+    public GithubAccount registerWithGithub(String nickname, GithubProfileInfo info) throws BaseCahHandler.CahException {
+        GithubAccount account = new GithubAccount(nickname, info);
         addAccount(account);
         return account;
     }
