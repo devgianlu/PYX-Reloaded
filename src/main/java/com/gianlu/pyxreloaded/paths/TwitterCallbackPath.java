@@ -21,8 +21,11 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TwitterCallbackPath implements HttpHandler {
+    private static final Logger logger = Logger.getLogger(TwitterCallbackPath.class.getSimpleName());
     private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
     private static final String REDIRECT_LOCATION = "/?" + Consts.GeneralKeys.AUTH_TYPE + "=" + Consts.AuthType.TWITTER;
     private final TwitterAuthHelper helper;
@@ -57,19 +60,19 @@ public class TwitterCallbackPath implements HttpHandler {
                 String verifier = extractVerifier(exchange);
 
                 if (token == null || verifier == null)
-                    throw new Exception("Invalid request!");
+                    throw new IllegalArgumentException("Missing token or verifier!");
 
                 Cookie tokensCookie = exchange.getRequestCookies().get("PYX-Twitter-Token");
                 if (tokensCookie == null)
-                    throw new Exception("Missing cookie!");
+                    throw new IllegalArgumentException("Missing 'PYX-Twitter-Token' cookie!");
 
                 List<NameValuePair> tokens = URLEncodedUtils.parse(tokensCookie.getValue(), Charset.forName("UTF-8"));
                 if (!Objects.equals(token, Utils.get(tokens, "oauth_token")))
-                    throw new Exception("Tokens aren't equal!");
+                    throw new IllegalStateException("Missing token in cookie or tokens don't match!");
 
                 String secret = Utils.get(tokens, "oauth_token_secret");
                 if (secret == null)
-                    throw new Exception("Missing token secret in cookie!");
+                    throw new IllegalArgumentException("Missing token secret in cookie!");
 
                 OAuth1AccessToken accessToken = helper.accessToken(new OAuth1RequestToken(token, secret), verifier);
                 CookieImpl cookie = new CookieImpl("PYX-Twitter-Token", accessToken.getRawResponse());
@@ -78,7 +81,7 @@ public class TwitterCallbackPath implements HttpHandler {
                 exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
                 exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
             } catch (Throwable ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
                 throw ex;
             }
         } else {

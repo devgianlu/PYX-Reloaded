@@ -59,8 +59,6 @@ public class GithubCallbackPath implements HttpHandler {
                 logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
                 throw ex;
             }
-
-            exchange.getResponseSender().send(code);
         } else {
             exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);
         }

@@ -10,8 +10,11 @@ import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TwitterStartAuthFlowPath implements HttpHandler {
+    private static final Logger logger = Logger.getLogger(TwitterStartAuthFlowPath.class.getSimpleName());
     private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
     private final TwitterAuthHelper helper;
 
@@ -36,7 +39,7 @@ public class TwitterStartAuthFlowPath implements HttpHandler {
                 exchange.getResponseHeaders().add(Headers.LOCATION, helper.authorizationUrl(token) + "&force_login=false");
                 exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
             } catch (Throwable ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
                 throw ex;
             }
         } else {
