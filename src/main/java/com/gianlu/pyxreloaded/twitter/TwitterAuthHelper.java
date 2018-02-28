@@ -6,6 +6,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.httpclient.HttpClient;
 import com.github.scribejava.core.model.*;
 import com.github.scribejava.core.oauth.OAuth10aService;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import io.undertow.util.Headers;
 import org.apache.http.Header;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class TwitterAuthHelper {
+    private static final String VERIFY_CREDENTIALS_URL = "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true";
     private final OAuth10aService service;
     private final JsonParser parser = new JsonParser();
 
@@ -55,10 +57,15 @@ public class TwitterAuthHelper {
 
     @NotNull
     public TwitterProfileInfo info(OAuth1AccessToken token) throws InterruptedException, ExecutionException, IOException {
-        OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true");
+        OAuthRequest request = new OAuthRequest(Verb.GET, VERIFY_CREDENTIALS_URL);
         service.signRequest(token, request);
         Response response = service.execute(request);
-        return new TwitterProfileInfo(parser.parse(response.getBody()).getAsJsonObject());
+
+        try {
+            return new TwitterProfileInfo(parser.parse(response.getBody()).getAsJsonObject());
+        } catch (JsonParseException | NullPointerException ex) {
+            throw new IOException(ex);
+        }
     }
 
     private static class HttpClientWrapper implements HttpClient {

@@ -73,10 +73,13 @@ public class GithubAuthHelper {
             if (!element.isJsonObject()) throw new IOException("Response is not of type JsonObject");
 
             JsonObject obj = element.getAsJsonObject();
-            if (obj.has("error")) throw new GithubException(obj);
-            else return obj.get("access_token").getAsString();
-
-            // TODO: Check scopes
+            if (obj.has("error")) {
+                throw new GithubException(obj);
+            } else {
+                String scopes = obj.get("scope").getAsString();
+                if (!scopes.contains("read:user")) throw GithubException.invalidScopes();
+                return obj.get("access_token").getAsString();
+            }
         } catch (JsonParseException | NullPointerException ex) {
             throw new IOException(ex);
         } finally {
