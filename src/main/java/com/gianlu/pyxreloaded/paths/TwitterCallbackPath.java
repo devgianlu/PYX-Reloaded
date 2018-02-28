@@ -1,17 +1,21 @@
 package com.gianlu.pyxreloaded.paths;
 
+import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
-import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
-import com.github.scribejava.core.model.OAuth1AccessToken;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.CookieImpl;
+import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Deque;
+import java.util.concurrent.TimeUnit;
 
 public class TwitterCallbackPath implements HttpHandler {
+    private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
+    private static final String REDIRECT_LOCATION = "/?" + Consts.GeneralKeys.AUTH_TYPE + "=" + Consts.AuthType.TWITTER;
     private final TwitterAuthHelper helper;
 
     public TwitterCallbackPath(TwitterAuthHelper helper) {
@@ -46,9 +50,12 @@ public class TwitterCallbackPath implements HttpHandler {
                 if (token == null || verifier == null)
                     throw new Exception("Invalid request!");
 
-                OAuth1AccessToken accessToken = helper.accessToken(token, verifier);
-                TwitterProfileInfo info = helper.info(accessToken);
-                System.out.println(info);
+                String accessToken = helper.accessToken(token, verifier);
+                CookieImpl cookie = new CookieImpl("PYX-Twitter-Token", accessToken);
+                cookie.setMaxAge(COOKIE_MAX_AGE);
+                exchange.setResponseCookie(cookie);
+                exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
+                exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 throw ex;
