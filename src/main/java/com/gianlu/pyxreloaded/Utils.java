@@ -2,9 +2,13 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cards.WhiteCard;
 import com.google.gson.JsonArray;
+import org.apache.http.NameValuePair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -48,5 +52,14 @@ public class Utils {
         }
 
         return builder.toString();
+    }
+
+    @Nullable
+    public static String get(List<NameValuePair> pairs, String name) {
+        for (NameValuePair pair : pairs)
+            if (Objects.equals(pair.getName(), name))
+                return pair.getValue();
+
+        return null;
     }
 }

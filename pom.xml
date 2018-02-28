@@ -74,9 +74,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.scribejava</groupId>
-            <artifactId>scribejava-apis</artifactId>
-            <version>5.2.0-java7again</version>
+            <groupId>com.hunorkovacs</groupId>
+            <artifactId>koauth-sync_2.11</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
