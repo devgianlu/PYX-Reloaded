@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.github.GithubAuthHelper;
 import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.apache.ApacheHttpTransport;
@@ -21,16 +22,17 @@ import java.util.Collections;
 
 public final class SocialLogin {
     private final GithubAuthHelper githubHelper;
+    private final TwitterAuthHelper twitterHelper;
     private final GoogleIdTokenVerifier googleHelper;
     private final FacebookAuthHelper facebookHelper;
 
-    public SocialLogin(GithubAuthHelper githubHelper, Preferences preferences) {
+    public SocialLogin(GithubAuthHelper githubHelper, TwitterAuthHelper twitterHelper, Preferences preferences) {
         this.githubHelper = githubHelper;
-        googleHelper = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
+        this.twitterHelper = twitterHelper;
+        this.facebookHelper = new FacebookAuthHelper(preferences.getString("facebookAppId", ""), preferences.getString("facebookAppSecret", ""));
+        this.googleHelper = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(preferences.getString("googleClientId", "")))
                 .build();
-
-        facebookHelper = new FacebookAuthHelper(preferences.getString("facebookAppId", ""), preferences.getString("facebookAppSecret", ""));
     }
 
     @Nullable
