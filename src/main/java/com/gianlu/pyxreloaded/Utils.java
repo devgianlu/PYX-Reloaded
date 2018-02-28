@@ -23,7 +23,6 @@ public class Utils {
         return jsonArray;
     }
 
-
     @NotNull
     public static String joinCardIds(Collection<WhiteCard> items, String separator) {
         if (items == null) return "";

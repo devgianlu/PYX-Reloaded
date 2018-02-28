@@ -64,6 +64,7 @@ class LoginManager {
         this._socials = $('#socialLogin');
         this.googleSignIn = this._socials.find('#googleSignIn');
         this.facebookSignIn = this._socials.find('#facebookSignIn');
+        this.twitterSignIn = this._socials.find('#twitterSignIn');
         this.githubSignIn = this._socials.find('#githubSignIn');
 
         this.nickDialog = new NicknameDialog();
@@ -166,6 +167,12 @@ class LoginManager {
     setupGitHub() {
         this.githubSignIn.on('click', () => {
             window.location = "https://github.com/login/oauth/authorize?scope=read:user&client_id=d7057c607cf69f592239"
+        })
+    }
+
+    setupTwitter() {
+        this.twitterSignIn.on('click', () => {
+            window.location = "/TwitterStartAuthFlow"
         })
     }
 
@@ -308,6 +315,7 @@ class LoginManager {
                     this.setupGoogle();
                     this.setupFacebook();
                     this.setupGitHub();
+                    this.setupTwitter();
 
                     const authType = getURLParameter("aT");
                     if (authType === "gh") {

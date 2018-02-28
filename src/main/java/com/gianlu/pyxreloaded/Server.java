@@ -4,9 +4,7 @@ import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.github.GithubAuthHelper;
-import com.gianlu.pyxreloaded.paths.AjaxPath;
-import com.gianlu.pyxreloaded.paths.EventsPath;
-import com.gianlu.pyxreloaded.paths.GithubCallbackPath;
+import com.gianlu.pyxreloaded.paths.*;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
 import com.gianlu.pyxreloaded.server.HttpsRedirect;
@@ -14,6 +12,7 @@ import com.gianlu.pyxreloaded.server.Provider;
 import com.gianlu.pyxreloaded.singletons.*;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
+import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
@@ -70,8 +69,9 @@ public class Server {
         Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
 
         GithubAuthHelper githubAuthHelper = new GithubAuthHelper(preferences);
+        TwitterAuthHelper twitterAuthHelper = new TwitterAuthHelper(preferences);
 
-        SocialLogin socialLogin = new SocialLogin(githubAuthHelper, preferences);
+        SocialLogin socialLogin = new SocialLogin(githubAuthHelper, twitterAuthHelper, preferences);
         Providers.add(Annotations.SocialLogin.class, (Provider<SocialLogin>) () -> socialLogin);
 
         CardcastService cardcastService = new CardcastService();
@@ -84,7 +84,9 @@ public class Server {
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
-                .addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper));
+                .addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper))
+                .addExactPath("/TwitterStartAuthFlow", new TwitterStartAuthFlowPath(twitterAuthHelper))
+                .addExactPath("/TwitterCallback", new TwitterCallbackPath(twitterAuthHelper));
 
         RoutingHandler router = new RoutingHandler();
         router.setFallbackHandler(pathHandler)
