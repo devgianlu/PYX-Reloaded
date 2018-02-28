@@ -33,7 +33,7 @@ public class GithubAuthHelper {
         this.appSecret = preferences.getString("githubAppSecret", "");
     }
 
-    public GithubProfileInfo info(String accessToken) throws IOException {
+    public GithubProfileInfo info(@NotNull String accessToken) throws IOException {
         HttpGet get = new HttpGet(USER);
         get.addHeader("Authorization", "token " + accessToken);
 

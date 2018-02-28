@@ -355,7 +355,21 @@ public final class Consts {
         /**
          * User sent an invalid Github access token.
          */
-        GITHUB_INVALID_TOKEN("ghit");
+        GITHUB_INVALID_TOKEN("ghit"),
+        /**
+         * User sent an invalid Twitter access token.
+         */
+        TWITTER_INVALID_TOKEN("twit"),
+        /**
+         * Twitter error.
+         * <p>
+         * FIXME: Remove this error
+         */
+        TWITTER_ERROR("twe"),
+        /**
+         * User hasn't a Twitter account.
+         */
+        TWITTER_NOT_REGISTERED("twnr");
 
         private final String code;
 

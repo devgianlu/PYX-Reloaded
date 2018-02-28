@@ -30,7 +30,7 @@ public class FacebookAuthHelper {
     }
 
     @Nullable
-    public FacebookToken verify(String accessToken) throws IOException, FacebookOAuthException {
+    public FacebookToken verify(@NotNull String accessToken) throws IOException, FacebookOAuthException {
         HttpGet get = new HttpGet(DEBUG_TOKEN + "?input_token=" + accessToken + "&access_token=" + appToken);
         try {
             HttpResponse resp = client.execute(get);

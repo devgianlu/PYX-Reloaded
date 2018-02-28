@@ -15,6 +15,7 @@ import com.gianlu.pyxreloaded.singletons.BanList;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.gianlu.pyxreloaded.singletons.SocialLogin;
 import com.gianlu.pyxreloaded.singletons.UsersWithAccount;
+import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 
@@ -99,6 +100,15 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithGithub(nickname, githubInfo);
                 break;
             case TWITTER:
+                String twitterTokens = params.get(Consts.AuthType.TWITTER);
+                if (twitterTokens == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);
+
+                TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);
+                if (accounts.hasEmail(twitterInfo.email))
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+
+                account = accounts.registerWithTwitter(nickname, twitterInfo);
                 break;
         }
 

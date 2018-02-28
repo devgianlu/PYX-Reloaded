@@ -98,6 +98,10 @@ class LoginManager {
         return "Invalid Github token. Please try again.";
     }
 
+    static _ERR_MSG_TWIT() {
+        return "Invalid Twitter token. Please try again.";
+    }
+
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
             case "niu":
@@ -209,6 +213,9 @@ class LoginManager {
                     case "ghit":
                         Notifier.error(LoginManager._ERR_MSG_GHIT(), error);
                         break;
+                    case "twit":
+                        Notifier.error(LoginManager._ERR_MSG_TWIT(), error);
+                        break;
                 }
             })
         };
@@ -296,6 +303,32 @@ class LoginManager {
         });
     }
 
+    _twitterSuccess(tokens) {
+        Requester.request("r", {
+            "aT": "tw",
+            "tw": tokens
+        }, (data) => {
+            Notifier.debug(data);
+            LoginManager._postLoggedIn();
+        }, (error) => {
+            switch (error.ec) {
+                case "twit":
+                    Notifier.error(LoginManager._ERR_MSG_TWIT(), error);
+                    break;
+                case "twnr":
+                    Notifier.error("Your Twitter account is not registered.", error);
+                    this._showNickDialog({
+                        "aT": "tw",
+                        "tw": tokens
+                    }, () => Notifier.timeout(Notifier.SUCCESS, "Twitter account successfully registered. Sing in by pressing Twitter again."));
+                    break;
+                default:
+                    Notifier.debug(error, true);
+                    break;
+            }
+        });
+    }
+
     setup() {
         Requester.request("fl", {}, (data) => {
                 data.css.sort(function (a, b) {
@@ -317,11 +350,17 @@ class LoginManager {
                     this.setupGitHub();
                     this.setupTwitter();
 
-                    const authType = getURLParameter("aT");
-                    if (authType === "gh") {
-                        const token = Cookies.getJSON("PYX-Github-Token");
-                        Cookies.remove("PYX-Github-Token");
-                        this._githubSuccess(token);
+                    switch (getURLParameter("aT")) {
+                        case "gh":
+                            const token = Cookies.getJSON("PYX-Github-Token");
+                            Cookies.remove("PYX-Github-Token");
+                            this._githubSuccess(token);
+                            break;
+                        case "tw":
+                            const tokens = Cookies.getJSON("PYX-Twitter-Token");
+                            Cookies.remove("PYX-Twitter-Token");
+                            this._twitterSuccess(tokens);
+                            break;
                     }
                 }
             }, null,

@@ -1,14 +1,12 @@
 package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.data.accounts.FacebookAccount;
-import com.gianlu.pyxreloaded.data.accounts.GithubAccount;
-import com.gianlu.pyxreloaded.data.accounts.GoogleAccount;
-import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
+import com.gianlu.pyxreloaded.data.accounts.*;
 import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
 import com.gianlu.pyxreloaded.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,6 +75,15 @@ public final class UsersWithAccount {
         }
     }
 
+    @Nullable
+    public TwitterAccount getTwitterAccount(@NotNull String id) throws BaseCahHandler.CahException {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE twitter_user_id='" + id + "'")) {
+            return set.next() ? new TwitterAccount(set) : null;
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
+    }
+
     public boolean hasEmail(@NotNull String email) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT count(*) FROM users WHERE email='" + email + "'")) {
             return set.getInt(1) > 0;
@@ -93,7 +100,7 @@ public final class UsersWithAccount {
         }
     }
 
-    private void addAccount(PasswordAccount account) throws BaseCahHandler.CahException {
+    private void addAccount(@NotNull PasswordAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, password) VALUES "
                     + VALUES(account.username, Consts.AuthType.PASSWORD.toString(), account.email, account.avatarUrl, account.hashedPassword));
@@ -104,7 +111,7 @@ public final class UsersWithAccount {
         }
     }
 
-    private void addAccount(GoogleAccount account) throws BaseCahHandler.CahException {
+    private void addAccount(@NotNull GoogleAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, google_sub) VALUES " +
                     VALUES(account.username, Consts.AuthType.GOOGLE.toString(), account.email, account.avatarUrl, account.subject));
@@ -115,7 +122,7 @@ public final class UsersWithAccount {
         }
     }
 
-    private void addAccount(FacebookAccount account) throws BaseCahHandler.CahException {
+    private void addAccount(@NotNull FacebookAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, facebook_user_id) VALUES " +
                     VALUES(account.username, Consts.AuthType.FACEBOOK.toString(), account.email, account.avatarUrl, account.userId));
@@ -126,7 +133,7 @@ public final class UsersWithAccount {
         }
     }
 
-    private void addAccount(GithubAccount account) throws BaseCahHandler.CahException {
+    private void addAccount(@NotNull GithubAccount account) throws BaseCahHandler.CahException {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, github_user_id) VALUES " +
                     VALUES(account.username, Consts.AuthType.GITHUB.toString(), account.email, account.avatarUrl, account.id));
@@ -137,28 +144,45 @@ public final class UsersWithAccount {
         }
     }
 
+    private void addAccount(@NotNull TwitterAccount account) throws BaseCahHandler.CahException {
+        try (Statement statement = db.statement()) {
+            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, twitter_user_id) VALUES " +
+                    VALUES(account.username, Consts.AuthType.TWITTER.toString(), account.email, account.avatarUrl, account.id));
+
+            if (result != 1) throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR);
+        } catch (SQLException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.SQL_ERROR, ex);
+        }
+    }
+
     @NotNull
-    public PasswordAccount registerWithPassword(String nickname, String email, String password) throws BaseCahHandler.CahException {
+    public PasswordAccount registerWithPassword(@NotNull String nickname, @NotNull String email, @NotNull String password) throws BaseCahHandler.CahException {
         PasswordAccount account = new PasswordAccount(nickname, email, BCrypt.hashpw(password, BCrypt.gensalt()));
         addAccount(account);
         return account;
     }
 
     @NotNull
-    public GoogleAccount registerWithGoogle(String nickname, GoogleIdToken.Payload token) throws BaseCahHandler.CahException {
+    public GoogleAccount registerWithGoogle(@NotNull String nickname, @NotNull GoogleIdToken.Payload token) throws BaseCahHandler.CahException {
         GoogleAccount account = new GoogleAccount(nickname, token);
         addAccount(account);
         return account;
     }
 
-    public FacebookAccount registerWithFacebook(String nickname, FacebookToken token, FacebookProfileInfo info) throws BaseCahHandler.CahException {
+    public FacebookAccount registerWithFacebook(@NotNull String nickname, @NotNull FacebookToken token, @NotNull FacebookProfileInfo info) throws BaseCahHandler.CahException {
         FacebookAccount account = new FacebookAccount(nickname, token, info);
         addAccount(account);
         return account;
     }
 
-    public GithubAccount registerWithGithub(String nickname, GithubProfileInfo info) throws BaseCahHandler.CahException {
+    public GithubAccount registerWithGithub(@NotNull String nickname, @NotNull GithubProfileInfo info) throws BaseCahHandler.CahException {
         GithubAccount account = new GithubAccount(nickname, info);
+        addAccount(account);
+        return account;
+    }
+
+    public TwitterAccount registerWithTwitter(@NotNull String nickname, @NotNull TwitterProfileInfo info) throws BaseCahHandler.CahException {
+        TwitterAccount account = new TwitterAccount(nickname, info);
         addAccount(account);
         return account;
     }

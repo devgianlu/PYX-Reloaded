@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.*;
+import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
@@ -97,9 +98,20 @@ public class RegisterHandler extends BaseHandler {
                 nickname = account.username;
                 user = User.withAccount(account, exchange.getHostName());
                 break;
-            default:
             case TWITTER:
-                throw new UnsupportedOperationException();
+                String twitterTokens = params.get(Consts.AuthType.TWITTER);
+                if (twitterTokens == null)
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);
+
+                TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);
+                account = accounts.getTwitterAccount(twitterInfo.id);
+                if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_NOT_REGISTERED);
+
+                nickname = account.username;
+                user = User.withAccount(account, exchange.getHostName());
+                break;
+            default:
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         }
 
         users.checkAndAdd(user);
