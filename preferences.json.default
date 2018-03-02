@@ -13,6 +13,14 @@
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
   "serverDbUrl": "jdbc:sqlite:server.sqlite.default",
+  "emails": {
+    "senderEmail": "",
+    "senderName": "PYX-Reloaded",
+    "smtpServer": "",
+    "smtpPort": 587,
+    "smtpUsername": "",
+    "smtpPassword": ""
+  },
   "socials": {
     "googleClientId": "",
     "facebookAppId": "",
