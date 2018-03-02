@@ -120,14 +120,14 @@ public class Game {
         this.cardcastService = cardcastService;
         this.state = Consts.GameState.LOBBY;
 
-        this.MAX_SKIPS_BEFORE_KICK = preferences.getInt("maxSkipsBeforeKick", 2);
-        this.ROUND_INTERMISSION = preferences.getInt("roundIntermission", 8) * 1000;
-        this.MINIMUM_BLACK_CARDS = preferences.getInt("minBlackCards", 50);
-        this.MINIMUM_WHITE_CARDS_PER_PLAYER = preferences.getInt("minWhiteCardsPerPlayer", 20);
-        this.PLAY_TIMEOUT_BASE = preferences.getInt("playTimeoutBase", 45) * 1000;
-        this.JUDGE_TIMEOUT_BASE = preferences.getInt("judgeTimeoutBase", 40) * 1000;
-        this.PLAY_TIMEOUT_PER_CARD = preferences.getInt("playTimeoutPerCard", 15) * 1000;
-        this.JUDGE_TIMEOUT_PER_CARD = preferences.getInt("judgeTimeoutPerCard", 7) * 1000;
+        this.MAX_SKIPS_BEFORE_KICK = preferences.getInt("game/maxSkipsBeforeKick", 2);
+        this.ROUND_INTERMISSION = preferences.getInt("game/roundIntermission", 8) * 1000;
+        this.MINIMUM_BLACK_CARDS = preferences.getInt("game/minBlackCards", 50);
+        this.MINIMUM_WHITE_CARDS_PER_PLAYER = preferences.getInt("game/minWhiteCardsPerPlayer", 20);
+        this.PLAY_TIMEOUT_BASE = preferences.getInt("game/playTimeoutBase", 45) * 1000;
+        this.JUDGE_TIMEOUT_BASE = preferences.getInt("game/judgeTimeoutBase", 40) * 1000;
+        this.PLAY_TIMEOUT_PER_CARD = preferences.getInt("game/playTimeoutPerCard", 15) * 1000;
+        this.JUDGE_TIMEOUT_PER_CARD = preferences.getInt("game/judgeTimeoutPerCard", 7) * 1000;
     }
 
     private static JsonArray getWhiteCardsDataJson(List<WhiteCard> cards) {

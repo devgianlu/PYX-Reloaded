@@ -33,9 +33,9 @@ public class TwitterAuthHelper {
     private final JsonParser parser = new JsonParser();
 
     public TwitterAuthHelper(Preferences preferences) {
-        service = new ServiceBuilder(preferences.getString("twitterAppId", ""))
-                .apiSecret(preferences.getString("twitterAppSecret", ""))
-                .callback(preferences.getString("twitterCallback", ""))
+        service = new ServiceBuilder(preferences.getString("socials/twitterAppId", ""))
+                .apiSecret(preferences.getString("socials/twitterAppSecret", ""))
+                .callback(preferences.getString("socials/twitterCallback", ""))
                 .httpClient(new HttpClientWrapper())
                 .build(TwitterApi.Authenticate.instance());
     }

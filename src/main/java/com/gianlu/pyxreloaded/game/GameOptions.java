@@ -98,23 +98,23 @@ public class GameOptions {
     }
 
     private static Preferences.MinDefaultMax getBlanksLimit(Preferences preferences) {
-        return preferences.getMinDefaultMax("blankCardsLimit", DEFAULT_BLANKS_MIN, DEFAULT_BLANKS_DEF, DEFAULT_BLANKS_MAX);
+        return preferences.getMinDefaultMax("game/blankCardsLimit", DEFAULT_BLANKS_MIN, DEFAULT_BLANKS_DEF, DEFAULT_BLANKS_MAX);
     }
 
     private static Preferences.MinDefaultMax getPlayerLimit(Preferences preferences) {
-        return preferences.getMinDefaultMax("playerLimit", DEFAULT_PLAYER_MIN, DEFAULT_PLAYER_DEF, DEFAULT_PLAYER_MAX);
+        return preferences.getMinDefaultMax("game/playerLimit", DEFAULT_PLAYER_MIN, DEFAULT_PLAYER_DEF, DEFAULT_PLAYER_MAX);
     }
 
     private static Preferences.MinDefaultMax getSpectatorLimit(Preferences preferences) {
-        return preferences.getMinDefaultMax("spectatorLimit", DEFAULT_SPECTATOR_MIN, DEFAULT_SPECTATOR_DEF, DEFAULT_SPECTATOR_MAX);
+        return preferences.getMinDefaultMax("game/spectatorLimit", DEFAULT_SPECTATOR_MIN, DEFAULT_SPECTATOR_DEF, DEFAULT_SPECTATOR_MAX);
     }
 
     private static Preferences.MinDefaultMax getScoreLimit(Preferences preferences) {
-        return preferences.getMinDefaultMax("scoreLimit", DEFAULT_SCORE_MIN, DEFAULT_SCORE_DEF, DEFAULT_SCORE_MAX);
+        return preferences.getMinDefaultMax("game/scoreLimit", DEFAULT_SCORE_MIN, DEFAULT_SCORE_DEF, DEFAULT_SCORE_MAX);
     }
 
     private static Preferences.MinDefaultMax getWinBy(Preferences preferences) {
-        return preferences.getMinDefaultMax("winBy", DEFAULT_WIN_BY_MIN, DEFAULT_WIN_BY_DEF, DEFAULT_WIN_BY_MAX);
+        return preferences.getMinDefaultMax("game/winBy", DEFAULT_WIN_BY_MIN, DEFAULT_WIN_BY_DEF, DEFAULT_WIN_BY_MAX);
     }
 
     private static int assign(Preferences.MinDefaultMax minDefaultMax, int current, JsonObject obj, Consts.GameOptionsData field) {

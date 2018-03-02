@@ -6,21 +6,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
-public final class Preferences extends HashMap<String, JsonElement> {
+public final class Preferences {
     private static final Logger logger = Logger.getLogger(Preferences.class.getSimpleName());
+    private final JsonObject root;
 
     private Preferences(String json) {
-        JsonObject obj = new JsonParser().parse(json).getAsJsonObject();
-        for (String key : obj.keySet()) put(key, obj.get(key));
+        root = new JsonParser().parse(json).getAsJsonObject();
     }
 
     private Preferences() {
+        root = new JsonObject();
     }
 
     @NotNull
@@ -57,6 +58,23 @@ public final class Preferences extends HashMap<String, JsonElement> {
         }
     }
 
+    @Nullable
+    private JsonElement get(String key) {
+        JsonObject parent = root;
+        String lastPath = key;
+        if (key.contains("/")) {
+            String[] pathsTemp = key.split("/");
+            lastPath = pathsTemp[pathsTemp.length - 1];
+            String[] paths = new String[pathsTemp.length - 1];
+            System.arraycopy(pathsTemp, 0, paths, 0, paths.length);
+
+            for (String path : paths)
+                parent = parent.getAsJsonObject(path);
+        }
+
+        return parent.get(lastPath);
+    }
+
     @NotNull
     public MinDefaultMax getMinDefaultMax(String key, int min, int def, int max) {
         JsonElement obj = get(key);
@@ -64,6 +82,7 @@ public final class Preferences extends HashMap<String, JsonElement> {
         else return new MinDefaultMax(obj.getAsJsonObject());
     }
 
+    @NotNull
     public String getString(String key, String fallback) {
         JsonElement obj = get(key);
         if (obj == null) return fallback;
@@ -80,6 +99,11 @@ public final class Preferences extends HashMap<String, JsonElement> {
         JsonElement obj = get(key);
         if (obj == null) return fallback;
         else return obj.getAsBoolean();
+    }
+
+    @Override
+    public String toString() {
+        return root.toString();
     }
 
     public static class MinDefaultMax {

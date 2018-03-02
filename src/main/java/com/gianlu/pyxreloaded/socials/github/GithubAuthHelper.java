@@ -30,8 +30,8 @@ public class GithubAuthHelper {
 
     public GithubAuthHelper(Preferences preferences) {
         this.client = HttpClients.createDefault();
-        this.appId = preferences.getString("githubAppId", "");
-        this.appSecret = preferences.getString("githubAppSecret", "");
+        this.appId = preferences.getString("socials/githubAppId", "");
+        this.appSecret = preferences.getString("socials/githubAppSecret", "");
     }
 
     public GithubProfileInfo info(@NotNull String accessToken, @NotNull GithubEmails emails) throws IOException, GithubException {

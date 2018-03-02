@@ -37,9 +37,9 @@ public final class SocialLogin {
     public SocialLogin(GithubAuthHelper githubHelper, TwitterAuthHelper twitterHelper, Preferences preferences) {
         this.githubHelper = githubHelper;
         this.twitterHelper = twitterHelper;
-        this.facebookHelper = new FacebookAuthHelper(preferences.getString("facebookAppId", ""), preferences.getString("facebookAppSecret", ""));
+        this.facebookHelper = new FacebookAuthHelper(preferences.getString("socials/facebookAppId", ""), preferences.getString("socials/facebookAppSecret", ""));
         this.googleHelper = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
-                .setAudience(Collections.singletonList(preferences.getString("googleClientId", "")))
+                .setAudience(Collections.singletonList(preferences.getString("socials/googleClientId", "")))
                 .build();
     }
 
