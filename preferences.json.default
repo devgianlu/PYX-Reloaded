@@ -19,7 +19,8 @@
     "smtpServer": "",
     "smtpPort": 587,
     "smtpUsername": "",
-    "smtpPassword": ""
+    "smtpPassword": "",
+    "verifyCallback": ""
   },
   "socials": {
     "googleClientId": "",

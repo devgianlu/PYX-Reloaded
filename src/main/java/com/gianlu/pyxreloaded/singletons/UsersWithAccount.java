@@ -15,6 +15,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 
 public final class UsersWithAccount {
     private final ServerDatabase db;
@@ -40,11 +41,22 @@ public final class UsersWithAccount {
     }
 
     @Nullable
-    public PasswordAccount getPasswordAccount(@NotNull String nickname) throws BaseCahHandler.CahException {
+    public PasswordAccount getPasswordAccountForNickname(@NotNull String nickname) throws BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE username='" + nickname + "'")) {
             return set.next() ? new PasswordAccount(set) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
+        }
+    }
+
+    @Nullable
+    public PasswordAccount getPasswordAccountForEmail(@NotNull String email) {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE email='" + email + "'")) {
+            return set.next() ? new PasswordAccount(set) : null;
+        } catch (SQLException | ParseException ex) {
+            return null;
         }
     }
 
@@ -54,6 +66,8 @@ public final class UsersWithAccount {
             return set.next() ? new GoogleAccount(set, token) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
     }
 
@@ -63,6 +77,8 @@ public final class UsersWithAccount {
             return set.next() ? new FacebookAccount(set) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
     }
 
@@ -72,6 +88,8 @@ public final class UsersWithAccount {
             return set.next() ? new GithubAccount(set, info) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
     }
 
@@ -81,6 +99,8 @@ public final class UsersWithAccount {
             return set.next() ? new TwitterAccount(set) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
     }
 
@@ -102,8 +122,8 @@ public final class UsersWithAccount {
 
     private void addAccount(@NotNull PasswordAccount account) {
         try (Statement statement = db.statement()) {
-            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, avatar_url, password) VALUES "
-                    + VALUES(account.username, Consts.AuthType.PASSWORD.toString(), account.email, account.avatarUrl, account.hashedPassword));
+            int result = statement.executeUpdate("INSERT INTO users (username, auth, email, email_verified, avatar_url, password) VALUES "
+                    + VALUES(account.username, Consts.AuthType.PASSWORD.toString(), account.email, "0", account.avatarUrl, account.hashedPassword));
 
             if (result != 1) throw new IllegalStateException();
         } catch (SQLException ex) {
@@ -155,9 +175,18 @@ public final class UsersWithAccount {
         }
     }
 
+    public void updateVerifiedStatus(PasswordAccount account, boolean verified) {
+        try (Statement statement = db.statement()) {
+            int result = statement.executeUpdate("UPDATE users SET email_verified=" + (verified ? 1 : 0) + " WHERE email='" + account.email + "'");
+            if (result == 0) throw new IllegalStateException();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     @NotNull
     public PasswordAccount registerWithPassword(@NotNull String nickname, @NotNull String email, @NotNull String password) {
-        PasswordAccount account = new PasswordAccount(nickname, email, BCrypt.hashpw(password, BCrypt.gensalt()));
+        PasswordAccount account = new PasswordAccount(nickname, email, false, BCrypt.hashpw(password, BCrypt.gensalt()));
         addAccount(account);
         return account;
     }

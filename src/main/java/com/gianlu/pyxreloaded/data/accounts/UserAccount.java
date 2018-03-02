@@ -2,11 +2,11 @@ package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
-import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 public abstract class UserAccount {
     public final String username;
@@ -16,7 +16,7 @@ public abstract class UserAccount {
     public final boolean emailVerified;
     private final Consts.AuthType auth;
 
-    UserAccount(ResultSet set, boolean emailVerified) throws SQLException, BaseCahHandler.CahException {
+    UserAccount(ResultSet set, boolean emailVerified) throws SQLException, ParseException {
         this.username = set.getString("username");
         this.email = set.getString("email");
         this.auth = Consts.AuthType.parse(set.getString("auth"));

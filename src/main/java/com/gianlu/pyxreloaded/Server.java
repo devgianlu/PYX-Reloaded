@@ -42,21 +42,21 @@ public class Server {
         int maxGames = preferences.getInt("maxGames", 100);
         int maxUsers = preferences.getInt("maxUsers", 400);
 
+        ServerDatabase serverDatabase = new ServerDatabase(preferences);
+
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
         LoadedCards loadedCards = new LoadedCards(preferences);
         Providers.add(Annotations.LoadedCards.class, (Provider<LoadedCards>) () -> loadedCards);
 
-        Emails emails = new Emails(preferences);
+        UsersWithAccount accounts = new UsersWithAccount(serverDatabase);
+        Providers.add(Annotations.UsersWithAccount.class, (Provider<UsersWithAccount>) () -> accounts);
+
+        Emails emails = new Emails(serverDatabase, preferences, accounts);
         Providers.add(Annotations.Emails.class, (Provider<Emails>) () -> emails);
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
-
-        ServerDatabase serverDatabase = new ServerDatabase(preferences);
-
-        UsersWithAccount accounts = new UsersWithAccount(serverDatabase);
-        Providers.add(Annotations.UsersWithAccount.class, (Provider<UsersWithAccount>) () -> accounts);
 
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
@@ -87,6 +87,7 @@ public class Server {
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
+                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
                 .addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper))
                 .addExactPath("/TwitterStartAuthFlow", new TwitterStartAuthFlowPath(twitterAuthHelper))
                 .addExactPath("/TwitterCallback", new TwitterCallbackPath(twitterAuthHelper));

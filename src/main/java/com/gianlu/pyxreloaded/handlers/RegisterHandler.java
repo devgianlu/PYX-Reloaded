@@ -19,6 +19,7 @@ import io.undertow.server.handlers.CookieImpl;
 import org.jetbrains.annotations.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.text.ParseException;
 import java.util.regex.Pattern;
 
 public class RegisterHandler extends BaseHandler {
@@ -43,9 +44,15 @@ public class RegisterHandler extends BaseHandler {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
+        Consts.AuthType type;
+        try {
+            type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
+        }
+
         UserAccount account;
         String nickname;
-        Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
         switch (type) {
             case PASSWORD:
                 nickname = params.get(Consts.GeneralKeys.NICKNAME);
@@ -54,7 +61,7 @@ public class RegisterHandler extends BaseHandler {
                 if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
-                account = accounts.getPasswordAccount(nickname);
+                account = accounts.getPasswordAccountForNickname(nickname);
                 if (account == null) { // Without account
                     user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
                 } else {

@@ -8,10 +8,7 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
-import com.gianlu.pyxreloaded.singletons.BanList;
-import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
-import com.gianlu.pyxreloaded.singletons.SocialLogin;
-import com.gianlu.pyxreloaded.singletons.UsersWithAccount;
+import com.gianlu.pyxreloaded.singletons.*;
 import com.gianlu.pyxreloaded.socials.facebook.FacebookProfileInfo;
 import com.gianlu.pyxreloaded.socials.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.socials.github.GithubProfileInfo;
@@ -19,6 +16,7 @@ import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 
+import java.text.ParseException;
 import java.util.regex.Pattern;
 
 public class CreateAccountHandler extends BaseHandler {
@@ -27,15 +25,18 @@ public class CreateAccountHandler extends BaseHandler {
     private final ConnectedUsers connectedUsers;
     private final UsersWithAccount accounts;
     private final SocialLogin socialLogin;
+    private final Emails emails;
 
     public CreateAccountHandler(@Annotations.BanList BanList banList,
                                 @Annotations.ConnectedUsers ConnectedUsers connectedUsers,
                                 @Annotations.UsersWithAccount UsersWithAccount accounts,
-                                @Annotations.SocialLogin SocialLogin socialLogin) {
+                                @Annotations.SocialLogin SocialLogin socialLogin,
+                                @Annotations.Emails Emails emails) {
         this.banList = banList;
         this.connectedUsers = connectedUsers;
         this.accounts = accounts;
         this.socialLogin = socialLogin;
+        this.emails = emails;
     }
 
     @Override
@@ -52,7 +53,13 @@ public class CreateAccountHandler extends BaseHandler {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
 
         UserAccount account;
-        Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+        Consts.AuthType type;
+        try {
+            type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
+        }
+
         switch (type) {
             case PASSWORD:
                 String email = params.get(Consts.UserData.EMAIL);
@@ -67,6 +74,7 @@ public class CreateAccountHandler extends BaseHandler {
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
                 account = accounts.registerWithPassword(nickname, email, password);
+                emails.sendEmailVerification(account);
                 break;
             case GOOGLE:
                 GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));

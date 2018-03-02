@@ -1,13 +1,13 @@
 package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.text.ParseException;
 
 public final class Consts {
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
@@ -1152,12 +1152,12 @@ public final class Consts {
         }
 
         @NotNull
-        public static AuthType parse(String key) throws BaseCahHandler.CahException {
+        public static AuthType parse(String key) throws ParseException {
             for (AuthType type : values())
                 if (type.key.equals(key))
                     return type;
 
-            throw new BaseCahHandler.CahException(ErrorCode.BAD_REQUEST);
+            throw new ParseException(key, 0);
         }
 
         @Override
