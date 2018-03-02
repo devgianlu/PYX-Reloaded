@@ -12,7 +12,7 @@ public final class BanList {
 
     public synchronized void add(String ip) {
         try {
-            if (!db.statement().execute("INSERT INTO ban_list (ip) VALUES (" + ip + ")"))
+            if (!db.statement().execute("INSERT INTO ban_list (ip) VALUES ('" + ip + "')"))
                 throw new IllegalStateException();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
