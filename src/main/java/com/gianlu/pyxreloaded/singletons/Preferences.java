@@ -5,6 +5,7 @@ import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -22,6 +23,7 @@ public final class Preferences extends HashMap<String, JsonElement> {
     private Preferences() {
     }
 
+    @NotNull
     private static Preferences loadDefault() {
         logger.info("Preferences not found. Loaded default.");
         return new Preferences();
@@ -55,6 +57,7 @@ public final class Preferences extends HashMap<String, JsonElement> {
         }
     }
 
+    @NotNull
     public MinDefaultMax getMinDefaultMax(String key, int min, int def, int max) {
         JsonElement obj = get(key);
         if (obj == null) return new MinDefaultMax(min, def, max);

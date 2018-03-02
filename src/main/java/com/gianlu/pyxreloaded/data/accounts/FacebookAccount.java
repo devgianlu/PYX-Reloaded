@@ -1,9 +1,9 @@
 package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
-import com.gianlu.pyxreloaded.facebook.FacebookToken;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.socials.facebook.FacebookProfileInfo;
+import com.gianlu.pyxreloaded.socials.facebook.FacebookToken;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

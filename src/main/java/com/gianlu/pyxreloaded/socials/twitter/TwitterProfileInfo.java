@@ -1,4 +1,4 @@
-package com.gianlu.pyxreloaded.twitter;
+package com.gianlu.pyxreloaded.socials.twitter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

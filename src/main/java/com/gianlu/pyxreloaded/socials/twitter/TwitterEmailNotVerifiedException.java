@@ -1,4 +1,4 @@
-package com.gianlu.pyxreloaded.twitter;
+package com.gianlu.pyxreloaded.socials.twitter;
 
 public class TwitterEmailNotVerifiedException extends Exception {
 }

@@ -50,4 +50,9 @@ public final class Annotations {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SocialLogin {
     }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Emails {
+    }
 }

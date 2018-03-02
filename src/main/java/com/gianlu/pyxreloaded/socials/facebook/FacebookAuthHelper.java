@@ -1,4 +1,4 @@
-package com.gianlu.pyxreloaded.facebook;
+package com.gianlu.pyxreloaded.socials.facebook;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

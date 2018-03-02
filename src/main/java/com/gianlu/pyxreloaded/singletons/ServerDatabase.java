@@ -8,8 +8,8 @@ import java.sql.Statement;
 public final class ServerDatabase {
     private final Connection conn;
 
-    public ServerDatabase(String url) throws SQLException {
-        conn = DriverManager.getConnection(url);
+    public ServerDatabase(Preferences preferences) throws SQLException {
+        conn = DriverManager.getConnection(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
     }
 
     public Statement statement() throws SQLException {

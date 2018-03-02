@@ -1,4 +1,4 @@
-package com.gianlu.pyxreloaded.twitter;
+package com.gianlu.pyxreloaded.socials.twitter;
 
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.github.scribejava.apis.TwitterApi;

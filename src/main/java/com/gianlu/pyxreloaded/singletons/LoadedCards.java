@@ -17,8 +17,8 @@ public final class LoadedCards {
     private final Set<PyxBlackCard> blackCards = new HashSet<>();
     private final Connection conn;
 
-    public LoadedCards(String url) throws SQLException {
-        conn = DriverManager.getConnection(url);
+    public LoadedCards(Preferences preferences) throws SQLException {
+        conn = DriverManager.getConnection(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
         loadWhiteCards();
         loadBlackCards();
         loadSets();

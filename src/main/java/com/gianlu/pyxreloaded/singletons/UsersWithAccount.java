@@ -2,11 +2,11 @@ package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.accounts.*;
-import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
-import com.gianlu.pyxreloaded.facebook.FacebookToken;
-import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
-import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
+import com.gianlu.pyxreloaded.socials.facebook.FacebookProfileInfo;
+import com.gianlu.pyxreloaded.socials.facebook.FacebookToken;
+import com.gianlu.pyxreloaded.socials.github.GithubProfileInfo;
+import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

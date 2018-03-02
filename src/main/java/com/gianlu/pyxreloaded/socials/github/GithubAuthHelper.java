@@ -1,4 +1,4 @@
-package com.gianlu.pyxreloaded.github;
+package com.gianlu.pyxreloaded.socials.github;
 
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.google.gson.JsonElement;

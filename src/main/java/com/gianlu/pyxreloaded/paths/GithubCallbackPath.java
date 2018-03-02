@@ -1,7 +1,7 @@
 package com.gianlu.pyxreloaded.paths;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.github.GithubAuthHelper;
+import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;

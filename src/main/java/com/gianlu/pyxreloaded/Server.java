@@ -3,16 +3,16 @@ package com.gianlu.pyxreloaded;
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.game.GameManager;
-import com.gianlu.pyxreloaded.github.GithubAuthHelper;
 import com.gianlu.pyxreloaded.paths.*;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
 import com.gianlu.pyxreloaded.server.HttpsRedirect;
 import com.gianlu.pyxreloaded.server.Provider;
 import com.gianlu.pyxreloaded.singletons.*;
+import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
+import com.gianlu.pyxreloaded.socials.twitter.TwitterAuthHelper;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
-import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
@@ -44,13 +44,16 @@ public class Server {
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
-        LoadedCards loadedCards = new LoadedCards(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
+        LoadedCards loadedCards = new LoadedCards(preferences);
         Providers.add(Annotations.LoadedCards.class, (Provider<LoadedCards>) () -> loadedCards);
+
+        Emails emails = new Emails(preferences);
+        Providers.add(Annotations.Emails.class, (Provider<Emails>) () -> emails);
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
 
-        ServerDatabase serverDatabase = new ServerDatabase(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
+        ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
         UsersWithAccount accounts = new UsersWithAccount(serverDatabase);
         Providers.add(Annotations.UsersWithAccount.class, (Provider<UsersWithAccount>) () -> accounts);

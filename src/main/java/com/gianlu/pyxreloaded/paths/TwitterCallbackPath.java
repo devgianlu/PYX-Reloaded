@@ -2,7 +2,7 @@ package com.gianlu.pyxreloaded.paths;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.Utils;
-import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
+import com.gianlu.pyxreloaded.socials.twitter.TwitterAuthHelper;
 import com.github.scribejava.core.model.OAuth1AccessToken;
 import com.github.scribejava.core.model.OAuth1RequestToken;
 import io.undertow.server.HttpHandler;

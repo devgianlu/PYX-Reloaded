@@ -1,8 +1,8 @@
 package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
-import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.socials.github.GithubProfileInfo;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

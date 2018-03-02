@@ -2,7 +2,7 @@ package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
-import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
+import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
