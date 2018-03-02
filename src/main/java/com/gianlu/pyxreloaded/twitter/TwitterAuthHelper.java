@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class TwitterAuthHelper {
-    private static final String VERIFY_CREDENTIALS_URL = "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true";
+    private static final String VERIFY_CREDENTIALS_URL = "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false";
     private final OAuth10aService service;
     private final JsonParser parser = new JsonParser();
 
@@ -56,7 +56,7 @@ public class TwitterAuthHelper {
     }
 
     @NotNull
-    public TwitterProfileInfo info(OAuth1AccessToken token) throws InterruptedException, ExecutionException, IOException {
+    public TwitterProfileInfo info(OAuth1AccessToken token) throws InterruptedException, ExecutionException, IOException, TwitterEmailNotVerifiedException {
         OAuthRequest request = new OAuthRequest(Verb.GET, VERIFY_CREDENTIALS_URL);
         service.signRequest(token, request);
         Response response = service.execute(request);

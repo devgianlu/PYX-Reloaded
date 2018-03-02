@@ -11,13 +11,13 @@ public class PasswordAccount extends UserAccount {
     public final String hashedPassword;
 
     public PasswordAccount(ResultSet set) throws SQLException, BaseCahHandler.CahException {
-        super(set);
+        super(set, false); // TODO
 
         hashedPassword = set.getString("password");
     }
 
     public PasswordAccount(String username, String email, @NotNull String hashedPassword) {
-        super(username, email, Consts.AuthType.PASSWORD, null); // TODO: Avatar
+        super(username, email, Consts.AuthType.PASSWORD, false, null); // TODO: Avatar and email verified
 
         this.hashedPassword = hashedPassword;
     }

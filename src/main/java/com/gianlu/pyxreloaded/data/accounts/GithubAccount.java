@@ -10,14 +10,14 @@ import java.sql.SQLException;
 public class GithubAccount extends UserAccount {
     public final String id;
 
-    public GithubAccount(ResultSet set) throws BaseCahHandler.CahException, SQLException {
-        super(set);
+    public GithubAccount(ResultSet set, GithubProfileInfo info) throws BaseCahHandler.CahException, SQLException {
+        super(set, info.emails.isPrimaryEmailVerified());
 
         id = set.getString("github_user_id");
     }
 
     public GithubAccount(String nickname, GithubProfileInfo info) {
-        super(nickname, info.email, Consts.AuthType.GITHUB, info.avatarUrl);
+        super(nickname, info.email, Consts.AuthType.GITHUB, info.emails.isPrimaryEmailVerified(), info.avatarUrl);
 
         id = info.id;
     }

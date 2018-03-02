@@ -102,6 +102,14 @@ class LoginManager {
         return "Invalid Twitter token. Please try again.";
     }
 
+    static _ERR_MSG_TWEMNV() {
+        return "You have to verify your Twitter account email.";
+    }
+
+    static _ERR_MSG_FBEMNV() {
+        return "You have to verify your Facebook account email.";
+    }
+
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
             case "niu":
@@ -170,7 +178,7 @@ class LoginManager {
 
     setupGitHub() {
         this.githubSignIn.on('click', () => {
-            window.location = "https://github.com/login/oauth/authorize?scope=read:user&client_id=d7057c607cf69f592239"
+            window.location = "https://github.com/login/oauth/authorize?scope=read:user,user:email&client_id=d7057c607cf69f592239"
         })
     }
 
@@ -216,6 +224,12 @@ class LoginManager {
                     case "twit":
                         Notifier.error(LoginManager._ERR_MSG_TWIT(), error);
                         break;
+                    case "twemnv":
+                        Notifier.error(LoginManager._ERR_MSG_TWEMNV(), error);
+                        break;
+                    case "fbemnv":
+                        Notifier.error(LoginManager._ERR_MSG_FBEMNV(), error);
+                        break;
                 }
             })
         };
@@ -235,6 +249,9 @@ class LoginManager {
             switch (error.ec) {
                 case "fit":
                     Notifier.error(LoginManager._ERR_MSG_FIT(), error);
+                    break;
+                case "fbemnv":
+                    Notifier.error(LoginManager._ERR_MSG_FBEMNV(), error);
                     break;
                 case "fnr":
                     Notifier.error("Your Facebook account is not registered.", error);
@@ -314,6 +331,9 @@ class LoginManager {
             switch (error.ec) {
                 case "twit":
                     Notifier.error(LoginManager._ERR_MSG_TWIT(), error);
+                    break;
+                case "twemnv":
+                    Notifier.error(LoginManager._ERR_MSG_TWEMNV(), error);
                     break;
                 case "twnr":
                     Notifier.error("Your Twitter account is not registered.", error);

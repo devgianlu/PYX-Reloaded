@@ -305,15 +305,11 @@ public final class Consts {
          */
         ALREADY_SUGGESTED("AS"),
         /**
-         * SQL error, fatal.
-         * <p>
-         * FIXME: Remove this error
+         * Email already in use.
          */
-        SQL_ERROR("sqle"),
+        EMAIL_IN_USE("emiu"),
         /**
          * Google error.
-         * <p>
-         * FIXME: Remove this error
          */
         GOOGLE_ERROR("ge"),
         /**
@@ -326,8 +322,6 @@ public final class Consts {
         GOOGLE_INVALID_TOKEN("git"),
         /**
          * Facebook error.
-         * <p>
-         * FIXME: Remove this error
          */
         FACEBOOK_ERROR("fe"),
         /**
@@ -339,13 +333,11 @@ public final class Consts {
          */
         FACEBOOK_NOT_REGISTERED("fnr"),
         /**
-         * Email already in use.
+         * User hasn't verified his Facebook email.
          */
-        EMAIL_IN_USE("emiu"),
+        FACEBOOK_EMAIL_NOT_VERIFIED("fbemnv"),
         /**
          * Github error.
-         * <p>
-         * FIXME: Remove this error
          */
         GITHUB_ERROR("ghe"),
         /**
@@ -362,14 +354,16 @@ public final class Consts {
         TWITTER_INVALID_TOKEN("twit"),
         /**
          * Twitter error.
-         * <p>
-         * FIXME: Remove this error
          */
         TWITTER_ERROR("twe"),
         /**
          * User hasn't a Twitter account.
          */
-        TWITTER_NOT_REGISTERED("twnr");
+        TWITTER_NOT_REGISTERED("twnr"),
+        /**
+         * User hasn't verified his Twitter email.
+         */
+        TWITTER_EMAIL_NOT_VERIFIED("twemnv");
 
         private final String code;
 
@@ -1184,7 +1178,11 @@ public final class Consts {
         /**
          * Email address.
          */
-        EMAIL("em");
+        EMAIL("em"),
+        /**
+         * Whether the user verified its email.
+         */
+        EMAIL_VERIFIED("emv");
 
         private final String key;
 

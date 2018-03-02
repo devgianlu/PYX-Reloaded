@@ -46,8 +46,13 @@ public class User {
         this.account = account;
     }
 
+    @NotNull
     public static User withAccount(UserAccount account, String hostname) {
         return new User(account.username, hostname, Sessions.generateNewId(), account);
+    }
+
+    public boolean isEmailVerified() {
+        return account != null && account.emailVerified;
     }
 
     public boolean isAdmin() {

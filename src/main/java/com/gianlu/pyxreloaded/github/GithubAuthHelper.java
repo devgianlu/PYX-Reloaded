@@ -22,6 +22,7 @@ import java.util.Arrays;
 public class GithubAuthHelper {
     private static final String ACCESS_TOKEN = "https://github.com/login/oauth/access_token";
     private static final String USER = "https://api.github.com/user";
+    private static final String EMAILS = "https://api.github.com/user/emails";
     private final String appId;
     private final String appSecret;
     private final HttpClient client;
@@ -33,7 +34,7 @@ public class GithubAuthHelper {
         this.appSecret = preferences.getString("githubAppSecret", "");
     }
 
-    public GithubProfileInfo info(@NotNull String accessToken) throws IOException {
+    public GithubProfileInfo info(@NotNull String accessToken, @NotNull GithubEmails emails) throws IOException, GithubException {
         HttpGet get = new HttpGet(USER);
         get.addHeader("Authorization", "token " + accessToken);
 
@@ -46,7 +47,36 @@ public class GithubAuthHelper {
             JsonElement element = parser.parse(new InputStreamReader(entity.getContent()));
             if (!element.isJsonObject()) throw new IOException("Response is not of type JsonObject");
 
-            return new GithubProfileInfo(element.getAsJsonObject());
+            JsonObject obj = new JsonObject();
+            if (obj.has("message")) throw GithubException.fromMessage(obj);
+            else return new GithubProfileInfo(element.getAsJsonObject(), emails);
+        } catch (JsonParseException | NullPointerException ex) {
+            throw new IOException(ex);
+        } finally {
+            get.releaseConnection();
+        }
+    }
+
+    public GithubEmails emails(@NotNull String accessToken) throws IOException, GithubException {
+        HttpGet get = new HttpGet(EMAILS);
+        get.addHeader("Authorization", "token " + accessToken);
+
+        try {
+            HttpResponse resp = client.execute(get);
+
+            HttpEntity entity = resp.getEntity();
+            if (entity == null) throw new IOException(new NullPointerException("HttpEntity is null"));
+
+            JsonElement element = parser.parse(new InputStreamReader(entity.getContent()));
+            if (element.isJsonArray()) {
+                return new GithubEmails(element.getAsJsonArray());
+            } else if (element.isJsonObject()) {
+                JsonObject obj = new JsonObject();
+                if (obj.has("message")) throw GithubException.fromMessage(obj);
+                throw new IOException("I am confused. " + element);
+            } else {
+                throw new IOException("What is that? " + element);
+            }
         } catch (JsonParseException | NullPointerException ex) {
             throw new IOException(ex);
         } finally {
@@ -74,10 +104,12 @@ public class GithubAuthHelper {
 
             JsonObject obj = element.getAsJsonObject();
             if (obj.has("error")) {
-                throw new GithubException(obj);
+                throw GithubException.fromError(obj);
             } else {
                 String scopes = obj.get("scope").getAsString();
-                if (!scopes.contains("read:user")) throw GithubException.invalidScopes();
+                if (!scopes.contains("read:user") || !scopes.contains("user:email"))
+                    throw GithubException.invalidScopes();
+
                 return obj.get("access_token").getAsString();
             }
         } catch (JsonParseException | NullPointerException ex) {

@@ -10,14 +10,14 @@ import java.sql.SQLException;
 public class GoogleAccount extends UserAccount {
     public final String subject;
 
-    public GoogleAccount(ResultSet set) throws SQLException, BaseCahHandler.CahException {
-        super(set);
+    public GoogleAccount(ResultSet set, GoogleIdToken.Payload token) throws SQLException, BaseCahHandler.CahException {
+        super(set, token.getEmailVerified());
 
         subject = set.getString("google_sub");
     }
 
     public GoogleAccount(String nickname, GoogleIdToken.Payload token) {
-        super(nickname, token.getEmail(), Consts.AuthType.GOOGLE, (String) token.getOrDefault("picture", null));
+        super(nickname, token.getEmail(), Consts.AuthType.GOOGLE, token.getEmailVerified(), (String) token.getOrDefault("picture", null));
 
         this.subject = token.getSubject();
     }

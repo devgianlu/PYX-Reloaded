@@ -59,7 +59,7 @@ public class FacebookAuthHelper {
     }
 
     @NotNull
-    public FacebookProfileInfo info(String userId) throws FacebookOAuthException, IOException {
+    public FacebookProfileInfo info(String userId) throws FacebookOAuthException, IOException, FacebookEmailNotVerifiedException {
         HttpGet get = new HttpGet(GRAPH + userId + "/?fields=picture.type(large),email&access_token=" + appToken);
         try {
             HttpResponse resp = client.execute(get);

@@ -51,7 +51,7 @@ public class CreateAccountHandler extends BaseHandler {
         if (connectedUsers.hasUser(nickname) || accounts.hasNickname(nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
 
-        UserAccount account = null;
+        UserAccount account;
         Consts.AuthType type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
         switch (type) {
             case PASSWORD:
@@ -110,9 +110,10 @@ public class CreateAccountHandler extends BaseHandler {
 
                 account = accounts.registerWithTwitter(nickname, twitterInfo);
                 break;
+            default:
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         }
 
-        if (account == null) throw new UnsupportedOperationException();
         return account.toJson();
     }
 }

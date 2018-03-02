@@ -2,14 +2,13 @@ package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.Utils;
-import com.gianlu.pyxreloaded.facebook.FacebookAuthHelper;
-import com.gianlu.pyxreloaded.facebook.FacebookOAuthException;
-import com.gianlu.pyxreloaded.facebook.FacebookProfileInfo;
-import com.gianlu.pyxreloaded.facebook.FacebookToken;
+import com.gianlu.pyxreloaded.facebook.*;
 import com.gianlu.pyxreloaded.github.GithubAuthHelper;
+import com.gianlu.pyxreloaded.github.GithubException;
 import com.gianlu.pyxreloaded.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.twitter.TwitterAuthHelper;
+import com.gianlu.pyxreloaded.twitter.TwitterEmailNotVerifiedException;
 import com.gianlu.pyxreloaded.twitter.TwitterProfileInfo;
 import com.github.scribejava.core.model.OAuth1AccessToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -65,6 +64,8 @@ public final class SocialLogin {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN, ex);
         } catch (IOException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_ERROR, ex);
+        } catch (FacebookEmailNotVerifiedException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_EMAIL_NOT_VERIFIED, ex);
         }
     }
 
@@ -85,8 +86,8 @@ public final class SocialLogin {
     @NotNull
     public GithubProfileInfo infoGithub(@NotNull String accessToken) throws BaseCahHandler.CahException {
         try {
-            return githubHelper.info(accessToken);
-        } catch (IOException ex) {
+            return githubHelper.info(accessToken, githubHelper.emails(accessToken));
+        } catch (IOException | GithubException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_ERROR, ex);
         }
     }
@@ -105,6 +106,8 @@ public final class SocialLogin {
             return twitterHelper.info(new OAuth1AccessToken(token, tokenSecret, tokens));
         } catch (IOException | ExecutionException | InterruptedException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_ERROR, ex);
+        } catch (TwitterEmailNotVerifiedException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_EMAIL_NOT_VERIFIED, ex);
         }
     }
 }

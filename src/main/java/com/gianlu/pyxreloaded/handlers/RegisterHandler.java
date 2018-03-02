@@ -69,7 +69,7 @@ public class RegisterHandler extends BaseHandler {
                 GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
-                account = accounts.getGoogleAccount(googleToken.getSubject());
+                account = accounts.getGoogleAccount(googleToken);
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_NOT_REGISTERED);
 
                 nickname = account.username;
@@ -80,7 +80,7 @@ public class RegisterHandler extends BaseHandler {
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
 
-                account = accounts.getFacebookAccount(facebookToken.userId);
+                account = accounts.getFacebookAccount(facebookToken);
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_NOT_REGISTERED);
 
                 nickname = account.username;
@@ -92,7 +92,7 @@ public class RegisterHandler extends BaseHandler {
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
 
                 GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
-                account = accounts.getGithubAccount(githubInfo.id);
+                account = accounts.getGithubAccount(githubInfo);
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_NOT_REGISTERED);
 
                 nickname = account.username;
@@ -104,7 +104,7 @@ public class RegisterHandler extends BaseHandler {
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);
 
                 TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);
-                account = accounts.getTwitterAccount(twitterInfo.id);
+                account = accounts.getTwitterAccount(twitterInfo);
                 if (account == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_NOT_REGISTERED);
 
                 nickname = account.username;

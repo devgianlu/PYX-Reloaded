@@ -12,13 +12,13 @@ public class FacebookAccount extends UserAccount {
     public final String userId;
 
     public FacebookAccount(ResultSet set) throws BaseCahHandler.CahException, SQLException {
-        super(set);
+        super(set, true); // Cannot even register without a verified email
 
         userId = set.getString("facebook_user_id");
     }
 
     public FacebookAccount(String nickname, FacebookToken token, FacebookProfileInfo info) {
-        super(nickname, info.email, Consts.AuthType.FACEBOOK, info.pictureUrl);
+        super(nickname, info.email, Consts.AuthType.FACEBOOK, true, info.pictureUrl);
 
         userId = token.userId;
     }
