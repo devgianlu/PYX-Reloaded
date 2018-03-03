@@ -603,10 +603,10 @@ class GameManager {
                         "<br>White cards: " + error.wcp + "/" + error.wcr, error);
                     break;
                 case "nep":
-                    Notifier.error("Not enough players to start the game!", data);
+                    Notifier.error("Not enough players to start the game!", error);
                     break;
                 default:
-                    Notifier.error("Failed starting the game!", data);
+                    Notifier.error("Failed starting the game!", error);
                     break;
             }
         });

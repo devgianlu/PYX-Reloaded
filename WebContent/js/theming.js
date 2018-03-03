@@ -138,7 +138,7 @@ class MaterialCustomizer {
             el.setAttribute("transform", "rotate(" + opts.alphaDeg * i + ")");
             r.appendChild(el);
 
-            /* TODO: If tooltips will ever be implemented in MDC (https://github.com/material-components/material-components-web/pull/1701)
+            /* If tooltips will ever be implemented in MDC (https://github.com/material-components/material-components-web/pull/1701)
             const tooltip = document.createElement("div");
             tooltip.setAttribute("for", value);
             tooltip.className = "mdl-tooltip mdl-tooltip--large";
