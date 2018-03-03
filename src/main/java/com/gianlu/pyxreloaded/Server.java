@@ -94,6 +94,10 @@ public class Server {
 
         RoutingHandler router = new RoutingHandler();
         router.setFallbackHandler(pathHandler)
+                .get("/user/{nickname}/", exchange -> {
+                    exchange.setRelativePath("/user.html");
+                    resourceHandler.handleRequest(exchange);
+                })
                 .get("/game/{gid}/", exchange -> {
                     exchange.setRelativePath("/game.html");
                     resourceHandler.handleRequest(exchange);

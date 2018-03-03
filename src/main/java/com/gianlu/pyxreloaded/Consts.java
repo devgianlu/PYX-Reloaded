@@ -569,7 +569,11 @@ public final class Consts {
         /**
          * Create an user account.
          */
-        CREATE_ACCOUNT("ca");
+        CREATE_ACCOUNT("ca"),
+        /**
+         * Retrieves user info.
+         */
+        GET_USER_INFO("gui");
 
         private final String op;
 
