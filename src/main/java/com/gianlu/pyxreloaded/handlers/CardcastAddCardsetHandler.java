@@ -29,8 +29,8 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         if (game.getState() != Consts.GameState.LOBBY)
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
 
-        String deckId = params.get(Consts.GeneralKeys.CARDCAST_ID);
-        if (deckId == null || deckId.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        String deckId = params.getStringNotNull(Consts.GeneralKeys.CARDCAST_ID);
+        if (deckId.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         if (deckId.length() != 5) throw new BaseCahHandler.CahException(Consts.ErrorCode.CARDCAST_INVALID_ID);
         deckId = deckId.toUpperCase();
 

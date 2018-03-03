@@ -46,7 +46,7 @@ public class RegisterHandler extends BaseHandler {
 
         Consts.AuthType type;
         try {
-            type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+            type = Consts.AuthType.parse(params.getStringNotNull(Consts.GeneralKeys.AUTH_TYPE));
         } catch (ParseException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
@@ -55,9 +55,7 @@ public class RegisterHandler extends BaseHandler {
         String nickname;
         switch (type) {
             case PASSWORD:
-                nickname = params.get(Consts.GeneralKeys.NICKNAME);
-                if (nickname == null)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME);
                 if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
@@ -65,15 +63,15 @@ public class RegisterHandler extends BaseHandler {
                 if (account == null) { // Without account
                     user = new User(nickname, exchange.getHostName(), Sessions.generateNewId());
                 } else {
-                    String password = params.get(Consts.AuthType.PASSWORD);
-                    if (password == null || password.isEmpty() || !BCrypt.checkpw(password, ((PasswordAccount) account).hashedPassword))
+                    String password = params.getStringNotNull(Consts.AuthType.PASSWORD);
+                    if (password.isEmpty() || !BCrypt.checkpw(password, ((PasswordAccount) account).hashedPassword))
                         throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);
 
                     user = User.withAccount(account, exchange.getHostName());
                 }
                 break;
             case GOOGLE:
-                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
+                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.getStringNotNull(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
                 account = accounts.getGoogleAccount(googleToken);
@@ -83,7 +81,7 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case FACEBOOK:
-                FacebookToken facebookToken = socialLogin.verifyFacebook(params.get(Consts.AuthType.FACEBOOK));
+                FacebookToken facebookToken = socialLogin.verifyFacebook(params.getStringNotNull(Consts.AuthType.FACEBOOK));
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
 
@@ -94,9 +92,7 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case GITHUB:
-                String githubToken = params.get(Consts.AuthType.GITHUB);
-                if (githubToken == null)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
+                String githubToken = params.getStringNotNull(Consts.AuthType.GITHUB);
 
                 GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
                 account = accounts.getGithubAccount(githubInfo);
@@ -106,9 +102,7 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case TWITTER:
-                String twitterTokens = params.get(Consts.AuthType.TWITTER);
-                if (twitterTokens == null)
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);
+                String twitterTokens = params.getStringNotNull(Consts.AuthType.TWITTER);
 
                 TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);
                 account = accounts.getTwitterAccount(twitterInfo);

@@ -3,6 +3,7 @@ package com.gianlu.pyxreloaded.server;
 import com.gianlu.pyxreloaded.Consts;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.QueryParameterUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -39,8 +40,15 @@ public class Parameters extends HashMap<String, String> {
     }
 
     @Nullable
-    public String get(Consts.ReceivableKey key) {
+    public String getString(Consts.ReceivableKey key) {
         return get(key.toString());
+    }
+
+    @NotNull
+    public String getStringNotNull(Consts.ReceivableKey key) throws BaseCahHandler.CahException {
+        String val = getString(key);
+        if (val == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        else return val;
     }
 
     public boolean getBoolean(Consts.ReceivableKey key, boolean fallback) {

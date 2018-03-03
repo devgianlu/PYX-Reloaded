@@ -24,9 +24,8 @@ public class ChatHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         user.checkChatFlood();
 
-        String msg = params.get(Consts.ChatData.MESSAGE);
-        if (msg == null || msg.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_MSG_SPECIFIED);
+        String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
+        if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {

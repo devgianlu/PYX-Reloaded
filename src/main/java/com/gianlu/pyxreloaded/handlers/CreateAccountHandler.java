@@ -44,9 +44,7 @@ public class CreateAccountHandler extends BaseHandler {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
-        String nickname = params.get(Consts.GeneralKeys.NICKNAME);
-        if (nickname == null)
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        String nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME);
         if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
         if (connectedUsers.hasUser(nickname) || accounts.hasNickname(nickname))
@@ -55,29 +53,26 @@ public class CreateAccountHandler extends BaseHandler {
         UserAccount account;
         Consts.AuthType type;
         try {
-            type = Consts.AuthType.parse(params.get(Consts.GeneralKeys.AUTH_TYPE));
+            type = Consts.AuthType.parse(params.getStringNotNull(Consts.GeneralKeys.AUTH_TYPE));
         } catch (ParseException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
 
         switch (type) {
             case PASSWORD:
-                String email = params.get(Consts.UserData.EMAIL);
-                if (email == null || email.isEmpty())
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                String email = params.getStringNotNull(Consts.UserData.EMAIL);
+                if (email.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
-                if (accounts.hasEmail(email))
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
+                if (accounts.hasEmail(email)) throw new BaseCahHandler.CahException(Consts.ErrorCode.EMAIL_IN_USE);
 
-                String password = params.get(Consts.AuthType.PASSWORD);
-                if (password == null || password.isEmpty())
-                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+                String password = params.getStringNotNull(Consts.AuthType.PASSWORD);
+                if (password.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
                 account = accounts.registerWithPassword(nickname, email, password);
                 emails.sendEmailVerification(account);
                 break;
             case GOOGLE:
-                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.get(Consts.AuthType.GOOGLE));
+                GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.getStringNotNull(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
                 if (accounts.hasEmail(googleToken.getEmail()))
@@ -86,7 +81,7 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithGoogle(nickname, googleToken);
                 break;
             case FACEBOOK:
-                FacebookToken facebookToken = socialLogin.verifyFacebook(params.get(Consts.AuthType.FACEBOOK));
+                FacebookToken facebookToken = socialLogin.verifyFacebook(params.getStringNotNull(Consts.AuthType.FACEBOOK));
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
 
@@ -97,7 +92,7 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithFacebook(nickname, facebookToken, facebookInfo);
                 break;
             case GITHUB:
-                String githubToken = params.get(Consts.AuthType.GITHUB);
+                String githubToken = params.getString(Consts.AuthType.GITHUB);
                 if (githubToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
 
@@ -108,7 +103,7 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithGithub(nickname, githubInfo);
                 break;
             case TWITTER:
-                String twitterTokens = params.get(Consts.AuthType.TWITTER);
+                String twitterTokens = params.getString(Consts.AuthType.TWITTER);
                 if (twitterTokens == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);
 

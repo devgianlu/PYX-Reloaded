@@ -29,7 +29,7 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
             throw new StatusException(StatusCodes.INTERNAL_SERVER_ERROR, ex);
         }
 
-        String op = params.get(Consts.GeneralKeys.OP);
+        String op = params.getStringNotNull(Consts.GeneralKeys.OP);
         if (!Handlers.skipUserCheck(op) && user == null) {
             throw new CahException(Consts.ErrorCode.NOT_REGISTERED);
         } else if (user != null && !user.isValid()) {

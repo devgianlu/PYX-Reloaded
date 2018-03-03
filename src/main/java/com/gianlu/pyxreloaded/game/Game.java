@@ -286,7 +286,7 @@ public class Game {
      * @param userPassword A given string
      * @return Whether the password is correct
      */
-    public boolean isPasswordCorrect(String userPassword) {
+    public boolean isPasswordCorrect(@Nullable String userPassword) {
         return getPassword() == null || getPassword().isEmpty() || Objects.equals(userPassword, getPassword());
     }
 
@@ -1302,7 +1302,7 @@ public class Game {
                         playCard = card;
                         if (WhiteDeck.isBlankCard(card)) {
                             if (cardText == null || cardText.isEmpty())
-                                throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_MSG_SPECIFIED);
+                                throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
                             ((BlankWhiteCard) playCard).setText(cardText);
                             playedBlankCards++;

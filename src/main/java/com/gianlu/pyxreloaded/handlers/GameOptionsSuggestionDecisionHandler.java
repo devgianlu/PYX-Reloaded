@@ -21,9 +21,8 @@ public class GameOptionsSuggestionDecisionHandler extends GameWithPlayerHandler 
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getHost() != user) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
 
-        String suggestedId = params.get(Consts.GameSuggestedOptionsData.ID);
-        if (suggestedId == null || suggestedId.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        String suggestedId = params.getStringNotNull(Consts.GameSuggestedOptionsData.ID);
+        if (suggestedId.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         if (!params.has(Consts.GameSuggestedOptionsData.DECISION))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);

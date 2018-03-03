@@ -26,9 +26,8 @@ public class KickHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
-        String nickname = params.get(Consts.GeneralKeys.NICKNAME);
-        if (nickname == null || nickname.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        String nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME);
+        if (nickname.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         final User kickUser = connectedUsers.getUser(nickname);
         if (kickUser == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_SUCH_USER);

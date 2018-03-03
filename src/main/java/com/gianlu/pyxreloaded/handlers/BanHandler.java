@@ -33,11 +33,10 @@ public class BanHandler extends BaseHandler {
         if (!user.isAdmin())
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
 
-        String nickname = params.get(Consts.GeneralKeys.NICKNAME); //Set a variable "nickname" to the one entered through the command.
+        String nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME); //Set a variable "nickname" to the one entered through the command.
 
         //Assuming this is for when the command wasn't properly typed
-        if (nickname == null || nickname.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
+        if (nickname.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
 

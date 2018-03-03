@@ -23,9 +23,8 @@ public class GameChatHandler extends GameWithPlayerHandler {
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         user.checkChatFlood();
 
-        String msg = params.get(Consts.ChatData.MESSAGE);
-        if (msg == null || msg.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_MSG_SPECIFIED);
+        String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
+        if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.MESSAGE_TOO_LONG);
