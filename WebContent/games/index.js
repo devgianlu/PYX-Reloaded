@@ -52,9 +52,14 @@ class Games {
              */
             Notifier.debug(data);
 
-            if (data.a.p !== null) this.profilePicture.attr('src', data.a.p);
             this.profileNickname.text(data.n);
-            this.profileEmail.text(data.a.em);
+            if (data.a !== undefined) {
+                if (data.a.p !== null) this.profilePicture.attr('src', data.a.p);
+                this.profileEmail.show();
+                this.profileEmail.text(data.a.em);
+            } else {
+                this.profileEmail.hide();
+            }
         }, (error) => {
             Notifier.error("Failed loading user info.", error)
         });
