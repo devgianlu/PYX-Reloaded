@@ -2,9 +2,12 @@ package com.gianlu.pyxreloaded.data;
 
 
 import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.paths.EventsPath;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.singletons.Sessions;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -16,7 +19,7 @@ public class User {
     private final String nickname;
     private final String hostname;
     private final String sessionId;
-    private final boolean admin;
+    private final UserAccount account;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
     private long lastReceivedEvents = 0;
     private long lastUserAction = 0;
@@ -32,15 +35,28 @@ public class User {
      * @param hostname  The user's Internet hostname (which will likely just be their IP address).
      * @param sessionId The unique ID of this session for this server singletons.
      */
-    public User(String nickname, String hostname, String sessionId, boolean admin) {
+    public User(String nickname, String hostname, String sessionId) {
+        this(nickname, hostname, sessionId, null);
+    }
+
+    private User(String nickname, String hostname, @NotNull String sessionId, @Nullable UserAccount account) {
         this.nickname = nickname;
         this.hostname = hostname;
         this.sessionId = sessionId;
-        this.admin = admin;
+        this.account = account;
+    }
+
+    @NotNull
+    public static User withAccount(UserAccount account, String hostname) {
+        return new User(account.username, hostname, Sessions.generateNewId(), account);
+    }
+
+    public boolean isEmailVerified() {
+        return account != null && account.emailVerified;
     }
 
     public boolean isAdmin() {
-        return admin;
+        return account != null && account.admin;
     }
 
     public void checkChatFlood() throws BaseCahHandler.CahException {
@@ -174,5 +190,9 @@ public class User {
 
     public List<Long> getLastMessageTimes() {
         return lastMessageTimes;
+    }
+
+    public UserAccount getAccount() {
+        return account;
     }
 }

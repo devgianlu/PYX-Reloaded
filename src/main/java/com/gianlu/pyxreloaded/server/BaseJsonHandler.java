@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
 
 import java.nio.charset.Charset;
@@ -16,7 +17,7 @@ public abstract class BaseJsonHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
-        if (exchange.getRequestMethod().equalToString("POST")) {
+        if (exchange.getRequestMethod() == Methods.POST) {
             exchange.startBlocking();
             if (exchange.isInIoThread()) {
                 exchange.dispatch(this);

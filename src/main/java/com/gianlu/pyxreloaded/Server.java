@@ -3,15 +3,15 @@ package com.gianlu.pyxreloaded;
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.game.GameManager;
-import com.gianlu.pyxreloaded.paths.AjaxPath;
-import com.gianlu.pyxreloaded.paths.EventsPath;
+import com.gianlu.pyxreloaded.paths.*;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
 import com.gianlu.pyxreloaded.server.HttpsRedirect;
 import com.gianlu.pyxreloaded.server.Provider;
 import com.gianlu.pyxreloaded.singletons.*;
+import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
+import com.gianlu.pyxreloaded.socials.twitter.TwitterAuthHelper;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
-import com.gianlu.pyxreloaded.task.RefreshAdminTokenTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -36,28 +36,32 @@ public class Server {
     private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
-    private static final long REFRESH_ADMIN_TOKEN_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
         int maxGames = preferences.getInt("maxGames", 100);
         int maxUsers = preferences.getInt("maxUsers", 400);
 
-        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
-        globalTimer.scheduleAtFixedRate(new RefreshAdminTokenTask(), 0, REFRESH_ADMIN_TOKEN_DELAY, TimeUnit.MILLISECONDS);
+        ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);
 
-        LoadedCards loadedCards = new LoadedCards(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
+        LoadedCards loadedCards = new LoadedCards(preferences);
         Providers.add(Annotations.LoadedCards.class, (Provider<LoadedCards>) () -> loadedCards);
+
+        UsersWithAccount accounts = new UsersWithAccount(serverDatabase);
+        Providers.add(Annotations.UsersWithAccount.class, (Provider<UsersWithAccount>) () -> accounts);
+
+        Emails emails = new Emails(serverDatabase, preferences, accounts);
+        Providers.add(Annotations.Emails.class, (Provider<Emails>) () -> emails);
 
         ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
 
-        ServerDatabase serverDatabase = new ServerDatabase(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
-
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
+
+        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
@@ -66,6 +70,12 @@ public class Server {
         globalTimer.scheduleAtFixedRate(userPingTask, PING_START_DELAY, PING_CHECK_DELAY, TimeUnit.MILLISECONDS);
 
         Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
+
+        GithubAuthHelper githubAuthHelper = new GithubAuthHelper(preferences);
+        TwitterAuthHelper twitterAuthHelper = new TwitterAuthHelper(preferences);
+
+        SocialLogin socialLogin = new SocialLogin(githubAuthHelper, twitterAuthHelper, preferences);
+        Providers.add(Annotations.SocialLogin.class, (Provider<SocialLogin>) () -> socialLogin);
 
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
@@ -76,7 +86,11 @@ public class Server {
         ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
-                .addExactPath("/Events", Handlers.websocket(new EventsPath()));
+                .addExactPath("/Events", Handlers.websocket(new EventsPath()))
+                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
+                .addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper))
+                .addExactPath("/TwitterStartAuthFlow", new TwitterStartAuthFlowPath(twitterAuthHelper))
+                .addExactPath("/TwitterCallback", new TwitterCallbackPath(twitterAuthHelper));
 
         RoutingHandler router = new RoutingHandler();
         router.setFallbackHandler(pathHandler)

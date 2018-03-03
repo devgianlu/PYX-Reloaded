@@ -1,11 +1,14 @@
+/*noinspection CssUnresolvedCustomProperty*/
 .br-theme-fontawesome-stars-o .br-widget a.br-active:after {
     color: var(--mdc-theme-secondary) !important;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .br-theme-fontawesome-stars-o .br-widget a.br-selected:after {
     color: var(--mdc-theme-secondary) !important;
 }
 
+/*noinspection CssUnresolvedCustomProperty*/
 .br-theme-fontawesome-stars-o .br-widget a.br-fractional:after {
     color: var(--mdc-theme-secondary) !important;
 }

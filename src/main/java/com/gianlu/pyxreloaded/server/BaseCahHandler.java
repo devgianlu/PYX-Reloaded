@@ -3,6 +3,7 @@ package com.gianlu.pyxreloaded.server;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.handlers.Handlers;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import com.google.gson.JsonElement;
 import io.undertow.server.HttpServerExchange;
@@ -11,7 +12,6 @@ import io.undertow.util.StatusCodes;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public abstract class BaseCahHandler extends BaseJsonHandler {
 
@@ -30,8 +30,7 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
         }
 
         String op = params.get(Consts.GeneralKeys.OP);
-        boolean skipUserCheck = Objects.equals(op, Consts.Operation.REGISTER.toString()) || Objects.equals(op, Consts.Operation.FIRST_LOAD.toString());
-        if (!skipUserCheck && user == null) {
+        if (!Handlers.skipUserCheck(op) && user == null) {
             throw new CahException(Consts.ErrorCode.NOT_REGISTERED);
         } else if (user != null && !user.isValid()) {
             Sessions.get().invalidate(sid.getValue());

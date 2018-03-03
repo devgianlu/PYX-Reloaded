@@ -1,14 +1,19 @@
 package com.gianlu.pyxreloaded;
 
+import com.gianlu.pyxreloaded.data.User;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.text.ParseException;
 
 public final class Consts {
     public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
     public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
+    public static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
 
     /**
      * Possible events.
@@ -224,10 +229,6 @@ public final class Consts {
          */
         NO_MSG_SPECIFIED("nms"),
         /**
-         * No nickname specified.
-         */
-        NO_NICK_SPECIFIED("nns"),
-        /**
          * No such user.
          */
         NO_SUCH_USER("nsu"),
@@ -268,10 +269,6 @@ public final class Consts {
          */
         OP_NOT_SPECIFIED("ons"),
         /**
-         * That nick is reserved.
-         */
-        RESERVED_NICK("rn"),
-        /**
          * Your session has expired. Refresh the page.
          */
         SESSION_EXPIRED("se"),
@@ -308,11 +305,65 @@ public final class Consts {
          */
         ALREADY_SUGGESTED("AS"),
         /**
-         * SQL error, fatal.
-         * <p>
-         * FIXME: Remove this error
+         * Email already in use.
          */
-        SQL_ERROR("sqle");
+        EMAIL_IN_USE("emiu"),
+        /**
+         * Google error.
+         */
+        GOOGLE_ERROR("ge"),
+        /**
+         * User hasn't a Google account.
+         */
+        GOOGLE_NOT_REGISTERED("gnr"),
+        /**
+         * User sent an invalid Google ID token.
+         */
+        GOOGLE_INVALID_TOKEN("git"),
+        /**
+         * Facebook error.
+         */
+        FACEBOOK_ERROR("fe"),
+        /**
+         * User sent an invalid Facebook access token.
+         */
+        FACEBOOK_INVALID_TOKEN("fit"),
+        /**
+         * User hasn't a Facebook account.
+         */
+        FACEBOOK_NOT_REGISTERED("fnr"),
+        /**
+         * User hasn't verified his Facebook email.
+         */
+        FACEBOOK_EMAIL_NOT_VERIFIED("fbemnv"),
+        /**
+         * Github error.
+         */
+        GITHUB_ERROR("ghe"),
+        /**
+         * User hasn't a Github account.
+         */
+        GITHUB_NOT_REGISTERED("ghnr"),
+        /**
+         * User sent an invalid Github access token.
+         */
+        GITHUB_INVALID_TOKEN("ghit"),
+        /**
+         * User sent an invalid Twitter access token.
+         */
+        TWITTER_INVALID_TOKEN("twit"),
+        /**
+         * Twitter error.
+         */
+        TWITTER_ERROR("twe"),
+        /**
+         * User hasn't a Twitter account.
+         */
+        TWITTER_NOT_REGISTERED("twnr"),
+        /**
+         * User hasn't verified his Twitter email.
+         */
+        TWITTER_EMAIL_NOT_VERIFIED("twemnv");
 
         private final String code;
 
@@ -514,8 +565,11 @@ public final class Consts {
         /**
          * Decide whether to accept or decline the game options suggested modification.
          */
-        GAME_OPTIONS_SUGGESTION_DECISION("gosd");
-
+        GAME_OPTIONS_SUGGESTION_DECISION("gosd"),
+        /**
+         * Create an user account.
+         */
+        CREATE_ACCOUNT("ca");
 
         private final String op;
 
@@ -533,7 +587,11 @@ public final class Consts {
      * Possible game state.
      */
     public enum GameState {
-        JUDGING("j"), LOBBY("l"), PLAYING("p"), ROUND_OVER("ro");
+        JUDGING("j"),
+        LOBBY("l"),
+        @IgnoreDuplicateIn(User.class)
+        PLAYING("p"),
+        ROUND_OVER("ro");
 
         private final String state;
 
@@ -598,10 +656,6 @@ public final class Consts {
          */
         GAME_ID("gid"),
         /**
-         * Admin token, alphanumeric string.
-         */
-        ADMIN_TOKEN("at"),
-        /**
          * Cardcast ID of type 'XXXXX'.
          */
         CARDCAST_ID("cci"),
@@ -648,7 +702,15 @@ public final class Consts {
         /**
          * Reason why a player disconnected.
          */
-        DISCONNECT_REASON("qr");
+        DISCONNECT_REASON("qr"),
+        /**
+         * Authentication type.
+         */
+        AUTH_TYPE("aT"),
+        /**
+         * User account data.
+         */
+        ACCOUNT("a");
 
         private final String key;
 
@@ -880,6 +942,7 @@ public final class Consts {
         /**
          * Game password.
          */
+        @IgnoreDuplicateIn(AuthType.class)
         PASSWORD("pw"),
         /**
          * Maximum number of players.
@@ -1062,6 +1125,68 @@ public final class Consts {
         private final String key;
 
         GamePlayerInfo(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    /**
+     * Identify auth type in database, also used to send authentication data
+     */
+    public enum AuthType implements ReceivableKey {
+        @IgnoreDuplicateIn(GameOptionsData.class)
+        PASSWORD("pw"),
+        GOOGLE("g"),
+        FACEBOOK("fb"),
+        GITHUB("gh"),
+        TWITTER("tw");
+
+        private final String key;
+
+        AuthType(String key) {
+            this.key = key;
+        }
+
+        @NotNull
+        public static AuthType parse(String key) throws ParseException {
+            for (AuthType type : values())
+                if (type.key.equals(key))
+                    return type;
+
+            throw new ParseException(key, 0);
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    /**
+     * User data
+     */
+    public enum UserData implements ReceivableKey, ReturnableKey {
+        /**
+         * Profile picture URL.
+         */
+        @IgnoreDuplicateIn(GameState.class)
+        PICTURE("p"),
+        /**
+         * Email address.
+         */
+        EMAIL("em"),
+        /**
+         * Whether the user verified its email.
+         */
+        EMAIL_VERIFIED("emv");
+
+        private final String key;
+
+        UserData(String key) {
             this.key = key;
         }
 

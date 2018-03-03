@@ -107,3 +107,50 @@ class Notifier {
             else console.log(data);
     }
 }
+
+class Requester {
+
+    /**
+     * @callback errorCallback
+     * @param {string} error.ec - Error code
+     */
+
+    /**
+     * @param {string} op
+     * @param {object} params
+     * @param {function} done
+     * @param {errorCallback} fail
+     * @param {function} failNative
+     */
+    static request(op, params, done = null, fail = null, failNative = null) {
+        let paramsStr = "";
+        for (const key in params) {
+            if (paramsStr.length > 0) paramsStr += "&";
+            if (params.hasOwnProperty(key))
+                paramsStr += key + "=" + encodeURIComponent(params[key]);
+        }
+
+        $.post("/AjaxServlet", paramsStr + "&o=" + op).done((data) => {
+            if (done !== null) done(data);
+        }).fail((data) => {
+            let called = false;
+
+            if (failNative !== null) {
+                failNative(data);
+                called = true;
+            }
+
+            /** @param {object} data.responseJSON */
+            if (fail !== null && "responseJSON" in data && "ec" in data.responseJSON) {
+                fail(data.responseJSON);
+                called = true;
+            }
+
+            if (!called) Notifier.debug(data, true);
+        });
+    }
+
+    static always(op, params, always) {
+        Requester.request(op, params, always, null, always);
+    }
+}

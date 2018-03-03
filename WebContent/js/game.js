@@ -111,7 +111,7 @@ class GameManager {
     set blackCard(card) {
         this.bc = card;
 
-        if (card === null) {
+        if (card === undefined || card === null) {
             this._blackCardContainer.empty();
             return;
         }
@@ -337,7 +337,7 @@ class GameManager {
                 break;
             case "sjj":
                 this.toggleHandVisibility(false);
-                Notifier.timeout(Notifier.ALERT, "Select the winning card.");
+                Notifier.timeout(Notifier.ALERT, "Select the winning card(s).");
                 break;
             case "sp":
                 this.toggleHandVisibility(true);
@@ -358,24 +358,23 @@ class GameManager {
     }
 
     changeGameOptions(go) {
-        $.post("/AjaxServlet", "o=cgo&go=" + JSON.stringify(go) + "&gid=" + this.id).done((data) => {
+        Requester.request("cgo", {
+            "gid": this.id,
+            "go": JSON.stringify(go)
+        }, (data) => {
             if ("H" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.H + "</b>.");
             else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                switch (data.responseJSON.ec) {
-                    case "AS":
-                        Notifier.error("You have already suggested a modification. Wait for it to be accepted or declined.", data);
-                        break;
-                    case "as":
-                        Notifier.error("The game must be in lobby state.", data);
-                        break;
-                    default:
-                        Notifier.error("Failed changing the game options.", data);
-                        break;
-                }
-            } else {
-                Notifier.error("Failed changing the game options.", data);
+        }, (error) => {
+            switch (error.ec) {
+                case "AS":
+                    Notifier.error("You have already suggested a modification. Wait for it to be accepted or declined.", data);
+                    break;
+                case "as":
+                    Notifier.error("The game must be in lobby state.", data);
+                    break;
+                default:
+                    Notifier.error("Failed changing the game options.", data);
+                    break;
             }
         });
 
@@ -383,18 +382,19 @@ class GameManager {
     }
 
     sendGameChatMessage(msg, clear) {
-        $.post("/AjaxServlet", "o=GC&m=" + msg + "&gid=" + this.id).done(function () {
+        Requester.request("GC", {
+            "m": msg,
+            "gid": this.id
+        }, () => {
             clear();
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                if (data.responseJSON.ec === "tf") {
-                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
-                    Notifier.debug(data, true);
-                    return;
-                }
+        }, (error) => {
+            if (error.ec === "tf") {
+                Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
+                Notifier.debug(error, true);
+                return;
             }
 
-            Notifier.error("Failed to send the message!", data);
+            Notifier.error("Failed sending the message!", error);
         });
     }
 
@@ -408,38 +408,35 @@ class GameManager {
             }
         }
 
-        const self = this;
-        $.post("/AjaxServlet", "o=pc&cid=" + card.cid + "&gid=" + this.id + "&wit=" + text).done(function (data) {
+        Requester.request("pc", {
+            "cid": card.cid,
+            "gid": this.id,
+            "wit": text
+        }, (data) => {
             /**
              * @param {int} data.ltp - Number of cards left to pick
              * @param {int} data.ltd - Number of cards left to draw
              */
 
-            self.updateHandInfo(data.ltp, data.ltd);
-            self.removeHandCard(card);
-            if (data.ltp === 0 && data.ltd === 0) {
-                self.closeHand();
+            this.updateHandInfo(data.ltp, data.ltd);
+            this.removeHandCard(card);
+            if (data.ltp === 0 && data.ltd === 0) this.closeHand();
+        }, (error) => {
+            switch (error.ec) {
+                case "ap":
+                    Notifier.error("You have already played all the necessary cards.", error);
+                    break;
+                case "nyt":
+                    Notifier.error("This is not your turn.", error);
+                    break;
+                case "sdc":
+                    Notifier.error("You have to draw all the remaining cards.", error);
+                    break;
+                default:
+                    Notifier.error("Failed to play the card!", error);
+                    break;
             }
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                switch (data.responseJSON.ec) {
-                    case "ap":
-                        Notifier.error("You have already played all the necessary cards.", data);
-                        break;
-                    case "nyt":
-                        Notifier.error("This is not your turn.", data);
-                        break;
-                    case "sdc":
-                        Notifier.error("You have to draw all the remaining cards.", data);
-                        break;
-                    default:
-                        Notifier.error("Failed to play the card!", data);
-                        break;
-                }
-            } else {
-                Notifier.error("Failed to play the card!", data);
-            }
-        });
+        })
     }
 
     addTableCards(cards, clear = false) {
@@ -469,7 +466,7 @@ class GameManager {
     _handleGameStatusChange(data) {
         switch (data.gs) {
             case "l":
-                this.blackCard = null;
+                this.blackCard = undefined;
                 this.addHandCards([], true);
                 this.addTableCards([], true);
                 this.toggleStartButton(this.amHost);
@@ -557,66 +554,60 @@ class GameManager {
     }
 
     _handleTableCardSelect(card) {
-        $.post("/AjaxServlet", "o=js&cid=" + card.cid + "&gid=" + this.id).done(function () {
-            // Do nothing
-        }).fail(function (data) {
-            if ("responseJSON" in data) {
-                switch (data.responseJSON.ec) {
+        Requester.request("js", {
+                "cid": card.cid,
+                "gid": this.id
+            }, null,
+            (error) => {
+                switch (error.ec) {
                     case "nj":
-                        Notifier.error("You're not the judge.", data);
+                        Notifier.error("You're not the judge.", error);
                         break;
                     case "nyt":
-                        Notifier.error("This is not your turn.", data);
+                        Notifier.error("This is not your turn.", error);
                         break;
                     default:
-                        Notifier.error("Failed to select the card!", data);
+                        Notifier.error("Failed to select the card!", error);
                         break;
                 }
-            } else {
-                Notifier.error("Failed to select the card!", data);
-            }
-        });
+            });
     }
 
     leave() {
         closeWebSocket();
-        $.post("/AjaxServlet", "o=lg&gid=" + this.id).always(function () {
+        Requester.always("lg", {
+            "gid": this.id
+        }, () => {
             GameManager._postLeave();
         });
     }
 
     start() {
-        $.post("/AjaxServlet", "o=sg&gid=" + this.id).done(function (data) {
+        Requester.request("sg", {
+            "gid": this.id
+        }, (data) => {
             Notifier.debug(data);
-        }).fail(function (data) {
+        }, (error) => {
             /**
-             * @param {object} data.responseJSON - The response body
-             *
-             * @param {string} error.ec - Error code
              * @param {int} error.bcp - Provided black cards
              * @param {int} error.bcr - Required black cards
              * @param {int} error.wcp - Provided white cards
              * @param {int} error.wcr - Required white cards
              */
-            if ("responseJSON" in data) {
-                const error = data.responseJSON;
-                switch (error.ec) {
-                    case "nec":
-                        Notifier.error("Not enough cards to start the game!" +
-                            "<br>Black cards: " + error.bcp + "/" + error.bcr +
-                            "<br>White cards: " + error.wcp + "/" + error.wcr, error);
-                        break;
-                    case "nep":
-                        Notifier.error("Not enough players to start the game!", data);
-                        break;
-                    default:
-                        Notifier.error("Failed starting the game!", data);
-                        break;
-                }
-            } else {
-                Notifier.error("Failed starting the game!", data);
+            switch (error.ec) {
+                case "nec":
+                    Notifier.error("Not enough cards to start the game!" +
+                        "<br>Black cards: " + error.bcp + "/" + error.bcr +
+                        "<br>White cards: " + error.wcp + "/" + error.wcr, error);
+                    break;
+                case "nep":
+                    Notifier.error("Not enough players to start the game!", data);
+                    break;
+                default:
+                    Notifier.error("Failed starting the game!", data);
+                    break;
             }
-        })
+        });
     }
 
     updateHandInfo(ltp, ltd) {
@@ -631,6 +622,15 @@ class GameManager {
         }
 
         this._reloadDrawerPadding();
+    }
+
+    _removePlayer(nick) {
+        for (let i = 0; i < this.info.pi.length; i++) {
+            if (this.info.pi[i].N === nick) {
+                this.info.pi.splice(i, 1);
+                break;
+            }
+        }
     }
 
     /**
@@ -676,13 +676,7 @@ class GameManager {
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> joined the game!");
                 break;
             case "gpl":
-                for (let i = 0; i < this.info.pi.length; i++) {
-                    if (this.info.pi[i].N === data.n) {
-                        this.info.pi.splice(i, 1);
-                        break;
-                    }
-                }
-
+                this._removePlayer(data.n);
                 this._reloadScoreboard();
                 Notifier.timeout(Notifier.INFO, "<b>" + data.n + "</b> left the game!");
                 break;
@@ -713,6 +707,7 @@ class GameManager {
                 this._updateOptionsDialog();
                 break;
             case "gpki":
+                this._removePlayer(data.n);
                 Notifier.timeout(Notifier.ALERT, "<b>" + data.n + "</b> has been kicked for being idle.");
                 break;
             case "gps":
@@ -842,12 +837,16 @@ class GameManager {
     }
 
     submitGameOptionsModificationDecision(id, decision, done = undefined) {
-        $.post("/AjaxServlet", "o=gosd&soid=" + id + "&d=" + decision + "&gid=" + this.id).done(() => {
+        Requester.request("gosd", {
+            "soid": id,
+            "d": decision,
+            "gid": this.id
+        }, () => {
             if (done !== undefined) done();
             if (this._submitGameOptionsModificationDecision_listener !== undefined)
                 this._submitGameOptionsModificationDecision_listener(id);
-        }).fail(function (data) {
-            Notifier.error("Failed submitting decision on the suggested game options.", data);
+        }, (error) => {
+            Notifier.error("Failed submitting decision on the suggested game options.", error);
         });
     }
 
@@ -862,37 +861,53 @@ class GameManager {
  * @param {GameOptionsDialog} gameOptionsDialog
  */
 function loadUI(gameManager, gameOptionsDialog) {
-    $.post("/AjaxServlet", "o=gme").done(function (data) {
-        gameManager.me = data;
+    Requester.request("gme", {}, (meData) => {
+        gameManager.me = meData;
 
-        $.post("/AjaxServlet", "o=ggi&gid=" + gameManager.id).done(function (data) {
-            gameManager.gameInfo = data;
-            Notifier.debug(data);
+        Requester.request("ggi", {
+            "gid": gameManager.id
+        }, (ggiData) => {
+            gameManager.gameInfo = ggiData;
+            Notifier.debug(ggiData);
 
-            $.post("/AjaxServlet", "o=gc&gid=" + gameManager.id).done(function (data) {
-                registerPollListener("GAME", function (data) {
-                    Notifier.debug(data);
-                    gameManager.handlePollEvent(data);
+            Requester.request("gc", {
+                "gid": gameManager.id
+            }, (gcData) => {
+                registerPollListener("GAME", (ev) => {
+                    Notifier.debug(ev);
+                    gameManager.handlePollEvent(ev);
                 });
 
-                gameManager.blackCard = data.bc;
-                gameManager.updateHandInfo(data.ltp, data.ltd);
+                gameManager.blackCard = gcData.bc;
+                gameManager.updateHandInfo(gcData.ltp, gcData.ltd);
 
-                gameManager.addHandCards(data.h, true);
-                gameManager.addTableCards(data.wc, true);
+                gameManager.addHandCards(gcData.h, true);
+                gameManager.addTableCards(gcData.wc, true);
 
                 gameManager.attachOptionsDialog = gameOptionsDialog;
 
                 new OtherStuffManager(gameManager);
 
-                Notifier.debug(data);
-            }).fail(function (data) {
-                Notifier.error("Failed loading the game!", data);
+                Notifier.debug(gcData);
+            }, (error) => {
+                Notifier.error("Failed loading the game!", error);
             });
-        }).fail(function (data) {
-            Notifier.error("Failed loading the game!", data);
+        }, (error) => {
+            Notifier.error("Failed loading the game!", error);
         });
-    }).fail(function (data) {
-        Notifier.error("Failed loading the game!", data);
+    }, (error) => {
+        Notifier.error("Failed loading the game!", error);
     });
+}
+
+function getLastPathSegment() {
+    return decodeURIComponent(new RegExp('[^\\/]+(?=\\/$|$)').exec(window.location.href) || [null, '']) || null;
+}
+
+function arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; ++i) if (a[i] !== b[i]) return false;
+    return true;
 }

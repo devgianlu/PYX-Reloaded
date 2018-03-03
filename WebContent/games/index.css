@@ -1,0 +1,33 @@
+#drawer .mdc-drawer__header-content {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#drawer .mdc-drawer__header-content .details__container {
+    overflow: hidden;
+    width: 100%;
+    margin: auto 0;
+}
+
+#drawer .mdc-drawer__header-content .details__container > * {
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#drawer .mdc-drawer__header-content img.details--profile {
+    border-radius: 50%;
+    height: 100%;
+    width: auto;
+    max-height: 72px;
+    max-width: 72px;
+}
+
+/* 600px (same as drawer) ---------- */
+@media only screen and (min-width: 600px) {
+    #drawer .mdc-drawer__header-content img.details--profile {
+        max-height: 96px;
+        max-width: 96px;
+    }
+}

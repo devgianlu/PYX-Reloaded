@@ -78,9 +78,11 @@
     <main class="mdc-toolbar-fixed-adjust" style="display: flex; flex-flow: row">
         <div id="gameLayout" style="display: none">
             <h1 class="message mdc-typography--display1">Game hasn't started yet.</h1>
-            <div id="blackCard"></div>
-            <div id="whiteCards">
-                <div class="list"></div>
+            <div class="__inner">
+                <div id="blackCard"></div>
+                <div id="whiteCards">
+                    <div class="list"></div>
+                </div>
             </div>
         </div>
         <div id="otherStuffLayout" class="mdc-layout-grid" style="display: none">
@@ -183,17 +185,16 @@
 <script src="//unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/js/jquery.tooltipster.min.js"></script>
-<script src="/js/utils.js"></script>
 <script src="/js/bottom_sheet.js"></script>
 <script src="/js/tabs.helper.js"></script>
 <script src="/js/cardcast.helper.js"></script>
-<script src="/js/notifs.helper.js"></script>
+<script src="/js/communication.helper.js"></script>
 <script src="/js/events.helper.js"></script>
 <script src="/game_options/dialog.js"></script>
 <script src="/js/game.js"></script>
 <script src="/js/game.other_stuff.js"></script>
 <script>
-    window.mdc.autoInit();
+    mdc.autoInit();
     TabsManager.init("tabs", ["gameLayout", "otherStuffLayout"]);
 
     const gameManager = new GameManager(getLastPathSegment());

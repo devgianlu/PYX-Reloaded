@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
     <link rel="stylesheet" href="/css/pyx-reloaded.css">
     <link rel="stylesheet" href="/css/theming.css">
+    <link rel="stylesheet" href="./index.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="/js/theming.js"></script>
     <script>Theming.apply();</script>
@@ -60,7 +61,13 @@
     <nav class="mdc-drawer__drawer">
         <header class="mdc-drawer__header">
             <div class="mdc-drawer__header-content mdc-theme--text-primary-on-primary mdc-theme--primary-bg">
-                PYX-Reloaded
+                <img class="details--profile" src="/css/no-profile.svg">
+                <div class="details__container">
+                    <h2 class="mdc-typography--title details--nick">
+                        {{Nickname}}</h2>
+                    <h2 class="mdc-typography--body1 details--email mdc-theme--text-secondary-on-primary">
+                        {{Email}}</h2>
+                </div>
             </div>
         </header>
         <nav class="mdc-drawer__content mdc-list">
@@ -199,14 +206,13 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
-<script src="/js/utils.js"></script>
 <script src="/js/cardcast.helper.js"></script>
-<script src="/js/notifs.helper.js"></script>
+<script src="/js/communication.helper.js"></script>
 <script src="/js/events.helper.js"></script>
 <script src="/game_options/dialog.js"></script>
 <script src="./index.js"></script>
 <script>
-    window.mdc.autoInit();
+    mdc.autoInit();
     setupGameOptionsDialog($('body .mdc-fab'), "Start a New Game", true, "Create", (go) => {
         games.createGame(go)
     });

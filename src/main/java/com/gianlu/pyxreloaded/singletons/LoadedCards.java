@@ -17,8 +17,8 @@ public final class LoadedCards {
     private final Set<PyxBlackCard> blackCards = new HashSet<>();
     private final Connection conn;
 
-    public LoadedCards(String url) throws SQLException {
-        conn = DriverManager.getConnection(url);
+    public LoadedCards(Preferences preferences) throws SQLException {
+        conn = DriverManager.getConnection(preferences.getString("pyxDbUrl", "jdbc:sqlite:pyx.sqlite"));
         loadWhiteCards();
         loadBlackCards();
         loadSets();
@@ -58,7 +58,7 @@ public final class LoadedCards {
 
     private Set<Integer> getBlackCardIdsFor(int setId) throws SQLException {
         try (Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT black_card_id FROM card_set_black_card WHERE card_set_id=" + setId)) {
+             ResultSet resultSet = statement.executeQuery("SELECT black_card_id FROM card_set_black_card WHERE card_set_id='" + setId + "'")) {
 
             Set<Integer> ids = new HashSet<>();
             while (resultSet.next()) ids.add(resultSet.getInt(1));
@@ -68,7 +68,7 @@ public final class LoadedCards {
 
     private Set<Integer> getWhiteCardIdsFor(int setId) throws SQLException {
         try (Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT white_card_id FROM card_set_white_card WHERE card_set_id=" + setId)) {
+             ResultSet resultSet = statement.executeQuery("SELECT white_card_id FROM card_set_white_card WHERE card_set_id='" + setId + "'")) {
 
             Set<Integer> ids = new HashSet<>();
             while (resultSet.next()) ids.add(resultSet.getInt(1));
