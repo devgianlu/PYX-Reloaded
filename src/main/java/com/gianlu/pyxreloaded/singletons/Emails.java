@@ -51,7 +51,7 @@ public final class Emails {
 
     private void send(EmailPopulatingBuilder builder) {
         Email email = builder.from(senderName, senderEmail).buildEmail();
-        mailer.sendMail(email);
+        mailer.sendMail(email, true);
     }
 
     private void saveToken(UserAccount account, String token) {
@@ -80,7 +80,7 @@ public final class Emails {
                 .to(account.username, account.email));
     }
 
-    public boolean tryVerify(@NotNull String token) {
+    public void tryVerify(@NotNull String token) throws SQLException {
         try (ResultSet set = db.statement().executeQuery("SELECT email FROM email_verifications WHERE token='" + token + "'")) {
             set.next();
             String email = set.getString("email");
@@ -91,10 +91,6 @@ public final class Emails {
 
             PasswordAccount account = accounts.getPasswordAccountForEmail(email);
             if (account != null) accounts.updateVerifiedStatus(account, true);
-            return true;
-        } catch (SQLException ignored) {
         }
-
-        return false;
     }
 }

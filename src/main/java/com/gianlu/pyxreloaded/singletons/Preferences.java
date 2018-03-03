@@ -82,8 +82,7 @@ public final class Preferences {
         else return new MinDefaultMax(obj.getAsJsonObject());
     }
 
-    @NotNull
-    public String getString(String key, String fallback) {
+    public String getString(String key, @Nullable String fallback) {
         JsonElement obj = get(key);
         if (obj == null) return fallback;
         else return obj.getAsString();

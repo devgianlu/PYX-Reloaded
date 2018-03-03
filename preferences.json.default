@@ -12,7 +12,11 @@
   "cacheEnabled": true,
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
-  "serverDbUrl": "jdbc:sqlite:server.sqlite.default",
+  "serverDb": {
+    "url": "jdbc:sqlite:server.sqlite.default",
+    "username": "",
+    "password": ""
+  },
   "emails": {
     "senderEmail": "",
     "senderName": "PYX-Reloaded",

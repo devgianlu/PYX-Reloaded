@@ -106,6 +106,7 @@ public final class UsersWithAccount {
 
     public boolean hasEmail(@NotNull String email) {
         try (ResultSet set = db.statement().executeQuery("SELECT count(*) FROM users WHERE email='" + email + "'")) {
+            set.next();
             return set.getInt(1) > 0;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -114,6 +115,7 @@ public final class UsersWithAccount {
 
     public boolean hasNickname(@NotNull String nickname) {
         try (ResultSet set = db.statement().executeQuery("SELECT count(*) FROM users WHERE username='" + nickname + "'")) {
+            set.next();
             return set.getInt(1) > 0;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);

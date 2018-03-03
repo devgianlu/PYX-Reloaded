@@ -9,7 +9,13 @@ public final class ServerDatabase {
     private final Connection conn;
 
     public ServerDatabase(Preferences preferences) throws SQLException {
-        conn = DriverManager.getConnection(preferences.getString("serverDbUrl", "jdbc:sqlite:server.sqlite"));
+        String username = preferences.getString("serverDb/username", null);
+        String password = preferences.getString("serverDb/password", null);
+
+        if (username != null && !username.isEmpty() && password != null)
+            conn = DriverManager.getConnection(preferences.getString("serverDb/url", "jdbc:sqlite:server.sqlite"), username, password);
+        else
+            conn = DriverManager.getConnection(preferences.getString("serverDb/url", "jdbc:sqlite:server.sqlite"));
     }
 
     public Statement statement() throws SQLException {

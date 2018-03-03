@@ -7,6 +7,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,10 +36,11 @@ public class VerifyEmailPath implements HttpHandler {
 
             exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "text/html");
 
-            if (emails.tryVerify(token)) {
+            try {
+                emails.tryVerify(token);
                 exchange.setStatusCode(StatusCodes.OK);
                 exchange.getResponseSender().send("<meta http-equiv=\"refresh\" content=\"3;url=/\" />Your email has been verified. You'll be redirected in a few seconds...");
-            } else {
+            } catch (SQLException ex) {
                 exchange.setStatusCode(StatusCodes.FORBIDDEN);
                 exchange.getResponseSender().send("Invalid token. Failed to verify your email or already verified.");
             }
