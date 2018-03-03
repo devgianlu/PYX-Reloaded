@@ -2,14 +2,12 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cards.WhiteCard;
 import com.google.gson.JsonArray;
+import io.undertow.server.HttpServerExchange;
 import org.apache.http.NameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
@@ -25,6 +23,12 @@ public class Utils {
         JsonArray jsonArray = new JsonArray(items.size());
         for (String item : items) jsonArray.add(item);
         return jsonArray;
+    }
+
+    @Nullable
+    public static String extractParam(HttpServerExchange exchange, String key) {
+        Deque<String> deque = exchange.getQueryParameters().get(key);
+        return deque == null || deque.isEmpty() ? null : deque.getFirst();
     }
 
     @NotNull

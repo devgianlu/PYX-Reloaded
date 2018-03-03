@@ -15,10 +15,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public final class Emails {
     private static final int SEND_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
     private static final int TOKEN_LENGTH = 24;
+    private static final Logger logger = Logger.getLogger(Emails.class.getSimpleName());
     private final Mailer mailer;
     private final UsersWithAccount accounts;
     private final ServerDatabase db;
@@ -42,7 +44,9 @@ public final class Emails {
                 .withSessionTimeout(SEND_TIMEOUT)
                 .buildMailer();
 
+        logger.info("Started mailer connection test...");
         this.mailer.testConnection();
+        logger.info("Mailer connection test was successful!");
     }
 
     private void send(EmailPopulatingBuilder builder) {

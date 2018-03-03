@@ -1,16 +1,14 @@
 package com.gianlu.pyxreloaded.paths;
 
 import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.Utils;
 import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
-import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Deque;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,42 +23,31 @@ public class GithubCallbackPath implements HttpHandler {
         this.githubHelper = githubHelper;
     }
 
-    @Nullable
-    private static String extractCode(HttpServerExchange exchange) {
-        Deque<String> deque = exchange.getQueryParameters().get("code");
-        return deque.isEmpty() ? null : deque.getFirst();
-    }
-
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        if (exchange.getRequestMethod() == Methods.GET) {
-            String code = extractCode(exchange);
-            if (code == null) {
-                exchange.setStatusCode(StatusCodes.BAD_REQUEST);
-                exchange.endExchange();
-                return;
-            }
+        exchange.startBlocking();
+        if (exchange.isInIoThread()) {
+            exchange.dispatch(this);
+            return;
+        }
 
-            exchange.startBlocking();
-            if (exchange.isInIoThread()) {
-                exchange.dispatch(this);
-                return;
-            }
+        String code = Utils.extractParam(exchange, "code");
+        if (code == null) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+            return;
+        }
 
-            try {
-                String accessToken = githubHelper.exchangeCode(code);
+        try {
+            String accessToken = githubHelper.exchangeCode(code);
 
-                CookieImpl cookie = new CookieImpl("PYX-Github-Token", accessToken);
-                cookie.setMaxAge(COOKIE_MAX_AGE);
-                exchange.setResponseCookie(cookie);
-                exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
-                exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
-            } catch (Throwable ex) {
-                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
-                throw ex;
-            }
-        } else {
-            exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);
+            CookieImpl cookie = new CookieImpl("PYX-Github-Token", accessToken);
+            cookie.setMaxAge(COOKIE_MAX_AGE);
+            exchange.setResponseCookie(cookie);
+            exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
+            exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
+            throw ex;
         }
     }
 }

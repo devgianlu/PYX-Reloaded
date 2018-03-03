@@ -6,7 +6,6 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
-import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
 
 import java.util.concurrent.TimeUnit;
@@ -24,26 +23,22 @@ public class TwitterStartAuthFlowPath implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        if (exchange.getRequestMethod() == Methods.GET) {
-            exchange.startBlocking();
-            if (exchange.isInIoThread()) {
-                exchange.dispatch(this);
-                return;
-            }
+        exchange.startBlocking();
+        if (exchange.isInIoThread()) {
+            exchange.dispatch(this);
+            return;
+        }
 
-            try {
-                OAuth1RequestToken token = helper.requestToken();
-                CookieImpl cookie = new CookieImpl("PYX-Twitter-Token", token.getRawResponse());
-                cookie.setMaxAge(COOKIE_MAX_AGE);
-                exchange.setResponseCookie(cookie);
-                exchange.getResponseHeaders().add(Headers.LOCATION, helper.authorizationUrl(token) + "&force_login=false");
-                exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
-            } catch (Throwable ex) {
-                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
-                throw ex;
-            }
-        } else {
-            exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);
+        try {
+            OAuth1RequestToken token = helper.requestToken();
+            CookieImpl cookie = new CookieImpl("PYX-Twitter-Token", token.getRawResponse());
+            cookie.setMaxAge(COOKIE_MAX_AGE);
+            exchange.setResponseCookie(cookie);
+            exchange.getResponseHeaders().add(Headers.LOCATION, helper.authorizationUrl(token) + "&force_login=false");
+            exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
+            throw ex;
         }
     }
 }
