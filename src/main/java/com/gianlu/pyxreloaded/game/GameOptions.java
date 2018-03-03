@@ -42,7 +42,7 @@ public class GameOptions {
     public String password = "";
     public TimeMultiplier timerMultiplier = DEFAULT_TIME_MULTIPLIER;
 
-    protected GameOptions(Preferences preferences) {
+    private GameOptions(Preferences preferences) {
         blanksInDeck = getBlanksLimit(preferences).def;
         scoreGoal = getScoreLimit(preferences).def;
         playerLimit = getPlayerLimit(preferences).def;
@@ -50,10 +50,10 @@ public class GameOptions {
         winBy = getWinBy(preferences).def;
     }
 
-    public GameOptions(Preferences preferences, String text) {
+    public GameOptions(Preferences preferences, @NotNull String text) {
         this(preferences);
 
-        if (text == null || text.isEmpty()) return;
+        if (text.isEmpty()) return;
 
         JsonObject json = new JsonParser().parse(text).getAsJsonObject();
         JsonArray cardSetIds = json.getAsJsonArray(Consts.GameOptionsData.CARD_SETS.toString());

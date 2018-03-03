@@ -19,9 +19,8 @@ public class JudgeSelectHandler extends GameWithPlayerHandler {
 
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        String cardIdStr = params.get(Consts.GeneralKeys.CARD_ID);
-        if (cardIdStr == null || cardIdStr.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_CARD_SPECIFIED);
+        String cardIdStr = params.getStringNotNull(Consts.GeneralKeys.CARD_ID);
+        if (cardIdStr.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         int cardId;
         try {

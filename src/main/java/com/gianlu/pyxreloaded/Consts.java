@@ -217,18 +217,6 @@ public final class Consts {
          */
         NICK_IN_USE("niu"),
         /**
-         * No card specified.
-         */
-        NO_CARD_SPECIFIED("ncs"),
-        /**
-         * No game specified.
-         */
-        NO_GAME_SPECIFIED("ngs"),
-        /**
-         * No message specified.
-         */
-        NO_MSG_SPECIFIED("nms"),
-        /**
          * No such user.
          */
         NO_SUCH_USER("nsu"),

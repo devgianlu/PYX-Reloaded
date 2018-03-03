@@ -18,9 +18,8 @@ public abstract class GameHandler extends BaseHandler {
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        String gameIdStr = params.get(Consts.GeneralKeys.GAME_ID);
-        if (gameIdStr == null || gameIdStr.isEmpty())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_GAME_SPECIFIED);
+        String gameIdStr = params.getStringNotNull(Consts.GeneralKeys.GAME_ID);
+        if (gameIdStr.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
         int gameId;
         try {

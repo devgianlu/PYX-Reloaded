@@ -23,7 +23,7 @@ public class CreateGameHandler extends BaseHandler {
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
-        String value = params.get(Consts.GameOptionsData.OPTIONS);
+        String value = params.getStringNotNull(Consts.GameOptionsData.OPTIONS);
         GameOptions options = new GameOptions(preferences, value);
         return new JsonWrapper(Consts.GeneralKeys.GAME_ID, gameManager.createGameWithPlayer(user, options).getId());
     }
