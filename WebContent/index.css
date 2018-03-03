@@ -1,0 +1,7 @@
+#socialLogin .mdc-card__supporting-text {
+    padding-bottom: 16px;
+}
+
+#socialLogin .mdc-card__supporting-text > .mdc-button {
+    margin: 4px;
+}
