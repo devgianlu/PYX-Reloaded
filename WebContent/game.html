@@ -197,7 +197,19 @@
     mdc.autoInit();
     TabsManager.init("tabs", ["gameLayout", "otherStuffLayout"]);
 
-    const gameManager = new GameManager(getLastPathSegment());
+    const _drawer = $('#drawer');
+    let drawer;
+    if (window.matchMedia('(min-width: 768px)').matches) {
+        _drawer.addClass("mdc-drawer--persistent");
+        _drawer.removeClass("mdc-drawer--temporary");
+        drawer = new mdc.drawer.MDCPersistentDrawer(_drawer[0]);
+    } else {
+        _drawer.removeClass("mdc-drawer--persistent");
+        _drawer.addClass("mdc-drawer--temporary");
+        drawer = new mdc.drawer.MDCTemporaryDrawer(_drawer[0]);
+    }
+
+    const gameManager = new GameManager(getLastPathSegment(), drawer);
     if (gameManager.id === null) {
         window.location = "/games/";
     } else {

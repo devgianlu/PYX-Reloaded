@@ -1,9 +1,9 @@
 class GameManager {
-    constructor(gid) {
+    constructor(gid, drawer) {
         this.root = $('body');
         this.gid = gid;
 
-        this.drawer = new mdc.drawer.MDCPersistentDrawer($('#drawer')[0]);
+        this.drawer = drawer;
         $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
 
         this._lobbyMessage = this.root.find('#gameLayout .message');
@@ -18,9 +18,11 @@ class GameManager {
         this._chatMessage.on('keydown', (ev) => this._handleSendChatMessage(ev));
         this._chatMessage.parent().find('.mdc-text-field__icon').on('click', () => this._handleSendChatMessage(undefined));
 
-        let drawerStatus = Cookies.getJSON("PYX-Drawer");
-        if (drawerStatus === undefined) drawerStatus = false;
-        this.drawer.open = drawerStatus;
+        if (this.drawer instanceof mdc.drawer.MDCPersistentDrawer) {
+            let drawerStatus = Cookies.getJSON("PYX-Drawer");
+            if (drawerStatus === undefined) drawerStatus = false;
+            this.drawer.open = drawerStatus;
+        }
 
         this.scoreboard = new List(this.root.find('#scoreboard')[0], {
             item: 'playerItemTemplate',
