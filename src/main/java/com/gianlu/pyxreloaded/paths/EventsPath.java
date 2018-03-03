@@ -7,16 +7,20 @@ import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import com.google.gson.JsonArray;
 import io.undertow.server.handlers.Cookie;
+import io.undertow.server.protocol.framed.AbstractFramedChannel;
 import io.undertow.util.Cookies;
 import io.undertow.util.Headers;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
+import org.xnio.ChannelListener;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,7 +60,12 @@ public class EventsPath implements WebSocketConnectionCallback {
         } else if (!user.isValid()) {
             sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.SESSION_EXPIRED));
         } else {
-            user.establishedEventsConnection(new EventsSender(user, channel));
+            if (user.getEventsSender() == null) user.establishedEventsConnection(new EventsSender(user, channel));
+            else user.getEventsSender().addChannel(channel);
+
+            channel.getCloseSetter().set((ChannelListener<AbstractFramedChannel>) newChannel -> {
+                if (user.getEventsSender() != null) user.getEventsSender().removeChannel((WebSocketChannel) newChannel);
+            });
         }
     }
 
@@ -65,12 +74,20 @@ public class EventsPath implements WebSocketConnectionCallback {
      */
     public class EventsSender {
         private final User user;
-        private final WebSocketChannel channel;
+        private final List<WebSocketChannel> channels;
         private final PriorityBlockingQueue<QueuedMessage> messages = new PriorityBlockingQueue<>();
 
         EventsSender(User user, WebSocketChannel channel) {
             this.user = user;
-            this.channel = channel;
+            this.channels = Collections.singletonList(channel);
+        }
+
+        void addChannel(WebSocketChannel channel) {
+            channels.add(channel);
+        }
+
+        private void removeChannel(WebSocketChannel channel) {
+            channels.remove(channel);
         }
 
         public void enqueue(QueuedMessage message) {
@@ -105,7 +122,9 @@ public class EventsPath implements WebSocketConnectionCallback {
                     array.add(message.getData().obj());
 
                 try {
-                    WebSockets.sendTextBlocking(new JsonWrapper(Consts.GeneralKeys.EVENTS, array).obj().toString(), channel);
+                    for (WebSocketChannel channel : channels)
+                        WebSockets.sendTextBlocking(new JsonWrapper(Consts.GeneralKeys.EVENTS, array).obj().toString(), channel);
+
                     user.userReceivedEvents();
                 } catch (IOException ex) {
                     handleIoException(ex);

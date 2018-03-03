@@ -108,6 +108,11 @@ public class User {
         this.eventsSender = sender;
     }
 
+    @Nullable
+    public EventsPath.EventsSender getEventsSender() {
+        return eventsSender;
+    }
+
     public void userDidSomething() {
         lastUserAction = System.currentTimeMillis();
         waitingPong = false;
