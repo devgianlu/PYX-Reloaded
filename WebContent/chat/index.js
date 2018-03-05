@@ -50,13 +50,17 @@ class ChatManager {
             this._chatMessage.val("");
             this._chatMessage.blur();
         }, (error) => {
-            if (error.ec === "tf") {
-                Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
-                Notifier.debug(error, true);
-                return;
+            switch (error.ec) {
+                case "tf":
+                    Notifier.timeout(Notifier.WARN, "You are chatting too fast. Calm down.");
+                    break;
+                case "anv":
+                    Notifier.error("You must be registered (and have verified your email) to send messages in the global chat.", error);
+                    break;
+                default:
+                    Notifier.error("Failed sending the message!", error);
+                    break;
             }
-
-            Notifier.error("Failed sending the message!", error);
         });
     }
 }

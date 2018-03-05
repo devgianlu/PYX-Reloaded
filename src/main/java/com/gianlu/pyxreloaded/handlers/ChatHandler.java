@@ -24,10 +24,11 @@ public class ChatHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         user.checkChatFlood();
 
+        if (user.getAccount() == null || !user.getAccount().emailVerified)
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
+
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
         if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-
-        // TODO: Allow only for registered users
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.MESSAGE_TOO_LONG);

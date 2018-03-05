@@ -351,7 +351,11 @@ public final class Consts {
         /**
          * User hasn't verified his Twitter email.
          */
-        TWITTER_EMAIL_NOT_VERIFIED("twemnv");
+        TWITTER_EMAIL_NOT_VERIFIED("twemnv"),
+        /**
+         * User hasn't an account or hasn't verified his email.
+         */
+        ACCOUNT_NOT_VERIFIED("anv");
 
         private final String code;
 
