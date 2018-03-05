@@ -660,6 +660,7 @@ class GameManager {
      * @param {object} data.sgo- Suggested game options
      * @param {string} data.sgo.soid - Suggested game options modification
      * @param {string} data.sgo.s - Game options modification suggester
+     * @param {int} data.gid - Game ID
      */
     handlePollEvent(data) {
         switch (data["E"]) {
@@ -670,7 +671,7 @@ class GameManager {
                 Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
                 break;
             case "C":
-                this._receivedGameChatMessage(data);
+                if (data.gid === this.id) this._receivedGameChatMessage(data);
                 break;
             case "gpj":
                 this.info.pi.push({"N": data.n, "sc": 0, "st": "si"});

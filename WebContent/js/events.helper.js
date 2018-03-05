@@ -39,6 +39,15 @@ function processPollData(events) {
 
 }
 
+/**
+ * @callback eventCallback
+ * @param {string} data.E - Event code
+ */
+
+/**
+ * @param {String} key
+ * @param {eventCallback} listener
+ */
 function registerPollListener(key, listener) {
     _pollingListeners[key] = listener;
 }

@@ -33,6 +33,7 @@ public class GameChatHandler extends GameWithPlayerHandler {
             EventWrapper ev = new EventWrapper(game, Consts.Event.CHAT);
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
+            ev.add(Consts.GeneralKeys.GAME_ID, game.getId());
             ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
             game.broadcastToPlayers(MessageType.CHAT, ev);
         }

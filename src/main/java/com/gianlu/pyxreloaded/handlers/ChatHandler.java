@@ -26,7 +26,8 @@ public class ChatHandler extends BaseHandler {
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
         if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-        if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
+
+        // TODO: Allow only for registered users
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.MESSAGE_TOO_LONG);
@@ -35,7 +36,7 @@ public class ChatHandler extends BaseHandler {
             EventWrapper ev = new EventWrapper(Consts.Event.CHAT);
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
-            if (user.isAdmin()) ev.add(Consts.ChatData.FROM_ADMIN, true);
+            ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
             users.broadcastToAll(MessageType.CHAT, ev);
         }
 
