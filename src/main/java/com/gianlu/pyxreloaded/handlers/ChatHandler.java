@@ -38,6 +38,8 @@ public class ChatHandler extends BaseHandler {
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
             ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
+            ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
+
             users.broadcastToAll(MessageType.CHAT, ev);
         }
 

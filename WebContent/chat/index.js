@@ -3,7 +3,7 @@ class ChatManager {
         this._main = $('main');
         this.chat = new List(this._main[0], {
             item: 'chatMessageTemplate',
-            valueNames: ['_text', '_img', '_nick']
+            valueNames: ['_text', '_nick', {attr: 'src', name: '_img'}]
         });
         this.chat.clear();
 
@@ -24,11 +24,13 @@ class ChatManager {
     /**
      * @param {String} data.m - Message
      * @param {String} data.f - Sender
+     * @param {String} data.p - Profile picture
      * @private
      */
     _handleChatMessage(data) {
         this.chat.add({
             '_nick': data.f,
+            '_img': data.p === null ? "/css/no-profile.svg" : data.p,
             '_text': data.m
         });
 
