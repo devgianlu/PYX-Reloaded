@@ -13,7 +13,7 @@
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
   "serverDb": {
-    "url": "jdbc:sqlite:server.sqlite.default",
+    "url": "jdbc:sqlite:server.sqlite",
     "username": "",
     "password": ""
   },
