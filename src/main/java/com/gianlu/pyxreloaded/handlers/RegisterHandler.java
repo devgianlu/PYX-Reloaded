@@ -115,7 +115,8 @@ public class RegisterHandler extends BaseHandler {
                 throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         }
 
-        users.checkAndAdd(user);
+        User registeredUser = users.checkAndAdd(user);
+        if (registeredUser != null) user = registeredUser;
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.get().add(user)));
 
         return new JsonWrapper()
