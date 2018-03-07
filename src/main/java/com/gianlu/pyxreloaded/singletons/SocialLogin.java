@@ -33,21 +33,23 @@ public final class SocialLogin {
     private final TwitterAuthHelper twitterHelper;
     private final GoogleIdTokenVerifier googleHelper;
     private final FacebookAuthHelper facebookHelper;
+    private final String googleAppId;
 
     public SocialLogin(@Nullable GithubAuthHelper githubHelper, @Nullable TwitterAuthHelper twitterHelper, @Nullable FacebookAuthHelper facebookHelper, Preferences preferences) {
         this.githubHelper = githubHelper;
         this.twitterHelper = twitterHelper;
         this.facebookHelper = facebookHelper;
-        this.googleHelper = instantiateGoogleHelper(preferences);
+
+        this.googleAppId = preferences.getString("socials/googleClientId", null);
+        this.googleHelper = instantiateGoogleHelper(googleAppId);
     }
 
+    @Contract("null -> null")
     @Nullable
-    private static GoogleIdTokenVerifier instantiateGoogleHelper(Preferences preferences) {
-        String clientId = preferences.getString("socials/googleClientId", null);
-        if (clientId == null || clientId.isEmpty()) return null;
-
+    private static GoogleIdTokenVerifier instantiateGoogleHelper(String appId) {
+        if (appId == null || appId.isEmpty()) return null;
         return new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
-                .setAudience(Collections.singletonList(clientId))
+                .setAudience(Collections.singletonList(appId))
                 .build();
     }
 
@@ -124,9 +126,19 @@ public final class SocialLogin {
         return googleHelper != null;
     }
 
+    @Nullable
+    public String googleAppId() {
+        return googleAppId;
+    }
+
     @Contract(pure = true)
     public boolean facebookEnabled() {
         return facebookHelper != null;
+    }
+
+    @Nullable
+    public String facebookAppId() {
+        return facebookHelper == null ? null : facebookHelper.appId();
     }
 
     @Contract(pure = true)
@@ -134,8 +146,18 @@ public final class SocialLogin {
         return githubHelper != null;
     }
 
+    @Nullable
+    public String githubAppId() {
+        return githubHelper == null ? null : githubHelper.appId();
+    }
+
     @Contract(pure = true)
     public boolean twitterEnabled() {
         return twitterHelper != null;
+    }
+
+    @Nullable
+    public String twitterAppId() {
+        return twitterHelper == null ? null : twitterHelper.appId();
     }
 }

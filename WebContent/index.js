@@ -148,47 +148,67 @@ class LoginManager {
         })
     }
 
-    setupGoogle() {
-        gapi.load('auth2', () => {
-            this.google_auth2 = gapi.auth2.init({
-                client_id: '464424051073-loi5kmcc3qev5a1lr5hvrjiqb3kcu2cl.apps.googleusercontent.com',
-                cookiepolicy: 'single_host_origin',
+    setupGoogle(appId) {
+        if (appId === undefined) {
+            this.googleSignIn.hide();
+        } else {
+            this.googleSignIn.show();
+            gapi.load('auth2', () => {
+                this.google_auth2 = gapi.auth2.init({
+                    client_id: appId,
+                    cookiepolicy: 'single_host_origin',
+                });
+
+                this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
+                    (user) => this._googleSuccess(user),
+                    (error) => Notifier.error("Failed signing in with Google.", error));
+            });
+        }
+    }
+
+    setupFacebook(appId) {
+        if (appId === undefined) {
+            this.facebookSignIn.hide();
+        } else {
+            FB.init({
+                appId: appId,
+                cookie: true,
+                xfbml: true,
+                autoLogAppEvents: Notifier._debug,
+                version: 'v2.12'
             });
 
-            this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
-                (user) => this._googleSuccess(user),
-                (error) => Notifier.error("Failed signing in with Google.", error));
-        });
+            FB.AppEvents.logPageView();
+
+            this.facebookSignIn.show();
+            this.facebookSignIn.on('click', () => FB.login((user) => {
+                this._facebookSuccess(user);
+            }, {
+                scope: 'email,public_profile',
+            }));
+        }
     }
 
-    setupFacebook() {
-        FB.init({
-            appId: '198497240899387',
-            cookie: true,
-            xfbml: true,
-            autoLogAppEvents: Notifier._debug,
-            version: 'v2.12'
-        });
-
-        FB.AppEvents.logPageView();
-
-        this.facebookSignIn.on('click', () => FB.login((user) => {
-            this._facebookSuccess(user);
-        }, {
-            scope: 'email,public_profile',
-        }));
+    setupGitHub(appId) {
+        if (appId === undefined) {
+            this.githubSignIn.hide();
+        } else {
+            this.githubSignIn.show();
+            this.githubSignIn.on('click', () => {
+                window.location = "https://github.com/login/oauth/authorize?scope=read:user,user:email&client_id=" + appId
+            })
+        }
     }
 
-    setupGitHub() {
-        this.githubSignIn.on('click', () => {
-            window.location = "https://github.com/login/oauth/authorize?scope=read:user,user:email&client_id=d7057c607cf69f592239"
-        })
-    }
-
-    setupTwitter() {
-        this.twitterSignIn.on('click', () => {
-            window.location = "/TwitterStartAuthFlow"
-        })
+    setupTwitter(appId) {
+        if (appId === undefined) {
+            this.twitterSignIn.hide();
+        } else {
+            this.twitterSignIn.show();
+            this.twitterSignIn.on('click', () => {
+                window.location = "/TwitterStartAuthFlow"
+            })
+        }
     }
 
     _showNickDialog(params, success) {
@@ -354,6 +374,13 @@ class LoginManager {
 
     setup() {
         Requester.request("fl", {}, (data) => {
+                /**
+                 * @param {object} data.aC - Auth config
+                 * @param {string} data.aC.g - Google app id
+                 * @param {string} data.aC.fb - Facebook app id
+                 * @param {string} data.aC.gh - Github app id
+                 * @param {string} data.aC.tw - Twitter app id
+                 */
                 data.css.sort(function (a, b) {
                     return a.w - b.w;
                 });
@@ -368,10 +395,13 @@ class LoginManager {
                         window.location = "/games/";
                     }
                 } else {
-                    this.setupGoogle();
-                    this.setupFacebook();
-                    this.setupGitHub();
-                    this.setupTwitter();
+                    const authConfig = data.aC;
+                    this.setupGoogle(authConfig.g);
+                    this.setupFacebook(authConfig.fb);
+                    this.setupGitHub(authConfig.gh);
+                    this.setupTwitter(authConfig.tw);
+
+                    Notifier.debug(authConfig);
 
                     switch (getURLParameter("aT")) {
                         case "gh":

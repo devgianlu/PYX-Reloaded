@@ -41,6 +41,11 @@ public class FacebookAuthHelper {
         return new FacebookAuthHelper(appId, appSecret);
     }
 
+    @NotNull
+    public String appId() {
+        return appId;
+    }
+
     @Nullable
     public FacebookToken verify(@NotNull String accessToken) throws IOException, FacebookOAuthException {
         HttpGet get = new HttpGet(DEBUG_TOKEN + "?input_token=" + accessToken + "&access_token=" + appToken);

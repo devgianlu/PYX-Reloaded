@@ -83,6 +83,11 @@ public class TwitterAuthHelper {
         }
     }
 
+    @NotNull
+    public String appId() {
+        return service.getConfig().getApiKey();
+    }
+
     private static class HttpClientWrapper implements HttpClient {
         private final CloseableHttpClient client;
 

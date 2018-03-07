@@ -9,6 +9,7 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.LoadedCards;
 import com.gianlu.pyxreloaded.singletons.Preferences;
+import com.gianlu.pyxreloaded.singletons.SocialLogin;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
 
@@ -17,10 +18,12 @@ import java.util.Set;
 public class FirstLoadHandler extends BaseHandler {
     public static final String OP = Consts.Operation.FIRST_LOAD.toString();
     private final LoadedCards loadedCards;
+    private final SocialLogin socials;
     private final Preferences preferences;
 
-    public FirstLoadHandler(@Annotations.LoadedCards LoadedCards loadedCards, @Annotations.Preferences Preferences preferences) {
+    public FirstLoadHandler(@Annotations.LoadedCards LoadedCards loadedCards, @Annotations.SocialLogin SocialLogin socials, @Annotations.Preferences Preferences preferences) {
         this.loadedCards = loadedCards;
+        this.socials = socials;
         this.preferences = preferences;
     }
 
@@ -44,6 +47,15 @@ public class FirstLoadHandler extends BaseHandler {
                 obj.add(Consts.GeneralKeys.NEXT, Consts.ReconnectNextAction.NONE.toString());
             }
         }
+
+        // TODO: Is password login enabled?
+
+        JsonWrapper socialsConfig = new JsonWrapper();
+        if (socials.googleEnabled()) socialsConfig.add(Consts.AuthType.GOOGLE, socials.googleAppId());
+        if (socials.facebookEnabled()) socialsConfig.add(Consts.AuthType.FACEBOOK, socials.facebookAppId());
+        if (socials.githubEnabled()) socialsConfig.add(Consts.AuthType.GITHUB, socials.githubAppId());
+        if (socials.twitterEnabled()) socialsConfig.add(Consts.AuthType.TWITTER, socials.twitterAppId());
+        obj.add(Consts.GeneralKeys.AUTH_CONFIG, socialsConfig);
 
         Set<PyxCardSet> cardSets = loadedCards.getLoadedSets();
         JsonArray json = new JsonArray(cardSets.size());

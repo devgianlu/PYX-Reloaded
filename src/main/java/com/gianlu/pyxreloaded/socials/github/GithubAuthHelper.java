@@ -130,4 +130,9 @@ public class GithubAuthHelper {
             post.releaseConnection();
         }
     }
+
+    @NotNull
+    public String appId() {
+        return appId;
+    }
 }
