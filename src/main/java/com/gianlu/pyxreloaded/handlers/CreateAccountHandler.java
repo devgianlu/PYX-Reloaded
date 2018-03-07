@@ -60,6 +60,8 @@ public class CreateAccountHandler extends BaseHandler {
 
         switch (type) {
             case PASSWORD:
+                if (!emails.enabled()) throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String email = params.getStringNotNull(Consts.UserData.EMAIL);
                 if (email.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
@@ -72,6 +74,9 @@ public class CreateAccountHandler extends BaseHandler {
                 emails.sendEmailVerification(account);
                 break;
             case GOOGLE:
+                if (!socialLogin.googleEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.getStringNotNull(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
@@ -81,6 +86,9 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithGoogle(nickname, googleToken);
                 break;
             case FACEBOOK:
+                if (!socialLogin.facebookEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 FacebookToken facebookToken = socialLogin.verifyFacebook(params.getStringNotNull(Consts.AuthType.FACEBOOK));
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
@@ -92,6 +100,9 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithFacebook(nickname, facebookToken, facebookInfo);
                 break;
             case GITHUB:
+                if (!socialLogin.githubEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String githubToken = params.getString(Consts.AuthType.GITHUB);
                 if (githubToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.GITHUB_INVALID_TOKEN);
@@ -103,6 +114,9 @@ public class CreateAccountHandler extends BaseHandler {
                 account = accounts.registerWithGithub(nickname, githubInfo);
                 break;
             case TWITTER:
+                if (!socialLogin.twitterEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String twitterTokens = params.getString(Consts.AuthType.TWITTER);
                 if (twitterTokens == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_INVALID_TOKEN);

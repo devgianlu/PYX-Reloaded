@@ -71,6 +71,9 @@ public class RegisterHandler extends BaseHandler {
                 }
                 break;
             case GOOGLE:
+                if (!socialLogin.googleEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.getStringNotNull(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
@@ -81,6 +84,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case FACEBOOK:
+                if (!socialLogin.facebookEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 FacebookToken facebookToken = socialLogin.verifyFacebook(params.getStringNotNull(Consts.AuthType.FACEBOOK));
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
@@ -92,6 +98,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case GITHUB:
+                if (!socialLogin.githubEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String githubToken = params.getStringNotNull(Consts.AuthType.GITHUB);
 
                 GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
@@ -102,6 +111,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case TWITTER:
+                if (!socialLogin.twitterEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String twitterTokens = params.getStringNotNull(Consts.AuthType.TWITTER);
 
                 TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);

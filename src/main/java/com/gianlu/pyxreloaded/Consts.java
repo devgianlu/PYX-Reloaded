@@ -355,7 +355,11 @@ public final class Consts {
         /**
          * User hasn't an account or hasn't verified his email.
          */
-        ACCOUNT_NOT_VERIFIED("anv");
+        ACCOUNT_NOT_VERIFIED("anv"),
+        /**
+         * This authentication type isn't supported by the server.
+         */
+        UNSUPPORTED_AUTH_TYPE("uaT");
 
         private final String code;
 

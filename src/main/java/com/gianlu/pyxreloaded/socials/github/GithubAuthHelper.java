@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,10 +29,21 @@ public class GithubAuthHelper {
     private final HttpClient client;
     private final JsonParser parser = new JsonParser();
 
-    public GithubAuthHelper(Preferences preferences) {
+    private GithubAuthHelper(@NotNull String appId, @NotNull String appSecret) {
         this.client = HttpClients.createDefault();
-        this.appId = preferences.getString("socials/githubAppId", "");
-        this.appSecret = preferences.getString("socials/githubAppSecret", "");
+        this.appId = appId;
+        this.appSecret = appSecret;
+    }
+
+    @Nullable
+    public static GithubAuthHelper instantiate(Preferences preferences) {
+        String appId = preferences.getString("socials/githubAppId", null);
+        if (appId == null || appId.isEmpty()) return null;
+
+        String appSecret = preferences.getString("socials/githubAppSecret", null);
+        if (appSecret == null || appSecret.isEmpty()) return null;
+
+        return new GithubAuthHelper(appId, appSecret);
     }
 
     public GithubProfileInfo info(@NotNull String accessToken, @NotNull GithubEmails emails) throws IOException, GithubException {

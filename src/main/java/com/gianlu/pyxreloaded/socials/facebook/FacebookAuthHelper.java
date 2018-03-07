@@ -1,5 +1,6 @@
 package com.gianlu.pyxreloaded.socials.facebook;
 
+import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -23,10 +24,21 @@ public class FacebookAuthHelper {
     private final JsonParser parser = new JsonParser();
     private final String appId;
 
-    public FacebookAuthHelper(String appId, String appSecret) {
+    private FacebookAuthHelper(@NotNull String appId, @NotNull String appSecret) {
         this.client = HttpClients.createDefault();
-        this.appToken = appId + "%7C" + appSecret; // URL encoded
         this.appId = appId;
+        this.appToken = appId + "%7C" + appSecret; // URL encoded
+    }
+
+    @Nullable
+    public static FacebookAuthHelper instantiate(Preferences preferences) {
+        String appId = preferences.getString("socials/facebookAppId", null);
+        if (appId == null || appId.isEmpty()) return null;
+
+        String appSecret = preferences.getString("socials/facebookAppSecret", null);
+        if (appSecret == null || appSecret.isEmpty()) return null;
+
+        return new FacebookAuthHelper(appId, appSecret);
     }
 
     @Nullable

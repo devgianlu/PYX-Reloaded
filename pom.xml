@@ -22,7 +22,7 @@
     </properties>
 
     <build>
-        <finalName>PYX</finalName>
+        <finalName>PYX-Reloaded</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,23 +45,33 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.gianlu.pyxreloaded.Server</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
                 <executions>
+                    <!-- Build JAR -->
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
+                        <configuration>
+                            <descriptor>src/assembly/jar.xml</descriptor>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.gianlu.pyxreloaded.Server</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Package ZIP -->
+                    <execution>
+                        <id>create-archive</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptor>src/assembly/zip.xml</descriptor>
+                        </configuration>
                         <goals>
                             <goal>single</goal>
                         </goals>
