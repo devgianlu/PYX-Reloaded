@@ -47,6 +47,11 @@ public final class Emails {
         }
     }
 
+    @NotNull
+    public String senderEmail() {
+        return senderEmail;
+    }
+
     @Nullable
     private Mailer mailer(Preferences preferences) {
         if (senderEmail == null || senderEmail.isEmpty()) return null;

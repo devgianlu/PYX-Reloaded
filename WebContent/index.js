@@ -58,8 +58,8 @@ class LoginManager {
 
         this.pyxEmail = this._pyx.find('input[type=email]');
 
-        this.pyxSubmit = this._pyx.find('._register');
-        this.pyxSubmit.on('click', () => this.createPyxAccount());
+        this.pyxRegister = this._pyx.find('._register');
+        this.pyxRegister.on('click', () => this.createPyxAccount());
 
         this._socials = $('#socialLogin');
         this.googleSignIn = this._socials.find('#googleSignIn');
@@ -380,6 +380,7 @@ class LoginManager {
                  * @param {string} data.aC.fb - Facebook app id
                  * @param {string} data.aC.gh - Github app id
                  * @param {string} data.aC.tw - Twitter app id
+                 * @param {string} data.aC.pw - Verification email sender
                  */
                 data.css.sort(function (a, b) {
                     return a.w - b.w;
@@ -396,12 +397,21 @@ class LoginManager {
                     }
                 } else {
                     const authConfig = data.aC;
+                    Notifier.debug(authConfig);
+
+
                     this.setupGoogle(authConfig.g);
                     this.setupFacebook(authConfig.fb);
                     this.setupGitHub(authConfig.gh);
                     this.setupTwitter(authConfig.tw);
 
-                    Notifier.debug(authConfig);
+                    if ("pw" in authConfig) {
+                        this.pyxEmail.parent().show();
+                        this.pyxRegister.show();
+                    } else {
+                        this.pyxEmail.parent().hide();
+                        this.pyxRegister.hide();
+                    }
 
                     switch (getURLParameter("aT")) {
                         case "gh":
