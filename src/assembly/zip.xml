@@ -42,5 +42,9 @@
             <directory>${project.basedir}/dist</directory>
             <outputDirectory>/</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/WebContent</directory>
+            <outputDirectory>/WebContent</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
