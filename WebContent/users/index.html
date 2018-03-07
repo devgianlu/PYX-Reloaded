@@ -19,6 +19,9 @@
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Users - PYX Reloaded</span>
             </section>
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <button class="material-icons align-icons mdc-toolbar__icon" id="refresh">refresh</button>
+            </section>
         </div>
     </header>
 
@@ -48,7 +51,7 @@
 <script src="./index.js"></script>
 <script>
     mdc.autoInit();
-    new UsersManager().setup();
+    new UsersManager().loadUsers();
 </script>
 
 </body>
