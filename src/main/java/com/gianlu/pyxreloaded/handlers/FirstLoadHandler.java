@@ -44,7 +44,7 @@ public class FirstLoadHandler extends BaseHandler {
             // They already have a session in progress, we need to figure out what they were doing
             // and tell the client where to continue from.
             obj.add(Consts.GeneralKeys.IN_PROGRESS, Boolean.TRUE)
-                    .add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+                    .add(Consts.UserData.NICKNAME, user.getNickname());
 
             if (user.getGame() != null) {
                 obj.add(Consts.GeneralKeys.NEXT, Consts.ReconnectNextAction.GAME.toString())

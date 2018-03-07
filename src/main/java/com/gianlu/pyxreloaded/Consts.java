@@ -640,10 +640,6 @@ public final class Consts {
          */
         ERROR_CODE("ec"),
         /**
-         * User nickname.
-         */
-        NICKNAME("n"),
-        /**
          * Card id, an int.
          */
         CARD_ID("cid"),
@@ -679,10 +675,6 @@ public final class Consts {
          * Next thing that should be done. Long string is fine.
          */
         NEXT("next"),
-        /**
-         * Whether the user successfully registered as an admin
-         */
-        IS_ADMIN("ia"),
         /**
          * Text for write in card.
          */
@@ -1171,6 +1163,10 @@ public final class Consts {
      */
     public enum UserData implements ReceivableKey, ReturnableKey {
         /**
+         * User nickname.
+         */
+        NICKNAME("n"),
+        /**
          * Profile picture URL.
          */
         @IgnoreDuplicateIn(GameState.class)
@@ -1179,6 +1175,14 @@ public final class Consts {
          * Email address.
          */
         EMAIL("em"),
+        /**
+         * Whether the user is an admin.
+         */
+        IS_ADMIN("ia"),
+        /**
+         * Whether the user has an account.
+         */
+        HAS_ACCOUNT("ha"),
         /**
          * Whether the user verified its email.
          */

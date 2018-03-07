@@ -1,6 +1,3 @@
-/*
- * Handler to ban users via either nick or IP.
- */
 package com.gianlu.pyxreloaded.handlers;
 
 import com.gianlu.pyxreloaded.Consts;
@@ -21,7 +18,7 @@ public class BanHandler extends BaseHandler {
     public static final String OP = Consts.Operation.BAN.toString();
     protected final Logger logger = Logger.getLogger(BanHandler.class);
     private final BanList banList;
-    private final ConnectedUsers connectedUsers; //Presumably between here to line 28, we get the list of users currently connected.
+    private final ConnectedUsers connectedUsers;
 
     public BanHandler(@Annotations.BanList BanList banList, @Annotations.ConnectedUsers ConnectedUsers connectedUsers) {
         this.banList = banList;
@@ -31,21 +28,13 @@ public class BanHandler extends BaseHandler {
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin())
-            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN); //Detect that user doesn't have permission to kick/ban etc
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
-        String nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME); //Set a variable "nickname" to the one entered through the command.
-
-        //Assuming this is for when the command wasn't properly typed
+        String nickname = params.getStringNotNull(Consts.UserData.NICKNAME);
         if (nickname.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
 
-        User kickUser = connectedUsers.getUser(nickname); //Single out the user we want to ban, give it its own object
+        User kickUser = connectedUsers.getUser(nickname);
 
-        /*
-         * Assuming singled out user exists, set banIP to the IP(?) of the user in question.
-         * Then, send a message via the LongPoll servlet to the client with a notif they've been kicked.
-         * Remove the user in question from the list of connected users on the server
-         * To everyone else: Send a message of who banned who
-         */
         if (kickUser != null) {
             banList.add(kickUser.getHostname());
 
@@ -55,6 +44,6 @@ public class BanHandler extends BaseHandler {
             logger.info(String.format("Banning %s (%s) by request of %s", kickUser.getNickname(), kickUser.getHostname(), user.getNickname()));
         }
 
-        return JsonWrapper.EMPTY; //Doesn't return any JSON
+        return JsonWrapper.EMPTY;
     }
 }

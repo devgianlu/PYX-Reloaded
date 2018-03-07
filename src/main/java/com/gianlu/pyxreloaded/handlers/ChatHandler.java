@@ -24,7 +24,7 @@ public class ChatHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         user.checkChatFlood();
 
-        if (user.getAccount() == null || !user.getAccount().emailVerified)
+        if (user.isEmailVerified()) // TODO: Disable this from preferences
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
@@ -38,7 +38,7 @@ public class ChatHandler extends BaseHandler {
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
             ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
-            ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
+            if (user.getAccount() != null) ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
 
             users.broadcastToAll(MessageType.CHAT, ev);
         }

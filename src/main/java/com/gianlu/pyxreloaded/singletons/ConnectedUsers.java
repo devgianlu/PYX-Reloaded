@@ -67,7 +67,7 @@ public final class ConnectedUsers {
                 users.put(user.getNickname().toLowerCase(), user);
                 if (broadcastConnectsAndDisconnects) {
                     EventWrapper ev = new EventWrapper(Consts.Event.NEW_PLAYER);
-                    ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+                    ev.add(Consts.UserData.NICKNAME, user.getNickname());
                     broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
                 }
             }
@@ -115,7 +115,7 @@ public final class ConnectedUsers {
         // Games are informed about the user leaving when the user object is marked invalid.
         if (broadcastConnectsAndDisconnects) {
             EventWrapper ev = new EventWrapper(Consts.Event.PLAYER_LEAVE);
-            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            ev.add(Consts.UserData.NICKNAME, user.getNickname());
             ev.add(Consts.GeneralKeys.DISCONNECT_REASON, reason.toString());
             broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
         }

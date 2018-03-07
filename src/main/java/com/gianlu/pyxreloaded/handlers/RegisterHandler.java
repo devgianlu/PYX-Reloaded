@@ -55,7 +55,7 @@ public class RegisterHandler extends BaseHandler {
         String nickname;
         switch (type) {
             case PASSWORD:
-                nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME);
+                nickname = params.getStringNotNull(Consts.UserData.NICKNAME);
                 if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
@@ -132,7 +132,7 @@ public class RegisterHandler extends BaseHandler {
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.get().add(user)));
 
         return new JsonWrapper()
-                .add(Consts.GeneralKeys.NICKNAME, nickname)
-                .add(Consts.GeneralKeys.IS_ADMIN, user.isAdmin());
+                .add(Consts.UserData.NICKNAME, nickname)
+                .add(Consts.UserData.IS_ADMIN, user.isAdmin());
     }
 }
