@@ -29,6 +29,11 @@
     vertical-align: -12% !important;
 }
 
+/* Margin in drawer in list items */
+.mdc-drawer__drawer .mdc-list-item > .mdc-list-item__start-detail {
+    margin-right: 8px;
+}
+
 /* Hide stuff in toolbar on mobile */
 .mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
     display: none;

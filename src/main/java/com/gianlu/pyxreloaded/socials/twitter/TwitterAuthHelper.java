@@ -19,6 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,12 +33,26 @@ public class TwitterAuthHelper {
     private final OAuth10aService service;
     private final JsonParser parser = new JsonParser();
 
-    public TwitterAuthHelper(Preferences preferences) {
-        service = new ServiceBuilder(preferences.getString("socials/twitterAppId", ""))
-                .apiSecret(preferences.getString("socials/twitterAppSecret", ""))
-                .callback(preferences.getString("socials/twitterCallback", ""))
+    private TwitterAuthHelper(@NotNull String appId, @NotNull String appSecret, @NotNull String callback) {
+        service = new ServiceBuilder(appId)
+                .apiSecret(appSecret)
+                .callback(callback)
                 .httpClient(new HttpClientWrapper())
                 .build(TwitterApi.Authenticate.instance());
+    }
+
+    @Nullable
+    public static TwitterAuthHelper instantiate(Preferences preferences) {
+        String appId = preferences.getString("socials/twitterAppId", null);
+        if (appId == null || appId.isEmpty()) return null;
+
+        String appSecret = preferences.getString("socials/twitterAppSecret", null);
+        if (appSecret == null || appSecret.isEmpty()) return null;
+
+        String callback = preferences.getString("socials/twitterCallback", null);
+        if (callback == null || callback.isEmpty()) return null;
+
+        return new TwitterAuthHelper(appId, appSecret, callback);
     }
 
     @NotNull
@@ -66,6 +81,11 @@ public class TwitterAuthHelper {
         } catch (JsonParseException | NullPointerException ex) {
             throw new IOException(ex);
         }
+    }
+
+    @NotNull
+    public String appId() {
+        return service.getConfig().getApiKey();
     }
 
     private static class HttpClientWrapper implements HttpClient {

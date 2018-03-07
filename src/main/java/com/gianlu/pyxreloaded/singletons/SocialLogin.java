@@ -33,13 +33,23 @@ public final class SocialLogin {
     private final TwitterAuthHelper twitterHelper;
     private final GoogleIdTokenVerifier googleHelper;
     private final FacebookAuthHelper facebookHelper;
+    private final String googleAppId;
 
-    public SocialLogin(GithubAuthHelper githubHelper, TwitterAuthHelper twitterHelper, Preferences preferences) {
+    public SocialLogin(@Nullable GithubAuthHelper githubHelper, @Nullable TwitterAuthHelper twitterHelper, @Nullable FacebookAuthHelper facebookHelper, Preferences preferences) {
         this.githubHelper = githubHelper;
         this.twitterHelper = twitterHelper;
-        this.facebookHelper = new FacebookAuthHelper(preferences.getString("socials/facebookAppId", ""), preferences.getString("socials/facebookAppSecret", ""));
-        this.googleHelper = new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
-                .setAudience(Collections.singletonList(preferences.getString("socials/googleClientId", "")))
+        this.facebookHelper = facebookHelper;
+
+        this.googleAppId = preferences.getString("socials/googleClientId", null);
+        this.googleHelper = instantiateGoogleHelper(googleAppId);
+    }
+
+    @Contract("null -> null")
+    @Nullable
+    private static GoogleIdTokenVerifier instantiateGoogleHelper(String appId) {
+        if (appId == null || appId.isEmpty()) return null;
+        return new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singletonList(appId))
                 .build();
     }
 
@@ -109,5 +119,45 @@ public final class SocialLogin {
         } catch (TwitterEmailNotVerifiedException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.TWITTER_EMAIL_NOT_VERIFIED, ex);
         }
+    }
+
+    @Contract(pure = true)
+    public boolean googleEnabled() {
+        return googleHelper != null;
+    }
+
+    @Nullable
+    public String googleAppId() {
+        return googleAppId;
+    }
+
+    @Contract(pure = true)
+    public boolean facebookEnabled() {
+        return facebookHelper != null;
+    }
+
+    @Nullable
+    public String facebookAppId() {
+        return facebookHelper == null ? null : facebookHelper.appId();
+    }
+
+    @Contract(pure = true)
+    public boolean githubEnabled() {
+        return githubHelper != null;
+    }
+
+    @Nullable
+    public String githubAppId() {
+        return githubHelper == null ? null : githubHelper.appId();
+    }
+
+    @Contract(pure = true)
+    public boolean twitterEnabled() {
+        return twitterHelper != null;
+    }
+
+    @Nullable
+    public String twitterAppId() {
+        return twitterHelper == null ? null : twitterHelper.appId();
     }
 }

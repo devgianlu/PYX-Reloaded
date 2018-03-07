@@ -5,7 +5,8 @@ ws.onmessage = function (event) {
     /** @param {object[]} data.Es - Events **/
     const data = JSON.parse(event.data);
     if ("e" in data) {
-        Notifier.debug(data);
+        Notifier.debug(data, true);
+        if (data.ec === "nr" || data.ec === "se") window.location = "/";
         return;
     }
 
@@ -39,6 +40,15 @@ function processPollData(events) {
 
 }
 
+/**
+ * @callback eventCallback
+ * @param {string} data.E - Event code
+ */
+
+/**
+ * @param {String} key
+ * @param {eventCallback} listener
+ */
 function registerPollListener(key, listener) {
     _pollingListeners[key] = listener;
 }

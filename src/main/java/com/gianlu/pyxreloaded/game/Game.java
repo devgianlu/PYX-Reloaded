@@ -193,7 +193,7 @@ public class Game {
         }
 
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_JOIN);
-        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+        ev.add(Consts.UserData.NICKNAME, user.getNickname());
         broadcastToPlayers(QueuedMessage.MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -262,7 +262,7 @@ public class Game {
     public void toggleLikeGame(User user) {
         if (toggleLikeDislike(likes, dislikes, user)) {
             EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_LIKE);
-            obj.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            obj.add(Consts.UserData.NICKNAME, user.getNickname());
             broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, obj);
         }
     }
@@ -275,7 +275,7 @@ public class Game {
     public void toggleDislikeGame(User user) {
         if (toggleLikeDislike(dislikes, likes, user)) {
             EventWrapper obj = new EventWrapper(this, Consts.Event.GAME_DISLIKE);
-            obj.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            obj.add(Consts.UserData.NICKNAME, user.getNickname());
             broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, obj);
         }
     }
@@ -345,7 +345,7 @@ public class Game {
             }
 
             EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_PLAYER_LEAVE);
-            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            ev.add(Consts.UserData.NICKNAME, user.getNickname());
             ev.add(Consts.OngoingGameData.WILL_STOP, willStop);
             broadcastToPlayers(QueuedMessage.MessageType.GAME_PLAYER_EVENT, ev);
 
@@ -384,7 +384,7 @@ public class Game {
         }
 
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_SPECTATOR_JOIN);
-        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+        ev.add(Consts.UserData.NICKNAME, user.getNickname());
         broadcastToPlayers(QueuedMessage.MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -401,7 +401,7 @@ public class Game {
         }
 
         EventWrapper ev = new EventWrapper(this, Consts.Event.GAME_SPECTATOR_LEAVE);
-        ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+        ev.add(Consts.UserData.NICKNAME, user.getNickname());
         broadcastToPlayers(QueuedMessage.MessageType.GAME_PLAYER_EVENT, ev);
     }
 
@@ -892,7 +892,7 @@ public class Game {
                         playersToUpdateStatus.add(player);
                     }
 
-                    ev.add(Consts.GeneralKeys.NICKNAME, player.getUser().getNickname());
+                    ev.add(Consts.UserData.NICKNAME, player.getUser().getNickname());
                     broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, ev);
 
                     // Put their cards back

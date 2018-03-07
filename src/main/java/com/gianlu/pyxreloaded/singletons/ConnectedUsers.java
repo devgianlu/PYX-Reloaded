@@ -4,6 +4,7 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.EventWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +42,23 @@ public final class ConnectedUsers {
      *
      * @param user User to add. {@code getNickname()} is used to determine the nickname.
      */
-    public void checkAndAdd(@NotNull User user) throws BaseCahHandler.CahException {
+    @Nullable
+    public User checkAndAdd(@NotNull User user) throws BaseCahHandler.CahException {
         synchronized (users) {
-            if (this.hasUser(user.getNickname())) {
-                logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
-                throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
+            if (hasUser(user.getNickname())) {
+                UserAccount account = user.getAccount();
+                if (account != null) {
+                    User registeredUser = users.get(account.username);
+                    if (registeredUser != null) {
+                        registeredUser.userDidSomething();
+                        return registeredUser;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    logger.info(String.format("Rejecting existing username %s from %s", user.toString(), user.getHostname()));
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.NICK_IN_USE);
+                }
             } else if (users.size() >= maxUsers && !user.isAdmin()) {
                 logger.warn(String.format("Rejecting user %s due to too many users (%d >= %d)", user.toString(), users.size(), maxUsers));
                 throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_MANY_USERS);
@@ -54,10 +67,12 @@ public final class ConnectedUsers {
                 users.put(user.getNickname().toLowerCase(), user);
                 if (broadcastConnectsAndDisconnects) {
                     EventWrapper ev = new EventWrapper(Consts.Event.NEW_PLAYER);
-                    ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+                    ev.add(Consts.UserData.NICKNAME, user.getNickname());
                     broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
                 }
             }
+
+            return null;
         }
     }
 
@@ -100,7 +115,7 @@ public final class ConnectedUsers {
         // Games are informed about the user leaving when the user object is marked invalid.
         if (broadcastConnectsAndDisconnects) {
             EventWrapper ev = new EventWrapper(Consts.Event.PLAYER_LEAVE);
-            ev.add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+            ev.add(Consts.UserData.NICKNAME, user.getNickname());
             ev.add(Consts.GeneralKeys.DISCONNECT_REASON, reason.toString());
             broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
         }

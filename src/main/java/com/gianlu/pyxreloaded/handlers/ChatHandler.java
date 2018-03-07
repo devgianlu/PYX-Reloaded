@@ -24,9 +24,11 @@ public class ChatHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         user.checkChatFlood();
 
+        if (user.isEmailVerified()) // TODO: Disable this from preferences
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
+
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
         if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
-        if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.MESSAGE_TOO_LONG);
@@ -35,7 +37,9 @@ public class ChatHandler extends BaseHandler {
             EventWrapper ev = new EventWrapper(Consts.Event.CHAT);
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
-            if (user.isAdmin()) ev.add(Consts.ChatData.FROM_ADMIN, true);
+            ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
+            if (user.getAccount() != null) ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
+
             users.broadcastToAll(MessageType.CHAT, ev);
         }
 

@@ -7,6 +7,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -17,7 +18,7 @@ public class TwitterStartAuthFlowPath implements HttpHandler {
     private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
     private final TwitterAuthHelper helper;
 
-    public TwitterStartAuthFlowPath(TwitterAuthHelper helper) {
+    public TwitterStartAuthFlowPath(@NotNull TwitterAuthHelper helper) {
         this.helper = helper;
     }
 

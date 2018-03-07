@@ -55,7 +55,7 @@ public class RegisterHandler extends BaseHandler {
         String nickname;
         switch (type) {
             case PASSWORD:
-                nickname = params.getStringNotNull(Consts.GeneralKeys.NICKNAME);
+                nickname = params.getStringNotNull(Consts.UserData.NICKNAME);
                 if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);
 
@@ -71,6 +71,9 @@ public class RegisterHandler extends BaseHandler {
                 }
                 break;
             case GOOGLE:
+                if (!socialLogin.googleEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 GoogleIdToken.Payload googleToken = socialLogin.verifyGoogle(params.getStringNotNull(Consts.AuthType.GOOGLE));
                 if (googleToken == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.GOOGLE_INVALID_TOKEN);
 
@@ -81,6 +84,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case FACEBOOK:
+                if (!socialLogin.facebookEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 FacebookToken facebookToken = socialLogin.verifyFacebook(params.getStringNotNull(Consts.AuthType.FACEBOOK));
                 if (facebookToken == null)
                     throw new BaseCahHandler.CahException(Consts.ErrorCode.FACEBOOK_INVALID_TOKEN);
@@ -92,6 +98,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case GITHUB:
+                if (!socialLogin.githubEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String githubToken = params.getStringNotNull(Consts.AuthType.GITHUB);
 
                 GithubProfileInfo githubInfo = socialLogin.infoGithub(githubToken);
@@ -102,6 +111,9 @@ public class RegisterHandler extends BaseHandler {
                 user = User.withAccount(account, exchange.getHostName());
                 break;
             case TWITTER:
+                if (!socialLogin.twitterEnabled())
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.UNSUPPORTED_AUTH_TYPE);
+
                 String twitterTokens = params.getStringNotNull(Consts.AuthType.TWITTER);
 
                 TwitterProfileInfo twitterInfo = socialLogin.infoTwitter(twitterTokens);
@@ -115,11 +127,12 @@ public class RegisterHandler extends BaseHandler {
                 throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);
         }
 
-        users.checkAndAdd(user);
+        User registeredUser = users.checkAndAdd(user);
+        if (registeredUser != null) user = registeredUser;
         exchange.setResponseCookie(new CookieImpl("PYX-Session", Sessions.get().add(user)));
 
         return new JsonWrapper()
-                .add(Consts.GeneralKeys.NICKNAME, nickname)
-                .add(Consts.GeneralKeys.IS_ADMIN, user.isAdmin());
+                .add(Consts.UserData.NICKNAME, nickname)
+                .add(Consts.UserData.IS_ADMIN, user.isAdmin());
     }
 }

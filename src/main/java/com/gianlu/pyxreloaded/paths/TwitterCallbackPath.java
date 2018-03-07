@@ -13,6 +13,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -27,7 +28,7 @@ public class TwitterCallbackPath implements HttpHandler {
     private static final String REDIRECT_LOCATION = "/?" + Consts.GeneralKeys.AUTH_TYPE + "=" + Consts.AuthType.TWITTER;
     private final TwitterAuthHelper helper;
 
-    public TwitterCallbackPath(TwitterAuthHelper helper) {
+    public TwitterCallbackPath(@NotNull TwitterAuthHelper helper) {
         this.helper = helper;
     }
 

@@ -5,7 +5,7 @@
 
     <groupId>com.gianlu.pyxreloaded</groupId>
     <artifactId>server</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>pyx-reloaded</name>
@@ -22,7 +22,7 @@
     </properties>
 
     <build>
-        <finalName>PYX</finalName>
+        <finalName>PYX-Reloaded</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,23 +45,33 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.gianlu.pyxreloaded.Server</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
                 <executions>
+                    <!-- Build JAR -->
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
+                        <configuration>
+                            <descriptor>src/assembly/jar.xml</descriptor>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.gianlu.pyxreloaded.Server</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Package ZIP -->
+                    <execution>
+                        <id>create-archive</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptor>src/assembly/zip.xml</descriptor>
+                        </configuration>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -129,11 +139,6 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.21.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
         </dependency>
 
         <!-- Random -->

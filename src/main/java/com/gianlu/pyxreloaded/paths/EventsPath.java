@@ -19,12 +19,13 @@ import org.xnio.ChannelListener;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EventsPath implements WebSocketConnectionCallback {
     /**
@@ -39,6 +40,7 @@ public class EventsPath implements WebSocketConnectionCallback {
      * operation.
      */
     private static final int MAX_MESSAGES_PER_POLL = 20;
+    private static final Logger logger = Logger.getLogger(EventsPath.class.getSimpleName());
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static Map<String, Cookie> getRequestCookies(WebSocketHttpExchange exchange) {
@@ -52,20 +54,26 @@ public class EventsPath implements WebSocketConnectionCallback {
 
     @Override
     public void onConnect(WebSocketHttpExchange exchange, WebSocketChannel channel) {
-        Cookie sid = getRequestCookies(exchange).get("PYX-Session");
+        try {
+            Cookie sid = getRequestCookies(exchange).get("PYX-Session");
 
-        User user;
-        if (sid == null || (user = Sessions.get().getUser(sid.getValue())) == null) {
-            sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.NOT_REGISTERED));
-        } else if (!user.isValid()) {
-            sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.SESSION_EXPIRED));
-        } else {
-            if (user.getEventsSender() == null) user.establishedEventsConnection(new EventsSender(user, channel));
-            else user.getEventsSender().addChannel(channel);
+            User user;
+            if (sid == null || (user = Sessions.get().getUser(sid.getValue())) == null) {
+                sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.NOT_REGISTERED));
+            } else if (!user.isValid()) {
+                sendConnectionError(exchange, channel, new JsonWrapper(Consts.ErrorCode.SESSION_EXPIRED));
+            } else {
+                if (user.getEventsSender() == null) user.establishedEventsConnection(new EventsSender(user, channel));
+                else user.getEventsSender().addChannel(channel);
 
-            channel.getCloseSetter().set((ChannelListener<AbstractFramedChannel>) newChannel -> {
-                if (user.getEventsSender() != null) user.getEventsSender().removeChannel((WebSocketChannel) newChannel);
-            });
+                channel.getCloseSetter().set((ChannelListener<AbstractFramedChannel>) newChannel -> {
+                    if (user.getEventsSender() != null)
+                        user.getEventsSender().removeChannel((WebSocketChannel) newChannel);
+                });
+            }
+        } catch (Throwable ex) {
+            logger.log(Level.SEVERE, "Failed handling incoming connection: ", ex);
+            throw ex;
         }
     }
 
@@ -79,15 +87,20 @@ public class EventsPath implements WebSocketConnectionCallback {
 
         EventsSender(User user, WebSocketChannel channel) {
             this.user = user;
-            this.channels = Collections.singletonList(channel);
+            this.channels = new ArrayList<>();
+            addChannel(channel);
         }
 
         void addChannel(WebSocketChannel channel) {
-            channels.add(channel);
+            synchronized (channels) {
+                channels.add(channel);
+            }
         }
 
         private void removeChannel(WebSocketChannel channel) {
-            channels.remove(channel);
+            synchronized (channels) {
+                channels.remove(channel);
+            }
         }
 
         public void enqueue(QueuedMessage message) {
@@ -98,9 +111,9 @@ public class EventsPath implements WebSocketConnectionCallback {
             executorService.execute(new EventTask());
         }
 
-        private void handleIoException(IOException ex) {
+        private void handleIoException(IOException ex, WebSocketChannel channel) {
             if (ex instanceof ClosedChannelException) {
-                user.noLongerValid();
+                removeChannel(channel);
             }
         }
 
@@ -121,13 +134,13 @@ public class EventsPath implements WebSocketConnectionCallback {
                 for (QueuedMessage message : toSend)
                     array.add(message.getData().obj());
 
-                try {
-                    for (WebSocketChannel channel : channels)
+                for (WebSocketChannel channel : channels.toArray(new WebSocketChannel[channels.size()])) {
+                    try {
                         WebSockets.sendTextBlocking(new JsonWrapper(Consts.GeneralKeys.EVENTS, array).obj().toString(), channel);
-
-                    user.userReceivedEvents();
-                } catch (IOException ex) {
-                    handleIoException(ex);
+                        user.userReceivedEvents();
+                    } catch (IOException ex) {
+                        handleIoException(ex, channel);
+                    }
                 }
             }
         }

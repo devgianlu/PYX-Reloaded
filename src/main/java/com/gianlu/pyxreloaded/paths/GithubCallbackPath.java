@@ -8,6 +8,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -19,7 +20,7 @@ public class GithubCallbackPath implements HttpHandler {
     private static final String REDIRECT_LOCATION = "/?" + Consts.GeneralKeys.AUTH_TYPE + "=" + Consts.AuthType.GITHUB;
     private final GithubAuthHelper githubHelper;
 
-    public GithubCallbackPath(GithubAuthHelper githubHelper) {
+    public GithubCallbackPath(@NotNull GithubAuthHelper githubHelper) {
         this.githubHelper = githubHelper;
     }
 

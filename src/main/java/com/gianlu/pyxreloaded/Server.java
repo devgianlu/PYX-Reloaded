@@ -9,6 +9,7 @@ import com.gianlu.pyxreloaded.server.CustomResourceHandler;
 import com.gianlu.pyxreloaded.server.HttpsRedirect;
 import com.gianlu.pyxreloaded.server.Provider;
 import com.gianlu.pyxreloaded.singletons.*;
+import com.gianlu.pyxreloaded.socials.facebook.FacebookAuthHelper;
 import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
 import com.gianlu.pyxreloaded.socials.twitter.TwitterAuthHelper;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
@@ -71,10 +72,10 @@ public class Server {
 
         Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
 
-        GithubAuthHelper githubAuthHelper = new GithubAuthHelper(preferences);
-        TwitterAuthHelper twitterAuthHelper = new TwitterAuthHelper(preferences);
+        GithubAuthHelper githubAuthHelper = GithubAuthHelper.instantiate(preferences);
+        TwitterAuthHelper twitterAuthHelper = TwitterAuthHelper.instantiate(preferences);
 
-        SocialLogin socialLogin = new SocialLogin(githubAuthHelper, twitterAuthHelper, preferences);
+        SocialLogin socialLogin = new SocialLogin(githubAuthHelper, twitterAuthHelper, FacebookAuthHelper.instantiate(preferences), preferences);
         Providers.add(Annotations.SocialLogin.class, (Provider<SocialLogin>) () -> socialLogin);
 
         CardcastService cardcastService = new CardcastService();
@@ -87,10 +88,15 @@ public class Server {
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
-                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
-                .addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper))
-                .addExactPath("/TwitterStartAuthFlow", new TwitterStartAuthFlowPath(twitterAuthHelper))
-                .addExactPath("/TwitterCallback", new TwitterCallbackPath(twitterAuthHelper));
+                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails));
+
+        if (githubAuthHelper != null)
+            pathHandler.addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper));
+
+        if (twitterAuthHelper != null) {
+            pathHandler.addExactPath("/TwitterStartAuthFlow", new TwitterStartAuthFlowPath(twitterAuthHelper));
+            pathHandler.addExactPath("/TwitterCallback", new TwitterCallbackPath(twitterAuthHelper));
+        }
 
         RoutingHandler router = new RoutingHandler();
         router.setFallbackHandler(pathHandler)

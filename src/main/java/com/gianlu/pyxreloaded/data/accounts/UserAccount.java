@@ -39,9 +39,9 @@ public abstract class UserAccount {
         obj.add(Consts.UserData.EMAIL, email);
         obj.add(Consts.GeneralKeys.AUTH_TYPE, auth.toString());
         obj.add(Consts.UserData.PICTURE, avatarUrl);
-        obj.add(Consts.GeneralKeys.NICKNAME, username);
+        obj.add(Consts.UserData.NICKNAME, username);
         obj.add(Consts.UserData.EMAIL_VERIFIED, emailVerified);
-        obj.add(Consts.GeneralKeys.IS_ADMIN, admin);
+        obj.add(Consts.UserData.IS_ADMIN, admin);
         return obj;
     }
 }

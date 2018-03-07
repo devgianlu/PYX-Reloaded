@@ -3,7 +3,9 @@ package com.gianlu.pyxreloaded.singletons;
 import com.gianlu.pyxreloaded.Utils;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.simplejavamail.email.Email;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.email.EmailPopulatingBuilder;
@@ -31,22 +33,48 @@ public final class Emails {
     public Emails(ServerDatabase db, Preferences preferences, UsersWithAccount accounts) {
         this.db = db;
         this.accounts = accounts;
-        this.senderEmail = preferences.getString("emails/senderEmail", "");
+        this.senderEmail = preferences.getString("emails/senderEmail", null);
         this.senderName = preferences.getString("emails/senderName", "PYX-Reloaded");
-        this.verifyCallback = preferences.getString("emails/verifyCallback", "");
+        this.verifyCallback = preferences.getString("emails/verifyCallback", null);
 
-        this.mailer = MailerBuilder
-                .withSMTPServer(preferences.getString("emails/smtpServer", ""),
-                        preferences.getInt("emails/smtpPort", 587),
-                        preferences.getString("emails/smtpUsername", ""),
-                        preferences.getString("emails/smtpPassword", ""))
+        this.mailer = mailer(preferences);
+        if (mailer == null) {
+            logger.info("Mailer is disabled.");
+        } else {
+            logger.info("Started mailer connection test...");
+            this.mailer.testConnection();
+            logger.info("Mailer connection test was successful!");
+        }
+    }
+
+    @NotNull
+    public String senderEmail() {
+        return senderEmail;
+    }
+
+    @Nullable
+    private Mailer mailer(Preferences preferences) {
+        if (senderEmail == null || senderEmail.isEmpty()) return null;
+        if (senderName == null || senderName.isEmpty()) return null;
+        if (verifyCallback == null || verifyCallback.isEmpty()) return null;
+
+        String smtpServer = preferences.getString("emails/smtpServer", null);
+        if (smtpServer == null || smtpServer.isEmpty()) return null;
+
+        int smtpPort = preferences.getInt("emails/smtpPort", 587);
+        if (smtpPort <= 0 || smtpPort >= 65536) return null;
+
+        String smtpUsername = preferences.getString("emails/smtpUsername", null);
+        if (smtpUsername == null || smtpUsername.isEmpty()) return null;
+
+        String smtpPassword = preferences.getString("emails/smtpPassword", null);
+        if (smtpPassword == null || smtpPassword.isEmpty()) return null;
+
+        return MailerBuilder
+                .withSMTPServer(smtpServer, smtpPort, smtpUsername, smtpPassword)
                 .withTransportStrategy(TransportStrategy.SMTP_TLS)
                 .withSessionTimeout(SEND_TIMEOUT)
                 .buildMailer();
-
-        logger.info("Started mailer connection test...");
-        this.mailer.testConnection();
-        logger.info("Mailer connection test was successful!");
     }
 
     private void send(EmailPopulatingBuilder builder) {
@@ -92,5 +120,10 @@ public final class Emails {
             PasswordAccount account = accounts.getPasswordAccountForEmail(email);
             if (account != null) accounts.updateVerifiedStatus(account, true);
         }
+    }
+
+    @Contract(pure = true)
+    public boolean enabled() {
+        return mailer != null;
     }
 }

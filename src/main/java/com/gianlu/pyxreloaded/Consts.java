@@ -351,7 +351,15 @@ public final class Consts {
         /**
          * User hasn't verified his Twitter email.
          */
-        TWITTER_EMAIL_NOT_VERIFIED("twemnv");
+        TWITTER_EMAIL_NOT_VERIFIED("twemnv"),
+        /**
+         * User hasn't an account or hasn't verified his email.
+         */
+        ACCOUNT_NOT_VERIFIED("anv"),
+        /**
+         * This authentication type isn't supported by the server.
+         */
+        UNSUPPORTED_AUTH_TYPE("uaT");
 
         private final String code;
 
@@ -636,10 +644,6 @@ public final class Consts {
          */
         ERROR_CODE("ec"),
         /**
-         * User nickname.
-         */
-        NICKNAME("n"),
-        /**
          * Card id, an int.
          */
         CARD_ID("cid"),
@@ -676,10 +680,6 @@ public final class Consts {
          */
         NEXT("next"),
         /**
-         * Whether the user successfully registered as an admin
-         */
-        IS_ADMIN("ia"),
-        /**
          * Text for write in card.
          */
         WRITE_IN_TEXT("wit"),
@@ -702,7 +702,11 @@ public final class Consts {
         /**
          * User account data.
          */
-        ACCOUNT("a");
+        ACCOUNT("a"),
+        /**
+         * Authentication configuration for client.
+         */
+        AUTH_CONFIG("aC");
 
         private final String key;
 
@@ -1129,7 +1133,7 @@ public final class Consts {
     /**
      * Identify auth type in database, also used to send authentication data
      */
-    public enum AuthType implements ReceivableKey {
+    public enum AuthType implements ReceivableKey, ReturnableKey {
         @IgnoreDuplicateIn(GameOptionsData.class)
         PASSWORD("pw"),
         GOOGLE("g"),
@@ -1163,6 +1167,10 @@ public final class Consts {
      */
     public enum UserData implements ReceivableKey, ReturnableKey {
         /**
+         * User nickname.
+         */
+        NICKNAME("n"),
+        /**
          * Profile picture URL.
          */
         @IgnoreDuplicateIn(GameState.class)
@@ -1171,6 +1179,14 @@ public final class Consts {
          * Email address.
          */
         EMAIL("em"),
+        /**
+         * Whether the user is an admin.
+         */
+        IS_ADMIN("ia"),
+        /**
+         * Whether the user has an account.
+         */
+        HAS_ACCOUNT("ha"),
         /**
          * Whether the user verified its email.
          */

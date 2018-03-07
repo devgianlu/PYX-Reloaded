@@ -197,7 +197,17 @@ public class User {
         return lastMessageTimes;
     }
 
+    @Nullable
     public UserAccount getAccount() {
         return account;
+    }
+
+    public JsonWrapper toSmallJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.UserData.NICKNAME, nickname);
+        obj.add(Consts.UserData.IS_ADMIN, isAdmin());
+        obj.add(Consts.UserData.HAS_ACCOUNT, isEmailVerified());
+        if (account != null) obj.add(Consts.UserData.PICTURE, account.avatarUrl);
+        return obj;
     }
 }
