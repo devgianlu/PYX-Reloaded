@@ -706,7 +706,11 @@ public final class Consts {
         /**
          * User account data.
          */
-        ACCOUNT("a");
+        ACCOUNT("a"),
+        /**
+         * Authentication configuration for client.
+         */
+        AUTH_CONFIG("aC");
 
         private final String key;
 
@@ -1133,7 +1137,7 @@ public final class Consts {
     /**
      * Identify auth type in database, also used to send authentication data
      */
-    public enum AuthType implements ReceivableKey {
+    public enum AuthType implements ReceivableKey, ReturnableKey {
         @IgnoreDuplicateIn(GameOptionsData.class)
         PASSWORD("pw"),
         GOOGLE("g"),
