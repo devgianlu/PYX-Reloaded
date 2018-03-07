@@ -112,6 +112,9 @@ class LoginManager {
 
     static _handleGeneralLoginErrors(error) {
         switch (error.ec) {
+            case "uaT":
+                Notifier.error("This authentication method isn't supported by this server.", error);
+                return true;
             case "niu":
                 Notifier.error(LoginManager._ERR_MSG_NIU(), error);
                 return true;
