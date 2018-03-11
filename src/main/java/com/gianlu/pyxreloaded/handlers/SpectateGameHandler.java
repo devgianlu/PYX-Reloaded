@@ -20,7 +20,7 @@ public class SpectateGameHandler extends GameHandler {
 
     @Override
     public JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        PreparingShutdown.check();
+        PreparingShutdown.get().check();
 
         if (!game.isPasswordCorrect(params.getString(Consts.GameOptionsData.PASSWORD)))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.WRONG_PASSWORD);

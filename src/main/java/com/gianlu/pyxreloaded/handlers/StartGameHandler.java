@@ -28,7 +28,7 @@ public class StartGameHandler extends GameWithPlayerHandler {
         if (game.getState() != Consts.GameState.LOBBY)
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
 
-        PreparingShutdown.check();
+        PreparingShutdown.get().check();
 
         try {
             if (!game.hasEnoughCards()) {

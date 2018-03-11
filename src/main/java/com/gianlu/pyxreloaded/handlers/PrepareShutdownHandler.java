@@ -19,7 +19,7 @@ public class PrepareShutdownHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
-        PreparingShutdown.set(true);
+        PreparingShutdown.get().set(true);
 
         return JsonWrapper.EMPTY;
     }

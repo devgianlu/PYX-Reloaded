@@ -113,22 +113,24 @@ public class Server {
                     resourceHandler.handleRequest(exchange);
                 });
 
-        Undertow.Builder server = Undertow.builder()
+        Undertow.Builder builder = Undertow.builder()
                 .setHandler(router);
 
         int port = preferences.getInt("port", 80);
         String host = preferences.getString("host", "0.0.0.0");
 
         if (preferences.getBoolean("secure", false)) {
-            server.addHttpListener(port, host, new HttpsRedirect())
+            builder.addHttpListener(port, host, new HttpsRedirect())
                     .addHttpsListener(preferences.getInt("securePort", 443), host, getSSLContext(
                             new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
                             new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
         } else {
-            server.addHttpListener(port, host);
+            builder.addHttpListener(port, host);
         }
 
-        server.build().start();
+        Undertow server = builder.build();
+        PreparingShutdown.setup(server, socialLogin, loadedCards, serverDatabase);
+        server.start();
         logger.info("Server started!");
     }
 

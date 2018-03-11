@@ -47,7 +47,7 @@ public final class GamesManager {
      */
     @NotNull
     public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws BaseCahHandler.CahException {
-        PreparingShutdown.check();
+        PreparingShutdown.get().check();
 
         synchronized (games) {
             if (games.size() >= getMaxGames())

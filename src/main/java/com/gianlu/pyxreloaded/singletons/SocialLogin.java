@@ -160,4 +160,11 @@ public final class SocialLogin {
     public String twitterAppId() {
         return twitterHelper == null ? null : twitterHelper.appId();
     }
+
+    public void close() throws IOException {
+        if (googleHelper != null) googleHelper.getTransport().shutdown();
+        if (facebookHelper != null) facebookHelper.close();
+        if (githubHelper != null) githubHelper.close();
+        if (twitterHelper != null) twitterHelper.close();
+    }
 }

@@ -7,8 +7,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 public class FacebookAuthHelper {
     private static final String DEBUG_TOKEN = "https://graph.facebook.com/debug_token";
     private static final String GRAPH = "https://graph.facebook.com/";
-    private final HttpClient client;
+    private final CloseableHttpClient client;
     private final String appToken;
     private final JsonParser parser = new JsonParser();
     private final String appId;
@@ -95,5 +95,9 @@ public class FacebookAuthHelper {
         } finally {
             get.releaseConnection();
         }
+    }
+
+    public void close() throws IOException {
+        client.close();
     }
 }

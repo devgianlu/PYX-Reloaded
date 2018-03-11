@@ -58,7 +58,7 @@ public final class ConnectedUsers {
      */
     @Nullable
     public User checkAndAdd(@NotNull User user) throws BaseCahHandler.CahException {
-        PreparingShutdown.check();
+        PreparingShutdown.get().check();
 
         synchronized (users) {
             if (hasUser(user.getNickname())) {
