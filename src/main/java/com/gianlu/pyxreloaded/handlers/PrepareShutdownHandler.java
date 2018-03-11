@@ -6,6 +6,7 @@ import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.PreparingShutdown;
 import io.undertow.server.HttpServerExchange;
 
 public class PrepareShutdownHandler extends BaseHandler {
@@ -18,7 +19,7 @@ public class PrepareShutdownHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
 
-        // TODO
+        PreparingShutdown.set(true);
 
         return JsonWrapper.EMPTY;
     }

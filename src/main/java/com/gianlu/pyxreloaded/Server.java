@@ -2,7 +2,6 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.paths.*;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
@@ -90,8 +89,8 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), preferences, updateGameListTask);
-        Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
+        GamesManager gamesManager = new GamesManager((manager, options) -> new Game(GamesManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), preferences, updateGameListTask);
+        Providers.add(Annotations.GameManager.class, (Provider<GamesManager>) () -> gamesManager);
 
         ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
         PathHandler pathHandler = new PathHandler(resourceHandler);

@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.gianlu.pyxreloaded.singletons.LoadedCards;
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.gianlu.pyxreloaded.task.SafeTimerTask;
@@ -81,7 +82,7 @@ public class Game {
     private final PlayerPlayedCardsTracker playedCards = new PlayerPlayedCardsTracker();
     private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
     private final ConnectedUsers connectedUsers;
-    private final GameManager gameManager;
+    private final GamesManager gamesManager;
     private final GameOptions options;
     private final Object roundTimerLock = new Object();
     private final Object judgeLock = new Object();
@@ -106,14 +107,14 @@ public class Game {
      *
      * @param id             The game's ID.
      * @param connectedUsers The user manager, for broadcasting messages.
-     * @param gameManager    The game manager, for broadcasting game list refresh notices and destroying this game
+     * @param gamesManager    The game manager, for broadcasting game list refresh notices and destroying this game
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */
-    public Game(int id, GameOptions options, ConnectedUsers connectedUsers, GameManager gameManager, LoadedCards loadedCards, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
+    public Game(int id, GameOptions options, ConnectedUsers connectedUsers, GamesManager gamesManager, LoadedCards loadedCards, ScheduledThreadPoolExecutor globalTimer, Preferences preferences, CardcastService cardcastService) {
         this.id = id;
         this.connectedUsers = connectedUsers;
-        this.gameManager = gameManager;
+        this.gamesManager = gamesManager;
         this.loadedCards = loadedCards;
         this.globalTimer = globalTimer;
         this.options = options;
@@ -364,7 +365,7 @@ public class Game {
             }
 
             // Destroy the game if it's empty
-            if (players.size() == 0) gameManager.destroyGame(id);
+            if (players.size() == 0) gamesManager.destroyGame(id);
         }
     }
 
@@ -688,7 +689,7 @@ public class Game {
             }
 
             startNextRound();
-            gameManager.broadcastGameListRefresh();
+            gamesManager.broadcastGameListRefresh();
         } else {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ENOUGH_PLAYERS);
         }
@@ -1013,7 +1014,7 @@ public class Game {
         for (Player player : players)
             notifyPlayerInfoChange(player);
 
-        gameManager.broadcastGameListRefresh();
+        gamesManager.broadcastGameListRefresh();
     }
 
     /**

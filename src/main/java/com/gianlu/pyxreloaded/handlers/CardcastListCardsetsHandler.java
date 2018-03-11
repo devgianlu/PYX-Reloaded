@@ -7,10 +7,10 @@ import com.gianlu.pyxreloaded.cardcast.FailedLoadingSomeCardcastDecks;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
 
@@ -18,8 +18,8 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CARDCAST_LIST_CARDSETS.toString();
     private final CardcastService cardcastService;
 
-    public CardcastListCardsetsHandler(@Annotations.GameManager GameManager gameManager, @Annotations.CardcastService CardcastService cardcastService) {
-        super(gameManager);
+    public CardcastListCardsetsHandler(@Annotations.GameManager GamesManager gamesManager, @Annotations.CardcastService CardcastService cardcastService) {
+        super(gamesManager);
         this.cardcastService = cardcastService;
     }
 

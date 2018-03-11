@@ -209,14 +209,14 @@
         drawer = new mdc.drawer.MDCTemporaryDrawer(_drawer[0]);
     }
 
-    const gameManager = new GameManager(getLastPathSegment(), drawer);
-    if (gameManager.id === null) {
+    const gamesManager = new GameManager(getLastPathSegment(), drawer);
+    if (gamesManager.id === null) {
         window.location = "/games/";
     } else {
         setupGameOptionsDialog($('#gameOptions'), "Game options", false, "??", (go) => {
-            gameManager.changeGameOptions(go);
+            gamesManager.changeGameOptions(go);
         }, (gameOptionsDialog) => {
-            loadUI(gameManager, gameOptionsDialog);
+            loadUI(gamesManager, gameOptionsDialog);
         });
     }
 </script>

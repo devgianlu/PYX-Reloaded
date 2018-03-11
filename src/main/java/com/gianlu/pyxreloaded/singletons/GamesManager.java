@@ -1,9 +1,10 @@
-package com.gianlu.pyxreloaded.game;
+package com.gianlu.pyxreloaded.singletons;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.game.Game;
+import com.gianlu.pyxreloaded.game.GameOptions;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
-import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -12,14 +13,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GameManager {
-    private static final Logger logger = Logger.getLogger(GameManager.class);
+public final class GamesManager {
+    private static final Logger logger = Logger.getLogger(GamesManager.class);
     private final int maxGames;
     private final Map<Integer, Game> games = new TreeMap<>();
     private final GameProvider gameProvider;
     private final BroadcastGameListUpdateTask broadcastUpdate;
 
-    public GameManager(GameProvider gameProvider, Preferences preferences, BroadcastGameListUpdateTask broadcastUpdate) {
+    public GamesManager(GameProvider gameProvider, Preferences preferences, BroadcastGameListUpdateTask broadcastUpdate) {
         this.gameProvider = gameProvider;
         this.maxGames = preferences.getInt("maxGames", 100);
         this.broadcastUpdate = broadcastUpdate;
@@ -31,21 +32,6 @@ public class GameManager {
 
     public int getMaxGames() {
         return maxGames;
-    }
-
-    /**
-     * Creates a new game, if there are free game slots.
-     *
-     * @return Newly created game
-     */
-    private Game createGame(GameOptions options) throws BaseCahHandler.CahException {
-        synchronized (games) {
-            if (games.size() >= getMaxGames())
-                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_MANY_GAMES);
-            Game game = gameProvider.create(this, options);
-            games.put(game.getId(), game);
-            return game;
-        }
     }
 
     /**
@@ -61,8 +47,14 @@ public class GameManager {
      */
     @NotNull
     public Game createGameWithPlayer(User user, @Nullable GameOptions options) throws BaseCahHandler.CahException {
+        PreparingShutdown.check();
+
         synchronized (games) {
-            Game game = createGame(options);
+            if (games.size() >= getMaxGames())
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_MANY_GAMES);
+
+            Game game = gameProvider.create(this, options);
+            games.put(game.getId(), game);
 
             game.addPlayer(user);
             logger.info(String.format("Created new game %d by user %s.", game.getId(), user.toString()));
@@ -127,6 +119,6 @@ public class GameManager {
     }
 
     public interface GameProvider {
-        Game create(GameManager manager, GameOptions options);
+        Game create(GamesManager manager, GameOptions options);
     }
 }

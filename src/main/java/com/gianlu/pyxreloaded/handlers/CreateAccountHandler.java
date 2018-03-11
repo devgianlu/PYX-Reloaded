@@ -44,6 +44,8 @@ public class CreateAccountHandler extends BaseHandler {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
+        PreparingShutdown.check();
+
         String nickname = params.getStringNotNull(Consts.UserData.NICKNAME);
         if (!Pattern.matches(Consts.VALID_NAME_PATTERN, nickname))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.INVALID_NICK);

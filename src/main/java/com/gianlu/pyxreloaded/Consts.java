@@ -357,7 +357,11 @@ public final class Consts {
         /**
          * This authentication type isn't supported by the server.
          */
-        UNSUPPORTED_AUTH_TYPE("uaT");
+        UNSUPPORTED_AUTH_TYPE("uaT"),
+        /**
+         * Preparing server shutdown, operation not allowed.
+         */
+        PREPARING_SHUTDOWN("PS");
 
         private final String code;
 

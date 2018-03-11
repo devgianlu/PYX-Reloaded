@@ -4,15 +4,15 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
 
 public abstract class GameWithPlayerHandler extends GameHandler {
 
-    public GameWithPlayerHandler(GameManager gameManager) {
-        super(gameManager);
+    public GameWithPlayerHandler(GamesManager gamesManager) {
+        super(gamesManager);
     }
 
     @Override
