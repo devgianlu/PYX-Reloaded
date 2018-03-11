@@ -41,7 +41,6 @@ public class Server {
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
         int maxGames = preferences.getInt("maxGames", 100);
-        int maxUsers = preferences.getInt("maxUsers", 400);
 
         ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
@@ -56,7 +55,7 @@ public class Server {
         Emails emails = new Emails(serverDatabase, preferences, accounts);
         Providers.add(Annotations.Emails.class, (Provider<Emails>) () -> emails);
 
-        ConnectedUsers connectedUsers = new ConnectedUsers(false, maxUsers);
+        ConnectedUsers connectedUsers = new ConnectedUsers(preferences);
         Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
 
         BanList banList = new BanList(serverDatabase);

@@ -12,6 +12,11 @@
   "cacheEnabled": true,
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
+  "chat": {
+    "registeredOnly": false,
+    "floodCount": 4,
+    "floodTime": 30
+  },
   "serverDb": {
     "url": "jdbc:sqlite:server.sqlite",
     "username": "",

@@ -10,8 +10,6 @@ import java.lang.annotation.Target;
 import java.text.ParseException;
 
 public final class Consts {
-    public static final int CHAT_FLOOD_MESSAGE_COUNT = 4;
-    public static final int CHAT_FLOOD_TIME = 30 * 1000;
     public static final int CHAT_MAX_LENGTH = 200;
     public static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
 

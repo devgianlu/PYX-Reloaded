@@ -10,21 +10,25 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
 
 public class ChatHandler extends BaseHandler {
     public static final String OP = Consts.Operation.CHAT.toString();
     private final ConnectedUsers users;
+    private final boolean registeredOnly;
 
-    public ChatHandler(@Annotations.ConnectedUsers ConnectedUsers users) {
+    public ChatHandler(@Annotations.Preferences Preferences preferences,
+                       @Annotations.ConnectedUsers ConnectedUsers users) {
         this.users = users;
+        this.registeredOnly = preferences.getBoolean("chat/registeredOnly", false);
     }
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
-        user.checkChatFlood();
+        users.checkChatFlood(user);
 
-        if (user.isEmailVerified()) // TODO: Disable this from preferences
+        if (registeredOnly && user.isEmailVerified())
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);

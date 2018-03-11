@@ -22,10 +22,24 @@ public final class ConnectedUsers {
     private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
     private final Map<String, User> users = new HashMap<>();
+    private final int chatFloodCount;
+    private final int chatFloodTime;
 
-    public ConnectedUsers(boolean broadcastConnectsAndDisconnects, int maxUsers) {
-        this.broadcastConnectsAndDisconnects = broadcastConnectsAndDisconnects;
-        this.maxUsers = maxUsers;
+    public ConnectedUsers(Preferences preferences) {
+        this.broadcastConnectsAndDisconnects = false;
+        this.maxUsers = preferences.getInt("maxUsers", 400);
+        this.chatFloodCount = preferences.getInt("chat/floodCount", 4);
+        this.chatFloodTime = preferences.getInt("chat/floodTime", 30) * 1000;
+    }
+
+    public void checkChatFlood(User user) throws BaseCahHandler.CahException {
+        if (user.getLastMessageTimes().size() >= chatFloodCount) {
+            long head = user.getLastMessageTimes().get(0);
+            if (System.currentTimeMillis() - head < chatFloodTime)
+                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_FAST);
+
+            user.getLastMessageTimes().remove(0);
+        }
     }
 
     /**
