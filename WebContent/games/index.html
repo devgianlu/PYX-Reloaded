@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Games - PYX-Reloaded</title>
-    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
@@ -17,7 +17,7 @@
 
 <body class="mdc-typography">
 <div class="page-content">
-    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <button class="material-icons mdc-toolbar__menu-icon">menu</button>
@@ -28,16 +28,16 @@
                 <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField"
                      style="margin-left: 16px">
                     <input type="text" id="gamesSearch" class="mdc-text-field__input search">
-                    <label class="mdc-text-field__label" for="gamesSearch">Search</label>
+                    <label class="mdc-floating-label" for="gamesSearch">Search</label>
                     <i class="material-icons mdc-text-field__icon" tabindex="0">search</i>
                     <div class="mdc-line-ripple"></div>
                 </div>
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon _refresh">refresh</button>
-                <button class="material-icons align-icons mdc-toolbar__icon _themingDialog">format_paint</button>
-                <button class="material-icons align-icons mdc-toolbar__icon _logout">exit_to_app</button>
+                <button class="material-icons mdc-toolbar__icon _refresh">refresh</button>
+                <button class="material-icons mdc-toolbar__icon _themingDialog">format_paint</button>
+                <button class="material-icons mdc-toolbar__icon _logout">exit_to_app</button>
             </section>
         </div>
     </header>
@@ -125,7 +125,7 @@
                     </div>
                     <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
                          style="display: flex; flex-flow: column">
-                        <header class="mdc-toolbar mdc-elevation--z4">
+                        <header class="mdc-toolbar">
                             <div class="mdc-toolbar__row">
                                 <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                                     <button class="material-icons mdc-toolbar__menu-icon">menu</button>
@@ -212,7 +212,7 @@
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
+<script src="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/cardcast.helper.js"></script>
 <script src="/js/communication.helper.js"></script>
