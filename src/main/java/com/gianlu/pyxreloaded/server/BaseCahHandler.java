@@ -3,7 +3,7 @@ package com.gianlu.pyxreloaded.server;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
-import com.gianlu.pyxreloaded.handlers.Handlers;
+import com.gianlu.pyxreloaded.singletons.Handlers;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import com.google.gson.JsonElement;
 import io.undertow.server.HttpServerExchange;

@@ -563,7 +563,11 @@ public final class Consts {
         /**
          * Create an user account.
          */
-        CREATE_ACCOUNT("ca");
+        CREATE_ACCOUNT("ca"),
+        /**
+         * Prepares the server for shutdown.
+         */
+        PREPARE_SHUTDOWN("ps");
 
         private final String op;
 
