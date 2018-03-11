@@ -3,6 +3,7 @@ package com.gianlu.pyxreloaded.game;
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -18,15 +19,9 @@ public class GameManager {
     private final GameProvider gameProvider;
     private final BroadcastGameListUpdateTask broadcastUpdate;
 
-    /**
-     * Create a new game manager.
-     *
-     * @param gameProvider Provider for new {@code Game} instances.
-     * @param maxGames     Provider for maximum number of games allowed on the server.
-     */
-    public GameManager(GameProvider gameProvider, int maxGames, BroadcastGameListUpdateTask broadcastUpdate) {
+    public GameManager(GameProvider gameProvider, Preferences preferences, BroadcastGameListUpdateTask broadcastUpdate) {
         this.gameProvider = gameProvider;
-        this.maxGames = maxGames;
+        this.maxGames = preferences.getInt("maxGames", 100);
         this.broadcastUpdate = broadcastUpdate;
     }
 
@@ -34,7 +29,7 @@ public class GameManager {
         return ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     }
 
-    private int getMaxGames() {
+    public int getMaxGames() {
         return maxGames;
     }
 

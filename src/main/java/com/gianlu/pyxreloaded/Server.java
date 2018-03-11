@@ -19,6 +19,7 @@ import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.ResourceHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
 import java.io.File;
@@ -28,7 +29,9 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class Server {
@@ -40,7 +43,6 @@ public class Server {
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
-        int maxGames = preferences.getInt("maxGames", 100);
 
         ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
@@ -61,15 +63,23 @@ public class Server {
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
 
-        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
+        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(2 * Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+            private final AtomicInteger threadCount = new AtomicInteger();
+
+            @Override
+            public Thread newThread(@NotNull Runnable r) {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                t.setName("timer-task-" + threadCount.incrementAndGet());
+                return t;
+            }
+        });
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
 
         UserPingTask userPingTask = new UserPingTask(connectedUsers, globalTimer);
         globalTimer.scheduleAtFixedRate(userPingTask, PING_START_DELAY, PING_CHECK_DELAY, TimeUnit.MILLISECONDS);
-
-        Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
 
         GithubAuthHelper githubAuthHelper = GithubAuthHelper.instantiate(preferences);
         TwitterAuthHelper twitterAuthHelper = TwitterAuthHelper.instantiate(preferences);
@@ -80,7 +90,7 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), 100, updateGameListTask);
+        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), preferences, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
 
         ResourceHandler resourceHandler = new CustomResourceHandler(preferences);

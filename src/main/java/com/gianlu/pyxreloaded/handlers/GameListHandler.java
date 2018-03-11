@@ -13,11 +13,9 @@ import io.undertow.server.HttpServerExchange;
 public class GameListHandler extends BaseHandler {
     public static final String OP = Consts.Operation.GAME_LIST.toString();
     private final GameManager gameManager;
-    private final int maxGames;
 
-    public GameListHandler(@Annotations.GameManager GameManager gameManager, @Annotations.MaxGames int maxGames) {
+    public GameListHandler(@Annotations.GameManager GameManager gameManager) {
         this.gameManager = gameManager;
-        this.maxGames = maxGames;
     }
 
     @Override
@@ -31,7 +29,7 @@ public class GameListHandler extends BaseHandler {
         }
 
         json.add(Consts.GeneralKeys.GAMES, infoArray);
-        json.add(Consts.GeneralKeys.MAX_GAMES, maxGames);
+        json.add(Consts.GeneralKeys.MAX_GAMES, gameManager.getMaxGames());
         return json;
     }
 }
