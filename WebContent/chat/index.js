@@ -48,7 +48,7 @@ class ChatManager {
 
     sendGameChatMessage(msg) {
         Requester.request("c", {"m": msg}, () => {
-            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
+            this._chatMessage.next().removeClass("mdc-floating-label--float-above");
             this._chatMessage.val("");
             this._chatMessage.blur();
         }, (error) => {

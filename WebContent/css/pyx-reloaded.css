@@ -29,6 +29,20 @@
     vertical-align: -12% !important;
 }
 
+/* Margin in drawer in list items */
+.mdc-drawer__drawer .mdc-list-item > .mdc-list-item__start-detail {
+    margin-right: 8px;
+}
+
+/* Toolbar icons fix */
+button.mdc-toolbar__icon {
+    box-sizing: content-box;
+}
+
+button.mdc-toolbar__menu-icon {
+    box-sizing: content-box;
+}
+
 /* Hide stuff in toolbar on mobile */
 .mdc-toolbar ._refresh, .mdc-toolbar ._themingDialog {
     display: none;
@@ -42,7 +56,7 @@
 
 /* Text field in toolbar */
 /*noinspection CssUnresolvedCustomProperty*/
-.mdc-toolbar .mdc-text-field__label {
+.mdc-toolbar .mdc-floating-label {
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
@@ -63,8 +77,8 @@
 }
 
 .mdc-toolbar .mdc-text-field {
-    margin-top: 0 !important;
-    margin-bottom: 16px !important;
+    height: 42px !important;
+    margin: 0 !important;
 }
 
 /* Chip in toolbar */
@@ -353,6 +367,6 @@ body {
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
-.mdc-toolbar .mdc-text-field .mdc-text-field__label {
+.mdc-toolbar .mdc-text-field .mdc-floating-label {
     color: var(--mdc-theme-text-secondary-on-dark) !important;
 }

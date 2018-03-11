@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title class="_title">{{Game name}} - PYX Reloaded</title>
-    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
@@ -31,7 +31,7 @@
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
                  data-mdc-auto-init="MDCTextField">
                 <input type="text" id="chatMessage" class="mdc-text-field__input">
-                <label for="chatMessage" class="mdc-text-field__label">Message</label>
+                <label for="chatMessage" class="mdc-floating-label">Message</label>
                 <i class="material-icons mdc-text-field__icon" tabindex="0">send</i>
                 <div class="mdc-text-field__outline">
                     <svg>
@@ -45,7 +45,7 @@
 </aside>
 
 <div class="page-content">
-    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <button class="material-icons mdc-toolbar__menu-icon">menu</button>
@@ -66,11 +66,11 @@
             </section>
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon" style="display: none;" id="startGame">
+                <button class="material-icons mdc-toolbar__icon" style="display: none;" id="startGame">
                     done
                 </button>
-                <button class="material-icons align-icons mdc-toolbar__icon" id="gameOptions">settings</button>
-                <button class="material-icons align-icons mdc-toolbar__icon" id="leaveGame">close</button>
+                <button class="material-icons mdc-toolbar__icon" id="gameOptions">settings</button>
+                <button class="material-icons mdc-toolbar__icon" id="leaveGame">close</button>
             </section>
         </div>
     </header>
@@ -122,7 +122,7 @@
                 </div>
             </section>
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                <button class="material-icons align-icons mdc-toolbar__icon _toggleHand">keyboard_arrow_up</button>
+                <button class="material-icons mdc-toolbar__icon _toggleHand">keyboard_arrow_up</button>
             </section>
         </div>
     </div>
@@ -180,7 +180,7 @@
 </div>
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
-<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
+<script src="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>

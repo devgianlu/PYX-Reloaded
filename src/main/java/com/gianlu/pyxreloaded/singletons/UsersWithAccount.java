@@ -42,7 +42,7 @@ public final class UsersWithAccount {
 
     @Nullable
     public PasswordAccount getPasswordAccountForNickname(@NotNull String nickname) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE username='" + nickname + "'")) {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE username='" + nickname + "' AND auth='pw'")) {
             return set.next() ? new PasswordAccount(set) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -53,7 +53,7 @@ public final class UsersWithAccount {
 
     @Nullable
     public PasswordAccount getPasswordAccountForEmail(@NotNull String email) {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE email='" + email + "'")) {
+        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE email='" + email + "' AND auth='pw'")) {
             return set.next() ? new PasswordAccount(set) : null;
         } catch (SQLException | ParseException ex) {
             return null;

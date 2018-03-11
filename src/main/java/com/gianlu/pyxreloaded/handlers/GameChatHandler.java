@@ -10,18 +10,23 @@ import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import io.undertow.server.HttpServerExchange;
 
 public class GameChatHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.GAME_CHAT.toString();
+    private final ConnectedUsers users;
 
-    public GameChatHandler(@Annotations.GameManager GameManager gameManager) {
+    public GameChatHandler(
+            @Annotations.ConnectedUsers ConnectedUsers users,
+            @Annotations.GameManager GameManager gameManager) {
         super(gameManager);
+        this.users = users;
     }
 
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
-        user.checkChatFlood();
+        users.checkChatFlood(user);
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
         if (msg.isEmpty()) throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST);

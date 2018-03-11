@@ -59,16 +59,6 @@ public class User {
         return account != null && account.admin;
     }
 
-    public void checkChatFlood() throws BaseCahHandler.CahException {
-        if (getLastMessageTimes().size() >= Consts.CHAT_FLOOD_MESSAGE_COUNT) {
-            long head = getLastMessageTimes().get(0);
-            if (System.currentTimeMillis() - head < Consts.CHAT_FLOOD_TIME)
-                throw new BaseCahHandler.CahException(Consts.ErrorCode.TOO_FAST);
-
-            getLastMessageTimes().remove(0);
-        }
-    }
-
     /**
      * Enqueue a new message to be delivered to the user.
      *
@@ -197,7 +187,17 @@ public class User {
         return lastMessageTimes;
     }
 
+    @Nullable
     public UserAccount getAccount() {
         return account;
+    }
+
+    public JsonWrapper toSmallJson() {
+        JsonWrapper obj = new JsonWrapper();
+        obj.add(Consts.UserData.NICKNAME, nickname);
+        obj.add(Consts.UserData.IS_ADMIN, isAdmin());
+        obj.add(Consts.UserData.HAS_ACCOUNT, isEmailVerified());
+        if (account != null) obj.add(Consts.UserData.PICTURE, account.avatarUrl);
+        return obj;
     }
 }

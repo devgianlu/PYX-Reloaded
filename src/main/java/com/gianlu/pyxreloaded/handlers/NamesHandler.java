@@ -20,7 +20,7 @@ public class NamesHandler extends BaseHandler {
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonArray array = new JsonArray();
-        for (User item : users.getUsers()) array.add(item.getNickname());
+        for (User item : users.getUsers()) array.add(item.toSmallJson().obj());
         return new JsonWrapper(Consts.GeneralKeys.NAMES, array);
     }
 }

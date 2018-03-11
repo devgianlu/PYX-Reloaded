@@ -14,8 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AjaxPath extends BaseCahHandler {
+    private final Map<Class<? extends BaseHandler>, BaseHandler> handlers = new HashMap<>();
 
     @Override
     protected JsonElement handleRequest(@Nullable String op, @Nullable User user, Parameters params, HttpServerExchange exchange) throws StatusException {
@@ -25,17 +28,21 @@ public class AjaxPath extends BaseCahHandler {
         BaseHandler handler;
         Class<? extends BaseHandler> cls = Handlers.LIST.get(op);
         if (cls != null) {
-            try {
-                Constructor<?> constructor = cls.getConstructors()[0];
-                Parameter[] parameters = constructor.getParameters();
-                Object[] objects = new Object[parameters.length];
+            handler = handlers.get(cls);
+            if (handler == null) {
+                try {
+                    Constructor<?> constructor = cls.getConstructors()[0];
+                    Parameter[] parameters = constructor.getParameters();
+                    Object[] objects = new Object[parameters.length];
 
-                for (int i = 0; i < parameters.length; i++)
-                    objects[i] = Providers.get(parameters[i].getAnnotations()[0].annotationType()).get();
+                    for (int i = 0; i < parameters.length; i++)
+                        objects[i] = Providers.get(parameters[i].getAnnotations()[0].annotationType()).get();
 
-                handler = (BaseHandler) constructor.newInstance(objects);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
-                throw new CahException(Consts.ErrorCode.BAD_OP, ex);
+                    handler = (BaseHandler) constructor.newInstance(objects);
+                    handlers.put(cls, handler);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+                    throw new CahException(Consts.ErrorCode.BAD_OP, ex);
+                }
             }
         } else {
             throw new CahException(Consts.ErrorCode.BAD_OP);

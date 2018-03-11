@@ -1,7 +1,7 @@
 class GameManager {
     constructor(gid, drawer) {
         this.root = $('body');
-        this.gid = gid;
+        this.gid = parseInt(gid);
 
         this.drawer = drawer;
         $('.mdc-toolbar__menu-icon').on('click', () => this.toggleDrawer());
@@ -196,6 +196,9 @@ class GameManager {
         this.user = user;
     }
 
+    /**
+     * @returns {int}
+     */
     get id() {
         return this.gid;
     }
@@ -244,7 +247,7 @@ class GameManager {
         if (msg.length === 0) return;
 
         this.sendGameChatMessage(msg, () => {
-            this._chatMessage.next().removeClass("mdc-text-field__label--float-above");
+            this._chatMessage.next().removeClass("mdc-floating-label--float-above");
             this._chatMessage.val("");
             this._chatMessage.blur();
         });
@@ -671,6 +674,7 @@ class GameManager {
                 Notifier.timeout(Notifier.INFO, "<b>" + data.cdi.csn + "</b> has been removed from the game!");
                 break;
             case "C":
+                console.log(data.gid + ":" + this.id);
                 if (data.gid === this.id) this._receivedGameChatMessage(data);
                 break;
             case "gpj":

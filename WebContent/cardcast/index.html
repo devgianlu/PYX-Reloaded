@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardcast - PYX-Reloaded</title>
-    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -18,7 +18,7 @@
 </head>
 <body class="mdc-typography">
 <div class="page-content">
-    <header class="mdc-toolbar mdc-toolbar--fixed mdc-elevation--z4">
+    <header class="mdc-toolbar mdc-toolbar--fixed">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
                 <span class="mdc-toolbar__title">Cardcast - PYX Reloaded</span>
@@ -27,7 +27,7 @@
             <section class="mdc-toolbar__section">
                 <div class="mdc-text-field mdc-text-field--dense" data-mdc-auto-init="MDCTextField">
                     <input type="text" id="cardcastSearch" class="mdc-text-field__input">
-                    <label class="mdc-text-field__label" for="cardcastSearch">Search</label>
+                    <label class="mdc-floating-label" for="cardcastSearch">Search</label>
                     <i class="material-icons mdc-text-field__icon" tabindex="0" onclick="submitSearch();">search</i>
                     <div class="mdc-line-ripple"></div>
                 </div>
@@ -35,7 +35,7 @@
 
             <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
                 <div class="mdc-menu-anchor">
-                    <button class="material-icons align-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
+                    <button class="material-icons mdc-toolbar__icon" onclick="showCardcastMenu();">
                         filter_list
                     </button>
                     <div class="mdc-menu" id="cardcastMenu" tabindex="-1">
@@ -184,7 +184,7 @@
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-<script src="//unpkg.com/material-components-web@0.30.0/dist/material-components-web.min.js"></script>
+<script src="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-bar-rating/1.2.2/jquery.barrating.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 <script src="/js/communication.helper.js"></script>

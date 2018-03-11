@@ -44,7 +44,7 @@ public class FirstLoadHandler extends BaseHandler {
             // They already have a session in progress, we need to figure out what they were doing
             // and tell the client where to continue from.
             obj.add(Consts.GeneralKeys.IN_PROGRESS, Boolean.TRUE)
-                    .add(Consts.GeneralKeys.NICKNAME, user.getNickname());
+                    .add(Consts.UserData.NICKNAME, user.getNickname());
 
             if (user.getGame() != null) {
                 obj.add(Consts.GeneralKeys.NEXT, Consts.ReconnectNextAction.GAME.toString())
@@ -63,10 +63,10 @@ public class FirstLoadHandler extends BaseHandler {
         obj.add(Consts.GeneralKeys.AUTH_CONFIG, authConfig);
 
         Set<PyxCardSet> cardSets = loadedCards.getLoadedSets();
-        JsonArray json = new JsonArray(cardSets.size());
-        for (PyxCardSet cardSet : cardSets) json.add(cardSet.getClientMetadataJson().obj());
-        obj.add(Consts.GameOptionsData.CARD_SETS, json)
-                .add(Consts.GameOptionsData.DEFAULT_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
+        JsonArray cards = new JsonArray(cardSets.size());
+        for (PyxCardSet cardSet : cardSets) cards.add(cardSet.getClientMetadataJson().obj());
+        obj.add(Consts.GameOptionsData.CARD_SETS, cards);
+        obj.add(Consts.GameOptionsData.DEFAULT_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
 
         return obj;
     }

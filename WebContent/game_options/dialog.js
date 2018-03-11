@@ -67,10 +67,10 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
         const selected = this.selectedItems;
 
         if (selected.length === 0) {
-            this.label_.classList.remove("mdc-select__label--float-above");
+            this.foundation_.adapter_.floatLabel(false);
         } else {
             this.selectedText_.textContent = selected.join(", ");
-            this.label_.classList.add("mdc-select__label--float-above");
+            this.foundation_.adapter_.floatLabel(true);
         }
 
         this.listener();
@@ -78,7 +78,7 @@ class MDCMultiSelect extends mdc.select.MDCSelect {
 
     clear() {
         this.selectedText_.textContent = "";
-        this.label_.classList.remove("mdc-select__label--float-above")
+        this.foundation_.adapter_.floatLabel(false);
     }
 }
 
@@ -280,10 +280,10 @@ class GameOptionsDialog {
 
         // Access
         if (go.pw.length > 0) {
-            this._password.next().addClass("mdc-text-field__label--float-above");
+            this._password.next().addClass("mdc-floating-label--float-above");
             this._password.val(go.pw);
         } else {
-            this._password.next().removeClass("mdc-text-field__label--float-above");
+            this._password.next().removeClass("mdc-floating-label--float-above");
             this._password.val("");
         }
 
@@ -325,7 +325,7 @@ class GameOptionsDialog {
 
         // Access
         this._password.val("");
-        this._password.next().removeClass("mdc-text-field__label--float-above");
+        this._password.next().removeClass("mdc-floating-label--float-above");
 
         // Cardcast
         this.cardcastDecks.clear();
@@ -407,7 +407,7 @@ class GameOptionsDialog {
     _resetAddCardcast() {
         this.cardcastAddDeckCode.valid = true;
         this._cardcastAddDeckCode.val("");
-        this._cardcastAddDeckCode.next().removeClass("mdc-text-field__label--float-above");
+        this._cardcastAddDeckCode.next().removeClass("mdc-floating-label--float-above");
 
         this._cardcastAddDeckInfo_loading.hide();
         this._cardcastAddDeckInfo_details.hide();

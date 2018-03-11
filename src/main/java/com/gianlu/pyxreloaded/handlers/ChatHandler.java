@@ -10,21 +10,25 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.BaseJsonHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
+import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
 
 public class ChatHandler extends BaseHandler {
     public static final String OP = Consts.Operation.CHAT.toString();
     private final ConnectedUsers users;
+    private final boolean registeredOnly;
 
-    public ChatHandler(@Annotations.ConnectedUsers ConnectedUsers users) {
+    public ChatHandler(@Annotations.Preferences Preferences preferences,
+                       @Annotations.ConnectedUsers ConnectedUsers users) {
         this.users = users;
+        this.registeredOnly = preferences.getBoolean("chat/registeredOnly", false);
     }
 
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
-        user.checkChatFlood();
+        users.checkChatFlood(user);
 
-        if (user.getAccount() == null || !user.getAccount().emailVerified)
+        if (registeredOnly && user.isEmailVerified())
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);
@@ -38,7 +42,7 @@ public class ChatHandler extends BaseHandler {
             ev.add(Consts.ChatData.FROM, user.getNickname());
             ev.add(Consts.ChatData.MESSAGE, msg);
             ev.add(Consts.ChatData.FROM_ADMIN, user.isAdmin());
-            ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
+            if (user.getAccount() != null) ev.add(Consts.UserData.PICTURE, user.getAccount().avatarUrl);
 
             users.broadcastToAll(MessageType.CHAT, ev);
         }

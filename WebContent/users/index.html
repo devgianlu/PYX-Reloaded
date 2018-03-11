@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global chat - PYX-Reloaded</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Users - PYX-Reloaded</title>
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css"/>
     <link rel="stylesheet" href="/css/pyx-reloaded.css">
-    <link rel="stylesheet" href="./index.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="/js/theming.js"></script>
     <script>Theming.apply();</script>
@@ -18,7 +17,10 @@
     <header class="mdc-toolbar mdc-toolbar--fixed">
         <div class="mdc-toolbar__row">
             <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <span class="mdc-toolbar__title">Global chat - PYX Reloaded</span>
+                <span class="mdc-toolbar__title">Users - PYX Reloaded</span>
+            </section>
+            <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <button class="material-icons mdc-toolbar__icon" id="refresh">refresh</button>
             </section>
         </div>
     </header>
@@ -26,41 +28,30 @@
     <main class="mdc-toolbar-fixed-adjust">
         <h1 class="mdc-typography--display1 message" style="margin-top: 48px">There are no messages.</h1>
         <ul class="mdc-list mdc-list--avatar-list list"></ul>
-        <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon"
-             data-mdc-auto-init="MDCTextField">
-            <input type="text" id="chatMessage" class="mdc-text-field__input">
-            <label for="chatMessage" class="mdc-floating-label">Message</label>
-            <i class="material-icons mdc-text-field__icon" tabindex="0">send</i>
-            <div class="mdc-text-field__outline">
-                <svg>
-                    <path class="mdc-text-field__outline-path"></path>
-                </svg>
-            </div>
-            <div class="mdc-text-field__idle-outline"></div>
-        </div>
     </main>
 </div>
 
 <div style="display: none">
-    <li class="mdc-list-item" id="chatMessageTemplate">
+    <li class="mdc-list-item" id="userTemplate">
         <img class="mdc-list-item__graphic _img" src="/css/no-profile.svg"/>
         <span class="mdc-list-item__text">
-            <span class="_nick">{{Sender}}</span>
-            <span class="mdc-list-item__secondary-text _text">{{Message}}</span>
+            <span class="_nick">{{Nickname}}</span>
+            <span class="mdc-list-item__secondary-text _role">{{Role}}</span>
         </span>
     </li>
 </div>
+
 
 <script src="//code.jquery.com/jquery-latest.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
-<script src="/js/events.helper.js"></script>
 <script src="/js/communication.helper.js"></script>
+<script src="/js/events.helper.js"></script>
 <script src="./index.js"></script>
 <script>
     mdc.autoInit();
-    new ChatManager();
+    new UsersManager().loadUsers();
 </script>
 
 </body>
