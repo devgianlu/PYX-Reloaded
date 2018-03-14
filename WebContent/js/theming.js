@@ -23,6 +23,11 @@ class Theming {
         } else {
             Theming.setPrimaryColor(primary);
             Theming.setSecondaryColor(secondary);
+
+            const themeColor = document.createElement("meta");
+            themeColor.name = "theme-color";
+            themeColor.content = primary;
+            document.head.appendChild(themeColor);
         }
     }
 
