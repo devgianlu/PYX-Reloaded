@@ -15,9 +15,12 @@ import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.resource.ResourceHandler;
+import io.undertow.server.handlers.encoding.ContentEncodingRepository;
+import io.undertow.server.handlers.encoding.EncodingHandler;
+import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
@@ -92,11 +95,15 @@ public class Server {
         GamesManager gamesManager = new GamesManager((manager, options) -> new Game(GamesManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), preferences, updateGameListTask);
         Providers.add(Annotations.GameManager.class, (Provider<GamesManager>) () -> gamesManager);
 
-        ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
+        EncodingHandler resourceHandler = new EncodingHandler(new ContentEncodingRepository()
+                .addEncodingHandler("gzip", new GzipEncodingProvider(), 1))
+                .setNext(new CustomResourceHandler(preferences));
+
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
-                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails));
+                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
+                .addExactPath("/manifest.json", new WebManifestPath(preferences));
 
         if (githubAuthHelper != null)
             pathHandler.addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper));
@@ -114,6 +121,7 @@ public class Server {
                 });
 
         Undertow.Builder builder = Undertow.builder()
+                .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                 .setHandler(router);
 
         int port = preferences.getInt("port", 80);

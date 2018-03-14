@@ -1,0 +1,11 @@
+{
+  "name": "PYX-Reloaded",
+  "short_name": "PYX-Reloaded",
+  "theme_color": "#673ab7",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": null,
+  "splash_pages": null
+}
