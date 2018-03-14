@@ -379,38 +379,37 @@ function changePage(page) {
 }
 
 function addDeckToGame(code) {
-    $.post("/AjaxServlet", "o=gme").fail(function (data) {
-        if ("responseJSON" in data) {
-            if (data.responseJSON.ec === "nr" || data.responseJSON.ec === "se") {
-                Notifier.error("You are not registered to the game server.", data, false, true);
+    Requester.request("gme", {}, (data) => {
+        if (data.gid === -1) {
+            Notifier.timeout(Notifier.WARN, "You have to be in a game.");
+        } else {
+            Requester.request("cac", {
+                "gid": data.gid,
+                "cci": code
+            }, () => {
+                Notifier.timeout(Notifier.SUCCESS, "Successfully added <b>" + code + "</b> to the current game.");
+            }, (error) => {
+                switch (error.ec) {
+                    case "ngh":
+                        Notifier.timeout(Notifier.WARN, "You have to be the game host to add the deck.");
+                        break;
+                    case "as":
+                        Notifier.timeout(Notifier.WARN, "The game must be in the lobby state to add the deck.");
+                        break;
+                    default:
+                        Notifier.error("Failed adding the deck.", data, false, true);
+                        break;
+                }
+            });
+        }
+    }, null, (error) => {
+        if ("responseJSON" in error && "ec" in error.responseJSON) {
+            if (error.responseJSON.ec === "nr" || error.responseJSON.ec === "se") {
+                Notifier.error("You are not registered to the game server.", error, false, true);
                 return;
             }
         }
 
-        Notifier.error("Failed contacting the server.", data, false, true);
-    }).done(function (data) {
-        if (data.gid === -1) {
-            Notifier.timeout(Notifier.WARN, "You have to be in a game.");
-        } else {
-            $.post("/AjaxServlet", "o=cac&gid=" + data.gid + "&cci=" + code).fail(function (data) {
-                if ("responseJSON" in data) {
-                    switch (data.responseJSON.ec) {
-                        case "ngh":
-                            Notifier.timeout(Notifier.WARN, "You have to be the game host to add the deck.");
-                            break;
-                        case "as":
-                            Notifier.timeout(Notifier.WARN, "The game must be in the lobby state to add the deck.");
-                            break;
-                        default:
-                            Notifier.error("Failed adding the deck.", data, false, true);
-                            break;
-                    }
-                } else {
-                    Notifier.error("Failed adding the deck.", data, false, true);
-                }
-            }).done(function () {
-                Notifier.timeout(Notifier.SUCCESS, "Successfully added <b>" + code + "</b> to the current game.");
-            });
-        }
+        Notifier.error("Failed contacting the server.", error, false, true);
     });
 }

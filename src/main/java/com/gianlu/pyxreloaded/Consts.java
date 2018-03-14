@@ -136,7 +136,16 @@ public final class Consts {
         /**
          * Suggested game options has been declined
          */
-        GAME_DECLINED_SUGGESTED_OPTIONS("gdso");
+        GAME_DECLINED_SUGGESTED_OPTIONS("gdso"),
+        /**
+         * Server is preparing for shutdown.
+         */
+        @IgnoreDuplicateIn(ErrorCode.class)
+        PREPARING_SHUTDOWN("PS"),
+        /**
+         * Server is being shutdown.
+         */
+        SERVER_SHUTDOWN("SS");
 
         private final String event;
 
@@ -361,6 +370,7 @@ public final class Consts {
         /**
          * Preparing server shutdown, operation not allowed.
          */
+        @IgnoreDuplicateIn(Event.class)
         PREPARING_SHUTDOWN("PS");
 
         private final String code;
@@ -383,6 +393,10 @@ public final class Consts {
          * The client was banned by the server administrator.
          */
         BANNED("b&"),
+        /**
+         * The server will shutdown very soon.
+         */
+        SERVER_SHUTDOWN("ss"),
         /**
          * The client made no user-caused requests within the timeout window.
          */
@@ -708,7 +722,11 @@ public final class Consts {
         /**
          * Authentication configuration for client.
          */
-        AUTH_CONFIG("aC");
+        AUTH_CONFIG("aC"),
+        /**
+         * Time remaining before shutdown, in millis.
+         */
+        BEFORE_SHUTDOWN("bs");
 
         private final String key;
 

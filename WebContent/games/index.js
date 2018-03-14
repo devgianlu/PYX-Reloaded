@@ -67,24 +67,9 @@ class Games {
 
     static logout() {
         closeWebSocket();
-        $.post("/AjaxServlet", "o=lo").always(function () {
+        Requester.always("lo", {}, () => {
             window.location = "/";
         });
-    }
-
-    static _handleJoinSpectateError(data, generalError) {
-        if ("responseJSON" in data) {
-            switch (data.responseJSON.ec) {
-                case "wp":
-                    Notifier.error("Wrong game password.", data);
-                    break;
-                default:
-                    Notifier.error(generalError, data);
-                    break;
-            }
-        } else {
-            Notifier.error(generalError, data);
-        }
     }
 
     static deckIdsToNames(ids) {
@@ -132,18 +117,22 @@ class Games {
     }
 
     toggleLike(gid, elm, toggleLike, toggleDislike) {
-        $.post("/AjaxServlet", "o=lk&gid=" + gid).done(function (data) {
+        Requester.request("lk", {
+            "gid": gid
+        }, (data) => {
             Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
-        }).fail(function (data) {
-            Notifier.error("Failed liking the game!", data);
+        }, (error) => {
+            Notifier.error("Failed liking the game!", error);
         });
     }
 
     toggleDislike(gid, elm, toggleLike, toggleDislike) {
-        $.post("/AjaxServlet", "o=dlk&gid=" + gid).done(function (data) {
+        Requester.request("dlk", {
+            "gid": gid
+        }, (data) => {
             Games._updateLikeDislike(elm, toggleLike, toggleDislike, data);
-        }).fail(function (data) {
-            Notifier.error("Failed disliking the game!", data);
+        }, (error) => {
+            Notifier.error("Failed disliking the game!", error);
         });
     }
 
@@ -170,25 +159,22 @@ class Games {
     }
 
     createGame(go) {
-        const self = this;
-        $.post("/AjaxServlet", "o=cg&go=" + JSON.stringify(go)).done(function (data) {
+        Requester.request("cg", {
+            "go": JSON.stringify(go)
+        }, (data) => {
             Games.postJoinSpectate(data.gid);
-            self.loadGamesList();
-        }).fail(function (data) {
-            Notifier.error("Failed creating the game!", data);
+            this.loadGamesList();
+        }, (error) => {
+            Notifier.error("Failed creating the game!", error);
         });
     }
 
     loadGamesList() {
-        const self = this;
-        $.post("/AjaxServlet", "o=ggl").done(function (data) {
-            /**
-             * @param {object[]} data.gl - Games list
-             */
-
-            self.setup(data.gl);
-        }).fail(function (data) {
-            Notifier.error("Failed loading the games!", data);
+        Requester.request("ggl", {}, (data) => {
+            /** @param {object[]} data.gl - Games list */
+            this.setup(data.gl);
+        }, (error) => {
+            Notifier.error("Failed loading the games!", error);
         });
 
         registerPollListener("LOBBIES", function (data) {
@@ -287,21 +273,39 @@ class Games {
     joinGame(gid, hp) {
         let password = "";
         if (hp) password = Games.askPassword();
-        $.post("/AjaxServlet", "o=jg&gid=" + gid + "&pw=" + password).done(function () {
+        Requester.request("jg", {
+            "gid": gid,
+            "pw": password
+        }, () => {
             Games.postJoinSpectate(gid)
-        }).fail(function (data) {
-            Games._handleJoinSpectateError(data, "Failed joining the game.");
-        })
+        }, (error) => {
+            switch (error.ec) {
+                case "wp":
+                    Notifier.error("Wrong game password.", error);
+                    return;
+            }
+
+            Notifier.error("Failed joining the game.", error);
+        });
     }
 
     spectateGame(gid, hp) {
         let password = "";
         if (hp) password = Games.askPassword();
-        $.post("/AjaxServlet", "o=vg&gid=" + gid + "&pw=" + password).done(function () {
+        Requester.request("vg", {
+            "gid": gid,
+            "pw": password
+        }, () => {
             Games.postJoinSpectate(gid)
-        }).fail(function (data) {
-            Games._handleJoinSpectateError(data, "Failed spectating the game.");
-        })
+        }, (error) => {
+            switch (error.ec) {
+                case "wp":
+                    Notifier.error("Wrong game password.", error);
+                    return;
+            }
+
+            Notifier.error("Failed spectating the game.", error);
+        });
     }
 
     submitSearch() {

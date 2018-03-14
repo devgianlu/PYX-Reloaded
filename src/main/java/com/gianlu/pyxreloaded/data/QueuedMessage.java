@@ -44,7 +44,7 @@ public class QueuedMessage implements Comparable<QueuedMessage> {
      * should be delivered (lower = more important) compared to other queued messages.
      */
     public enum MessageType {
-        PING(1), KICKED(2), PLAYER_EVENT(3), GAME_EVENT(4), GAME_PLAYER_EVENT(5), CHAT(6);
+        SERVER(1), KICKED(2), PLAYER_EVENT(3), GAME_EVENT(4), GAME_PLAYER_EVENT(5), CHAT(6);
 
         private final int weight;
 
