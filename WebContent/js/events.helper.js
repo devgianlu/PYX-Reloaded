@@ -63,7 +63,3 @@ function processPollData(events) {
 function registerPollListener(key, listener) {
     _pollingListeners[key] = listener;
 }
-
-function unregisterPollListener(key) {
-    delete _pollingListeners[key];
-}

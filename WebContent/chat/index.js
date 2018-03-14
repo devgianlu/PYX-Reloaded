@@ -30,7 +30,7 @@ class ChatManager {
     _handleChatMessage(data) {
         this.chat.add({
             '_nick': data.f,
-            '_img': data.p === null ? "/css/no-profile.svg" : data.p,
+            '_img': data.p === null ? "/css/images/no-profile.svg" : data.p,
             '_text': data.m
         });
 
