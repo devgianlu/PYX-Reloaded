@@ -14,13 +14,15 @@ public final class PreparingShutdown {
     private static final Logger logger = Logger.getLogger(PreparingShutdown.class.getSimpleName());
     private static PreparingShutdown instance;
     private final Undertow server;
+    private final ConnectedUsers users;
     private final SocialLogin socials;
     private final LoadedCards loadedCards;
     private final ServerDatabase serverDatabase;
     private boolean value = false;
 
-    private PreparingShutdown(Undertow server, SocialLogin socials, LoadedCards loadedCards, ServerDatabase serverDatabase) {
+    private PreparingShutdown(Undertow server, ConnectedUsers users, SocialLogin socials, LoadedCards loadedCards, ServerDatabase serverDatabase) {
         this.server = server;
+        this.users = users;
         this.socials = socials;
         this.loadedCards = loadedCards;
         this.serverDatabase = serverDatabase;
@@ -32,8 +34,8 @@ public final class PreparingShutdown {
         return instance;
     }
 
-    public static void setup(Undertow server, SocialLogin socials, LoadedCards loadedCards, ServerDatabase serverDatabase) {
-        instance = new PreparingShutdown(server, socials, loadedCards, serverDatabase);
+    public static void setup(Undertow server, ConnectedUsers users, SocialLogin socials, LoadedCards loadedCards, ServerDatabase serverDatabase) {
+        instance = new PreparingShutdown(server, users, socials, loadedCards, serverDatabase);
     }
 
     public synchronized void check() throws BaseCahHandler.CahException {
@@ -45,7 +47,21 @@ public final class PreparingShutdown {
         logger.log(Level.INFO, "Preparing for shutdown set to " + set);
     }
 
-    public void shutdown() {
+    /**
+     * Shutdown the server if it can be done safely
+     */
+    public void tryShutdown() {
+        if (value && users.canShutdown()) {
+            shutdown();
+        }
+    }
+
+    /**
+     * Shutdown the server independently of its status
+     */
+    private void shutdown() {
+        logger.log(Level.INFO, "Shutting down the server!");
+
         try {
             server.stop();
             socials.close();

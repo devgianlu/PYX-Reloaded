@@ -106,6 +106,8 @@ public final class ConnectedUsers {
                 user.noLongerValid();
                 users.remove(user.getNickname().toLowerCase());
                 notifyRemoveUser(user, reason);
+
+                PreparingShutdown.get().tryShutdown(); // This won't allow the LogoutHandler to send the response but we don't really care about the last user to leave the server
             }
         }
     }
@@ -174,6 +176,8 @@ public final class ConnectedUsers {
                 logger.error("Unable to remove pinged-out user", ex);
             }
         }
+
+        PreparingShutdown.get().tryShutdown();
     }
 
     /**
@@ -206,5 +210,12 @@ public final class ConnectedUsers {
         synchronized (users) {
             return new ArrayList<>(users.values());
         }
+    }
+
+    /**
+     * @return Whether the server can be shutdown safely
+     */
+    public boolean canShutdown() {
+        return users.isEmpty();
     }
 }

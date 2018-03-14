@@ -129,7 +129,7 @@ public class Server {
         }
 
         Undertow server = builder.build();
-        PreparingShutdown.setup(server, socialLogin, loadedCards, serverDatabase);
+        PreparingShutdown.setup(server, connectedUsers, socialLogin, loadedCards, serverDatabase);
         server.start();
         logger.info("Server started!");
     }
