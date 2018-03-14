@@ -2,7 +2,6 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cardcast.CardcastService;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.paths.*;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.CustomResourceHandler;
@@ -16,9 +15,13 @@ import com.gianlu.pyxreloaded.task.BroadcastGameListUpdateTask;
 import com.gianlu.pyxreloaded.task.UserPingTask;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.resource.ResourceHandler;
+import io.undertow.server.handlers.encoding.ContentEncodingRepository;
+import io.undertow.server.handlers.encoding.EncodingHandler;
+import io.undertow.server.handlers.encoding.GzipEncodingProvider;
+import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
 import java.io.File;
@@ -28,7 +31,9 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class Server {
@@ -40,7 +45,6 @@ public class Server {
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         Preferences preferences = Preferences.load(args);
-        int maxGames = preferences.getInt("maxGames", 100);
 
         ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
@@ -61,15 +65,23 @@ public class Server {
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
 
-        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(maxGames + 2);
+        ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(2 * Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+            private final AtomicInteger threadCount = new AtomicInteger();
+
+            @Override
+            public Thread newThread(@NotNull Runnable r) {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                t.setName("timer-task-" + threadCount.incrementAndGet());
+                return t;
+            }
+        });
 
         BroadcastGameListUpdateTask updateGameListTask = new BroadcastGameListUpdateTask(connectedUsers);
         globalTimer.scheduleAtFixedRate(updateGameListTask, BROADCAST_UPDATE_START_DELAY, BROADCAST_UPDATE_DELAY, TimeUnit.MILLISECONDS);
 
         UserPingTask userPingTask = new UserPingTask(connectedUsers, globalTimer);
         globalTimer.scheduleAtFixedRate(userPingTask, PING_START_DELAY, PING_CHECK_DELAY, TimeUnit.MILLISECONDS);
-
-        Providers.add(Annotations.MaxGames.class, (Provider<Integer>) () -> maxGames);
 
         GithubAuthHelper githubAuthHelper = GithubAuthHelper.instantiate(preferences);
         TwitterAuthHelper twitterAuthHelper = TwitterAuthHelper.instantiate(preferences);
@@ -80,14 +92,18 @@ public class Server {
         CardcastService cardcastService = new CardcastService();
         Providers.add(Annotations.CardcastService.class, (Provider<CardcastService>) () -> cardcastService);
 
-        GameManager gameManager = new GameManager((manager, options) -> new Game(GameManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), 100, updateGameListTask);
-        Providers.add(Annotations.GameManager.class, (Provider<GameManager>) () -> gameManager);
+        GamesManager gamesManager = new GamesManager((manager, options) -> new Game(GamesManager.generateGameId(), options, connectedUsers, manager, loadedCards, globalTimer, preferences, cardcastService), preferences, updateGameListTask);
+        Providers.add(Annotations.GameManager.class, (Provider<GamesManager>) () -> gamesManager);
 
-        ResourceHandler resourceHandler = new CustomResourceHandler(preferences);
+        EncodingHandler resourceHandler = new EncodingHandler(new ContentEncodingRepository()
+                .addEncodingHandler("gzip", new GzipEncodingProvider(), 1))
+                .setNext(new CustomResourceHandler(preferences));
+
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
-                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails));
+                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
+                .addExactPath("/manifest.json", new WebManifestPath(preferences));
 
         if (githubAuthHelper != null)
             pathHandler.addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper));
@@ -104,22 +120,25 @@ public class Server {
                     resourceHandler.handleRequest(exchange);
                 });
 
-        Undertow.Builder server = Undertow.builder()
+        Undertow.Builder builder = Undertow.builder()
+                .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                 .setHandler(router);
 
         int port = preferences.getInt("port", 80);
         String host = preferences.getString("host", "0.0.0.0");
 
         if (preferences.getBoolean("secure", false)) {
-            server.addHttpListener(port, host, new HttpsRedirect())
+            builder.addHttpListener(port, host, new HttpsRedirect())
                     .addHttpsListener(preferences.getInt("securePort", 443), host, getSSLContext(
                             new File(preferences.getString("keyStorePath", "")), preferences.getString("keyStorePassword", ""),
                             new File(preferences.getString("trustStorePath", "")), preferences.getString("trustStorePassword", "")));
         } else {
-            server.addHttpListener(port, host);
+            builder.addHttpListener(port, host);
         }
 
-        server.build().start();
+        Undertow server = builder.build();
+        PreparingShutdown.setup(server, globalTimer, connectedUsers, socialLogin, loadedCards, serverDatabase);
+        server.start();
         logger.info("Server started!");
     }
 

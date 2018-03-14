@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title class="_title">{{Game name}} - PYX Reloaded</title>
+    <link rel="icon" href="/css/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/css/images/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/css/images/icon-16x16.png">
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
@@ -15,7 +18,6 @@
     <link rel="stylesheet" href="/css/game.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="/js/theming.js"></script>
-    <script>Theming.apply();</script>
 </head>
 <body class="mdc-typography">
 
@@ -209,14 +211,14 @@
         drawer = new mdc.drawer.MDCTemporaryDrawer(_drawer[0]);
     }
 
-    const gameManager = new GameManager(getLastPathSegment(), drawer);
-    if (gameManager.id === null) {
+    const gamesManager = new GameManager(getLastPathSegment(), drawer);
+    if (gamesManager.id === null) {
         window.location = "/games/";
     } else {
         setupGameOptionsDialog($('#gameOptions'), "Game options", false, "??", (go) => {
-            gameManager.changeGameOptions(go);
+            gamesManager.changeGameOptions(go);
         }, (gameOptionsDialog) => {
-            loadUI(gameManager, gameOptionsDialog);
+            loadUI(gamesManager, gameOptionsDialog);
         });
     }
 </script>

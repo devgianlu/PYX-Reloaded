@@ -28,7 +28,7 @@ public class ChatHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         users.checkChatFlood(user);
 
-        if (registeredOnly && user.isEmailVerified())
+        if (registeredOnly && !user.isEmailVerified())
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ACCOUNT_NOT_VERIFIED);
 
         String msg = params.getStringNotNull(Consts.ChatData.MESSAGE);

@@ -7,10 +7,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ public class GithubAuthHelper {
     private static final String EMAILS = "https://api.github.com/user/emails";
     private final String appId;
     private final String appSecret;
-    private final HttpClient client;
+    private final CloseableHttpClient client;
     private final JsonParser parser = new JsonParser();
 
     private GithubAuthHelper(@NotNull String appId, @NotNull String appSecret) {
@@ -134,5 +134,9 @@ public class GithubAuthHelper {
     @NotNull
     public String appId() {
         return appId;
+    }
+
+    public void close() throws IOException {
+        client.close();
     }
 }

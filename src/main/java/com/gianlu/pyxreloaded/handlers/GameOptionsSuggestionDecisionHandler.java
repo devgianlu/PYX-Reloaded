@@ -4,17 +4,17 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
 
 public class GameOptionsSuggestionDecisionHandler extends GameWithPlayerHandler {
     public final static String OP = Consts.Operation.GAME_OPTIONS_SUGGESTION_DECISION.toString();
 
-    public GameOptionsSuggestionDecisionHandler(@Annotations.GameManager GameManager gameManager) {
-        super(gameManager);
+    public GameOptionsSuggestionDecisionHandler(@Annotations.GameManager GamesManager gamesManager) {
+        super(gamesManager);
     }
 
     @Override

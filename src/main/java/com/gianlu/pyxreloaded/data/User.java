@@ -6,6 +6,7 @@ import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.game.Game;
 import com.gianlu.pyxreloaded.paths.EventsPath;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import com.gianlu.pyxreloaded.singletons.PreparingShutdown;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,8 +95,10 @@ public class User {
         return getNickname();
     }
 
-    public void establishedEventsConnection(EventsPath.EventsSender sender) {
-        this.eventsSender = sender;
+    public void establishedEventsConnection(@NotNull EventsPath.EventsSender sender) {
+        eventsSender = sender;
+        PreparingShutdown ps = PreparingShutdown.get();
+        if (ps.is()) eventsSender.enqueue(new QueuedMessage(QueuedMessage.MessageType.SERVER, ps.getEvent()));
     }
 
     @Nullable
@@ -129,7 +132,7 @@ public class User {
      */
     public void sendPing() {
         waitingPong = true;
-        enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.PING, new EventWrapper(Consts.Event.PING)));
+        enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.SERVER, new EventWrapper(Consts.Event.PING)));
     }
 
     public boolean isWaitingPong() {

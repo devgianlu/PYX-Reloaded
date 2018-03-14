@@ -29,7 +29,7 @@ class UsersManager {
                 this.users.add({
                     "_nick": user.n,
                     "_role": user.ia ? "Admin" : (user.ha ? "Registered" : "Guest"),
-                    "_img": user.p === undefined || user.p === null ? "/css/no-profile.svg" : user.p
+                    "_img": user.p === undefined || user.p === null ? "/css/images/no-profile.svg" : user.p
                 });
             }
 

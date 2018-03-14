@@ -29,6 +29,17 @@ function processPollData(events) {
         if (event.E === "pp") {
             Requester.request("PP", {});
             continue;
+        } else if (event.E === "PS") {
+            /** @param {int} event.bs - Time before shutdown */
+            let bs;
+            if (event.bs >= 60000) bs = Math.ceil(event.bs / 60000) + " minutes";
+            else bs = Math.ceil(event.bs / 1000) + " seconds";
+
+            Notifier.show(Notifier.WARN, "The server is preparing for shutdown. The server will be shutdown in " + bs, 20, false);
+            continue;
+        } else if (event.E === "SS") {
+            window.location = "https://google.com"; // TODO: Redirect to status page
+            continue;
         }
 
         for (const key in _pollingListeners) {
@@ -51,8 +62,4 @@ function processPollData(events) {
  */
 function registerPollListener(key, listener) {
     _pollingListeners[key] = listener;
-}
-
-function unregisterPollListener(key) {
-    delete _pollingListeners[key];
 }

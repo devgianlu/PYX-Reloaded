@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Games - PYX-Reloaded</title>
+    <link rel="icon" href="/css/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/css/images/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/css/images/icon-16x16.png">
     <link rel="stylesheet" href="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500">
@@ -11,8 +14,6 @@
     <link rel="stylesheet" href="/css/theming.css">
     <link rel="stylesheet" href="./index.css">
     <script src="//cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-    <script src="/js/theming.js"></script>
-    <script>Theming.apply();</script>
 </head>
 
 <body class="mdc-typography">
@@ -61,7 +62,7 @@
     <nav class="mdc-drawer__drawer">
         <header class="mdc-drawer__header">
             <div class="mdc-drawer__header-content mdc-theme--text-primary-on-primary mdc-theme--primary-bg">
-                <img class="details--profile" src="/css/no-profile.svg">
+                <img class="details--profile" src="/css/images/no-profile.svg">
                 <div class="details__container">
                     <h2 class="mdc-typography--title details--nick">
                         {{Nickname}}</h2>
@@ -71,15 +72,15 @@
             </div>
         </header>
         <nav class="mdc-drawer__content mdc-list">
-            <a class="mdc-list-item" href="/users/" target="_blank">
+            <a class="mdc-list-item" href="/users/" target="_blank" rel="noopener">
                 <i class="material-icons mdc-list-item__start-detail">people</i>
                 Users
             </a>
-            <a class="mdc-list-item" href="/chat/" target="_blank">
+            <a class="mdc-list-item" href="/chat/" target="_blank" rel="noopener">
                 <i class="material-icons mdc-list-item__start-detail">message</i>
                 Chat
             </a>
-            <a class="mdc-list-item" href="/cardcast/" target="_blank">
+            <a class="mdc-list-item" href="/cardcast/" target="_blank" rel="noopener">
                 <i class="material-icons mdc-list-item__start-detail">cast</i>
                 Cardcast
             </a>
@@ -121,7 +122,6 @@
                                 <g class="wheel--maing"></g>
                             </svg>
                         </div>
-                        <script>initWheel();</script>
                     </div>
                     <div id="themingExample" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"
                          style="display: flex; flex-flow: column">
@@ -214,13 +214,16 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <script src="//unpkg.com/material-components-web@0.32.0/dist/material-components-web.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+<script src="/js/wheel.js"></script>
 <script src="/js/cardcast.helper.js"></script>
 <script src="/js/communication.helper.js"></script>
 <script src="/js/events.helper.js"></script>
 <script src="/game_options/dialog.js"></script>
 <script src="./index.js"></script>
 <script>
+    initWheel();
     mdc.autoInit();
+
     setupGameOptionsDialog($('body .mdc-fab'), "Start a New Game", true, "Create", (go) => {
         games.createGame(go)
     });

@@ -4,6 +4,7 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.data.User;
+import com.gianlu.pyxreloaded.singletons.PreparingShutdown;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import com.google.gson.JsonArray;
 import io.undertow.server.handlers.Cookie;
@@ -19,6 +20,7 @@ import org.xnio.ChannelListener;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -42,6 +44,7 @@ public class EventsPath implements WebSocketConnectionCallback {
     private static final int MAX_MESSAGES_PER_POLL = 20;
     private static final Logger logger = Logger.getLogger(EventsPath.class.getSimpleName());
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final Map<User, EventsSender.EventTask> tasks = new HashMap<>();
 
     private static Map<String, Cookie> getRequestCookies(WebSocketHttpExchange exchange) {
         return Cookies.parseRequestCookies(200, false, exchange.getRequestHeaders().get(Headers.COOKIE_STRING));
@@ -108,7 +111,14 @@ public class EventsPath implements WebSocketConnectionCallback {
                 messages.add(message);
             }
 
-            executorService.execute(new EventTask());
+            EventTask current = tasks.get(user);
+            if (current == null) {
+                current = new EventTask();
+                synchronized (tasks) {
+                    tasks.put(user, current);
+                }
+                executorService.execute(current);
+            }
         }
 
         private void handleIoException(IOException ex, WebSocketChannel channel) {
@@ -118,11 +128,17 @@ public class EventsPath implements WebSocketConnectionCallback {
         }
 
         private class EventTask implements Runnable {
+
             @Override
             public void run() {
                 try {
                     Thread.sleep(WAIT_FOR_MORE_DELAY);
                 } catch (InterruptedException ignored) {
+                }
+
+                synchronized (tasks) {
+                    tasks.remove(user);
+                    if (tasks.isEmpty()) PreparingShutdown.get().allEventsSent();
                 }
 
                 ArrayList<QueuedMessage> toSend = new ArrayList<>(MAX_MESSAGES_PER_POLL);

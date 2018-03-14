@@ -141,9 +141,16 @@ class Requester {
             }
 
             /** @param {object} data.responseJSON */
-            if (fail !== null && "responseJSON" in data && "ec" in data.responseJSON) {
-                fail(data.responseJSON);
-                called = true;
+            if ("responseJSON" in data && "ec" in data.responseJSON) {
+                if (data.responseJSON.ec === "PS") {
+                    Notifier.error("Preparing for server shutdown. Operation not allowed.", data);
+                    return;
+                }
+
+                if (fail !== null) {
+                    fail(data.responseJSON);
+                    called = true;
+                }
             }
 
             if (!called) Notifier.debug(data, true);

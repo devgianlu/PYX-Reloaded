@@ -21,4 +21,8 @@ public final class ServerDatabase {
     public Statement statement() throws SQLException {
         return conn.createStatement();
     }
+
+    public void close() throws SQLException {
+        conn.close();
+    }
 }

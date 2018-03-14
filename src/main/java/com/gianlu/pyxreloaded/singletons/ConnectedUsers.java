@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public final class ConnectedUsers {
     private static final long PING_TIMEOUT = TimeUnit.SECONDS.toMillis(90);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(60);
-    private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
+    private static final Logger logger = Logger.getLogger(ConnectedUsers.class.getSimpleName());
     private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
     private final Map<String, User> users = new HashMap<>();
@@ -58,6 +58,8 @@ public final class ConnectedUsers {
      */
     @Nullable
     public User checkAndAdd(@NotNull User user) throws BaseCahHandler.CahException {
+        PreparingShutdown.get().check();
+
         synchronized (users) {
             if (hasUser(user.getNickname())) {
                 UserAccount account = user.getAccount();
@@ -104,6 +106,8 @@ public final class ConnectedUsers {
                 user.noLongerValid();
                 users.remove(user.getNickname().toLowerCase());
                 notifyRemoveUser(user, reason);
+
+                PreparingShutdown.get().tryShutdown(); // This won't allow the LogoutHandler to send the response but we don't really care about the last user to leave the server
             }
         }
     }
@@ -172,6 +176,8 @@ public final class ConnectedUsers {
                 logger.error("Unable to remove pinged-out user", ex);
             }
         }
+
+        PreparingShutdown.get().tryShutdown();
     }
 
     /**
@@ -203,6 +209,22 @@ public final class ConnectedUsers {
     public Collection<User> getUsers() {
         synchronized (users) {
             return new ArrayList<>(users.values());
+        }
+    }
+
+    /**
+     * @return Whether the server can be shutdown safely
+     */
+    public boolean canShutdown() {
+        return users.isEmpty();
+    }
+
+    public void preShutdown() {
+        synchronized (users) {
+            for (User user : users.values()) {
+                user.enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.SERVER, new EventWrapper(Consts.Event.SERVER_SHUTDOWN)));
+                removeUser(user, Consts.DisconnectReason.SERVER_SHUTDOWN);
+            }
         }
     }
 }

@@ -52,7 +52,7 @@ public class JsonWrapper {
         return this;
     }
 
-    public JsonWrapper add(Consts.ReturnableKey data, int i) {
+    public JsonWrapper add(Consts.ReturnableKey data, Number i) {
         obj.addProperty(data.toString(), i);
         return this;
     }

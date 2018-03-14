@@ -4,18 +4,18 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class PlayCardHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.PLAY_CARD.toString();
 
-    public PlayCardHandler(@Annotations.GameManager GameManager gameManager) {
-        super(gameManager);
+    public PlayCardHandler(@Annotations.GameManager GamesManager gamesManager) {
+        super(gamesManager);
     }
 
     @Override

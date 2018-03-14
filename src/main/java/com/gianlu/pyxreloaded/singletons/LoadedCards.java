@@ -101,4 +101,8 @@ public final class LoadedCards {
             }
         }
     }
+
+    public void close() throws SQLException {
+        conn.close();
+    }
 }

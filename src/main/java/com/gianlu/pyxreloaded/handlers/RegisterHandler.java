@@ -44,6 +44,8 @@ public class RegisterHandler extends BaseHandler {
         if (banList.contains(exchange.getHostName()))
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BANNED);
 
+        PreparingShutdown.get().check();
+
         Consts.AuthType type;
         try {
             type = Consts.AuthType.parse(params.getStringNotNull(Consts.GeneralKeys.AUTH_TYPE));

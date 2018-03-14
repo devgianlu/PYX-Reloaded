@@ -6,10 +6,11 @@ import com.gianlu.pyxreloaded.cards.CardSet;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
+import com.gianlu.pyxreloaded.singletons.PreparingShutdown;
 import io.undertow.server.HttpServerExchange;
 
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.List;
 public class StartGameHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.START_GAME.toString();
 
-    public StartGameHandler(@Annotations.GameManager GameManager gameManager) {
-        super(gameManager);
+    public StartGameHandler(@Annotations.GameManager GamesManager gamesManager) {
+        super(gamesManager);
     }
 
     @Override
@@ -26,6 +27,8 @@ public class StartGameHandler extends GameWithPlayerHandler {
         if (game.getHost() != user) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);
         if (game.getState() != Consts.GameState.LOBBY)
             throw new BaseCahHandler.CahException(Consts.ErrorCode.ALREADY_STARTED);
+
+        PreparingShutdown.get().check();
 
         try {
             if (!game.hasEnoughCards()) {

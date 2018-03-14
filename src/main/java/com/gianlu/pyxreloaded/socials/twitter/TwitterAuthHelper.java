@@ -88,6 +88,10 @@ public class TwitterAuthHelper {
         return service.getConfig().getApiKey();
     }
 
+    public void close() throws IOException {
+        service.getConfig().getHttpClient().close();
+    }
+
     private static class HttpClientWrapper implements HttpClient {
         private final CloseableHttpClient client;
 

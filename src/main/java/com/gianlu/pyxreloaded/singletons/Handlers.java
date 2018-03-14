@@ -1,13 +1,15 @@
-package com.gianlu.pyxreloaded.handlers;
+package com.gianlu.pyxreloaded.singletons;
+
+import com.gianlu.pyxreloaded.handlers.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Handlers {
+public final class Handlers {
     public final static Map<String, Class<? extends BaseHandler>> LIST;
-    public final static List<String> SKIP_USER_CHECK;
+    private final static List<String> SKIP_USER_CHECK;
 
     static {
         LIST = new HashMap<>();
@@ -41,6 +43,7 @@ public class Handlers {
         LIST.put(GameOptionsSuggestionDecisionHandler.OP, GameOptionsSuggestionDecisionHandler.class);
         LIST.put(GetSuggestedGameOptionsHandler.OP, GetSuggestedGameOptionsHandler.class);
         LIST.put(CreateAccountHandler.OP, CreateAccountHandler.class);
+        LIST.put(PrepareShutdownHandler.OP, PrepareShutdownHandler.class);
 
         SKIP_USER_CHECK = new ArrayList<>();
         SKIP_USER_CHECK.add(RegisterHandler.OP);

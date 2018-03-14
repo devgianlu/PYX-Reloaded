@@ -4,12 +4,12 @@ import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.game.Game;
-import com.gianlu.pyxreloaded.game.GameManager;
 import com.gianlu.pyxreloaded.game.GameOptions;
 import com.gianlu.pyxreloaded.game.SuggestedGameOptions;
 import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
+import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
 
@@ -17,8 +17,8 @@ public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CHANGE_GAME_OPTIONS.toString();
     private final Preferences preferences;
 
-    public ChangeGameOptionsHandler(@Annotations.GameManager GameManager gameManager, @Annotations.Preferences Preferences preferences) {
-        super(gameManager);
+    public ChangeGameOptionsHandler(@Annotations.GameManager GamesManager gamesManager, @Annotations.Preferences Preferences preferences) {
+        super(gamesManager);
         this.preferences = preferences;
     }
 
