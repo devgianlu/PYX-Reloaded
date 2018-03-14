@@ -152,16 +152,18 @@ class LoginManager {
         if (appId === undefined) {
             this.googleSignIn.hide();
         } else {
-            this.googleSignIn.show();
-            gapi.load('auth2', () => {
-                this.google_auth2 = gapi.auth2.init({
-                    client_id: appId,
-                    cookiepolicy: 'single_host_origin',
-                });
+            $.getScript("https://apis.google.com/js/api:client.js", () => {
+                this.googleSignIn.show();
+                gapi.load('auth2', () => {
+                    this.google_auth2 = gapi.auth2.init({
+                        client_id: appId,
+                        cookiepolicy: 'single_host_origin',
+                    });
 
-                this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
-                    (user) => this._googleSuccess(user),
-                    (error) => Notifier.error("Failed signing in with Google.", error));
+                    this.google_auth2.attachClickHandler(this.googleSignIn[0], {},
+                        (user) => this._googleSuccess(user),
+                        (error) => Notifier.error("Failed signing in with Google.", error));
+                });
             });
         }
     }
@@ -170,22 +172,24 @@ class LoginManager {
         if (appId === undefined) {
             this.facebookSignIn.hide();
         } else {
-            FB.init({
-                appId: appId,
-                cookie: true,
-                xfbml: true,
-                autoLogAppEvents: Notifier._debug,
-                version: 'v2.12'
+            $.getScript("https://connect.facebook.net/en_US/sdk.js", () => {
+                FB.init({
+                    appId: appId,
+                    cookie: true,
+                    xfbml: true,
+                    autoLogAppEvents: Notifier._debug,
+                    version: 'v2.12'
+                });
+
+                FB.AppEvents.logPageView();
+
+                this.facebookSignIn.show();
+                this.facebookSignIn.on('click', () => FB.login((user) => {
+                    this._facebookSuccess(user);
+                }, {
+                    scope: 'email,public_profile',
+                }));
             });
-
-            FB.AppEvents.logPageView();
-
-            this.facebookSignIn.show();
-            this.facebookSignIn.on('click', () => FB.login((user) => {
-                this._facebookSuccess(user);
-            }, {
-                scope: 'email,public_profile',
-            }));
         }
     }
 
@@ -398,7 +402,6 @@ class LoginManager {
                 } else {
                     const authConfig = data.aC;
                     Notifier.debug(authConfig);
-
 
                     this.setupGoogle(authConfig.g);
                     this.setupFacebook(authConfig.fb);
