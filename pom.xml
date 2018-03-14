@@ -22,7 +22,7 @@
     </properties>
 
     <build>
-        <finalName>PYX-Reloaded-${project.version}</finalName>
+        <finalName>PYX-Reloaded</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
