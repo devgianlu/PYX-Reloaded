@@ -1,6 +1,6 @@
 function showThemingDialog() {
     const themingDialog = new mdc.dialog.MDCDialog(document.getElementById('themingDialog'));
-    themingDialog.listen('MDCDialog:accept', function () {
+    themingDialog.listen('MDCDialog:accept', () => {
         Theming.setPrimaryColor(wheel_.getColorPrimary());
         Theming.setSecondaryColor(wheel_.getColorSecondary());
     });
