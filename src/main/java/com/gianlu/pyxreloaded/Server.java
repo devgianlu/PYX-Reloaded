@@ -102,8 +102,11 @@ public class Server {
         PathHandler pathHandler = new PathHandler(resourceHandler);
         pathHandler.addExactPath("/AjaxServlet", new AjaxPath())
                 .addExactPath("/Events", Handlers.websocket(new EventsPath()))
-                .addExactPath("/VerifyEmail", new VerifyEmailPath(emails))
+                .addExactPath("/Version", new VersionPath())
                 .addExactPath("/manifest.json", new WebManifestPath(preferences));
+
+        if (emails.enabled())
+            pathHandler.addExactPath("/VerifyEmail", new VerifyEmailPath(emails));
 
         if (githubAuthHelper != null)
             pathHandler.addExactPath("/GithubCallback", new GithubCallbackPath(githubAuthHelper));
