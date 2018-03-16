@@ -13,7 +13,7 @@ class ChatManager {
         this._chatMessage.on('keydown', (ev) => this._handleSendChatMessage(ev));
         this._chatMessage.parent().find('.mdc-text-field__icon').on('click', () => this._handleSendChatMessage(undefined));
 
-        registerPollListener("GLOBAL_CHAT", (data) => {
+        eventsReceiver.register("GLOBAL_CHAT", (data) => {
             Notifier.debug(data, false);
             if (data.E === "C" && data.gid === undefined) {
                 this._handleChatMessage(data);

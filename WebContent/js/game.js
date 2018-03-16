@@ -580,13 +580,10 @@ class GameManager {
             });
     }
 
-    leave() {
-        closeWebSocket();
-        Requester.always("lg", {
-            "gid": this.id
-        }, () => {
-            GameManager._postLeave();
-        });
+    static wrapCardcastDecks(CCs) {
+        const names = [];
+        for (let i = 0; i < CCs.length; i++) names[i] = "<i>" + CCs[i] + "</i>";
+        return names;
     }
 
     start() {
@@ -841,6 +838,30 @@ class GameManager {
         return div;
     }
 
+    static deckIdsToNames(ids) {
+        const names = [];
+        const css = localStorage["css"];
+        if (css === undefined) return ids; // Shouldn't happen
+        const json = JSON.parse(css);
+
+        for (let i = 0; i < ids.length; i++) {
+            for (let j = 0; j < json.length; j++) {
+                if (ids[i] === json[j].csi) names[i] = json[j].csn;
+            }
+        }
+
+        return names;
+    }
+
+    leave() {
+        eventsReceiver.close();
+        Requester.always("lg", {
+            "gid": this.id
+        }, () => {
+            GameManager._postLeave();
+        });
+    }
+
     set submitGameOptionsModificationDecision_listener(set) {
         this._submitGameOptionsModificationDecision_listener = set;
     }
@@ -882,7 +903,7 @@ function loadUI(gameManager, gameOptionsDialog) {
             Requester.request("gc", {
                 "gid": gameManager.id
             }, (gcData) => {
-                registerPollListener("GAME", (ev) => {
+                eventsReceiver.register("GAME", (ev) => {
                     Notifier.debug(ev);
                     gameManager.handlePollEvent(ev);
                 });

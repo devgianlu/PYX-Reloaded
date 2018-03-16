@@ -71,7 +71,7 @@ class Games {
     }
 
     static logout() {
-        closeWebSocket();
+        eventsReceiver.close();
         Requester.always("lo", {}, () => {
             window.location = "/";
         });
@@ -182,8 +182,8 @@ class Games {
             Notifier.error("Failed loading the games!", error);
         });
 
-        registerPollListener("LOBBIES", function (data) {
-            if (data["E"] === "glr") self.loadGamesList();
+        eventsReceiver.register("LOBBIES", (data) => {
+            if (data["E"] === "glr") this.loadGamesList();
         });
     }
 
@@ -205,7 +205,6 @@ class Games {
     setup(list) {
         this.games.clear();
 
-        const self = this;
         for (let i = 0; i < list.length; i++) {
             const game = list[i];
 
@@ -248,12 +247,12 @@ class Games {
                 "_status": status
             })[0].elm);
 
-            elm.find('._join').on('click', function () {
-                self.joinGame(game.gid, game.hp);
+            elm.find('._join').on('click', () => {
+                this.joinGame(game.gid, game.hp);
             });
 
-            elm.find('._spectate').on('click', function () {
-                self.spectateGame(game.gid, game.hp);
+            elm.find('._spectate').on('click', () => {
+                this.spectateGame(game.gid, game.hp);
             });
 
             const _toggleLike = elm.find('._toggleLike')[0];
@@ -263,12 +262,12 @@ class Games {
 
             toggleLike.on = game.iLK;
             _toggleLike.addEventListener('MDCIconToggle:change', () => {
-                self.toggleLike(game.gid, elm, toggleLike, toggleDislike);
+                this.toggleLike(game.gid, elm, toggleLike, toggleDislike);
             });
 
             toggleDislike.on = game.iDLK;
             _toggleDislike.addEventListener('MDCIconToggle:change', () => {
-                self.toggleDislike(game.gid, elm, toggleLike, toggleDislike);
+                this.toggleDislike(game.gid, elm, toggleLike, toggleDislike);
             });
         }
 

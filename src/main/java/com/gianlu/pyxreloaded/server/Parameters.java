@@ -36,7 +36,7 @@ public class Parameters extends HashMap<String, String> {
     }
 
     public boolean has(Consts.ReceivableKey key) {
-        return get(key) != null;
+        return get(key.toString()) != null;
     }
 
     @Nullable

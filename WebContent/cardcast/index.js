@@ -57,10 +57,9 @@ class CardcastMenu {
             })
         }
 
-        const self = this;
         this.searchField = $('#cardcastSearch');
-        this.searchField.on('keydown', function (ev) {
-            if (ev.keyCode === 13) self.cardcastOptionsChanged();
+        this.searchField.on('keydown', (ev) => {
+            if (ev.keyCode === 13) this.cardcastOptionsChanged();
         });
 
         this.cardcastOptionsChanged();
@@ -167,36 +166,35 @@ class CardcastDialog {
         this._callsList = this.dialog.find('#callsList');
         this._responsesList = this.dialog.find('#responsesList');
 
-        const self = this;
-        this.cardcast.info(function (data, error) {
+        this.cardcast.info((data, error) => {
             if (data === null) {
                 Notifier.error("Failed loading deck info!", error);
             } else {
-                self._name.text(data.name);
-                self._author_category.text(CardcastDialog._createCategoryAndAuthorString(data.category, data.author.username));
-                self._desc.text(data.description);
-                self._code.text(data.code);
-                self._category.text(CardcastMenu.getCategoryMaterialIconsName(data.category));
-                self._calls.text("Calls (" + data.call_count + ")");
-                self._responses.text("Responses (" + data.response_count + ")");
+                this._name.text(data.name);
+                this._author_category.text(CardcastDialog._createCategoryAndAuthorString(data.category, data.author.username));
+                this._desc.text(data.description);
+                this._code.text(data.code);
+                this._category.text(CardcastMenu.getCategoryMaterialIconsName(data.category));
+                this._calls.text("Calls (" + data.call_count + ")");
+                this._responses.text("Responses (" + data.response_count + ")");
 
-                self._rating.barrating('destroy');
-                self._rating.barrating({
+                this._rating.barrating('destroy');
+                this._rating.barrating({
                     theme: 'fontawesome-stars-o',
                     readonly: true,
                     initialRating: data.rating
                 });
 
-                self._rating.parent().css('margin-top', '6px');
-                self._rating.parent().css('margin-right', '16px');
+                this._rating.parent().css('margin-top', '6px');
+                this._rating.parent().css('margin-right', '16px');
             }
         });
 
-        this.cardcast.calls(function (calls, error) {
+        this.cardcast.calls((calls, error) => {
             if (calls === null) {
                 Notifier.error("Failed loading deck calls!", error);
             } else {
-                const list = CardcastDialog._initCardsList(self._callsList[0]);
+                const list = CardcastDialog._initCardsList(this._callsList[0]);
                 for (let i = 0; i < calls.length; i++) {
                     list.add({
                         "_text": calls[i].text.join("____"),
@@ -206,11 +204,11 @@ class CardcastDialog {
             }
         });
 
-        this.cardcast.responses(function (calls, error) {
+        this.cardcast.responses((calls, error) => {
             if (calls === null) {
                 Notifier.error("Failed loading deck responses!", error);
             } else {
-                const list = CardcastDialog._initCardsList(self._responsesList[0]);
+                const list = CardcastDialog._initCardsList(this._responsesList[0]);
                 for (let i = 0; i < calls.length; i++) {
                     list.add({
                         "_text": calls[i].text[0],

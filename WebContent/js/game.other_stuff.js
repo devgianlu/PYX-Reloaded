@@ -11,7 +11,7 @@ class OtherStuffManager {
 
         this.gameManager.submitGameOptionsModificationDecision_listener = (id) => this.removeSuggestedOptionsItem(id);
 
-        registerPollListener("GAME_OTHER_STUFF", (data) => {
+        eventsReceiver.register("GAME_OTHER_STUFF", (data) => {
             this._handleEvent(data);
         });
     }

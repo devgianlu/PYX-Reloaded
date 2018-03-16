@@ -435,25 +435,24 @@ class GameOptionsDialog {
         this._cardcastAddDeckInfo_details.hide();
 
         if (code.match(/[A-Z0-9]{5}/) !== null) {
-            const self = this;
-            new Cardcast(code).info(function (info, error) {
-                self._cardcastAddDeckInfo_loading.hide();
+            new Cardcast(code).info((info, error) => {
+                this._cardcastAddDeckInfo_loading.hide();
                 if (info === null) {
                     Notifier.debug(error);
-                    self._cardcastAddDeckInfo_details.hide();
-                    self.cardcastAddDeckCode.valid = false;
+                    this._cardcastAddDeckInfo_details.hide();
+                    this.cardcastAddDeckCode.valid = false;
                     return;
                 }
 
-                self._loadedCardcastDecks[info.code] = info;
+                this._loadedCardcastDecks[info.code] = info;
 
-                self._cardcastAddDeckInfo_details.show();
-                self.cardcastAddDeckCode.valid = true;
+                this._cardcastAddDeckInfo_details.show();
+                this.cardcastAddDeckCode.valid = true;
 
-                self._cardcastAddDeckInfo_details.attr("data-code", info.code);
+                this._cardcastAddDeckInfo_details.attr("data-code", info.code);
 
-                self._cardcastAddDeckInfo_details.find('.\_name').text(info.name);
-                self._cardcastAddDeckInfo_details.find('.\_author').text("by " + info.author.username);
+                this._cardcastAddDeckInfo_details.find('.\_name').text(info.name);
+                this._cardcastAddDeckInfo_details.find('.\_author').text("by " + info.author.username);
 
                 if (loaded !== undefined) loaded();
             });
@@ -475,9 +474,8 @@ class GameOptionsDialog {
                 "code": deck.code
             })[0].elm);
 
-            const self = this;
-            elm.find('._remove').on('click', function () {
-                self.removeCardcastDeck(deck.code);
+            elm.find('._remove').on('click', () => {
+                this.removeCardcastDeck(deck.code);
             });
         }
 
