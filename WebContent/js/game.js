@@ -320,6 +320,8 @@ class GameManager {
             "_sender": data.f + ": "
         });
 
+        this.chat.list.scrollTop = this.chat.list.scrollHeight;
+
         if (!this.drawer.open) {
             this.unreadNotifications = this.unreadNotifications + 1;
         }
