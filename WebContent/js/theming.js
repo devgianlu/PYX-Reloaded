@@ -28,6 +28,16 @@ class Theming {
             themeColor.name = "theme-color";
             themeColor.content = primary;
             document.head.appendChild(themeColor);
+
+            const appleMobileCapable = document.createElement("meta");
+            appleMobileCapable.name = "apple-mobile-web-app-capable";
+            appleMobileCapable.content = "yes";
+            document.head.appendChild(appleMobileCapable);
+
+            const appleStatusBar = document.createElement("meta");
+            appleStatusBar.name = "apple-apple-mobile-web-app-status-bar-style-web-app-capable";
+            appleStatusBar.content = "black-translucent";
+            document.head.appendChild(appleStatusBar);
         }
     }
 
