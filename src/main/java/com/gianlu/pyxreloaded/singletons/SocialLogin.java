@@ -7,13 +7,13 @@ import com.gianlu.pyxreloaded.socials.facebook.*;
 import com.gianlu.pyxreloaded.socials.github.GithubAuthHelper;
 import com.gianlu.pyxreloaded.socials.github.GithubException;
 import com.gianlu.pyxreloaded.socials.github.GithubProfileInfo;
+import com.gianlu.pyxreloaded.socials.google.GoogleApacheHttpTransport;
 import com.gianlu.pyxreloaded.socials.twitter.TwitterAuthHelper;
 import com.gianlu.pyxreloaded.socials.twitter.TwitterEmailNotVerifiedException;
 import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import com.github.scribejava.core.model.OAuth1AccessToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -48,7 +48,7 @@ public final class SocialLogin {
     @Nullable
     private static GoogleIdTokenVerifier instantiateGoogleHelper(String appId) {
         if (appId == null || appId.isEmpty()) return null;
-        return new GoogleIdTokenVerifier.Builder(new ApacheHttpTransport(), new JacksonFactory())
+        return new GoogleIdTokenVerifier.Builder(new GoogleApacheHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(appId))
                 .build();
     }
