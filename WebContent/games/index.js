@@ -8,6 +8,8 @@ class Games {
         this._searchField.on('keydown', () => this.submitSearch());
         this._searchField.parent().find('.mdc-text-field__icon').on('click', () => this.submitSearch());
 
+        this._adminPanel = $('._adminPanel');
+
         this._refresh = $('._refresh');
         this._refresh.on('click', () => {
             this.loadGamesList();
@@ -57,8 +59,11 @@ class Games {
                 if (data.a.p !== null) this.profilePicture.attr('src', data.a.p);
                 this.profileEmail.show();
                 this.profileEmail.text(data.a.em);
+                if (data.a.ia) this._adminPanel.show();
+                else this._adminPanel.hide();
             } else {
                 this.profileEmail.hide();
+                this._adminPanel.hide();
             }
         }, (error) => {
             Notifier.error("Failed loading user info.", error)
