@@ -3,6 +3,7 @@ function showThemingDialog() {
     themingDialog.listen('MDCDialog:accept', () => {
         Theming.setPrimaryColor(wheel_.getColorPrimary());
         Theming.setSecondaryColor(wheel_.getColorSecondary());
+        Theming.apply();
     });
 
     themingDialog.show();

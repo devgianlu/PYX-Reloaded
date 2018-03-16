@@ -24,10 +24,14 @@ class Theming {
             Theming.setPrimaryColor(primary);
             Theming.setSecondaryColor(secondary);
 
-            const themeColor = document.createElement("meta");
+            let themeColor = document.head.querySelector('meta[name=theme-color]');
+            if (themeColor === null) {
+                themeColor = document.createElement('meta');
+                document.head.appendChild(themeColor);
+            }
+
             themeColor.name = "theme-color";
             themeColor.content = primary;
-            document.head.appendChild(themeColor);
 
             const appleMobileCapable = document.createElement("meta");
             appleMobileCapable.name = "apple-mobile-web-app-capable";
