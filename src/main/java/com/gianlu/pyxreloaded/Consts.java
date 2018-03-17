@@ -12,6 +12,17 @@ import java.text.ParseException;
 public final class Consts {
     public static final int CHAT_MAX_LENGTH = 200;
     public static final String VALID_NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9_]{2,29}";
+    private static final String[] validUserPreferences = new String[]{
+            "TpC", // Theme primary color
+            "TsC" // Theme secondary color
+    };
+
+    public static boolean isPreferenceKeyValid(String key) {
+        for (String valid : validUserPreferences)
+            if (valid.equals(key)) return true;
+
+        return false;
+    }
 
     /**
      * Possible events.
@@ -734,7 +745,11 @@ public final class Consts {
         /**
          * Time remaining before shutdown, in millis.
          */
-        BEFORE_SHUTDOWN("bs");
+        BEFORE_SHUTDOWN("bs"),
+        /**
+         * User preferences object.
+         */
+        USER_PREFERENCES("up");
 
         private final String key;
 
