@@ -15,6 +15,7 @@ import com.gianlu.pyxreloaded.socials.github.GithubProfileInfo;
 import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.util.regex.Pattern;
@@ -39,6 +40,7 @@ public class CreateAccountHandler extends BaseHandler {
         this.emails = emails;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (banList.contains(exchange.getHostName()))

@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class GetCardsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.GET_CARDS.toString();
@@ -16,6 +17,7 @@ public class GetCardsHandler extends GameWithPlayerHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();

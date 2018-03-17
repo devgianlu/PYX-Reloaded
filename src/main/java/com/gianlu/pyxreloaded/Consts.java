@@ -585,7 +585,15 @@ public final class Consts {
         /**
          * Prepares the server for shutdown.
          */
-        PREPARE_SHUTDOWN("ps");
+        PREPARE_SHUTDOWN("ps"),
+        /**
+         * Get user preferences.
+         */
+        GET_USER_PREFERENCES("gup"),
+        /**
+         * Set user preferences.
+         */
+        SET_USER_PREFERENCES("sup");
 
         private final String op;
 

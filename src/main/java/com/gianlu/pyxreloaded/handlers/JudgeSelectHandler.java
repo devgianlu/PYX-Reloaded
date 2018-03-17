@@ -9,6 +9,7 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class JudgeSelectHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.JUDGE_SELECT.toString();
@@ -17,6 +18,7 @@ public class JudgeSelectHandler extends GameWithPlayerHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String cardIdStr = params.getStringNotNull(Consts.GeneralKeys.CARD_ID);

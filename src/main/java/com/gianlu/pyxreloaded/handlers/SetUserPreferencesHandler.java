@@ -7,13 +7,12 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import io.undertow.server.HttpServerExchange;
 import org.jetbrains.annotations.NotNull;
 
-public class PongHandler extends BaseHandler {
-    public static final String OP = Consts.Operation.PONG.toString();
+public class SetUserPreferencesHandler extends BaseHandler {
+    public static final String OP = Consts.Operation.SET_USER_PREFERENCES.toString();
 
     @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
-        user.userReceivedEvents();
-        return JsonWrapper.EMPTY;
+        return JsonWrapper.EMPTY; // TODO
     }
 }

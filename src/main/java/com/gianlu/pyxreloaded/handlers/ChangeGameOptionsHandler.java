@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CHANGE_GAME_OPTIONS.toString();
@@ -22,6 +23,7 @@ public class ChangeGameOptionsHandler extends GameWithPlayerHandler {
         this.preferences = preferences;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getState() != Consts.GameState.LOBBY)

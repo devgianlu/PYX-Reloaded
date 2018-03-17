@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class GameWithPlayerHandler extends GameHandler {
 
@@ -15,11 +16,13 @@ public abstract class GameWithPlayerHandler extends GameHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public final JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (user.getGame() != game) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_IN_THAT_GAME);
         else return handleWithUserInGame(user, game, params, exchange);
     }
 
+    @NotNull
     public abstract JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException;
 }

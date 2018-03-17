@@ -5,6 +5,7 @@ import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.gianlu.pyxreloaded.data.User;
 import com.gianlu.pyxreloaded.server.Parameters;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class to get user's nick for the game.html page - not safe to store/retrieve as a cookie.
@@ -17,6 +18,7 @@ public class GetMeHandler extends BaseHandler {
     public GetMeHandler() {
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();

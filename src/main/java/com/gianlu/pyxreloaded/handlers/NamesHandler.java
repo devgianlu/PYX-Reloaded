@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class NamesHandler extends BaseHandler {
     public static final String OP = Consts.Operation.NAMES.toString();
@@ -17,6 +18,7 @@ public class NamesHandler extends BaseHandler {
         this.users = users;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonArray array = new JsonArray();

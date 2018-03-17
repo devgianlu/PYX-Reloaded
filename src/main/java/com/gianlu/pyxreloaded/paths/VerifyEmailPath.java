@@ -1,6 +1,7 @@
 package com.gianlu.pyxreloaded.paths;
 
 import com.gianlu.pyxreloaded.Utils;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.singletons.Emails;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -31,6 +32,7 @@ public class VerifyEmailPath implements HttpHandler {
             String token = Utils.extractParam(exchange, "token");
             if (token == null) {
                 exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                exchange.getResponseSender().send("Missing token!");
                 return;
             }
 
@@ -43,6 +45,9 @@ public class VerifyEmailPath implements HttpHandler {
             } catch (SQLException ex) {
                 exchange.setStatusCode(StatusCodes.FORBIDDEN);
                 exchange.getResponseSender().send("Invalid token. Failed to verify your email or already verified.");
+            } catch (BaseCahHandler.CahException ex) {
+                exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                exchange.getResponseSender().send(ex.getMessage());
             }
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, "Failed verifying email: ", ex);

@@ -10,6 +10,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayCardHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.PLAY_CARD.toString();
@@ -18,6 +19,7 @@ public class PlayCardHandler extends GameWithPlayerHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String cardIdStr = params.getStringNotNull(Consts.GeneralKeys.CARD_ID);

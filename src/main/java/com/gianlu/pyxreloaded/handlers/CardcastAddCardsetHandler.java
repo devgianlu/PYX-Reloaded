@@ -13,6 +13,7 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CARDCAST_ADD_CARDSET.toString();
@@ -23,6 +24,7 @@ public class CardcastAddCardsetHandler extends GameWithPlayerHandler {
         this.cardcastService = cardcastService;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getHost() != user) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_GAME_HOST);

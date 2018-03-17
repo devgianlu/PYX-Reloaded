@@ -10,10 +10,10 @@ import java.text.ParseException;
 public class PasswordAccount extends UserAccount {
     public final String hashedPassword;
 
-    public PasswordAccount(ResultSet set) throws SQLException, ParseException {
-        super(set, set.getBoolean("email_verified"));
+    public PasswordAccount(ResultSet user) throws SQLException, ParseException {
+        super(user, user.getBoolean("email_verified"));
 
-        hashedPassword = set.getString("password");
+        hashedPassword = user.getString("password");
     }
 
     public PasswordAccount(String username, String email, boolean emailVerified, @NotNull String hashedPassword) {

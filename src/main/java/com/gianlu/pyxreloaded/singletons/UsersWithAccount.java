@@ -40,10 +40,23 @@ public final class UsersWithAccount {
         return builder.append(")").toString();
     }
 
+    @NotNull
+    private static <A extends UserAccount> A preferences(@NotNull Statement statement, @NotNull A account) throws SQLException {
+        ResultSet prefs = statement.executeQuery("SELECT key, value FROM preferences WHERE username='" + account.username + "'");
+        account.loadPreferences(prefs);
+        return account; // Just to have a better code structure
+    }
+
+    @NotNull
+    private static ResultSet user(@NotNull Statement statement, @NotNull Consts.AuthType type, @NotNull String key, @NotNull String value) throws SQLException {
+        return statement.executeQuery("SELECT * FROM users WHERE " + key + "='" + value + "' AND auth='" + type.toString() + "'");
+    }
+
     @Nullable
     public PasswordAccount getPasswordAccountForNickname(@NotNull String nickname) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE username='" + nickname + "' AND auth='pw'")) {
-            return set.next() ? new PasswordAccount(set) : null;
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.PASSWORD, "username", nickname)) {
+            return user.next() ? preferences(statement, new PasswordAccount(user)) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         } catch (ParseException ex) {
@@ -52,18 +65,22 @@ public final class UsersWithAccount {
     }
 
     @Nullable
-    public PasswordAccount getPasswordAccountForEmail(@NotNull String email) {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE email='" + email + "' AND auth='pw'")) {
-            return set.next() ? new PasswordAccount(set) : null;
-        } catch (SQLException | ParseException ex) {
-            return null;
+    public PasswordAccount getPasswordAccountForEmail(@NotNull String email) throws BaseCahHandler.CahException {
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.PASSWORD, "email", email)) {
+            return user.next() ? preferences(statement, new PasswordAccount(user)) : null;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } catch (ParseException ex) {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }
     }
 
     @Nullable
     public GoogleAccount getGoogleAccount(@NotNull GoogleIdToken.Payload token) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE google_sub='" + token.getSubject() + "'")) {
-            return set.next() ? new GoogleAccount(set, token) : null;
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.GOOGLE, "google_sub", token.getSubject())) {
+            return user.next() ? preferences(statement, new GoogleAccount(user, token)) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         } catch (ParseException ex) {
@@ -73,8 +90,9 @@ public final class UsersWithAccount {
 
     @Nullable
     public FacebookAccount getFacebookAccount(@NotNull FacebookToken token) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE facebook_user_id='" + token.userId + "'")) {
-            return set.next() ? new FacebookAccount(set) : null;
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.FACEBOOK, "facebook_user_id", token.userId)) {
+            return user.next() ? preferences(statement, new FacebookAccount(user)) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         } catch (ParseException ex) {
@@ -84,8 +102,9 @@ public final class UsersWithAccount {
 
     @Nullable
     public GithubAccount getGithubAccount(@NotNull GithubProfileInfo info) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE github_user_id='" + info.id + "'")) {
-            return set.next() ? new GithubAccount(set, info) : null;
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.GITHUB, "github_user_id", info.id)) {
+            return user.next() ? preferences(statement, new GithubAccount(user, info)) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         } catch (ParseException ex) {
@@ -95,8 +114,9 @@ public final class UsersWithAccount {
 
     @Nullable
     public TwitterAccount getTwitterAccount(@NotNull TwitterProfileInfo info) throws BaseCahHandler.CahException {
-        try (ResultSet set = db.statement().executeQuery("SELECT * FROM users WHERE twitter_user_id='" + info.id + "'")) {
-            return set.next() ? new TwitterAccount(set) : null;
+        try (Statement statement = db.statement();
+             ResultSet user = user(statement, Consts.AuthType.TWITTER, "twitter_user_id", info.id)) {
+            return user.next() ? preferences(statement, new TwitterAccount(user)) : null;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         } catch (ParseException ex) {

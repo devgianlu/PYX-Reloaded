@@ -9,6 +9,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class GameListHandler extends BaseHandler {
     public static final String OP = Consts.Operation.GAME_LIST.toString();
@@ -18,6 +19,7 @@ public class GameListHandler extends BaseHandler {
         this.gamesManager = gamesManager;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonWrapper json = new JsonWrapper();

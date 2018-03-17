@@ -10,6 +10,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class CreateGameHandler extends BaseHandler {
     public static final String OP = Consts.Operation.CREATE_GAME.toString();
@@ -21,6 +22,7 @@ public class CreateGameHandler extends BaseHandler {
         this.gamesManager = gamesManager;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         String value = params.getStringNotNull(Consts.GameOptionsData.OPTIONS);

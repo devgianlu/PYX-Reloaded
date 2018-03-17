@@ -44,6 +44,8 @@ public final class Handlers {
         LIST.put(GetSuggestedGameOptionsHandler.OP, GetSuggestedGameOptionsHandler.class);
         LIST.put(CreateAccountHandler.OP, CreateAccountHandler.class);
         LIST.put(PrepareShutdownHandler.OP, PrepareShutdownHandler.class);
+        LIST.put(GetUserPreferencesHandler.OP, GetUserPreferencesHandler.class);
+        LIST.put(SetUserPreferencesHandler.OP, SetUserPreferencesHandler.class);
 
         SKIP_USER_CHECK = new ArrayList<>();
         SKIP_USER_CHECK.add(RegisterHandler.OP);

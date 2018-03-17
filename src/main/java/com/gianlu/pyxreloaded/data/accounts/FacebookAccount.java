@@ -11,10 +11,10 @@ import java.text.ParseException;
 public class FacebookAccount extends UserAccount {
     public final String userId;
 
-    public FacebookAccount(ResultSet set) throws SQLException, ParseException {
-        super(set, true); // Cannot even register without a verified email
+    public FacebookAccount(ResultSet user) throws SQLException, ParseException {
+        super(user, true); // Cannot even register without a verified email
 
-        userId = set.getString("facebook_user_id");
+        userId = user.getString("facebook_user_id");
     }
 
     public FacebookAccount(String nickname, FacebookToken token, FacebookProfileInfo info) {

@@ -10,6 +10,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.gianlu.pyxreloaded.singletons.PreparingShutdown;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class SpectateGameHandler extends GameHandler {
     public static final String OP = Consts.Operation.SPECTATE_GAME.toString();
@@ -18,6 +19,7 @@ public class SpectateGameHandler extends GameHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         PreparingShutdown.get().check();

@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.gianlu.pyxreloaded.singletons.Preferences;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class ChatHandler extends BaseHandler {
     public static final String OP = Consts.Operation.CHAT.toString();
@@ -24,6 +25,7 @@ public class ChatHandler extends BaseHandler {
         this.registeredOnly = preferences.getBoolean("chat/registeredOnly", false);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         users.checkChatFlood(user);

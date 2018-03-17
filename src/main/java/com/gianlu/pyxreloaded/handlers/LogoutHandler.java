@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.gianlu.pyxreloaded.singletons.Sessions;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class LogoutHandler extends BaseHandler {
     public final static String OP = Consts.Operation.LOG_OUT.toString();
@@ -17,6 +18,7 @@ public class LogoutHandler extends BaseHandler {
         this.users = users;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         user.noLongerValid();

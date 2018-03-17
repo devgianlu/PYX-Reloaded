@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class GameChatHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.GAME_CHAT.toString();
@@ -24,6 +25,7 @@ public class GameChatHandler extends GameWithPlayerHandler {
         this.users = users;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         users.checkChatFlood(user);

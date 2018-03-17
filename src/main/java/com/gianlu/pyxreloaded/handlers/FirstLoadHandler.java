@@ -13,6 +13,7 @@ import com.gianlu.pyxreloaded.singletons.Preferences;
 import com.gianlu.pyxreloaded.singletons.SocialLogin;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -33,6 +34,7 @@ public class FirstLoadHandler extends BaseHandler {
         this.preferences = preferences;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         JsonWrapper obj = new JsonWrapper();

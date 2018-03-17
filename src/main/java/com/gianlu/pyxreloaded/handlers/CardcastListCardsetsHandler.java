@@ -13,6 +13,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import com.google.gson.JsonArray;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.CARDCAST_LIST_CARDSETS.toString();
@@ -23,6 +24,7 @@ public class CardcastListCardsetsHandler extends GameWithPlayerHandler {
         this.cardcastService = cardcastService;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         JsonArray array = new JsonArray();

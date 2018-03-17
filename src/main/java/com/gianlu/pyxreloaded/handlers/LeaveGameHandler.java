@@ -8,6 +8,7 @@ import com.gianlu.pyxreloaded.server.Annotations;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 
 public class LeaveGameHandler extends GameWithPlayerHandler {
@@ -17,6 +18,7 @@ public class LeaveGameHandler extends GameWithPlayerHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) {
         game.removePlayer(user);

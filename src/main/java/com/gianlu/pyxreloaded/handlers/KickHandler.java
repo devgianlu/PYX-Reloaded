@@ -12,6 +12,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import io.undertow.server.HttpServerExchange;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class KickHandler extends BaseHandler {
     public static final String OP = Consts.Operation.KICK.toString();
@@ -22,6 +23,7 @@ public class KickHandler extends BaseHandler {
         this.connectedUsers = connectedUsers;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);

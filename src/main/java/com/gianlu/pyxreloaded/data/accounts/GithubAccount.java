@@ -10,10 +10,10 @@ import java.text.ParseException;
 public class GithubAccount extends UserAccount {
     public final String id;
 
-    public GithubAccount(ResultSet set, GithubProfileInfo info) throws SQLException, ParseException {
-        super(set, info.emails.isPrimaryEmailVerified());
+    public GithubAccount(ResultSet user, GithubProfileInfo info) throws SQLException, ParseException {
+        super(user, info.emails.isPrimaryEmailVerified());
 
-        id = set.getString("github_user_id");
+        id = user.getString("github_user_id");
     }
 
     public GithubAccount(String nickname, GithubProfileInfo info) {

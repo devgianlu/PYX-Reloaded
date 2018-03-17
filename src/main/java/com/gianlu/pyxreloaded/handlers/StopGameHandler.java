@@ -10,6 +10,7 @@ import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class StopGameHandler extends GameWithPlayerHandler {
     public static final String OP = Consts.Operation.STOP_GAME.toString();
@@ -19,6 +20,7 @@ public class StopGameHandler extends GameWithPlayerHandler {
         super(gamesManager);
     }
 
+    @NotNull
     @Override
     public JsonWrapper handleWithUserInGame(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (game.getHost() != user) {

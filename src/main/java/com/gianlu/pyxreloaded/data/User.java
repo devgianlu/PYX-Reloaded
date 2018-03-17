@@ -203,4 +203,9 @@ public class User {
         if (account != null) obj.add(Consts.UserData.PICTURE, account.avatarUrl);
         return obj;
     }
+
+    @Nullable
+    public UserAccount.Preferences getPreferences() {
+        return account != null ? account.getPreferences() : null;
+    }
 }

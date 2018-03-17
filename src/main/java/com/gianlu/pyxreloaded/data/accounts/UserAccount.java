@@ -2,11 +2,13 @@ package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.HashMap;
 
 public abstract class UserAccount {
     public final String username;
@@ -15,6 +17,7 @@ public abstract class UserAccount {
     public final String avatarUrl;
     public final boolean emailVerified;
     private final Consts.AuthType auth;
+    private final Preferences preferences = new Preferences();
 
     UserAccount(ResultSet set, boolean emailVerified) throws SQLException, ParseException {
         this.username = set.getString("username");
@@ -43,5 +46,29 @@ public abstract class UserAccount {
         obj.add(Consts.UserData.EMAIL_VERIFIED, emailVerified);
         obj.add(Consts.UserData.IS_ADMIN, admin);
         return obj;
+    }
+
+    public void loadPreferences(@NotNull ResultSet prefs) throws SQLException {
+        preferences.load(prefs);
+    }
+
+    @NotNull
+    public Preferences getPreferences() {
+        return preferences;
+    }
+
+    public class Preferences extends HashMap<String, String> {
+
+        private Preferences() {
+        }
+
+        private void load(@NotNull ResultSet set) throws SQLException {
+            while (set.next()) put(set.getString("key"), set.getString("value"));
+        }
+
+        @NotNull
+        public JsonWrapper toJson() {
+            return JsonWrapper.from(this);
+        }
     }
 }

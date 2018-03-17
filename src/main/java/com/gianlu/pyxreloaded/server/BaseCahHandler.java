@@ -63,5 +63,10 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
             this.code = code;
             this.data = data;
         }
+
+        @Override
+        public String getMessage() {
+            return code + (data != null ? (": " + data.toString()) : "");
+        }
     }
 }

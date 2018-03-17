@@ -16,6 +16,7 @@ import com.gianlu.pyxreloaded.socials.twitter.TwitterProfileInfo;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -39,6 +40,7 @@ public class RegisterHandler extends BaseHandler {
         this.socialLogin = socialLogin;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(@Nullable User user, Parameters params, HttpServerExchange exchange) throws BaseJsonHandler.StatusException {
         if (banList.contains(exchange.getHostName()))

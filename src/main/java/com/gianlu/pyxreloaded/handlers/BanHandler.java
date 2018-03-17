@@ -13,6 +13,7 @@ import com.gianlu.pyxreloaded.singletons.BanList;
 import com.gianlu.pyxreloaded.singletons.ConnectedUsers;
 import io.undertow.server.HttpServerExchange;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class BanHandler extends BaseHandler {
     public static final String OP = Consts.Operation.BAN.toString();
@@ -25,6 +26,7 @@ public class BanHandler extends BaseHandler {
         this.connectedUsers = connectedUsers;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         if (!user.isAdmin())

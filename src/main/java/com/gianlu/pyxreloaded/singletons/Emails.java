@@ -3,6 +3,7 @@ package com.gianlu.pyxreloaded.singletons;
 import com.gianlu.pyxreloaded.Utils;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,7 +109,7 @@ public final class Emails {
                 .to(account.username, account.email));
     }
 
-    public void tryVerify(@NotNull String token) throws SQLException {
+    public void tryVerify(@NotNull String token) throws SQLException, BaseCahHandler.CahException {
         try (ResultSet set = db.statement().executeQuery("SELECT email FROM email_verifications WHERE token='" + token + "'")) {
             set.next();
             String email = set.getString("email");

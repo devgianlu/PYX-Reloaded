@@ -10,10 +10,10 @@ import java.text.ParseException;
 public class GoogleAccount extends UserAccount {
     public final String subject;
 
-    public GoogleAccount(ResultSet set, GoogleIdToken.Payload token) throws SQLException, ParseException {
-        super(set, token.getEmailVerified());
+    public GoogleAccount(ResultSet user, GoogleIdToken.Payload token) throws SQLException, ParseException {
+        super(user, token.getEmailVerified());
 
-        subject = set.getString("google_sub");
+        subject = user.getString("google_sub");
     }
 
     public GoogleAccount(String nickname, GoogleIdToken.Payload token) {

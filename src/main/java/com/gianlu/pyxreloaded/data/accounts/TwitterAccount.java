@@ -11,10 +11,10 @@ import java.text.ParseException;
 public class TwitterAccount extends UserAccount {
     public final String id;
 
-    public TwitterAccount(ResultSet set) throws SQLException, ParseException {
-        super(set, true); // Cannot even register without a verified email
+    public TwitterAccount(ResultSet user) throws SQLException, ParseException {
+        super(user, true); // Cannot even register without a verified email
 
-        id = set.getString("twitter_user_id");
+        id = user.getString("twitter_user_id");
     }
 
     public TwitterAccount(String nickname, @NotNull TwitterProfileInfo info) {

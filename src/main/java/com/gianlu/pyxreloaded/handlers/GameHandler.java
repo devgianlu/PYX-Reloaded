@@ -8,14 +8,16 @@ import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import com.gianlu.pyxreloaded.server.Parameters;
 import com.gianlu.pyxreloaded.singletons.GamesManager;
 import io.undertow.server.HttpServerExchange;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class GameHandler extends BaseHandler {
     protected final GamesManager gamesManager;
 
-    public GameHandler(GamesManager gamesManager) {
+    GameHandler(GamesManager gamesManager) {
         this.gamesManager = gamesManager;
     }
 
+    @NotNull
     @Override
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException {
         String gameIdStr = params.getStringNotNull(Consts.GeneralKeys.GAME_ID);
@@ -34,5 +36,6 @@ public abstract class GameHandler extends BaseHandler {
         return handle(user, game, params, exchange);
     }
 
+    @NotNull
     public abstract JsonWrapper handle(User user, Game game, Parameters params, HttpServerExchange exchange) throws BaseCahHandler.CahException;
 }
