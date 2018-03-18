@@ -40,25 +40,31 @@ class EventsReceiver {
     processEvents(events) {
         for (let i = 0; i < events.length; i++) {
             const event = events[i];
-            if (event.E === "pp") {
-                Requester.request("PP", {});
-                continue;
-            } else if (event.E === "PS") {
-                /** @param {int} event.bs - Time before shutdown */
-                let bs;
-                if (event.bs >= 60000) bs = Math.ceil(event.bs / 60000) + " minutes";
-                else bs = Math.ceil(event.bs / 1000) + " seconds";
+            switch (event.E) {
+                case "pp":
+                    Requester.request("PP", {});
+                    break;
+                case "PS":
+                    /** @param {int} event.bs - Time before shutdown */
+                    let bs;
+                    if (event.bs >= 60000) bs = Math.ceil(event.bs / 60000) + " minutes";
+                    else bs = Math.ceil(event.bs / 1000) + " seconds";
 
-                Notifier.show(Notifier.WARN, "The server is preparing for shutdown. The server will be shutdown in " + bs, 20, false);
-                continue;
-            } else if (event.E === "SS") {
-                window.location = "https://google.com"; // TODO: Redirect to server status page
-                continue;
-            }
-
-            for (const key in this.eventListeners) {
-                if (this.eventListeners.hasOwnProperty(key))
-                    this.eventListeners[key](event);
+                    Notifier.show(Notifier.WARN, "The server is preparing for shutdown. The server will be shutdown in " + bs, 20, false);
+                    break;
+                case "SS":
+                    window.location = "https://google.com"; // TODO: Redirect to server status page
+                    break;
+                case "B&":
+                case "kk":
+                    window.location = "/"; // TODO: Redirect to banned/kicked page
+                    break;
+                default:
+                    for (const key in this.eventListeners) {
+                        if (this.eventListeners.hasOwnProperty(key))
+                            this.eventListeners[key](event);
+                    }
+                    break;
             }
         }
     }
