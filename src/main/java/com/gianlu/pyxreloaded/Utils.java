@@ -32,6 +32,12 @@ public class Utils {
         return map;
     }
 
+    public static boolean contains(String[] array, String val) {
+        for (String str : array)
+            if (str.equals(val)) return true;
+        return false;
+    }
+
     @Nullable
     public static String extractParam(HttpServerExchange exchange, String key) {
         Deque<String> deque = exchange.getQueryParameters().get(key);

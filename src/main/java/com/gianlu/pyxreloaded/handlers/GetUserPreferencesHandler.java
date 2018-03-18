@@ -16,6 +16,12 @@ public class GetUserPreferencesHandler extends BaseHandler {
     public JsonWrapper handle(User user, Parameters params, HttpServerExchange exchange) {
         UserAccount account = user.getAccount();
         if (account == null) return JsonWrapper.EMPTY;
-        else return account.preferences.toJson();
+
+        String[] keys;
+        String keysStr = params.getString(Consts.GeneralKeys.USER_PREFERENCES);
+        if (keysStr == null) keys = null;
+        else keys = keysStr.split(",");
+
+        return account.preferences.toJson(keys);
     }
 }

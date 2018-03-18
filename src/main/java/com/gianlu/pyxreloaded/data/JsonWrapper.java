@@ -1,9 +1,11 @@
 package com.gianlu.pyxreloaded.data;
 
 import com.gianlu.pyxreloaded.Consts;
+import com.gianlu.pyxreloaded.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -37,9 +39,12 @@ public class JsonWrapper {
     }
 
     @NotNull
-    public static JsonWrapper from(@NotNull Map<String, String> map) {
+    public static JsonWrapper from(@NotNull Map<String, String> map, @Nullable String[] keys) {
         JsonWrapper wrapper = new JsonWrapper();
-        for (String key : map.keySet()) wrapper.obj.addProperty(key, map.get(key));
+        for (String key : map.keySet()) {
+            if (keys == null || Utils.contains(keys, key))
+                wrapper.obj.addProperty(key, map.get(key));
+        }
         return wrapper;
     }
 

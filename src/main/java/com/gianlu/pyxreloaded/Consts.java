@@ -747,7 +747,7 @@ public final class Consts {
          */
         BEFORE_SHUTDOWN("bs"),
         /**
-         * User preferences object.
+         * User preferences object, also used to filter keys.
          */
         USER_PREFERENCES("up");
 

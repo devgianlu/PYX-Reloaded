@@ -67,8 +67,8 @@ public abstract class UserAccount {
         }
 
         @NotNull
-        public JsonWrapper toJson() {
-            return JsonWrapper.from(this);
+        public JsonWrapper toJson(@Nullable String[] keys) {
+            return JsonWrapper.from(this, keys);
         }
 
         private void update(@NotNull Map<String, String> map) {

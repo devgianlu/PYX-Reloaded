@@ -67,7 +67,7 @@ class Theming {
         };
 
         xmlhttp.open("POST", "/AjaxServlet", true);
-        xmlhttp.send("o=gup");
+        xmlhttp.send("o=gup&up=TpC,TsC");
     }
 
     static getFromCookies() {
