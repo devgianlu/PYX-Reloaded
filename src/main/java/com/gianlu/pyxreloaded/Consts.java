@@ -2,6 +2,7 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.data.User;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,6 +23,29 @@ public final class Consts {
             if (valid.equals(key)) return true;
 
         return false;
+    }
+
+    public enum ChatCommand {
+        BAN("ban"),
+        KICK("kick");
+
+        private final String key;
+
+        ChatCommand(String key) {
+            this.key = key;
+        }
+
+        @Nullable
+        public static ChatCommand parse(String str) {
+            for (ChatCommand cmd : values())
+                if (cmd.key.equals(str)) return cmd;
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
     }
 
     /**

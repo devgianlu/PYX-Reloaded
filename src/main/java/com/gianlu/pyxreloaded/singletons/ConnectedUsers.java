@@ -19,14 +19,14 @@ public final class ConnectedUsers {
     private static final long PING_TIMEOUT = TimeUnit.SECONDS.toMillis(90);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(60);
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class.getSimpleName());
-    private final boolean broadcastConnectsAndDisconnects;
     private final int maxUsers;
     private final Map<String, User> users = new HashMap<>();
     private final int chatFloodCount;
     private final int chatFloodTime;
+    private final BanList banList;
 
-    public ConnectedUsers(Preferences preferences) {
-        this.broadcastConnectsAndDisconnects = false;
+    public ConnectedUsers(BanList banList, Preferences preferences) {
+        this.banList = banList;
         this.maxUsers = preferences.getInt("maxUsers", 400);
         this.chatFloodCount = preferences.getInt("chat/floodCount", 4);
         this.chatFloodTime = preferences.getInt("chat/floodTime", 30) * 1000;
@@ -40,6 +40,45 @@ public final class ConnectedUsers {
 
             user.getLastMessageTimes().remove(0);
         }
+    }
+
+    /**
+     * @return true, if the message was a chat command; false, otherwise.
+     */
+    public boolean runChatCommand(User user, String command) throws BaseCahHandler.CahException {
+        if (!user.isAdmin()) throw new BaseCahHandler.CahException(Consts.ErrorCode.NOT_ADMIN);
+
+        if (!command.startsWith("/")) return false;
+        String[] params = command.substring(1).split("\\s");
+
+        Consts.ChatCommand cmd = Consts.ChatCommand.parse(params[0]);
+        if (cmd == null) return false;
+
+        switch (cmd) {
+            case BAN:
+                User banTarget = getUser(params[1]);
+                if (banTarget == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_SUCH_USER);
+                banUser(banTarget);
+                return true;
+            case KICK:
+                User kickTarget = getUser(params[1]);
+                if (kickTarget == null) throw new BaseCahHandler.CahException(Consts.ErrorCode.NO_SUCH_USER);
+                banUser(kickTarget);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public void banUser(@NotNull User user) {
+        banList.add(user.getHostname());
+        user.enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.KICKED, new EventWrapper(Consts.Event.BANNED)));
+        removeUser(user, Consts.DisconnectReason.BANNED);
+    }
+
+    public void kickUser(@NotNull User user) {
+        user.enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.KICKED, new EventWrapper(Consts.Event.KICKED)));
+        removeUser(user, Consts.DisconnectReason.KICKED);
     }
 
     /**
@@ -81,11 +120,6 @@ public final class ConnectedUsers {
             } else {
                 logger.info(String.format("New user %s from %s (admin=%b)", user.toString(), user.getHostname(), user.isAdmin()));
                 users.put(user.getNickname().toLowerCase(), user);
-                if (broadcastConnectsAndDisconnects) {
-                    EventWrapper ev = new EventWrapper(Consts.Event.NEW_PLAYER);
-                    ev.add(Consts.UserData.NICKNAME, user.getNickname());
-                    broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
-                }
             }
 
             return null;
@@ -105,7 +139,6 @@ public final class ConnectedUsers {
                 logger.info(String.format("Removing user %s because %s", user.toString(), reason));
                 user.noLongerValid();
                 users.remove(user.getNickname().toLowerCase());
-                notifyRemoveUser(user, reason);
 
                 PreparingShutdown.get().tryShutdown(); // This won't allow the LogoutHandler to send the response but we don't really care about the last user to leave the server
             }
@@ -121,22 +154,6 @@ public final class ConnectedUsers {
     @Nullable
     public User getUser(String nickname) {
         return users.get(nickname.toLowerCase());
-    }
-
-    /**
-     * Broadcast to all remaining users that a user has left. Also logs for metrics.
-     *
-     * @param user   User that has left.
-     * @param reason Reason why the user has left.
-     */
-    private void notifyRemoveUser(User user, Consts.DisconnectReason reason) {
-        // Games are informed about the user leaving when the user object is marked invalid.
-        if (broadcastConnectsAndDisconnects) {
-            EventWrapper ev = new EventWrapper(Consts.Event.PLAYER_LEAVE);
-            ev.add(Consts.UserData.NICKNAME, user.getNickname());
-            ev.add(Consts.GeneralKeys.DISCONNECT_REASON, reason.toString());
-            broadcastToAll(QueuedMessage.MessageType.PLAYER_EVENT, ev);
-        }
     }
 
     /**
@@ -170,7 +187,6 @@ public final class ConnectedUsers {
         for (Entry<User, Consts.DisconnectReason> entry : removedUsers.entrySet()) {
             try {
                 entry.getKey().noLongerValid();
-                notifyRemoveUser(entry.getKey(), entry.getValue());
                 logger.info(String.format("Automatically kicking user %s due to %s", entry.getKey(), entry.getValue()));
             } catch (Exception ex) {
                 logger.error("Unable to remove pinged-out user", ex);

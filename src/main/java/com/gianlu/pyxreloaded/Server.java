@@ -59,11 +59,11 @@ public class Server {
         Emails emails = new Emails(serverDatabase, preferences, accounts);
         Providers.add(Annotations.Emails.class, (Provider<Emails>) () -> emails);
 
-        ConnectedUsers connectedUsers = new ConnectedUsers(preferences);
-        Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
-
         BanList banList = new BanList(serverDatabase);
         Providers.add(Annotations.BanList.class, (Provider<BanList>) () -> banList);
+
+        ConnectedUsers connectedUsers = new ConnectedUsers(banList, preferences);
+        Providers.add(Annotations.ConnectedUsers.class, (Provider<ConnectedUsers>) () -> connectedUsers);
 
         ScheduledThreadPoolExecutor globalTimer = new ScheduledThreadPoolExecutor(2 * Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
             private final AtomicInteger threadCount = new AtomicInteger();

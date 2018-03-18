@@ -1,15 +1,22 @@
 package com.gianlu.pyxreloaded.singletons;
 
+import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.handlers.*;
+import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public final class Handlers {
-    public final static Map<String, Class<? extends BaseHandler>> LIST;
+    private final static Map<String, Class<? extends BaseHandler>> LIST;
     private final static List<String> SKIP_USER_CHECK;
+    private static final Map<Class<? extends BaseHandler>, BaseHandler> handlers = new HashMap<>();
 
     static {
         LIST = new HashMap<>();
@@ -55,5 +62,33 @@ public final class Handlers {
 
     public static boolean skipUserCheck(String op) {
         return SKIP_USER_CHECK.contains(op);
+    }
+
+    @NotNull
+    public static BaseHandler obtain(String op) throws BaseCahHandler.CahException {
+        BaseHandler handler;
+        Class<? extends BaseHandler> cls = Handlers.LIST.get(op);
+        if (cls != null) {
+            handler = handlers.get(cls);
+            if (handler == null) {
+                try {
+                    Constructor<?> constructor = cls.getConstructors()[0];
+                    Parameter[] parameters = constructor.getParameters();
+                    Object[] objects = new Object[parameters.length];
+
+                    for (int i = 0; i < parameters.length; i++)
+                        objects[i] = Providers.get(parameters[i].getAnnotations()[0].annotationType()).get();
+
+                    handler = (BaseHandler) constructor.newInstance(objects);
+                    handlers.put(cls, handler);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+                    throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_OP, ex);
+                }
+            }
+        } else {
+            throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_OP);
+        }
+
+        return handler;
     }
 }

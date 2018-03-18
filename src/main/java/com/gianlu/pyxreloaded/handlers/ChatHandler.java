@@ -38,7 +38,7 @@ public class ChatHandler extends BaseHandler {
 
         if (msg.length() > Consts.CHAT_MAX_LENGTH) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.MESSAGE_TOO_LONG);
-        } else {
+        } else if (!users.runChatCommand(user, msg)) {
             user.getLastMessageTimes().add(System.currentTimeMillis());
             EventWrapper ev = new EventWrapper(Consts.Event.CHAT);
             ev.add(Consts.ChatData.FROM, user.getNickname());
