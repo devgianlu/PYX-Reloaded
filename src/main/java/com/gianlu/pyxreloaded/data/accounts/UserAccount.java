@@ -2,7 +2,6 @@ package com.gianlu.pyxreloaded.data.accounts;
 
 import com.gianlu.pyxreloaded.Consts;
 import com.gianlu.pyxreloaded.data.JsonWrapper;
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class UserAccount {
     public final String username;
@@ -53,8 +53,8 @@ public abstract class UserAccount {
         preferences.load(prefs);
     }
 
-    public void updatePreferences(@NotNull JsonObject obj) {
-        preferences.update(obj);
+    public void updatePreferences(@NotNull Map<String, String> map) {
+        preferences.update(map);
     }
 
     public class Preferences extends HashMap<String, String> {
@@ -71,10 +71,10 @@ public abstract class UserAccount {
             return JsonWrapper.from(this);
         }
 
-        private void update(@NotNull JsonObject obj) {
-            for (String key : obj.keySet()) {
+        private void update(@NotNull Map<String, String> map) {
+            for (String key : map.keySet()) {
                 if (Consts.isPreferenceKeyValid(key))
-                    put(key, obj.get(key).toString());
+                    put(key, map.get(key));
             }
         }
     }

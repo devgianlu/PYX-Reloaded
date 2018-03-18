@@ -165,7 +165,7 @@ class Games {
 
     createGame(go) {
         Requester.request("cg", {
-            "go": JSON.stringify(go)
+            "go": go
         }, (data) => {
             Games.postJoinSpectate(data.gid);
             this.loadGamesList();

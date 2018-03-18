@@ -2,6 +2,7 @@ package com.gianlu.pyxreloaded;
 
 import com.gianlu.pyxreloaded.cards.WhiteCard;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.undertow.server.HttpServerExchange;
 import org.apache.http.NameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,12 @@ public class Utils {
         JsonArray jsonArray = new JsonArray(items.size());
         for (String item : items) jsonArray.add(item);
         return jsonArray;
+    }
+
+    public static Map<String, String> toMap(JsonObject obj) {
+        HashMap<String, String> map = new HashMap<>();
+        for (String key : obj.keySet()) map.put(key, obj.get(key).getAsString());
+        return map;
     }
 
     @Nullable

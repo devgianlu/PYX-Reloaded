@@ -126,8 +126,10 @@ class Requester {
         let paramsStr = "";
         for (const key in params) {
             if (paramsStr.length > 0) paramsStr += "&";
-            if (params.hasOwnProperty(key))
-                paramsStr += key + "=" + encodeURIComponent(params[key]);
+            if (params.hasOwnProperty(key)) {
+                const val = params[key];
+                paramsStr += key + "=" + encodeURIComponent(typeof val === "object" ? JSON.stringify(val) : val);
+            }
         }
 
         $.post("/AjaxServlet", paramsStr + "&o=" + op).done((data) => {

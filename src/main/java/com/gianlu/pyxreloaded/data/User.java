@@ -206,6 +206,6 @@ public class User {
 
     @Nullable
     public UserAccount.Preferences getPreferences() {
-        return account != null ? account.getPreferences() : null;
+        return account != null ? account.preferences : null;
     }
 }

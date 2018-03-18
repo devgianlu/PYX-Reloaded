@@ -1,9 +1,7 @@
 function showThemingDialog() {
     const themingDialog = new mdc.dialog.MDCDialog(document.getElementById('themingDialog'));
     themingDialog.listen('MDCDialog:accept', () => {
-        Theming.setPrimaryColor(wheel_.getColorPrimary());
-        Theming.setSecondaryColor(wheel_.getColorSecondary());
-        Theming.apply();
+        Theming.applyKnown(wheel_.getColorPrimary(), wheel_.getColorSecondary());
     });
 
     themingDialog.show();
@@ -13,18 +11,13 @@ let wheel_ = undefined;
 
 function initWheel() {
     wheel_ = new MaterialCustomizer(document.querySelector("#themingWheel > svg"));
-    const primary = Cookies.get("PYX-Theme-Primary");
-    const secondary = Cookies.get("PYX-Theme-Secondary");
-    if (primary === undefined || secondary === undefined) {
-        wheel_.highlightField(DEFAULT_PRIMARY);
-        wheel_.highlightField(DEFAULT_SECONDARY);
-    } else {
+    Theming.get((primary, secondary) => {
         wheel_.highlightFieldRgb(primary);
         wheel_.highlightFieldRgb(secondary);
-    }
 
-    window.requestAnimationFrame(function () {
-        wheel_.updateStylesheet();
+        window.requestAnimationFrame(() => {
+            wheel_.updateStylesheet();
+        });
     });
 }
 

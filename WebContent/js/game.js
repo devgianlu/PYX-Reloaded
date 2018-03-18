@@ -367,7 +367,7 @@ class GameManager {
     changeGameOptions(go) {
         Requester.request("cgo", {
             "gid": this.id,
-            "go": JSON.stringify(go)
+            "go": go
         }, (data) => {
             if ("H" in data) Notifier.timeout(Notifier.SUCCESS, "Your suggestion has been submitted to <b>" + data.H + "</b>.");
             else Notifier.timeout(Notifier.SUCCESS, "Game options changed successfully!");

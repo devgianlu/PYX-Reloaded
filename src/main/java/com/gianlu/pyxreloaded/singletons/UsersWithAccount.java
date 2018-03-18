@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.util.Map;
 
 public final class UsersWithAccount {
     private final ServerDatabase db;
@@ -51,6 +52,8 @@ public final class UsersWithAccount {
     private static ResultSet user(@NotNull Statement statement, @NotNull Consts.AuthType type, @NotNull String key, @NotNull String value) throws SQLException {
         return statement.executeQuery("SELECT * FROM users WHERE " + key + "='" + value + "' AND auth='" + type.toString() + "'");
     }
+
+    // ---- Query methods ---- //
 
     @Nullable
     public PasswordAccount getPasswordAccountForNickname(@NotNull String nickname) throws BaseCahHandler.CahException {
@@ -142,6 +145,8 @@ public final class UsersWithAccount {
         }
     }
 
+    // ---- Add methods ---- //
+
     private void addAccount(@NotNull PasswordAccount account) {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("INSERT INTO users (username, auth, email, email_verified, avatar_url, password) VALUES "
@@ -197,6 +202,19 @@ public final class UsersWithAccount {
         }
     }
 
+    // ---- Update methods ---- //
+
+    public void updatePreferences(UserAccount account, Map<String, String> map) {
+        try (Statement statement = db.statement()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                statement.executeUpdate("INSERT OR REPLACE INTO preferences (username, key, value) VALUES " +
+                        VALUES(account.username, entry.getKey(), entry.getValue()));
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public void updateVerifiedStatus(PasswordAccount account, boolean verified) {
         try (Statement statement = db.statement()) {
             int result = statement.executeUpdate("UPDATE users SET email_verified=" + (verified ? 1 : 0) + " WHERE email='" + account.email + "'");
@@ -205,6 +223,8 @@ public final class UsersWithAccount {
             throw new RuntimeException(ex);
         }
     }
+
+    // ---- Utility methods ---- //
 
     @NotNull
     public PasswordAccount registerWithPassword(@NotNull String nickname, @NotNull String email, @NotNull String password) {
