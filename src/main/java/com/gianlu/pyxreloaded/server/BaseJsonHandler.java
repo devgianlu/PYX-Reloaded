@@ -7,10 +7,9 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import io.undertow.util.StatusCodes;
+import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class BaseJsonHandler implements HttpHandler {
     protected final static Logger logger = Logger.getLogger(BaseJsonHandler.class.getSimpleName());
@@ -39,7 +38,7 @@ public abstract class BaseJsonHandler implements HttpHandler {
                     exchange.getResponseSender().send(obj.toString());
                 }
             } catch (Throwable ex) {
-                logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
+                logger.error("Failed processing the request: " + exchange, ex);
             }
         } else {
             exchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);

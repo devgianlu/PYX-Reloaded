@@ -5,14 +5,13 @@ import com.gianlu.pyxreloaded.data.EventWrapper;
 import com.gianlu.pyxreloaded.data.QueuedMessage;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
 import io.undertow.Undertow;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class PreparingShutdown {
     private static final Logger logger = Logger.getLogger(PreparingShutdown.class.getSimpleName());
@@ -62,7 +61,7 @@ public final class PreparingShutdown {
             globalTimer.schedule(this::kickAndShutdown, shutdownTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             users.broadcastToAll(QueuedMessage.MessageType.SERVER, getEvent());
 
-            logger.log(Level.INFO, "Shutdown will happen at " + shutdownTime);
+            logger.info("Shutdown will happen at " + shutdownTime);
         }
     }
 
@@ -96,7 +95,7 @@ public final class PreparingShutdown {
      * Shutdown the server independently of its status
      */
     private void shutdownNow() {
-        logger.log(Level.INFO, "Waiting for events to be sent...");
+        logger.info("Waiting for events to be sent...");
 
         synchronized (waitForEventsToBeSent) {
             try {
@@ -105,7 +104,7 @@ public final class PreparingShutdown {
             }
         }
 
-        logger.log(Level.INFO, "Shutting down the server!");
+        logger.info("Shutting down the server!");
 
         try {
             server.stop();
@@ -114,7 +113,7 @@ public final class PreparingShutdown {
             serverDatabase.close();
             System.exit(0);
         } catch (SQLException | IOException ex) {
-            logger.log(Level.SEVERE, "Shutdown wasn't clear.", ex);
+            logger.error("Shutdown wasn't clear.", ex);
             System.exit(1);
         }
     }

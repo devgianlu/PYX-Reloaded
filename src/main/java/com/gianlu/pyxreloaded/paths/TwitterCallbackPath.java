@@ -13,14 +13,13 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TwitterCallbackPath implements HttpHandler {
     private static final Logger logger = Logger.getLogger(TwitterCallbackPath.class.getSimpleName());
@@ -66,7 +65,7 @@ public class TwitterCallbackPath implements HttpHandler {
             exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
             exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
+            logger.error("Failed processing the request: " + exchange, ex);
             throw ex;
         }
     }

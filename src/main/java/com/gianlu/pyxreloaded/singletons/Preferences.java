@@ -5,12 +5,12 @@ import com.gianlu.pyxreloaded.data.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.logging.Logger;
 
 public final class Preferences {
     private static final Logger logger = Logger.getLogger(Preferences.class.getSimpleName());

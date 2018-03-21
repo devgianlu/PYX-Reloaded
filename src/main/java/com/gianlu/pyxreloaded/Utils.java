@@ -14,10 +14,32 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Utils {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    public static boolean isVersionNewer(String older, String newer) {
+        String[] olderSplit = older.split("\\.");
+        String[] newerSplit = newer.split("\\.");
+
+        for (int i = 0; i < olderSplit.length && i < newerSplit.length; i++) {
+            int olderNum = Integer.parseInt(olderSplit[i]);
+            int newerNum = Integer.parseInt(newerSplit[i]);
+            if (newerNum > olderNum) return true;
+        }
+
+        return false;
+    }
+
     public static JsonArray toIntsJsonArray(Collection<Integer> items) {
         JsonArray jsonArray = new JsonArray(items.size());
         for (int item : items) jsonArray.add(item);
         return jsonArray;
+    }
+
+    @NotNull
+    public static String getServerVersion(Package pkg) {
+        String version = pkg.getImplementationVersion();
+        if (version == null) version = pkg.getSpecificationVersion();
+        if (version == null) version = System.getenv("version");
+        if (version == null) version = "debug";
+        return version;
     }
 
     public static JsonArray toStringsJsonArray(Collection<String> items) {

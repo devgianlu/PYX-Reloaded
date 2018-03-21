@@ -13,8 +13,8 @@ import java.util.List;
  * @author Andy Janata (ajanata@socialgamer.net)
  */
 public class Player {
-    private final User user;
     public final List<WhiteCard> hand = new LinkedList<>();
+    private final User user;
     private int score = 0;
     private int skipCount = 0;
 

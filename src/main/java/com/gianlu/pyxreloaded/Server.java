@@ -21,6 +21,9 @@ import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.encoding.ContentEncodingRepository;
 import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
@@ -34,7 +37,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 public class Server {
     private static final Logger logger = Logger.getLogger(Server.class.getSimpleName());
@@ -44,8 +46,18 @@ public class Server {
     private static final long BROADCAST_UPDATE_DELAY = TimeUnit.SECONDS.toMillis(60);
 
     public static void main(String[] args) throws IOException, SQLException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        Preferences preferences = Preferences.load(args);
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.INFO);
 
+        for (String arg : args) {
+            if (arg.equals("--update")) {
+                Updater.update();
+                return;
+            }
+        }
+
+
+        Preferences preferences = Preferences.load(args);
         ServerDatabase serverDatabase = new ServerDatabase(preferences);
 
         Providers.add(Annotations.Preferences.class, (Provider<Preferences>) () -> preferences);

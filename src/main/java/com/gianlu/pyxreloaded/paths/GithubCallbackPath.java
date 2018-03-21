@@ -8,11 +8,10 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GithubCallbackPath implements HttpHandler {
     private static final Logger logger = Logger.getLogger(GithubCallbackPath.class.getSimpleName());
@@ -47,7 +46,7 @@ public class GithubCallbackPath implements HttpHandler {
             exchange.getResponseHeaders().add(Headers.LOCATION, REDIRECT_LOCATION);
             exchange.setStatusCode(StatusCodes.TEMPORARY_REDIRECT);
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Failed processing the request: " + exchange, ex);
+            logger.error("Failed processing the request: " + exchange, ex);
             throw ex;
         }
     }

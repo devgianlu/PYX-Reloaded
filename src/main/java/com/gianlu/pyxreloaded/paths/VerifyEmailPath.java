@@ -7,10 +7,9 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class VerifyEmailPath implements HttpHandler {
     private static final Logger logger = Logger.getLogger(VerifyEmailPath.class.getSimpleName());
@@ -50,7 +49,7 @@ public class VerifyEmailPath implements HttpHandler {
                 exchange.getResponseSender().send(ex.getMessage());
             }
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Failed verifying email: ", ex);
+            logger.error("Failed verifying email.", ex);
             throw ex;
         }
     }

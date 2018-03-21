@@ -30,41 +30,29 @@ public class CardcastService {
     private final static AtomicInteger cardId = new AtomicInteger(Integer.MIN_VALUE);
     private static final Logger LOG = Logger.getLogger(CardcastService.class);
     private static final String HOSTNAME = "api.cardcastgame.com";
-
-    public static int getNewCardId() {
-        synchronized (cardId) {
-            return cardId.decrementAndGet();
-        }
-    }
-
     /**
      * Base URL to the Cardcast API.
      */
     private static final String BASE_URL = "https://" + HOSTNAME + "/v1/decks/";
-
     /**
      * URL to the Cardcast API for information about a card set. The only format replacement is the
      * string deck ID.
      */
     private static final String CARD_SET_INFO_URL_FORMAT_STRING = BASE_URL + "%s";
-
     /**
      * URL to the Cardcast API for cards in a card set. The only format replacement is the string
      * deck ID.
      */
     private static final String CARD_SET_CARDS_URL_FORMAT_STRING = CARD_SET_INFO_URL_FORMAT_STRING + "/cards";
-
     /**
      * Connection timeout
      */
     private static final int TIMEOUT = (int) TimeUnit.SECONDS.toMillis(3);
-
     /**
      * How long to cache nonexistent card sets, or after an error occurs while querying for the card
      * set. We need to do this to prevent DoS attacks.
      */
     private static final long INVALID_SET_CACHE_LIFETIME = TimeUnit.SECONDS.toMillis(30);
-
     /**
      * How long to cache valid card sets.
      */
@@ -78,6 +66,12 @@ public class CardcastService {
                     .setConnectionRequestTimeout(TIMEOUT)
                     .build())
             .build();
+
+    public static int getNewCardId() {
+        synchronized (cardId) {
+            return cardId.decrementAndGet();
+        }
+    }
 
     @Nullable
     private CardcastCacheEntry checkCache(String setId) {

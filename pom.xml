@@ -84,6 +84,13 @@
     </build>
 
     <dependencies>
+        <!-- Updater -->
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>1.92</version>
+        </dependency>
+
         <!-- Send emails -->
         <dependency>
             <groupId>org.simplejavamail</groupId>

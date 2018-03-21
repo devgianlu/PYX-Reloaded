@@ -1,10 +1,10 @@
 package com.gianlu.pyxreloaded.paths;
 
+import com.gianlu.pyxreloaded.Utils;
 import com.google.gson.JsonObject;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jetbrains.annotations.NotNull;
 
 public class VersionPath implements HttpHandler {
     private final String json;
@@ -12,17 +12,8 @@ public class VersionPath implements HttpHandler {
     public VersionPath() {
         JsonObject obj = new JsonObject();
         Package pkg = Package.getPackage("com.gianlu.pyxreloaded");
-        obj.addProperty("version", getServerVersion(pkg));
+        obj.addProperty("version", Utils.getServerVersion(pkg));
         json = obj.toString();
-    }
-
-    @NotNull
-    private static String getServerVersion(Package pkg) {
-        String version = pkg.getImplementationVersion();
-        if (version == null) version = pkg.getSpecificationVersion();
-        if (version == null) version = System.getenv("version");
-        if (version == null) version = "debug";
-        return version;
     }
 
     @Override

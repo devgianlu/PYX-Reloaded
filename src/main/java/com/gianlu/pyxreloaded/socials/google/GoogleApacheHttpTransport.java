@@ -11,11 +11,10 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class GoogleApacheHttpTransport extends HttpTransport {
     private static final Logger logger = Logger.getLogger(GoogleApacheHttpTransport.class.getSimpleName());
@@ -115,7 +114,7 @@ public final class GoogleApacheHttpTransport extends HttpTransport {
                     }
                 }
             } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, "", ex);
+                logger.error("IdleConnectionMonitorThread", ex);
             }
         }
 

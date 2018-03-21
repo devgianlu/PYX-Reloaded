@@ -15,6 +15,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
+import org.apache.log4j.Logger;
 import org.xnio.ChannelListener;
 
 import java.io.IOException;
@@ -26,8 +27,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class EventsPath implements WebSocketConnectionCallback {
     /**
@@ -75,7 +74,7 @@ public class EventsPath implements WebSocketConnectionCallback {
                 });
             }
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Failed handling incoming connection: ", ex);
+            logger.error("Failed handling incoming connection.", ex);
             throw ex;
         }
     }

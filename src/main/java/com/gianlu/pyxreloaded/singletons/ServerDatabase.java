@@ -25,4 +25,9 @@ public final class ServerDatabase {
     public void close() throws SQLException {
         conn.close();
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        conn.close();
+    }
 }

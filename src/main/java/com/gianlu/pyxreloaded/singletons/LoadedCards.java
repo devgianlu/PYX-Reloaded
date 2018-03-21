@@ -3,12 +3,12 @@ package com.gianlu.pyxreloaded.singletons;
 import com.gianlu.pyxreloaded.cards.PyxBlackCard;
 import com.gianlu.pyxreloaded.cards.PyxCardSet;
 import com.gianlu.pyxreloaded.cards.PyxWhiteCard;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public final class LoadedCards {
     private static final Logger logger = Logger.getLogger(LoadedCards.class.getSimpleName());
@@ -23,6 +23,11 @@ public final class LoadedCards {
         loadBlackCards();
         loadSets();
         logger.info("Successfully loaded " + sets.size() + " card sets, " + whiteCards.size() + " white cards and " + blackCards.size() + " black cards.");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        conn.close();
     }
 
     @NotNull

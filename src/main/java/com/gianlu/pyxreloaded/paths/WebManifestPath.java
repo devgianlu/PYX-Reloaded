@@ -7,13 +7,13 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.util.Headers;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.util.logging.Logger;
 
 public class WebManifestPath implements HttpHandler {
     private static final Logger logger = Logger.getLogger(WebManifestPath.class.getSimpleName());
@@ -23,7 +23,7 @@ public class WebManifestPath implements HttpHandler {
     public WebManifestPath(Preferences preferences) throws FileNotFoundException {
         File manifest = new File(preferences.getString("webContent", "./WebContent"), "manifest.json");
         if (!manifest.exists() && !manifest.canRead()) {
-            logger.severe("Missing base manifest file. Loading empty.");
+            logger.error("Missing base manifest file. Loading empty.");
             baseManifest = new JsonObject();
         } else {
             baseManifest = new JsonParser().parse(new InputStreamReader(new FileInputStream(manifest))).getAsJsonObject();

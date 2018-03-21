@@ -9,11 +9,11 @@ import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.ETag;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 public class CustomResourceHandler extends ResourceHandler {
     private final boolean cacheEnabled;

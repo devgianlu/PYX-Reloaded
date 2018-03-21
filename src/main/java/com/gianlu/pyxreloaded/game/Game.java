@@ -107,7 +107,7 @@ public class Game {
      *
      * @param id             The game's ID.
      * @param connectedUsers The user manager, for broadcasting messages.
-     * @param gamesManager    The game manager, for broadcasting game list refresh notices and destroying this game
+     * @param gamesManager   The game manager, for broadcasting game list refresh notices and destroying this game
      *                       when everybody leaves.
      * @param globalTimer    The global timer on which to schedule tasks.
      */

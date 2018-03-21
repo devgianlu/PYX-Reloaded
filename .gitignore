@@ -1,5 +1,7 @@
-target
+target/
+.update/
 .idea/
+.backup/
 WebContent/node_modules/
 WebContent/.backup/
 .old/

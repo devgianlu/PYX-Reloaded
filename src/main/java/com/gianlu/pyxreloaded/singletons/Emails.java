@@ -4,6 +4,7 @@ import com.gianlu.pyxreloaded.Utils;
 import com.gianlu.pyxreloaded.data.accounts.PasswordAccount;
 import com.gianlu.pyxreloaded.data.accounts.UserAccount;
 import com.gianlu.pyxreloaded.server.BaseCahHandler;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public final class Emails {
     private static final int SEND_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
