@@ -43,7 +43,7 @@ class EventsReceiver {
             switch (event.E) {
                 case "pp":
                     Requester.request("PP", {});
-                    break;
+                    continue;
                 case "PS":
                     /** @param {int} event.bs - Time before shutdown */
                     let bs;
@@ -51,20 +51,19 @@ class EventsReceiver {
                     else bs = Math.ceil(event.bs / 1000) + " seconds";
 
                     Notifier.show(Notifier.WARN, "The server is preparing for shutdown. The server will be shutdown in " + bs, 20, false);
-                    break;
+                    continue;
                 case "SS":
                     window.location = "https://google.com"; // TODO: Redirect to server status page
-                    break;
+                    continue;
                 case "B&":
                 case "kk":
                     window.location = "/"; // TODO: Redirect to banned/kicked page
-                    break;
+                    continue;
                 default:
                     for (const key in this.eventListeners) {
                         if (this.eventListeners.hasOwnProperty(key))
                             this.eventListeners[key](event);
                     }
-                    break;
             }
         }
     }

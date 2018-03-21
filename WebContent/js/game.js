@@ -497,7 +497,7 @@ class GameManager {
             case "ro":
                 this._lobbyMessage.hide();
                 this._highlightWinningCards(data.WC);
-                if (data.wl) {
+                if (data.ws) {
                     // Someone won the game
                     if (data.rw !== this.user.n) Notifier.timeout(Notifier.ALERT, "<b>" + data.rw + "</b> won the game!");
                 } else {
@@ -655,7 +655,7 @@ class GameManager {
      * @param {string} data.rw - Round winner nickname
      * @param {int} data.i - Round intermission
      * @param {object} data.go - Game options
-     * @param {boolean} data.wl - Whether the game will stop
+     * @param {boolean} data.ws - Whether the game will stop
      * @param {object} data.cdi - Cardcast deck info
      * @param {string} data.cdi.csn - Card set name
      * @param {string} data.H - Game host
@@ -702,7 +702,7 @@ class GameManager {
                 break;
             case "gjl":
                 Notifier.timeout(Notifier.ALERT, "The judge left.");
-                if (!data.wl)
+                if (!data.ws)
                     Notifier.countdown(Notifier.ALERT, "A new round will begin in ", data.i / 1000, " seconds...");
                 break;
             case "gjs":
