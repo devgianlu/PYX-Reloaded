@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -157,6 +158,10 @@ public class Updater {
             HttpEntity entity = resp.getEntity();
             if (entity == null) throw new IllegalStateException("Response has no entity.");
 
+            float length = entity.getContentLength();
+            float downloaded = 0;
+            long partial = 0;
+
             String dir = null;
             try (ZipInputStream zis = new ZipInputStream(entity.getContent())) {
                 byte[] buffer = new byte[4096];
@@ -170,15 +175,25 @@ public class Updater {
                         continue;
                     }
 
-                    // TODO: Log progress
-
                     try (FileOutputStream fos = new FileOutputStream(newFile)) {
                         int len;
-                        while ((len = zis.read(buffer)) > 0) fos.write(buffer, 0, len);
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+
+                            partial += len;
+                            downloaded += len;
+                            if (partial > 1000000) {
+                                partial = 0;
+                                logger.info(String.format(Locale.getDefault(), "Downloaded %.2f%% (%.0fB/%.0fB)", (downloaded / length) * 100f, downloaded, length));
+                            }
+                        }
                     }
                 }
+
                 zis.closeEntry();
             }
+
+            get.releaseConnection();
 
             if (dir == null) throw new IllegalStateException("What happened?");
 
