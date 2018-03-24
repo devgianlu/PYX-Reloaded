@@ -12,6 +12,7 @@
   "cacheEnabled": true,
   "webContent": "./WebContent",
   "pyxDbUrl": "jdbc:sqlite:pyx.sqlite",
+  "serverStatusPage": "http://example.com",
   "chat": {
     "registeredOnly": false,
     "floodCount": 4,

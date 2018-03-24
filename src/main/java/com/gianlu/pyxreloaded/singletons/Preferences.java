@@ -88,6 +88,12 @@ public final class Preferences {
         else return obj.getAsString();
     }
 
+    public String getStringNotEmpty(String key, @Nullable String fallback) {
+        String str = getString(key, fallback);
+        if (str != null && str.isEmpty()) return fallback;
+        return str;
+    }
+
     public int getInt(String key, int fallback) {
         JsonElement obj = get(key);
         if (obj == null) return fallback;

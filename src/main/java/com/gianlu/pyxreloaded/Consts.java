@@ -773,7 +773,11 @@ public final class Consts {
         /**
          * User preferences object, also used to filter keys.
          */
-        USER_PREFERENCES("up");
+        USER_PREFERENCES("up"),
+        /**
+         * The server status page.
+         */
+        SERVER_STATUS_PAGE("ssp");
 
         private final String key;
 

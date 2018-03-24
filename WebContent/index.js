@@ -68,6 +68,9 @@ class LoginManager {
         this.githubSignIn = this._socials.find('#githubSignIn');
 
         this.nickDialog = new NicknameDialog();
+
+        this.statusPage = $('#statusPage');
+        this.statusPage.on('click', () => redirectToStatusPage());
     }
 
     static _postLoggedIn() {
@@ -379,6 +382,7 @@ class LoginManager {
     setup() {
         Requester.request("fl", {}, (data) => {
                 /**
+                 * @param {string} data.ssp - Server status page
                  * @param {object} data.aC - Auth config
                  * @param {string} data.aC.g - Google app id
                  * @param {string} data.aC.fb - Facebook app id
@@ -392,6 +396,9 @@ class LoginManager {
 
                 localStorage['css'] = JSON.stringify(data.css);
                 localStorage['dgo'] = JSON.stringify(data.dgo);
+
+                if (data.ssp === undefined || data.ssp === null) delete localStorage['ssp'];
+                else localStorage['ssp'] = data.ssp;
 
                 if (data.ip) {
                     if (data.next === "game") {

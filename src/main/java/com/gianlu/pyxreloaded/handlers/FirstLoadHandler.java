@@ -19,19 +19,29 @@ import java.util.Set;
 
 public class FirstLoadHandler extends BaseHandler {
     public static final String OP = Consts.Operation.FIRST_LOAD.toString();
-    private final LoadedCards loadedCards;
-    private final Emails emails;
-    private final SocialLogin socials;
-    private final Preferences preferences;
+    private final JsonWrapper defaultGameOptions;
+    private final JsonArray cards;
+    private final JsonWrapper authConfig;
+    private final String serverStatusPage;
 
     public FirstLoadHandler(@Annotations.LoadedCards LoadedCards loadedCards,
                             @Annotations.Emails Emails emails,
                             @Annotations.SocialLogin SocialLogin socials,
                             @Annotations.Preferences Preferences preferences) {
-        this.loadedCards = loadedCards;
-        this.emails = emails;
-        this.socials = socials;
-        this.preferences = preferences;
+        serverStatusPage = preferences.getStringNotEmpty("serverStatusPage", null);
+
+        Set<PyxCardSet> cardSets = loadedCards.getLoadedSets();
+        cards = new JsonArray(cardSets.size());
+        for (PyxCardSet cardSet : cardSets) cards.add(cardSet.getClientMetadataJson().obj());
+
+        defaultGameOptions = GameOptions.getOptionsDefaultsJson(preferences);
+
+        authConfig = new JsonWrapper();
+        if (emails.enabled()) authConfig.add(Consts.AuthType.PASSWORD, emails.senderEmail());
+        if (socials.googleEnabled()) authConfig.add(Consts.AuthType.GOOGLE, socials.googleAppId());
+        if (socials.facebookEnabled()) authConfig.add(Consts.AuthType.FACEBOOK, socials.facebookAppId());
+        if (socials.githubEnabled()) authConfig.add(Consts.AuthType.GITHUB, socials.githubAppId());
+        if (socials.twitterEnabled()) authConfig.add(Consts.AuthType.TWITTER, socials.twitterAppId());
     }
 
     @NotNull
@@ -56,19 +66,10 @@ public class FirstLoadHandler extends BaseHandler {
             }
         }
 
-        JsonWrapper authConfig = new JsonWrapper();
-        if (emails.enabled()) authConfig.add(Consts.AuthType.PASSWORD, emails.senderEmail());
-        if (socials.googleEnabled()) authConfig.add(Consts.AuthType.GOOGLE, socials.googleAppId());
-        if (socials.facebookEnabled()) authConfig.add(Consts.AuthType.FACEBOOK, socials.facebookAppId());
-        if (socials.githubEnabled()) authConfig.add(Consts.AuthType.GITHUB, socials.githubAppId());
-        if (socials.twitterEnabled()) authConfig.add(Consts.AuthType.TWITTER, socials.twitterAppId());
         obj.add(Consts.GeneralKeys.AUTH_CONFIG, authConfig);
-
-        Set<PyxCardSet> cardSets = loadedCards.getLoadedSets();
-        JsonArray cards = new JsonArray(cardSets.size());
-        for (PyxCardSet cardSet : cardSets) cards.add(cardSet.getClientMetadataJson().obj());
         obj.add(Consts.GameOptionsData.CARD_SETS, cards);
-        obj.add(Consts.GameOptionsData.DEFAULT_OPTIONS, GameOptions.getOptionsDefaultsJson(preferences));
+        obj.add(Consts.GameOptionsData.DEFAULT_OPTIONS, defaultGameOptions);
+        obj.add(Consts.GeneralKeys.SERVER_STATUS_PAGE, serverStatusPage);
 
         return obj;
     }

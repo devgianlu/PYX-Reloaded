@@ -163,3 +163,9 @@ class Requester {
         Requester.request(op, params, always, null, always);
     }
 }
+
+function redirectToStatusPage() {
+    const ssp = localStorage['ssp'];
+    if (ssp === undefined || ssp === null) window.location = "http://status." + location.hostname;
+    else window.location = ssp;
+}

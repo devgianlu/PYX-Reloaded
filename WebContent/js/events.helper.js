@@ -53,7 +53,7 @@ class EventsReceiver {
                     Notifier.show(Notifier.WARN, "The server is preparing for shutdown. The server will be shutdown in " + bs, 20, false);
                     continue;
                 case "SS":
-                    window.location = "https://google.com"; // TODO: Redirect to server status page
+                    redirectToStatusPage();
                     continue;
                 case "B&":
                 case "kk":
