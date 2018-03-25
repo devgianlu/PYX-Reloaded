@@ -6,9 +6,9 @@ import io.undertow.util.QueryParameterUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,17 +18,18 @@ public class Parameters extends HashMap<String, String> {
     private Parameters() {
     }
 
-    public static Parameters fromExchange(HttpServerExchange exchange, int length) throws IOException {
-        ByteBuffer body = ByteBuffer.allocate(length);
+    public static Parameters fromExchange(HttpServerExchange exchange) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         InputStream in = exchange.getInputStream();
         byte[] buffer = new byte[8 * 1024];
 
         int read;
         while ((read = in.read(buffer)) != -1)
-            body.put(buffer, 0, read);
+            out.write(buffer, 0, read);
 
         Parameters params = new Parameters();
-        Map<String, Deque<String>> rawParams = QueryParameterUtils.parseQueryString(new String(body.array()), "UTF-8");
+        Map<String, Deque<String>> rawParams = QueryParameterUtils.parseQueryString(new String(out.toByteArray()), "UTF-8");
         for (Map.Entry<String, Deque<String>> entry : rawParams.entrySet())
             params.put(entry.getKey(), entry.getValue().getFirst());
 

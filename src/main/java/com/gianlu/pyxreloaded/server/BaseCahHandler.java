@@ -23,7 +23,7 @@ public abstract class BaseCahHandler extends BaseJsonHandler {
 
         Parameters params;
         try {
-            params = Parameters.fromExchange(exchange, (int) exchange.getRequestContentLength());
+            params = Parameters.fromExchange(exchange);
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new StatusException(StatusCodes.INTERNAL_SERVER_ERROR, ex);
