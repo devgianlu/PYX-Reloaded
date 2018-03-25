@@ -72,7 +72,7 @@ public final class Preferences {
                 parent = parent.getAsJsonObject(path);
         }
 
-        return parent.get(lastPath);
+        return parent == null ? null : parent.get(lastPath);
     }
 
     @NotNull

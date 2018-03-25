@@ -154,6 +154,7 @@ class LoginManager {
     setupGoogle(appId) {
         if (appId === undefined) {
             this.googleSignIn.hide();
+            return false;
         } else {
             $.getScript("https://apis.google.com/js/api:client.js", () => {
                 this.googleSignIn.show();
@@ -168,12 +169,14 @@ class LoginManager {
                         (error) => Notifier.error("Failed signing in with Google.", error));
                 });
             });
+            return true;
         }
     }
 
     setupFacebook(appId) {
         if (appId === undefined) {
             this.facebookSignIn.hide();
+            return false;
         } else {
             $.getScript("https://connect.facebook.net/en_US/sdk.js", () => {
                 FB.init({
@@ -193,28 +196,33 @@ class LoginManager {
                     scope: 'email,public_profile',
                 }));
             });
+            return true;
         }
     }
 
     setupGitHub(appId) {
         if (appId === undefined) {
             this.githubSignIn.hide();
+            return false;
         } else {
             this.githubSignIn.show();
             this.githubSignIn.on('click', () => {
                 window.location = "https://github.com/login/oauth/authorize?scope=read:user,user:email&client_id=" + appId
-            })
+            });
+            return true;
         }
     }
 
     setupTwitter(appId) {
         if (appId === undefined) {
             this.twitterSignIn.hide();
+            return false;
         } else {
             this.twitterSignIn.show();
             this.twitterSignIn.on('click', () => {
                 window.location = "/TwitterStartAuthFlow"
-            })
+            });
+            return true;
         }
     }
 
@@ -401,19 +409,11 @@ class LoginManager {
                 else localStorage['ssp'] = data.ssp;
 
                 if (data.ip) {
-                    if (data.next === "game") {
-                        window.location = "/games/?gid=" + data.gid;
-                    } else {
-                        window.location = "/games/";
-                    }
+                    if (data.next === "game") window.location = "/games/?gid=" + data.gid;
+                    else window.location = "/games/";
                 } else {
                     const authConfig = data.aC;
                     Notifier.debug(authConfig);
-
-                    this.setupGoogle(authConfig.g);
-                    this.setupFacebook(authConfig.fb);
-                    this.setupGitHub(authConfig.gh);
-                    this.setupTwitter(authConfig.tw);
 
                     if ("pw" in authConfig) {
                         this.pyxEmail.parent().show();
@@ -423,17 +423,26 @@ class LoginManager {
                         this.pyxRegister.hide();
                     }
 
-                    switch (getURLParameter("aT")) {
-                        case "gh":
-                            const token = Cookies.getJSON("PYX-Github-Token");
-                            Cookies.remove("PYX-Github-Token");
-                            this._githubSuccess(token);
-                            break;
-                        case "tw":
-                            const tokens = Cookies.getJSON("PYX-Twitter-Token");
-                            Cookies.remove("PYX-Twitter-Token");
-                            this._twitterSuccess(tokens);
-                            break;
+                    if (!this.setupGoogle(authConfig.g)
+                        && !this.setupFacebook(authConfig.fb)
+                        && !this.setupGitHub(authConfig.gh)
+                        && !this.setupTwitter(authConfig.tw)) {
+
+                        this._socials.hide();
+                    } else {
+                        this._socials.show();
+                        switch (getURLParameter("aT")) {
+                            case "gh":
+                                const token = Cookies.getJSON("PYX-Github-Token");
+                                Cookies.remove("PYX-Github-Token");
+                                this._githubSuccess(token);
+                                break;
+                            case "tw":
+                                const tokens = Cookies.getJSON("PYX-Twitter-Token");
+                                Cookies.remove("PYX-Twitter-Token");
+                                this._twitterSuccess(tokens);
+                                break;
+                        }
                     }
                 }
             }, null,
