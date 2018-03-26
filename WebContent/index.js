@@ -423,11 +423,13 @@ class LoginManager {
                         this.pyxRegister.hide();
                     }
 
-                    if (!this.setupGoogle(authConfig.g)
-                        && !this.setupFacebook(authConfig.fb)
-                        && !this.setupGitHub(authConfig.gh)
-                        && !this.setupTwitter(authConfig.tw)) {
+                    let oneVisible = false;
+                    if (this.setupGoogle(authConfig.g)) oneVisible = true;
+                    if (this.setupFacebook(authConfig.fb)) oneVisible = true;
+                    if (this.setupGitHub(authConfig.gh)) oneVisible = true;
+                    if (this.setupTwitter(authConfig.tw)) oneVisible = true;
 
+                    if (!oneVisible) {
                         this._socials.hide();
                     } else {
                         this._socials.show();
