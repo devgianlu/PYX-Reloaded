@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public final class ConnectedUsers {
     private static final long PING_TIMEOUT = TimeUnit.SECONDS.toMillis(90);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(60);
+    private static final long PONG_REICEVE_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
     private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
     private final int maxUsers;
     private final Map<String, User> users = new HashMap<>();
@@ -162,7 +163,7 @@ public final class ConnectedUsers {
      * but have not actually done anything for a long time.
      */
     public void checkForPingAndIdleTimeouts() {
-        final Map<User, Consts.DisconnectReason> removedUsers = new HashMap<>();
+        Map<User, Consts.DisconnectReason> removedUsers = new HashMap<>();
         synchronized (users) {
             Iterator<User> iterator = users.values().iterator();
             while (iterator.hasNext()) {
@@ -170,8 +171,10 @@ public final class ConnectedUsers {
 
                 Consts.DisconnectReason reason = null;
                 if (System.currentTimeMillis() - user.getLastReceivedEvents() > PING_TIMEOUT) {
-                    if (user.isWaitingPong()) reason = Consts.DisconnectReason.PING_TIMEOUT;
-                    else user.sendPing();
+                    if (user.getWhenPongRequested() == -1)
+                        user.sendPing();
+                    else if (System.currentTimeMillis() - user.getWhenPongRequested() > PONG_REICEVE_TIMEOUT)
+                        reason = Consts.DisconnectReason.PING_TIMEOUT;
                 } else if (!user.isAdmin() && System.currentTimeMillis() - user.getLastUserAction() > IDLE_TIMEOUT) {
                     reason = Consts.DisconnectReason.IDLE_TIMEOUT;
                 }

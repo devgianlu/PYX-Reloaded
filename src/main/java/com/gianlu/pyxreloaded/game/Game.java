@@ -1135,7 +1135,7 @@ public class Game {
     private BlackCard getNextBlackCard() {
         try {
             return blackDeck.getNextCard();
-        } catch (final OutOfCardsException e) {
+        } catch (OutOfCardsException ex) {
             blackDeck.reshuffle();
 
             broadcastToPlayers(QueuedMessage.MessageType.GAME_EVENT, new EventWrapper(this, Consts.Event.GAME_BLACK_RESHUFFLE));

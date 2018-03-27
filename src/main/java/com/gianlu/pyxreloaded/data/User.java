@@ -22,12 +22,12 @@ public class User {
     private final String sessionId;
     private final UserAccount account;
     private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
-    private long lastReceivedEvents = 0;
-    private long lastUserAction = 0;
+    private volatile long lastReceivedEvents = System.currentTimeMillis();
+    private volatile long lastUserAction = System.currentTimeMillis();
     private Game currentGame;
     private boolean valid = true;
     private EventsPath.EventsSender eventsSender = null;
-    private boolean waitingPong = false;
+    private volatile long whenPongRequested = -1;
 
     /**
      * Create a new user.
@@ -106,9 +106,10 @@ public class User {
         return eventsSender;
     }
 
-    public void userDidSomething() {
+    public synchronized void userDidSomething() {
         lastUserAction = System.currentTimeMillis();
-        waitingPong = false;
+        lastReceivedEvents = System.currentTimeMillis(); // if it did something, it is clearly still alive
+        whenPongRequested = -1;
     }
 
     /**
@@ -116,27 +117,27 @@ public class User {
      */
     public synchronized void userReceivedEvents() {
         lastReceivedEvents = System.currentTimeMillis();
-        waitingPong = false;
+        whenPongRequested = -1;
     }
 
-    public long getLastUserAction() {
+    public synchronized long getLastUserAction() {
         return lastUserAction;
     }
 
-    public long getLastReceivedEvents() {
+    public synchronized long getLastReceivedEvents() {
         return lastReceivedEvents;
+    }
+
+    public synchronized long getWhenPongRequested() {
+        return whenPongRequested;
     }
 
     /**
      * Send a ping to the client
      */
     public synchronized void sendPing() {
-        waitingPong = true;
+        whenPongRequested = System.currentTimeMillis();
         enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.SERVER, new EventWrapper(Consts.Event.PING)));
-    }
-
-    public synchronized boolean isWaitingPong() {
-        return waitingPong;
     }
 
     /**
