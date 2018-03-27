@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public final class Emails {
     private static final int SEND_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
     private static final int TOKEN_LENGTH = 24;
-    private static final Logger logger = Logger.getLogger(Emails.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(Emails.class);
     private final Mailer mailer;
     private final UsersWithAccount accounts;
     private final ServerDatabase db;

@@ -46,7 +46,7 @@ public class CustomResourceHandler extends ResourceHandler {
     }
 
     private static class ETagSupplier implements PathResourceManager.ETagFunction {
-        private static final Logger logger = Logger.getLogger(ETagSupplier.class.getSimpleName());
+        private static final Logger logger = Logger.getLogger(ETagSupplier.class);
         private final boolean cacheEnabled;
         private final String serverTag;
 

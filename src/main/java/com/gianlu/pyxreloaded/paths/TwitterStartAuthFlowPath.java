@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 public class TwitterStartAuthFlowPath implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(TwitterStartAuthFlowPath.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(TwitterStartAuthFlowPath.class);
     private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
     private final TwitterAuthHelper helper;
 

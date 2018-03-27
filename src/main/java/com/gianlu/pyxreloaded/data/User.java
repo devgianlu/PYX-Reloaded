@@ -114,7 +114,7 @@ public class User {
     /**
      * User received some events or responded to a ping
      */
-    public void userReceivedEvents() {
+    public synchronized void userReceivedEvents() {
         lastReceivedEvents = System.currentTimeMillis();
         waitingPong = false;
     }
@@ -130,12 +130,12 @@ public class User {
     /**
      * Send a ping to the client
      */
-    public void sendPing() {
+    public synchronized void sendPing() {
         waitingPong = true;
         enqueueMessage(new QueuedMessage(QueuedMessage.MessageType.SERVER, new EventWrapper(Consts.Event.PING)));
     }
 
-    public boolean isWaitingPong() {
+    public synchronized boolean isWaitingPong() {
         return waitingPong;
     }
 

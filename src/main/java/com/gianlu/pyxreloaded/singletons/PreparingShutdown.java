@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public final class PreparingShutdown {
-    private static final Logger logger = Logger.getLogger(PreparingShutdown.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(PreparingShutdown.class);
     private static PreparingShutdown instance;
     private final Undertow server;
     private final ScheduledThreadPoolExecutor globalTimer;

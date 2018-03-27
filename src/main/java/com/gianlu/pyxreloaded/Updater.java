@@ -29,7 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Updater {
-    private final static Logger logger = Logger.getLogger(Updater.class.getSimpleName());
+    private final static Logger logger = Logger.getLogger(Updater.class);
     private static final String[] BACKUP_EXCLUDE = {".git", ".backup", ".idea", ".update"};
     private final GHRelease latestRelease;
     private final File currentFiles;

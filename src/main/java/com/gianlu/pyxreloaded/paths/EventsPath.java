@@ -41,7 +41,7 @@ public class EventsPath implements WebSocketConnectionCallback {
      * operation.
      */
     private static final int MAX_MESSAGES_PER_POLL = 20;
-    private static final Logger logger = Logger.getLogger(EventsPath.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(EventsPath.class);
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final Map<User, EventsSender.EventTask> tasks = new HashMap<>();
 

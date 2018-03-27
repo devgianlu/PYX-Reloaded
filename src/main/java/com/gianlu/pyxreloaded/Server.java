@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
-    private static final Logger logger = Logger.getLogger(Server.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(Server.class);
     private static final long PING_START_DELAY = TimeUnit.SECONDS.toMillis(60);
     private static final long PING_CHECK_DELAY = TimeUnit.SECONDS.toMillis(5);
     private static final long BROADCAST_UPDATE_START_DELAY = TimeUnit.SECONDS.toMillis(60);

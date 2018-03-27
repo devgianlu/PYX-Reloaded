@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class TwitterCallbackPath implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(TwitterCallbackPath.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(TwitterCallbackPath.class);
     private static final int COOKIE_MAX_AGE = (int) TimeUnit.MINUTES.toSeconds(5); // sec
     private static final String REDIRECT_LOCATION = "/?" + Consts.GeneralKeys.AUTH_TYPE + "=" + Consts.AuthType.TWITTER;
     private final TwitterAuthHelper helper;

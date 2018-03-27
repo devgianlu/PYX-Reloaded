@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class LoadedCards {
-    private static final Logger logger = Logger.getLogger(LoadedCards.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(LoadedCards.class);
     private final Set<PyxCardSet> sets = new HashSet<>();
     private final Set<PyxWhiteCard> whiteCards = new HashSet<>();
     private final Set<PyxBlackCard> blackCards = new HashSet<>();

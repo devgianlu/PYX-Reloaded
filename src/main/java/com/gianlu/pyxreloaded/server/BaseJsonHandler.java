@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import java.nio.charset.Charset;
 
 public abstract class BaseJsonHandler implements HttpHandler {
-    protected final static Logger logger = Logger.getLogger(BaseJsonHandler.class.getSimpleName());
+    protected final static Logger logger = Logger.getLogger(BaseJsonHandler.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {

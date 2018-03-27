@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 public final class GoogleApacheHttpTransport extends HttpTransport {
-    private static final Logger logger = Logger.getLogger(GoogleApacheHttpTransport.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(GoogleApacheHttpTransport.class);
     private final HttpClient httpClient;
     private final PoolingHttpClientConnectionManager connectionManager;
     private final IdleConnectionMonitorThread idleConnectionMonitorThread;

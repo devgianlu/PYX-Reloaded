@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 import java.net.URLDecoder;
 
 public class WebManifestPath implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(WebManifestPath.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(WebManifestPath.class);
     private final JsonObject baseManifest;
     private final String baseManifestString;
 

@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import java.sql.SQLException;
 
 public class VerifyEmailPath implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(VerifyEmailPath.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(VerifyEmailPath.class);
     private final Emails emails;
 
     public VerifyEmailPath(Emails emails) {

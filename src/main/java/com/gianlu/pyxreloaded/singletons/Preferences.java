@@ -13,7 +13,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 public final class Preferences {
-    private static final Logger logger = Logger.getLogger(Preferences.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(Preferences.class);
     private final JsonObject root;
 
     private Preferences(String json) {

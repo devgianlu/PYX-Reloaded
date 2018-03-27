@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public final class ConnectedUsers {
     private static final long PING_TIMEOUT = TimeUnit.SECONDS.toMillis(90);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(60);
-    private static final Logger logger = Logger.getLogger(ConnectedUsers.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(ConnectedUsers.class);
     private final int maxUsers;
     private final Map<String, User> users = new HashMap<>();
     private final int chatFloodCount;
