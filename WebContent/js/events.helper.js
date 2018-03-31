@@ -57,7 +57,7 @@ class EventsReceiver {
                     continue;
                 case "B&":
                 case "kk":
-                    window.location = "/"; // TODO: Redirect to banned/kicked page
+                    window.location = "/kicked/";
                     continue;
                 default:
                     for (const key in this.eventListeners) {
