@@ -187,7 +187,7 @@ public class GameOptions {
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || !(o instanceof GameOptions)) return false;
+        if (!(o instanceof GameOptions)) return false;
 
         GameOptions that = (GameOptions) o;
 

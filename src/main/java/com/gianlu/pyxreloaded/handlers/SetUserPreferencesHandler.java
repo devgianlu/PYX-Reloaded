@@ -37,7 +37,7 @@ public class SetUserPreferencesHandler extends BaseHandler {
             Map<String, String> map = Utils.toMap(obj);
             account.updatePreferences(map);
             accounts.updatePreferences(account, map);
-            return account.preferences.toJson(map.keySet().toArray(new String[map.size()]));
+            return account.preferences.toJson(map.keySet().toArray(new String[0]));
         } catch (IllegalStateException | JsonSyntaxException ex) {
             throw new BaseCahHandler.CahException(Consts.ErrorCode.BAD_REQUEST, ex);
         }

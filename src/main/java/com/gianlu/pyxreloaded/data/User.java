@@ -21,7 +21,7 @@ public class User {
     private final String hostname;
     private final String sessionId;
     private final UserAccount account;
-    private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<Long>());
+    private final List<Long> lastMessageTimes = Collections.synchronizedList(new LinkedList<>());
     private volatile long lastReceivedEvents = System.currentTimeMillis();
     private volatile long lastUserAction = System.currentTimeMillis();
     private Game currentGame;

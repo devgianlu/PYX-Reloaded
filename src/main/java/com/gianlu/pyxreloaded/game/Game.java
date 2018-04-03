@@ -77,10 +77,10 @@ public class Game {
     private final int MAX_SKIPS_BEFORE_KICK;
 
     private final int id;
-    private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>(10));
-    private final List<Player> roundPlayers = Collections.synchronizedList(new ArrayList<Player>(9));
+    private final List<Player> players = Collections.synchronizedList(new ArrayList<>(10));
+    private final List<Player> roundPlayers = Collections.synchronizedList(new ArrayList<>(9));
     private final PlayerPlayedCardsTracker playedCards = new PlayerPlayedCardsTracker();
-    private final List<User> spectators = Collections.synchronizedList(new ArrayList<User>(10));
+    private final List<User> spectators = Collections.synchronizedList(new ArrayList<>(10));
     private final ConnectedUsers connectedUsers;
     private final GamesManager gamesManager;
     private final GameOptions options;
@@ -162,7 +162,7 @@ public class Game {
      */
     private static boolean toggleLikeDislike(Set<User> one, Set<User> other, User user) {
         if (!one.contains(user)) {
-            if (other.contains(user)) other.remove(user);
+            other.remove(user);
             one.add(user);
             return true;
         } else {
@@ -592,12 +592,12 @@ public class Game {
         }
 
         JsonArray playerNames = new JsonArray();
-        for (Player player : players.toArray(new Player[players.size()]))
+        for (Player player : players.toArray(new Player[0]))
             playerNames.add(player.getUser().getNickname());
         obj.add(Consts.GameInfoData.PLAYERS, playerNames);
 
         JsonArray spectatorNames = new JsonArray();
-        for (User spectator : spectators.toArray(new User[spectators.size()]))
+        for (User spectator : spectators.toArray(new User[0]))
             spectatorNames.add(spectator.getNickname());
         obj.add(Consts.GameInfoData.SPECTATORS, spectatorNames);
 
@@ -609,7 +609,7 @@ public class Game {
      */
     public JsonElement getAllPlayersInfoJson() {
         JsonArray json = new JsonArray(players.size());
-        for (Player player : players.toArray(new Player[players.size()]))
+        for (Player player : players.toArray(new Player[0]))
             json.add(getPlayerInfoJson(player).obj());
 
         return json;
@@ -1074,7 +1074,7 @@ public class Game {
         }
 
         // Deal cards so that everyone has 10 cards or more if draw > 0
-        Player[] playersCopy = players.toArray(new Player[players.size()]);
+        Player[] playersCopy = players.toArray(new Player[0]);
         for (Player player : playersCopy) {
             boolean clearHand = player.hand.size() == 0;
             List<WhiteCard> newCards = new LinkedList<>();
@@ -1151,7 +1151,7 @@ public class Game {
      **/
     @Nullable
     public Player getPlayerForUser(User user) {
-        for (Player player : players.toArray(new Player[players.size()])) {
+        for (Player player : players.toArray(new Player[0])) {
             if (player.getUser() == user) return player;
         }
 
@@ -1253,7 +1253,7 @@ public class Game {
      */
     private List<User> playersToUsers() {
         List<User> users = new ArrayList<>(players.size());
-        for (Player player : players.toArray(new Player[players.size()]))
+        for (Player player : players.toArray(new Player[0]))
             users.add(player.getUser());
 
         synchronized (spectators) {

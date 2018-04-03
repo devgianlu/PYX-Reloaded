@@ -58,7 +58,7 @@ public class CardcastService {
      */
     private static final long VALID_SET_CACHE_LIFETIME = TimeUnit.MINUTES.toMillis(15);
     private static final Pattern validIdPattern = Pattern.compile("[A-Z0-9]{5}");
-    private static final Map<String, SoftReference<CardcastCacheEntry>> cache = Collections.synchronizedMap(new HashMap<String, SoftReference<CardcastCacheEntry>>());
+    private static final Map<String, SoftReference<CardcastCacheEntry>> cache = Collections.synchronizedMap(new HashMap<>());
     private static final HttpClient client = HttpClients.custom()
             .setDefaultRequestConfig(RequestConfig.custom()
                     .setConnectTimeout(TIMEOUT)

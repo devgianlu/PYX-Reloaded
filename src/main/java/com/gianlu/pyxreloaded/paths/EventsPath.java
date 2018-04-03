@@ -149,7 +149,7 @@ public class EventsPath implements WebSocketConnectionCallback {
                 for (QueuedMessage message : toSend)
                     array.add(message.getData().obj());
 
-                for (WebSocketChannel channel : channels.toArray(new WebSocketChannel[channels.size()])) {
+                for (WebSocketChannel channel : channels.toArray(new WebSocketChannel[0])) {
                     try {
                         WebSockets.sendTextBlocking(new JsonWrapper(Consts.GeneralKeys.EVENTS, array).obj().toString(), channel);
                         user.userReceivedEvents();
