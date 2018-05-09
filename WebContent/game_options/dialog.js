@@ -124,7 +124,7 @@ class GameOptionsDialog {
         this._cardcastAddDeckInfo_loading = this._cardcastAddDeckInfo.find('.mdc-linear-progress');
         this._cardcastAddDeckInfo_details = this._cardcastAddDeckInfo.find('.details');
         this._cardcastAddDeckButton = this._cardcastAddDeckInfo.find('.details .mdc-button');
-        this._cardcastAddDeckButton.on('click', () => this.addCardcastDeck(this._cardcastAddDeckInfo_details.data('code')));
+        this._cardcastAddDeckButton.on('click', () => this.addCardcastDeck(this._cardcastAddDeckInfo_details.attr('data-code')));
 
         this._cardsTitle = this._dialog.find('#cardsTitle');
         this._cardcastTitle = this._dialog.find('#cardcastDecksTitle');
